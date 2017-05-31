@@ -258,7 +258,7 @@
   .brickyeditor .brickyeditor-image-input > input {
     display: none; }
 
-[data-bricky-field-name="text"][contenteditable="true"]:focus, [data-bricky-field-name="text"][contenteditable="true"]:hover {
+[data-bricky-field-type="html"][contenteditable="true"]:focus, [data-bricky-field-type="html"][contenteditable="true"]:hover {
   outline: 1px dotted #777; }
 
 #brickyeditorLoader {

@@ -44,7 +44,7 @@
     }
 }
 
-[data-bricky-field-name="text"][contenteditable="true"] {
+[data-bricky-field-type="html"][contenteditable="true"] {
     &:focus, &:hover {
         outline: 1px dotted $color-contenteditable-border;
     }
