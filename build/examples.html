@@ -28,7 +28,7 @@
                             var html = editor.getHtml();             
                             var $tab = $('#tabHtml');
                             $tab.find("code").text(html);
-                            $tab.tab('show');
+                            //$tab.tab('show');
                             hljs.highlightBlock($tab.find("code")[0]);
                         });
 
@@ -36,18 +36,13 @@
                             var data = editor.getData();    
                             var $tab = $('#tabJson');                                                    
                             $tab.find("code").text(JSON.stringify(data, null, "\t"));
-                            $tab.tab('show');
+                            //$tab.tab('show');
                             hljs.highlightBlock($tab.find("code")[0]);
                         });
                     }
                 });                
             });
         </script>
-        <style>
-            .brickyeditor-tools {
-                top: 58px;
-            }
-        </style>
     </head>
     <body>
 

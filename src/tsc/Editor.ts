@@ -100,7 +100,7 @@ namespace BrickyEditor {
         private addTools() {
             let editor = this;
             let categories: Array<string> = new Array<string>();
-            var $templates = $(Constants.selectorTemplates, editor.$tools);
+            let $templates = $(Constants.selectorTemplates, editor.$tools);
             $templates.hide();
             editor.$el.append(editor.$tools);
                                             
