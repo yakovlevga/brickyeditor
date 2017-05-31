@@ -4,7 +4,7 @@
         "module": "amd",
         "outFile": "jquery.brickyeditor.js",
         "removeComments": true,
-        "declaration": true
+        "declaration": true  
     },
     "typeRoots": ["types"]    
 }

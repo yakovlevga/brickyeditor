@@ -31,15 +31,13 @@ gulp.task('ts', function() {
         .pipe(tsProject());    
 
     return [
-        // tsResult.dts
-        // .pipe(gulp.dest(paths.buildJs)),
-        
         tsResult.js        
         .pipe(gulp.dest(paths.buildJs))
+        .pipe(gulp.dest(paths.dist))
         .pipe(uglify({ preserveComments: 'false' })) 
-        //.pipe(sourcemaps.write('.'))
         .pipe(rename({ suffix: '.min'}))
-        .pipe(gulp.dest(paths.buildJs))];
+        .pipe(gulp.dest(paths.buildJs))
+        .pipe(gulp.dest(paths.dist))];
 });
 
 gulp.task('sass', function () {    
@@ -50,7 +48,8 @@ gulp.task('sass', function () {
         .pipe(gulp.dest(paths.dist))
         .pipe(cleanCss())
         .pipe(rename({ suffix: '.min'}))
-        .pipe(gulp.dest(paths.buildCss));
+        .pipe(gulp.dest(paths.buildCss))
+        .pipe(gulp.dest(paths.dist));        
 });
 
 gulp.task('default', ['clearBuild', 'ts', 'sass']);
