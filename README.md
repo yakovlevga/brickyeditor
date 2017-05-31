@@ -10,6 +10,9 @@ Your longrids and articles will be in one clean style.
 Since **BrickyEditor** can save blocks as JSON, not only in rendered HTML, you can easily deliver your content to mobile platforms 
 and render it natively, without
 
+## Demo page
+[see demo for details](http://brickyeditor.info/examples.html)
+
 ## Basic usage
 1. Copy files from brickyeditor\build to your site folder.
 2. Add `<script src="js/jquery.brickyeditor.js"></script>` to your page.
