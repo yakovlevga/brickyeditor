@@ -1,0 +1,45 @@
+.brickyeditor {
+    input, select {
+        display: block;
+        width: 100%;
+        padding: .5rem .75rem;
+        font-size: 1rem;
+        line-height: 1.25;
+        color: #464a4c;
+        background-color: #fff;
+        border: 1px solid rgba(0,0,0,.15);
+        border-radius: .25rem;
+
+        &:focus {
+            color: #464a4c;
+            background-color: #fff;
+            border-color: #5cb3fd;
+            outline: 0;
+        }
+    }
+
+    .brickyeditor-prompt-field {
+        margin-bottom: 1rem;
+    }
+
+    .brickyeditor-image-input {
+        background: silver;
+        width: 100px;
+        height: 100px;
+        content: 'select file';
+        img {
+            cursor: pointer;
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+        }
+    
+        .brickyeditor-image-input .brickyeditor-image-input-filename {
+            font-style: italic;
+        }
+
+        > input {
+            display: none;
+        }
+    }
+}

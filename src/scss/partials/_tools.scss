@@ -1,0 +1,63 @@
+@import '_base';
+
+$block-name : tools;
+
+
+.#{$base}-#{$block-name} {
+    @include fixed($left: null);
+    background: $panel-background;
+    width: $tools-width;
+    height: 100%;
+    overflow: hidden;
+
+    .templates {
+        width: $tools-width + $scrollbar-width;
+        height: 99%;
+        overflow: auto;    
+    
+        .template {
+            cursor: pointer;
+            background: #fff;
+            zoom: 0.4;
+            user-select: none;
+
+            &:hover {
+                background: darken(#fff, 5%);
+            }
+        }
+    }
+
+    // .brickyeditor-tools .bricky-template {
+    //     cursor: pointer;
+    //     background: #fff;
+    //     padding: 16px 8px;
+    //     margin: 0 6px 6px 12px;
+    //     zoom: 0.5;
+    // }
+
+
+    // .brickyeditor-tools-hidden {
+    //     right: -180px;
+    //     background-color: #ccc;
+    // }
+}
+
+
+// .#{$base}-#{$block-name} {
+//     position: fixed;
+//     left: 0px;
+//     top: 0px;
+//     height: 100%;    
+//     z-index: 101;    
+
+
+//     .#{$base}-#{$block-name}-panel {
+//         position: absolute;
+//         background-color: #eee;
+//         border-radius: .25rem;
+//         padding: .5rem;
+//         margin: 0 .5rem;
+//         top: 30%;
+//         text-align: center;
+//     }
+// }

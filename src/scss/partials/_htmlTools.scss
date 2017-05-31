@@ -1,0 +1,14 @@
+.brickyeditor-html-tools {
+    @include fixed($right: null, $bottom: null);
+    height: 100%;    
+
+    .panel {
+        position: absolute;
+        background-color: #eee;
+        border-radius: .25rem;
+        padding: .5rem;
+        margin: 0 .5rem;
+        top: 30%;
+        text-align: center;
+    }
+}

@@ -1,0 +1,10 @@
+$fixed-z-index: 101;
+
+@mixin fixed($top: 0px, $right: 0px, $bottom: 0px, $left: 0px) {
+    position: fixed;
+    @if($top) { top: $top; }
+    @if($right) { right: $right; }
+    @if($bottom) { bottom: $bottom; }
+    @if($left) { left: $left; }
+    z-index: $fixed-z-index;
+}

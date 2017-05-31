@@ -1,0 +1,14 @@
+@import '_base';
+
+$oembed: "oembed";
+
+.#{$base} {
+    .#{$base}-#{$oembed} {
+        text-align: center;
+
+        blockquote,
+        iframe {
+        @include margin-middle-important();
+        }    
+    }
+}

@@ -1,0 +1,136 @@
+[
+    { 
+        "file": "embed", 
+        "title": "Insta", 
+        "category": ["Embed"]
+    },
+
+    { 
+        "file": "h1", 
+        "title": "Heading 1", 
+        "category": ["Title"]
+    },
+
+    { 
+        "file": "h2", 
+        "title": "Heading 2", 
+        "category": ["Title"]
+    },
+    { 
+        "file": "h3", 
+        "title": "Heading 3", 
+        "category": ["Title"]
+    },
+    { 
+        "file": "h4", 
+        "title": "Heading 4", 
+        "category": ["Title"]
+    },
+    { 
+        "file": "h5", 
+        "title": "Heading 5", 
+        "category": ["Title"]
+    },
+    { 
+        "file": "h6", 
+        "title": "Heading 6", 
+        "category": ["Title"]
+    },
+
+    { 
+        "file": "h1-display", 
+        "title": "Display Heading 1", 
+        "category": ["Title"]
+    },
+
+    { 
+        "file": "h2-display", 
+        "title": "Display Heading 2", 
+        "category": ["Title"]
+    },
+
+    { 
+        "file": "h3-display", 
+        "title": "Display Heading 3", 
+        "category": ["Title"]
+    },
+
+    { 
+        "file": "h4-display", 
+        "title": "Display Heading 4", 
+        "category": ["Title"]
+    },
+
+    { 
+        "file": "hr", 
+        "title": "Horizontal rule", 
+        "category": ["Delimeters"]
+    },
+
+    { 
+        "file": "p", 
+        "title": "Paragraph", 
+        "category": ["Text"]
+    },
+    { 
+        "file": "plead", 
+        "title": "Lead paragraph", 
+        "category": ["Text"]
+    },
+    { 
+        "file": "2columns", 
+        "title": "Two columns text", 
+        "category": ["Text", "Columns"]
+    },
+
+    { 
+        "file": "3columns", 
+        "title": "Three columns text", 
+        "category": ["Text", "Columns"]
+    },
+
+    { 
+        "file": "3cards", 
+        "title": "Three card", 
+        "category": ["Text", "Image", "Columns"]
+    },
+
+    { 
+        "file": "img", 
+        "title": "Image", 
+        "category": ["Image"]
+    },
+
+    { 
+        "file": "text-img-4", 
+        "title": "Image on right", 
+        "category": ["Text", "Columns", "Image"]
+    },
+
+    { 
+        "file": "text-img-3", 
+        "title": "Image on right", 
+        "category": ["Text", "Columns", "Image"]
+    },
+    {
+        "file": "text-img-2",
+        "title": "Image on right", 
+        "category": ["Text", "Columns", "Image"]
+    },
+
+    { 
+        "file": "img-4-text", 
+        "title": "Image on left", 
+        "category": ["Text", "Columns", "Image"]
+    },
+    { 
+        "file": "img-3-text", 
+        "title": "Image on left", 
+        "category": ["Text", "Columns", "Image"]
+    },
+    { 
+        "file": "img-2-text", 
+        "title": "Image on left", 
+        "category": ["Text", "Columns", "Image"]
+    }
+]

@@ -1,0 +1,40 @@
+@import '_base';
+
+@mixin btn($type, $bg, $color: #555) {
+    .btn-#{$type} {
+        background-color: $bg;
+        @if($color) { color: $color; }
+        &:hover {
+            background-color: darken($bg, 10%);
+            @if($color) { color: darken($color, 10%); }
+        }
+    }
+}
+
+.#{$base}
+{
+    .btn { 
+        cursor: pointer;
+        display: inline-block;
+        margin: 0 10px 0 0;
+        line-height: 1.8;
+        appearance: none;
+        box-shadow: none;
+        border-radius: 5%;
+        background-color: #fff;
+        border: none;
+
+        &:focus {
+            outline: none
+        }
+
+        &:hover {
+            color: #000;
+            //box-shadow: inset 0 0 0 1px #ccc,0 5px 15px #999;
+        }
+    }
+
+    @include btn(ok, $color-btn-success-bg);
+    @include btn(cancel, #eee);
+    @include btn(clear, $color-transparent, $color-btn-dark); 
+}
