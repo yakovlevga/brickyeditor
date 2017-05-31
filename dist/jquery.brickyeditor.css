@@ -258,6 +258,9 @@
   .brickyeditor .brickyeditor-image-input > input {
     display: none; }
 
+[data-bricky-field-name="text"][contenteditable="true"]:focus, [data-bricky-field-name="text"][contenteditable="true"]:hover {
+  outline: 1px dotted #777; }
+
 #brickyeditorLoader {
   position: absolute;
   top: 0;

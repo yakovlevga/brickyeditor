@@ -3,7 +3,7 @@
     <head>        
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-        
+        <title>BrickyEditor - WYSIWYG longrid editor.</title>
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
         <link rel="stylesheet" href="lib/css/font-awesome.min.css">
         <link rel="stylesheet" href="css/jquery.brickyeditor.min.css">
@@ -28,7 +28,6 @@
                             var html = editor.getHtml();             
                             var $tab = $('#tabHtml');
                             $tab.find("code").text(html);
-                            //$tab.tab('show');
                             hljs.highlightBlock($tab.find("code")[0]);
                         });
 
@@ -36,7 +35,6 @@
                             var data = editor.getData();    
                             var $tab = $('#tabJson');                                                    
                             $tab.find("code").text(JSON.stringify(data, null, "\t"));
-                            //$tab.tab('show');
                             hljs.highlightBlock($tab.find("code")[0]);
                         });
                     }

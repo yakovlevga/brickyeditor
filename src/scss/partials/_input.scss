@@ -43,3 +43,9 @@
         }
     }
 }
+
+[data-bricky-field-name="text"][contenteditable="true"] {
+    &:focus, &:hover {
+        outline: 1px dotted $color-contenteditable-border;
+    }
+}
