@@ -2,7 +2,6 @@
 
 $block-name : tools;
 
-
 .#{$base}-#{$block-name} {
     @include fixed($left: null);
     background: $panel-background;

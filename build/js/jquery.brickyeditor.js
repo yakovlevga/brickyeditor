@@ -17,15 +17,41 @@ var BrickyEditor;
             this.editor = editor;
             this.template = templateName;
             var template = BrickyEditor.TemplateService.getTemplate(templateName);
-            var $editor = $(template.html);
-            this.$editor = $editor;
-            this.bindEditorFields(data);
+            this.$block = $(template.html);
+            this.$editor = this.getBlockTools(this.$block);
+            this.bindBlockFields(data);
         }
-        Block.prototype.showControls = function ($blockEditor) {
-        };
-        Block.prototype.bindEditorFields = function (data) {
+        Block.prototype.getBlockTools = function ($block) {
             var block = this;
-            this.$editor
+            var $tools = $("<div class='brickyeditor-block-wrapper'>\n                    <div  class='brickyeditor-block-tools'>\n                        <a class='fa fa-trash-o' data-brickyeditor-block-action='" + BlockAction.Delete + "'></a>\n                        <a class='fa fa-copy' data-brickyeditor-block-action='" + BlockAction.Copy + "'></a>\n                        <a class='fa fa-angle-up' data-brickyeditor-block-action='" + BlockAction.Up + "'></a>\n                        <a class='fa fa-angle-down' data-brickyeditor-block-action='" + BlockAction.Down + "'></a>\n                    </div>\n                </div>");
+            $('[data-brickyeditor-block-action]', $tools).on('click', function () {
+                var action = $(this).attr('data-brickyeditor-block-action');
+                block.action(parseInt(action));
+            });
+            $tools.append($block);
+            return $tools;
+        };
+        Block.prototype.action = function (action) {
+            switch (action) {
+                case BlockAction.Delete:
+                    this.editor.deleteBlock(this);
+                    break;
+                case BlockAction.Up:
+                    this.editor.moveBlock(this, -1);
+                    break;
+                case BlockAction.Down:
+                    this.editor.moveBlock(this, +1);
+                    break;
+                case BlockAction.Copy:
+                    this.editor.copyBlock(this);
+                    break;
+                default:
+                    break;
+            }
+        };
+        Block.prototype.bindBlockFields = function (data) {
+            var block = this;
+            this.$block
                 .find(BrickyEditor.Constants.selectorField)
                 .addBack(BrickyEditor.Constants.selectorField)
                 .each(function () {
@@ -57,7 +83,7 @@ var BrickyEditor;
             };
         };
         Block.prototype.getHtml = function (trim) {
-            var $html = this.$editor.clone();
+            var $html = this.$block.clone();
             $html
                 .find(BrickyEditor.Constants.selectorField)
                 .addBack(BrickyEditor.Constants.selectorField)
@@ -78,6 +104,15 @@ var BrickyEditor;
         return Block;
     }());
     BrickyEditor.Block = Block;
+    var BlockAction;
+    (function (BlockAction) {
+        BlockAction[BlockAction["Delete"] = 0] = "Delete";
+        BlockAction[BlockAction["Settings"] = 1] = "Settings";
+        BlockAction[BlockAction["Copy"] = 2] = "Copy";
+        BlockAction[BlockAction["Up"] = 3] = "Up";
+        BlockAction[BlockAction["Down"] = 4] = "Down";
+    })(BlockAction || (BlockAction = {}));
+    ;
 })(BrickyEditor || (BrickyEditor = {}));
 String.prototype.breContains = function (part) {
     return this.indexOf(part) >= 0;
@@ -205,6 +240,7 @@ var BrickyEditor;
     Constants.selectorField = "[" + Constants.field + "]";
     Constants.selectorHtmlToolsCommand = '[data-brickyeditor-doc-command]';
     Constants.selectorHtmlToolsCommandRange = '[data-brickyeditor-doc-command-range]';
+    Constants.selectorBlockWrapper = '.brickyeditor-block-wrapper';
     Constants.dummyText = "On the other hand, we denounce with righteous indignation and dislike men who are so beguiled and demoralized by the charms of pleasure of the moment, so blinded by desire, that they cannot foresee the pain and trouble that are bound to ensue.";
     BrickyEditor.Constants = Constants;
 })(BrickyEditor || (BrickyEditor = {}));
@@ -322,12 +358,41 @@ var BrickyEditor;
                 $hideBtn.toggleClass("fa-arrow-left").toggleClass("fa-arrow-right");
             });
         };
-        Editor.prototype.addBlock = function (template, data) {
+        Editor.prototype.addBlock = function (template, data, idx) {
             var block = new BrickyEditor.Block(this, template, data);
-            var blockTools = "<div class='brickyeditor-block-tools'>\n                <div class='brickyeditor-icon brickyeditor-icon-x'></div>\n                <div class='brickyeditor-icon brickyeditor-icon-cog'></div>\n                <div class='brickyeditor-icon brickyeditor-icon-up'></div>\n                <div class='brickyeditor-icon brickyeditor-icon-down'></div>\n            </div>";
-            this.$el.append(blockTools);
-            this.$el.append(block.$editor);
-            this.blocks.push(block);
+            if (idx != null) {
+                this.$el.children(BrickyEditor.Constants.selectorBlockWrapper).eq(idx).after(block.$editor);
+                this.blocks.splice(idx, 0, block);
+            }
+            else {
+                this.$el.append(block.$editor);
+                this.blocks.push(block);
+            }
+        };
+        Editor.prototype.deleteBlock = function (block) {
+            var idx = this.blocks.indexOf(block);
+            this.blocks.splice(idx, 1);
+            block.$editor.remove();
+            block = null;
+        };
+        Editor.prototype.moveBlock = function (block, offset) {
+            var idx = this.blocks.indexOf(block);
+            var new_idx = idx + offset;
+            if (new_idx < this.blocks.length && new_idx >= 0) {
+                var $anchorBlock = this.blocks[new_idx].$editor;
+                if (offset > 0) {
+                    $anchorBlock.after(block.$editor);
+                }
+                else if (offset < 0) {
+                    $anchorBlock.before(block.$editor);
+                }
+                this.blocks.splice(idx, 1);
+                this.blocks.splice(new_idx, 0, block);
+            }
+        };
+        Editor.prototype.copyBlock = function (block) {
+            var idx = this.blocks.indexOf(block);
+            this.addBlock(block.template, block.getData().fields, idx);
         };
         Editor.prototype.getData = function () {
             var blocksData = [];

@@ -401,3 +401,13 @@
   100% {
     left: 0px;
     -moz-transform: scale(0.5, 1); } }
+
+.brickyeditor-block-tools {
+  width: 64px;
+  margin-left: -80px;
+  float: left; }
+  .brickyeditor-block-tools a {
+    color: #777 !important;
+    cursor: pointer; }
+    .brickyeditor-block-tools a:hover {
+      color: #aaaaaa !important; }

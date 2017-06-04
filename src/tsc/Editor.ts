@@ -157,18 +157,46 @@ namespace BrickyEditor {
             // });            
         }
 
-        private addBlock(template: string, data? : Array<Fields.BaseField>) {
+        private addBlock(template: string, data? : Array<Fields.BaseField>, idx? : number) {
             var block = new Block(this, template, data);
-            var blockTools = 
-            `<div class='brickyeditor-block-tools'>
-                <div class='brickyeditor-icon brickyeditor-icon-x'></div>
-                <div class='brickyeditor-icon brickyeditor-icon-cog'></div>
-                <div class='brickyeditor-icon brickyeditor-icon-up'></div>
-                <div class='brickyeditor-icon brickyeditor-icon-down'></div>
-            </div>`;
-            this.$el.append(blockTools);
-            this.$el.append(block.$editor);
-            this.blocks.push(block);
+            if(idx != null) {   
+                this.$el.children(Constants.selectorBlockWrapper).eq(idx).after(block.$editor);
+                this.blocks.splice(idx, 0, block);
+            }
+            else {
+                this.$el.append(block.$editor);
+                this.blocks.push(block);
+            }
+        }
+
+        public deleteBlock(block: Block) {
+            let idx = this.blocks.indexOf(block);
+            this.blocks.splice(idx, 1);
+            block.$editor.remove();
+            block = null;
+        }
+
+        public moveBlock(block: Block, offset: number) {
+            let idx = this.blocks.indexOf(block);
+            let new_idx = idx + offset;
+
+            if (new_idx < this.blocks.length && new_idx >= 0) {
+                var $anchorBlock = this.blocks[new_idx].$editor;
+                if(offset > 0) {
+                    $anchorBlock.after(block.$editor);
+                }
+                else if (offset < 0) {
+                    $anchorBlock.before(block.$editor);
+                }
+
+                this.blocks.splice(idx, 1);
+                this.blocks.splice(new_idx, 0, block);
+            }
+        }
+
+        public copyBlock(block: Block) {
+            let idx = this.blocks.indexOf(block);
+            this.addBlock(block.template, block.getData().fields, idx);
         }
         
         public getData() : any {

@@ -18,6 +18,8 @@ namespace BrickyEditor {
 
         public static selectorHtmlToolsCommand = '[data-brickyeditor-doc-command]';
         public static selectorHtmlToolsCommandRange = '[data-brickyeditor-doc-command-range]';
+
+        public static selectorBlockWrapper = '.brickyeditor-block-wrapper';
         
         public static dummyText = "On the other hand, we denounce with righteous indignation and dislike men who are so beguiled and demoralized by the charms of pleasure of the moment, so blinded by desire, that they cannot foresee the pain and trouble that are bound to ensue.";
     }
