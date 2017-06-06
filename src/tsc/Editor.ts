@@ -14,13 +14,38 @@ namespace BrickyEditor {
         // UI
         private $el: JQuery; // jquery element of editor
         private $tools: JQuery; // jquery element of editor tools
-        private $filter: JQuery; // blocks filter             
+        private $filter: JQuery; // blocks filter      
+        private $toolsBtn: JQuery; // show tools button
+
+        
+        private compactTools? : Boolean = null;
+        private _isMobile : Boolean;
+        public get isMobile() : Boolean {
+            return this._isMobile;
+        }
+        public set isMobile(value : Boolean) {
+            if(this._isMobile == value)
+                return;
+                
+            this._isMobile = value;
+            if(this.$tools != null) {
+                this.$tools.toggle(!value);                
+                this.$toolsBtn.toggle(value);
+                if(value) {
+                    this.$tools.addClass(Constants.classMobile);
+                }
+                else {
+                    this.$tools.removeClass(Constants.classMobile);
+                }
+            }
+        } 
 
         constructor($el: JQuery, options: EditorOptions) {
             let editor = this;
             this.options = options ? options : new EditorOptions();
             $.extend(this.options, new EditorOptions());
             this.$el = $el;
+            
             this
                 .loadTemplatesAsync()
                 .done(function() {
@@ -68,6 +93,11 @@ namespace BrickyEditor {
                 .loadTemplateAsync(editor.options.templatesBaseFolder, Constants.templateToolsKey)
                 .done(function(html) {
                     editor.$tools = $(html);
+                    let toolsBtn = `<button class='brickyeditor-tools-show-btn'><i class='fa fa-cog'></i></button>`;
+                    editor.$toolsBtn = $(toolsBtn);
+                    editor.$toolsBtn.on('click', () => {
+                        editor.modal.showModal(editor.$tools.clone(true));
+                    });
                 })
                 .fail(function(err) {
                     console.log("Tools loading error");
@@ -81,6 +111,9 @@ namespace BrickyEditor {
                     var htmlTools = new HtmlTools(html, editor);
                     editor.htmlTools = htmlTools;
                     editor.$el.append(htmlTools.$control);
+
+                    //todo: hide tools for mobile
+                    //htmlTools.$control.hide();
                 })
                 .fail(function(err) {
                     console.log("Html Tools loading error");
@@ -91,6 +124,10 @@ namespace BrickyEditor {
                 .apply($, tasks)
                 .then(function() { 
                     editor.addTools();
+
+                    // subscribe to window resizing, to check if need to show mobile version
+                    $(window).resize(() => editor.checkIsCompactTools(editor));
+
                     result.resolve(); 
                 });
 
@@ -103,11 +140,19 @@ namespace BrickyEditor {
             let $templates = $(Constants.selectorTemplates, editor.$tools);
             $templates.hide();
             editor.$el.append(editor.$tools);
-                                            
+            editor.$el.append(editor.$toolsBtn);
+
+            // Set is mobile if there is not enough of space for tools
+            // or if it's not forced by compactTools in passed settings.
+            editor.checkIsCompactTools(editor);            
+
+            // editor.$tools.toggle(!editor.isMobile);
+            // editor.$toolsBtn.toggle(editor.isMobile);
+
             for (var templateName in TemplateService.templates) {
                 let block = new Block(null, templateName);
                 let template = TemplateService.templates[templateName];
-                let $template = $(`<div class='template m-r-1 m-b-1 m-l-1 p-1' data-bricky-template="${templateName}">${block.getHtml(true)}</div>`);
+                let $template = $(`<div class='template m-1 p-1' data-bricky-template="${templateName}">${block.getHtml(true)}</div>`);
                 $templates.append($template);
 
                 // fill all templates categories
@@ -127,8 +172,6 @@ namespace BrickyEditor {
                     editor.addBlock(template);
                 });
 
-
-
             $(Constants.selectorLoader, editor.$tools)
                 .fadeOut('slow', function() {
                     $templates.fadeIn('fast');
@@ -137,14 +180,25 @@ namespace BrickyEditor {
             let $hideBtn = $('[data-brickyeditor-hide-tools]', editor.$tools);
             $hideBtn.on('click', function() {
                 if($hideBtn.attr("data-brickyeditor-hide-tools")) {
-                    editor.$tools.animate({ right: '-204px'}, 'fast')
-                    $hideBtn.removeAttr("data-brickyeditor-hide-tools");
+                    if(editor.isMobile) {
+                        editor.$tools.hide();
+                        editor.$toolsBtn.show();
+                    }
+                    else {
+                        editor.$tools.animate({ right: '-204px'}, 'fast')
+                        $hideBtn.removeAttr("data-brickyeditor-hide-tools");
+                        $hideBtn.toggleClass("fa-arrow-left").toggleClass("fa-arrow-right");                        
+                    }
                 }
                 else {
-                    editor.$tools.animate({ right: '0px'}, 'fast');
-                    $hideBtn.attr("data-brickyeditor-hide-tools", "true");
+                    if(editor.isMobile) {
+                    }
+                    else {
+                        editor.$tools.animate({ right: '0px'}, 'fast');
+                        $hideBtn.attr("data-brickyeditor-hide-tools", "true");
+                        $hideBtn.toggleClass("fa-arrow-left").toggleClass("fa-arrow-right");
+                    }
                 }
-                $hideBtn.toggleClass("fa-arrow-left").toggleClass("fa-arrow-right");                
             });
                 
             
@@ -155,6 +209,18 @@ namespace BrickyEditor {
             // categories.forEach(category => {
             //     filterSelect.append(`<option>${category}</option>`);
             // });            
+        }
+
+        // Set is mobile if there is not enough of space for tools
+        // or if it's not forced by compactTools in passed settings.
+        private checkIsCompactTools(editor: Editor) {            
+            if(editor.compactTools == null) {
+                let offset = (window.innerWidth - editor.$el.width()) / 2 - editor.$tools.width();
+                editor.isMobile = offset <= 0;
+            }        
+            else {
+                editor.isMobile = editor.compactTools;
+            }
         }
 
         private addBlock(template: string, data? : Array<Fields.BaseField>, idx? : number) {

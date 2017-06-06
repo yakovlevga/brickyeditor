@@ -2,6 +2,16 @@
 
 $block-name : tools;
 
+.brickyeditor-tools-show-btn {
+    position: fixed;
+    top: 0;
+    right: 0;
+
+    .fa {
+        color: $color-btn-dark;
+    }
+}
+
 .#{$base}-#{$block-name} {
     @include fixed($left: null);
     background: $panel-background;
@@ -38,25 +48,27 @@ $block-name : tools;
     // .brickyeditor-tools-hidden {
     //     right: -180px;
     //     background-color: #ccc;
-    // }
+    // }    
 }
 
+// Mobile version
+.brickyeditor-modal-content .brickyeditor-tools-mobile {
+        position: relative !important;
+        width: 100% !important;
+        height: 100%;
+        overflow: hidden;
 
-// .#{$base}-#{$block-name} {
-//     position: fixed;
-//     left: 0px;
-//     top: 0px;
-//     height: 100%;    
-//     z-index: 101;    
+        .templates {
+            width: 100% !important;
+            height: 99%;
+            overflow: auto;    
+        
+            .template {
+                zoom: 0.3 !important;
+            }
+        }
 
-
-//     .#{$base}-#{$block-name}-panel {
-//         position: absolute;
-//         background-color: #eee;
-//         border-radius: .25rem;
-//         padding: .5rem;
-//         margin: 0 .5rem;
-//         top: 30%;
-//         text-align: center;
-//     }
-// }
+        [data-brickyeditor-hide-tools] {
+            display: none;
+        } 
+    }

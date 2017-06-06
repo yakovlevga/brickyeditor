@@ -140,6 +140,17 @@ var BrickyEditor;
     var Common = (function () {
         function Common() {
         }
+        Common.getSelectedText = function () {
+            var text = "";
+            var doc = document;
+            if (window.getSelection) {
+                text = window.getSelection().toString();
+            }
+            else if (doc.selection && doc.selection.type != "Control") {
+                text = doc.selection.createRange().text;
+            }
+            return text;
+        };
         Common.propsEach = function (obj, func) {
             for (var key in obj) {
                 if (obj.hasOwnProperty(key)) {
@@ -241,6 +252,7 @@ var BrickyEditor;
     Constants.selectorHtmlToolsCommand = '[data-brickyeditor-doc-command]';
     Constants.selectorHtmlToolsCommandRange = '[data-brickyeditor-doc-command-range]';
     Constants.selectorBlockWrapper = '.brickyeditor-block-wrapper';
+    Constants.classMobile = "brickyeditor-tools-mobile";
     Constants.dummyText = "On the other hand, we denounce with righteous indignation and dislike men who are so beguiled and demoralized by the charms of pleasure of the moment, so blinded by desire, that they cannot foresee the pain and trouble that are bound to ensue.";
     BrickyEditor.Constants = Constants;
 })(BrickyEditor || (BrickyEditor = {}));
@@ -249,6 +261,7 @@ var BrickyEditor;
     var Editor = (function () {
         function Editor($el, options) {
             this.blocks = [];
+            this.compactTools = null;
             var editor = this;
             this.options = options ? options : new BrickyEditor.EditorOptions();
             $.extend(this.options, new BrickyEditor.EditorOptions());
@@ -266,6 +279,28 @@ var BrickyEditor;
                 }
             });
         }
+        Object.defineProperty(Editor.prototype, "isMobile", {
+            get: function () {
+                return this._isMobile;
+            },
+            set: function (value) {
+                if (this._isMobile == value)
+                    return;
+                this._isMobile = value;
+                if (this.$tools != null) {
+                    this.$tools.toggle(!value);
+                    this.$toolsBtn.toggle(value);
+                    if (value) {
+                        this.$tools.addClass(BrickyEditor.Constants.classMobile);
+                    }
+                    else {
+                        this.$tools.removeClass(BrickyEditor.Constants.classMobile);
+                    }
+                }
+            },
+            enumerable: true,
+            configurable: true
+        });
         Editor.prototype.loadTemplatesAsync = function () {
             var result = $.Deferred();
             var editor = this;
@@ -292,6 +327,11 @@ var BrickyEditor;
                 .loadTemplateAsync(editor.options.templatesBaseFolder, BrickyEditor.Constants.templateToolsKey)
                 .done(function (html) {
                 editor.$tools = $(html);
+                var toolsBtn = "<button class='brickyeditor-tools-show-btn'><i class='fa fa-cog'></i></button>";
+                editor.$toolsBtn = $(toolsBtn);
+                editor.$toolsBtn.on('click', function () {
+                    editor.modal.showModal(editor.$tools.clone(true));
+                });
             })
                 .fail(function (err) {
                 console.log("Tools loading error");
@@ -312,6 +352,7 @@ var BrickyEditor;
                 .apply($, tasks)
                 .then(function () {
                 editor.addTools();
+                $(window).resize(function () { return editor.checkIsCompactTools(editor); });
                 result.resolve();
             });
             return result;
@@ -322,10 +363,12 @@ var BrickyEditor;
             var $templates = $(BrickyEditor.Constants.selectorTemplates, editor.$tools);
             $templates.hide();
             editor.$el.append(editor.$tools);
+            editor.$el.append(editor.$toolsBtn);
+            editor.checkIsCompactTools(editor);
             for (var templateName in BrickyEditor.TemplateService.templates) {
                 var block = new BrickyEditor.Block(null, templateName);
                 var template = BrickyEditor.TemplateService.templates[templateName];
-                var $template = $("<div class='template m-r-1 m-b-1 m-l-1 p-1' data-bricky-template=\"" + templateName + "\">" + block.getHtml(true) + "</div>");
+                var $template = $("<div class='template m-1 p-1' data-bricky-template=\"" + templateName + "\">" + block.getHtml(true) + "</div>");
                 $templates.append($template);
                 BrickyEditor.Common.arrayEach(template.category, function (category) {
                     var exists = BrickyEditor.Common.arrayAny(categories, function (x) {
@@ -348,15 +391,35 @@ var BrickyEditor;
             var $hideBtn = $('[data-brickyeditor-hide-tools]', editor.$tools);
             $hideBtn.on('click', function () {
                 if ($hideBtn.attr("data-brickyeditor-hide-tools")) {
-                    editor.$tools.animate({ right: '-204px' }, 'fast');
-                    $hideBtn.removeAttr("data-brickyeditor-hide-tools");
+                    if (editor.isMobile) {
+                        editor.$tools.hide();
+                        editor.$toolsBtn.show();
+                    }
+                    else {
+                        editor.$tools.animate({ right: '-204px' }, 'fast');
+                        $hideBtn.removeAttr("data-brickyeditor-hide-tools");
+                        $hideBtn.toggleClass("fa-arrow-left").toggleClass("fa-arrow-right");
+                    }
                 }
                 else {
-                    editor.$tools.animate({ right: '0px' }, 'fast');
-                    $hideBtn.attr("data-brickyeditor-hide-tools", "true");
+                    if (editor.isMobile) {
+                    }
+                    else {
+                        editor.$tools.animate({ right: '0px' }, 'fast');
+                        $hideBtn.attr("data-brickyeditor-hide-tools", "true");
+                        $hideBtn.toggleClass("fa-arrow-left").toggleClass("fa-arrow-right");
+                    }
                 }
-                $hideBtn.toggleClass("fa-arrow-left").toggleClass("fa-arrow-right");
             });
+        };
+        Editor.prototype.checkIsCompactTools = function (editor) {
+            if (editor.compactTools == null) {
+                var offset = (window.innerWidth - editor.$el.width()) / 2 - editor.$tools.width();
+                editor.isMobile = offset <= 0;
+            }
+            else {
+                editor.isMobile = editor.compactTools;
+            }
         };
         Editor.prototype.addBlock = function (template, data, idx) {
             var block = new BrickyEditor.Block(this, template, data);
@@ -418,6 +481,7 @@ var BrickyEditor;
         function EditorOptions() {
             this.templatesBaseFolder = "templates";
             this.templatesFolder = "templates/bootstrap4";
+            this.compactTools = null;
         }
         return EditorOptions;
     }());
@@ -539,8 +603,11 @@ var BrickyEditor;
                 $content.html('');
             });
         };
-        Modal.prototype.showModal = function ($content) {
-            this.$content.append($content);
+        Modal.prototype.showModal = function ($html) {
+            this.$content.append($html);
+            if (!$html.is(':visible')) {
+                $html.show();
+            }
             this.$control.fadeIn();
         };
         Modal.prototype.promptAsync = function (fields) {
@@ -771,6 +838,7 @@ var BrickyEditor;
                 return _super !== null && _super.apply(this, arguments) || this;
             }
             HtmlField.prototype.bind = function () {
+                var field = this;
                 var $field = this.$field;
                 var data = this.data;
                 if (!$field.is('[contenteditable]')) {
@@ -783,6 +851,17 @@ var BrickyEditor;
                 $field.html(this.data.html);
                 this.$field.on('blur keyup paste input', function () {
                     data.html = $(this).html().trim();
+                });
+                this.$field.on('paste', function (e) {
+                    var ev = e.originalEvent;
+                    var text = ev.clipboardData.getData('text/html');
+                    if (text) {
+                        var $temp = $("<div></div>");
+                        var $text = $(text);
+                        $text.removeAttr("style");
+                        $temp.append($text);
+                        ev.clipboardData.setData('text/html', $temp.html());
+                    }
                 });
             };
             return HtmlField;

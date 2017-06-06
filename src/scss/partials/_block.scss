@@ -1,13 +1,25 @@
-.brickyeditor-block-tools {
-    width: 16*4px;
-    margin-left: -16*5px;
-    float: left;
+.brickyeditor-block-wrapper {
+    .brickyeditor-block-tools {
+        width: 16*4px;
+        position: absolute;
+        display: none;
+        background: white;
+        opacity: 0.8;
+        z-index: $fixed-z-index;
 
-    a {
-        color: $color-btn-dark !important;
-        cursor: pointer;
-        &:hover {
-            color: lighten($color-btn-dark, 20%) !important;
+        a {
+            color: $color-btn-dark !important;
+            font-weight: bold;
+            cursor: pointer;
+            &:hover {
+                color: lighten($color-btn-dark, 20%) !important;
+            }
+        }
+    }
+
+    &:hover {
+        .brickyeditor-block-tools {                
+            display: block;
         }
     }
 }

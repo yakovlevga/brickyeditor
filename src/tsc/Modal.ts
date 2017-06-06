@@ -5,6 +5,7 @@ namespace BrickyEditor {
     export class Modal {
 
         public $control: JQuery; // jquery element of editor tools   
+        public closeFunction: any;
 
         private $content: JQuery;
 
@@ -26,8 +27,11 @@ namespace BrickyEditor {
             });
         }
 
-        public showModal($content) {
-            this.$content.append($content);            
+        public showModal($html) {
+            this.$content.append($html);
+            if(!$html.is(':visible')) {
+                $html.show();
+            }
             this.$control.fadeIn();
         }
 

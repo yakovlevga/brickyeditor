@@ -124,6 +124,13 @@
   .brickyeditor .brickyeditor-oembed iframe {
     margin: 0 auto !important; }
 
+.brickyeditor-tools-show-btn {
+  position: fixed;
+  top: 0;
+  right: 0; }
+  .brickyeditor-tools-show-btn .fa {
+    color: #777; }
+
 .brickyeditor-tools {
   position: fixed;
   top: 0px;
@@ -145,6 +152,20 @@
       user-select: none; }
       .brickyeditor-tools .templates .template:hover {
         background: #f2f2f2; }
+
+.brickyeditor-modal-content .brickyeditor-tools-mobile {
+  position: relative !important;
+  width: 100% !important;
+  height: 100%;
+  overflow: hidden; }
+  .brickyeditor-modal-content .brickyeditor-tools-mobile .templates {
+    width: 100% !important;
+    height: 99%;
+    overflow: auto; }
+    .brickyeditor-modal-content .brickyeditor-tools-mobile .templates .template {
+      zoom: 0.3 !important; }
+  .brickyeditor-modal-content .brickyeditor-tools-mobile [data-brickyeditor-hide-tools] {
+    display: none; }
 
 .brickyeditor .btn {
   cursor: pointer;
@@ -402,12 +423,19 @@
     left: 0px;
     -moz-transform: scale(0.5, 1); } }
 
-.brickyeditor-block-tools {
+.brickyeditor-block-wrapper .brickyeditor-block-tools {
   width: 64px;
-  margin-left: -80px;
-  float: left; }
-  .brickyeditor-block-tools a {
+  position: absolute;
+  display: none;
+  background: white;
+  opacity: 0.8;
+  z-index: 101; }
+  .brickyeditor-block-wrapper .brickyeditor-block-tools a {
     color: #777 !important;
+    font-weight: bold;
     cursor: pointer; }
-    .brickyeditor-block-tools a:hover {
+    .brickyeditor-block-wrapper .brickyeditor-block-tools a:hover {
       color: #aaaaaa !important; }
+
+.brickyeditor-block-wrapper:hover .brickyeditor-block-tools {
+  display: block; }

@@ -1,17 +1,19 @@
-var gulp            = require('gulp'),
-    clean           = require('gulp-clean'),
-    uglify          = require('gulp-uglify'),
-    cleanCss        = require('gulp-clean-css'),
-    ts              = require('gulp-typescript'),
-    browserSync     = require('browser-sync'),
-    copy            = require('gulp-copy'),
-    rename          = require('gulp-rename'),
-    sourcemaps      = require('gulp-sourcemaps');
-    sass            = require('gulp-sass');
+const   gulp            = require('gulp'),
+        clean           = require('gulp-clean'),
+        uglify          = require('gulp-uglify'),
+        cleanCss        = require('gulp-clean-css'),
+        ts              = require('gulp-typescript'),
+        copy            = require('gulp-copy'),
+        rename          = require('gulp-rename'),
+        sourcemaps      = require('gulp-sourcemaps');
+        sass            = require('gulp-sass'),
+        browserSync     = require('browser-sync'),        
+        reload          = browserSync.reload;
 
-let paths = {
+const paths = {
     srcTsConfig: './src/tsc/tsconfig.json',
-    srcTsAllFiles: './src/tsc/**/*.ts',    
+    srcTsAllFiles: './src/tsc/**/*.ts',
+    srcSassAllFiles: './src/scss/**/*.scss',
     srcSassMain: './src/scss/main.scss',    
 
     dist: './dist',
@@ -19,14 +21,23 @@ let paths = {
     buildCss: './build/css'
 };
 
+// Browser-sync task
+gulp.task('browserSync', function() {
+    browserSync({
+        server: {
+            baseDir: './'            
+        }
+    });
+});
+
 gulp.task('clearBuild', function() {
     return gulp.src([paths.buildCss, paths.buildJs])
         .pipe(clean());
 });
 
 gulp.task('ts', function() {
-    var tsProject = ts.createProject(paths.srcTsConfig);
-    var tsResult = gulp.src(paths.srcTsAllFiles)
+    const tsProject = ts.createProject(paths.srcTsConfig);
+    const tsResult = gulp.src(paths.srcTsAllFiles)
         .pipe(sourcemaps.init())
         .pipe(tsProject());    
 
@@ -37,7 +48,8 @@ gulp.task('ts', function() {
         .pipe(uglify({ preserveComments: 'false' })) 
         .pipe(rename({ suffix: '.min'}))
         .pipe(gulp.dest(paths.buildJs))
-        .pipe(gulp.dest(paths.dist))];
+        .pipe(gulp.dest(paths.dist))
+        .pipe(reload({ stream: true }))];
 });
 
 gulp.task('sass', function () {    
@@ -49,7 +61,14 @@ gulp.task('sass', function () {
         .pipe(cleanCss())
         .pipe(rename({ suffix: '.min'}))
         .pipe(gulp.dest(paths.buildCss))
-        .pipe(gulp.dest(paths.dist));        
+        .pipe(gulp.dest(paths.dist))
+        .pipe(reload({ stream: true }));        
 });
 
-gulp.task('default', ['clearBuild', 'ts', 'sass']);
+// changes tracking 
+gulp.task('watcher',function(){
+    gulp.watch(paths.srcTsAllFiles, ['ts']);
+    gulp.watch(paths.srcSassAllFiles, ['sass']);
+});
+
+gulp.task('default', ['clearBuild', 'ts', 'sass', 'watcher', 'browserSync']);

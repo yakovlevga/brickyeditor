@@ -46,6 +46,9 @@ namespace BrickyEditor {
                     else {
                         document.execCommand(command);
                     }
+
+                    //todo: hide tools for mobile
+                    //editor.htmlTools.$control.hide();
                     
                     return false;                
                 });

@@ -36,48 +36,22 @@ Array.prototype.first = function<T>(filter: (elem: T) => Boolean) {
         }
     }
     return null;
-}
-
-// Object extensions
-
-// interface Object {
-//     breForEach(func: (key, value) => void);
-//     breFilterKeys(filter: (key: string, value) => Boolean);
-//     breFilterKeys(filter: (key: string, value) => Boolean, payload?);
-// }
-
-// Object.prototype.breForEach = function(func: (key, value) => void) {
-//     if(typeof func !== "function")
-//         return;
-        
-//     for (var key in this) {
-//         if (this.hasOwnProperty(key)) {
-//             var value = this[key];
-//             func(key, value);    
-//         }
-//     }
-// }
-
-// Object.prototype.breFilterKeys = function(filter: (key, value) => Boolean) {
-//     let result = [];
-//     this.breForEach((key ,value) => {
-//         if(filter(key ,value)) {
-//             result.push(key);
-//         }
-//     });
-//     return result;
-// }
-
-// Object.prototype.breFilterKeys = function(filter: (key, value) => Boolean, payload?) {
-//     let result = this.breFilterKeys(filter);
-//     if(payload) {
-//         result.push(payload);
-//     }
-//     return result;
-// }        
+}  
 
 namespace BrickyEditor {
     export class Common {        
+
+        // Selection
+        static getSelectedText() {
+            let text = "";
+            let doc = document as any; 
+            if (window.getSelection) {
+                text = window.getSelection().toString();
+            } else if (doc.selection && doc.selection.type != "Control") {
+                text = doc.selection.createRange().text;
+            }
+            return text;
+        }
 
         // Objects
         static propsEach(obj: any, func: (key: string, value) => any) {
