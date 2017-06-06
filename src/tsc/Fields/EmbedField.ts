@@ -34,6 +34,8 @@ namespace BrickyEditor {
                             }
 
                             $field.replaceWith($embed);
+
+                            field.selectBlock();
                         });
                 });
             }                    

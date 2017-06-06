@@ -17,23 +17,16 @@ namespace BrickyEditor {
                     Constants.dummyText;
 
                 $field.html(this.data.html);
-                this.$field.on('blur keyup paste input', function() { 
-                    data.html = $(this).html().trim();
+
+                $field.on('focus', () => {
+                    this.selectBlock();
                 });
 
-                // this.$field.on('selectionchange', () => {
-                //     let selectedText = Common.getSelectedText();
-                //     console.log(selectedText);
-                //     console.log(selectedText.length);
-                //     if(selectedText.length > 0) {
-                //         field.block.editor.htmlTools.$control.show();
-                //     }
-                //     else {
-                //         field.block.editor.htmlTools.$control.hide();
-                //     }
-                // });         
+                $field.on('blur keyup paste input', function() {
+                     data.html = $(this).html().trim()
+                });    
 
-                this.$field.on('paste', (e) => {
+                $field.on('paste', (e) => {
 
                     let ev = e.originalEvent as any;                    
                     let text = ev.clipboardData.getData('text/html');

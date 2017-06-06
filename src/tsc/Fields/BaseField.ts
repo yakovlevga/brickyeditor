@@ -32,6 +32,10 @@ namespace BrickyEditor {
 
             protected bind() {}
 
+            protected selectBlock() {
+                this.block.editor.selectedBlock = this.block;
+            }
+
             public getData() : any {
                 return {
                     type: this.type,

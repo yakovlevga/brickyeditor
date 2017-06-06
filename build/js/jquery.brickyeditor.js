@@ -423,9 +423,13 @@ var BrickyEditor;
         };
         Editor.prototype.addBlock = function (template, data, idx) {
             var block = new BrickyEditor.Block(this, template, data);
+            if (idx == null && this.selectedBlock != null) {
+                idx = this.blocks.indexOf(this.selectedBlock) + 1;
+            }
             if (idx != null) {
-                this.$el.children(BrickyEditor.Constants.selectorBlockWrapper).eq(idx).after(block.$editor);
+                this.blocks[idx - 1].$block.after(block.$editor);
                 this.blocks.splice(idx, 0, block);
+                this.selectedBlock = block;
             }
             else {
                 this.$el.append(block.$editor);
@@ -771,6 +775,9 @@ var BrickyEditor;
                 }
             };
             BaseField.prototype.bind = function () { };
+            BaseField.prototype.selectBlock = function () {
+                this.block.editor.selectedBlock = this.block;
+            };
             BaseField.prototype.getData = function () {
                 return {
                     type: this.type,
@@ -820,6 +827,7 @@ var BrickyEditor;
                             }
                         }
                         $field.replaceWith($embed);
+                        field.selectBlock();
                     });
                 });
             };
@@ -838,6 +846,7 @@ var BrickyEditor;
                 return _super !== null && _super.apply(this, arguments) || this;
             }
             HtmlField.prototype.bind = function () {
+                var _this = this;
                 var field = this;
                 var $field = this.$field;
                 var data = this.data;
@@ -849,10 +858,13 @@ var BrickyEditor;
                         BrickyEditor.TemplateService.getFieldValue($field, 'html') ||
                         BrickyEditor.Constants.dummyText;
                 $field.html(this.data.html);
-                this.$field.on('blur keyup paste input', function () {
+                $field.on('focus', function () {
+                    _this.selectBlock();
+                });
+                $field.on('blur keyup paste input', function () {
                     data.html = $(this).html().trim();
                 });
-                this.$field.on('paste', function (e) {
+                $field.on('paste', function (e) {
                     var ev = e.originalEvent;
                     var text = ev.clipboardData.getData('text/html');
                     if (text) {
@@ -903,6 +915,7 @@ var BrickyEditor;
                         var alt = fields.first(function (f) { return f.key === 'alt'; }).value;
                         field.setAlt(alt);
                     });
+                    field.selectBlock();
                 });
             };
             ImageField.prototype.getPromptParams = function () {

@@ -7,6 +7,7 @@ namespace BrickyEditor {
         private templates: any;
 
         public options: EditorOptions;
+        public selectedBlock: Block;
 
         public modal: Modal;
         public htmlTools: HtmlTools;
@@ -225,9 +226,15 @@ namespace BrickyEditor {
 
         private addBlock(template: string, data? : Array<Fields.BaseField>, idx? : number) {
             var block = new Block(this, template, data);
+
+            if(idx == null && this.selectedBlock != null) {
+                idx = this.blocks.indexOf(this.selectedBlock) + 1;
+            }
+
             if(idx != null) {   
-                this.$el.children(Constants.selectorBlockWrapper).eq(idx).after(block.$editor);
+                this.blocks[idx - 1].$block.after(block.$editor);
                 this.blocks.splice(idx, 0, block);
+                this.selectedBlock = block;                
             }
             else {
                 this.$el.append(block.$editor);

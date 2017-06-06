@@ -29,6 +29,8 @@ namespace BrickyEditor {
                         var alt = fields.first(f => f.key === 'alt').value;
                         field.setAlt(alt);
                     });
+
+                    field.selectBlock();
                 });
             }
 
