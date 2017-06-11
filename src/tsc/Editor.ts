@@ -43,8 +43,7 @@ namespace BrickyEditor {
 
         constructor($el: JQuery, options: EditorOptions) {
             let editor = this;
-            this.options = options ? options : new EditorOptions();
-            $.extend(this.options, new EditorOptions());
+            this.options = new EditorOptions(options);
             this.$el = $el;
             
             this

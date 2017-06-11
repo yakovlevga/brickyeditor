@@ -263,8 +263,7 @@ var BrickyEditor;
             this.blocks = [];
             this.compactTools = null;
             var editor = this;
-            this.options = options ? options : new BrickyEditor.EditorOptions();
-            $.extend(this.options, new BrickyEditor.EditorOptions());
+            this.options = new BrickyEditor.EditorOptions(options);
             this.$el = $el;
             this
                 .loadTemplatesAsync()
@@ -482,10 +481,15 @@ var BrickyEditor;
 var BrickyEditor;
 (function (BrickyEditor) {
     var EditorOptions = (function () {
-        function EditorOptions() {
+        function EditorOptions(options) {
             this.templatesBaseFolder = "templates";
             this.templatesFolder = "templates/bootstrap4";
             this.compactTools = null;
+            this.templatesBaseFolder = options.templatesBaseFolder || this.templatesBaseFolder;
+            this.templatesFolder = options.templatesFolder || this.templatesFolder;
+            this.onload = options.onload;
+            this.blocks = options.blocks;
+            this.compactTools = options.compactTools;
         }
         return EditorOptions;
     }());
