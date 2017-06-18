@@ -5,4 +5,18 @@
         let editor = new BrickyEditor.Editor($(this), options);
         return editor;
     };
-})(jQuery);
+}(jQuery));
+
+(function( $ ) {
+ 
+    $.fn.showLinkLocation = function() {
+ 
+        this.filter( "a" ).append(function() {
+            return " (" + this.href + ")";
+        });
+ 
+        return this;
+ 
+    };
+ 
+}( jQuery ));

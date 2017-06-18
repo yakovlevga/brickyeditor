@@ -49,7 +49,7 @@ namespace BrickyEditor {
             this
                 .loadTemplatesAsync()
                 .done(function() {
-                    if(editor.options.blocks.length) {
+                    if(editor.options.blocks && editor.options.blocks.length) {
                         editor.options.blocks.forEach(block => {
                             editor.addBlock(block.template, block.fields);
                         });
@@ -231,7 +231,7 @@ namespace BrickyEditor {
             }
 
             if(idx != null) {   
-                this.blocks[idx - 1].$block.after(block.$editor);
+                this.blocks[idx - 1].$editor.after(block.$editor);
                 this.blocks.splice(idx, 0, block);
                 this.selectedBlock = block;                
             }
@@ -239,6 +239,8 @@ namespace BrickyEditor {
                 this.$el.append(block.$editor);
                 this.blocks.push(block);
             }
+
+            this.selectedBlock = block;
         }
 
         public deleteBlock(block: Block) {
@@ -246,6 +248,7 @@ namespace BrickyEditor {
             this.blocks.splice(idx, 1);
             block.$editor.remove();
             block = null;
+            this.selectedBlock = null;
         }
 
         public moveBlock(block: Block, offset: number) {

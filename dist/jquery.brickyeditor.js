@@ -268,7 +268,7 @@ var BrickyEditor;
             this
                 .loadTemplatesAsync()
                 .done(function () {
-                if (editor.options.blocks.length) {
+                if (editor.options.blocks && editor.options.blocks.length) {
                     editor.options.blocks.forEach(function (block) {
                         editor.addBlock(block.template, block.fields);
                     });
@@ -426,7 +426,7 @@ var BrickyEditor;
                 idx = this.blocks.indexOf(this.selectedBlock) + 1;
             }
             if (idx != null) {
-                this.blocks[idx - 1].$block.after(block.$editor);
+                this.blocks[idx - 1].$editor.after(block.$editor);
                 this.blocks.splice(idx, 0, block);
                 this.selectedBlock = block;
             }
@@ -434,12 +434,14 @@ var BrickyEditor;
                 this.$el.append(block.$editor);
                 this.blocks.push(block);
             }
+            this.selectedBlock = block;
         };
         Editor.prototype.deleteBlock = function (block) {
             var idx = this.blocks.indexOf(block);
             this.blocks.splice(idx, 1);
             block.$editor.remove();
             block = null;
+            this.selectedBlock = null;
         };
         Editor.prototype.moveBlock = function (block, offset) {
             var idx = this.blocks.indexOf(block);
@@ -592,7 +594,15 @@ var BrickyEditor;
         var editor = new BrickyEditor.Editor($(this), options);
         return editor;
     };
-})(jQuery);
+}(jQuery));
+(function ($) {
+    $.fn.showLinkLocation = function () {
+        this.filter("a").append(function () {
+            return " (" + this.href + ")";
+        });
+        return this;
+    };
+}(jQuery));
 var BrickyEditor;
 (function (BrickyEditor) {
     var Modal = (function () {
