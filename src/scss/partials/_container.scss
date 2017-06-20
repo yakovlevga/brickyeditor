@@ -1,0 +1,35 @@
+[data-bricky-field-type="container"] {
+    &.selected {
+        outline: 1px dotted $color-border;
+        background: none !important;
+    }
+
+    &:empty {
+        min-height: 50px;
+        background: repeating-linear-gradient(
+            45deg,
+            rgba(0, 0, 0, 0.2),
+            rgba(0, 0, 0, 0.2) 10px,
+            rgba(0, 0, 0, 0.3) 10px,
+            rgba(0, 0, 0, 0.3) 20px)
+    }
+
+    &:hover:empty {
+        background:repeating-linear-gradient(
+            45deg,
+            rgba(0, 0, 0, 0.5),
+            rgba(0, 0, 0, 0.5) 10px,
+            rgba(0, 0, 0, 0.6) 10px,
+            rgba(0, 0, 0, 0.6) 20px)
+    }
+}
+
+.brickyeditor-field-container:empty {
+    min-height: 50px;
+    background: repeating-linear-gradient(
+        45deg,
+        rgba(0, 0, 0, 0.2),
+        rgba(0, 0, 0, 0.2) 10px,
+        rgba(0, 0, 0, 0.3) 10px,
+        rgba(0, 0, 0, 0.3) 20px)
+}

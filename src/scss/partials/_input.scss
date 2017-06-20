@@ -46,6 +46,6 @@
 
 [data-bricky-field-type="html"][contenteditable="true"] {
     &:focus, &:hover {
-        outline: 1px dotted $color-contenteditable-border;
+        outline: 1px dotted $color-border;
     }
 }

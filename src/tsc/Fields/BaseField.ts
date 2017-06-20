@@ -2,10 +2,25 @@ namespace BrickyEditor {
     export namespace Fields {
         export class BaseField {
             public name: string;
-            public data: any;
             public type: string;
             protected block: Block;            
             protected $field: JQuery;            
+
+            
+            protected _data : any;
+            public get data() : any {
+                return this._data;
+            }
+            public set data(v : any) {
+                this._data = v;
+            }            
+
+            private static fields = {
+                'html': (block, $el, data) => { return new HtmlField(block, $el, data); },
+                'image': (block, $el, data) => { return new ImageField(block, $el, data); },
+                'embed': (block, $el, data) => { return new EmbedField(block, $el, data); },
+                'container': (block, $el, data) => { return new ContainerField(block, $el, data); }
+            };
 
             constructor(block: Block, $field: JQuery, data: any) {                
                 this.block = block;
@@ -18,23 +33,20 @@ namespace BrickyEditor {
 
             public static getField(block: Block, $el: JQuery, data?: Fields.BaseField) : BaseField {
                 let type = TemplateService.getFieldValue($el, "type");
-                switch(type) {
-                    case 'html':
-                        return new HtmlField(block, $el, data);
-                    case 'image':
-                        return new ImageField(block, $el, data);
-                    case 'embed':
-                        return new EmbedField(block, $el, data);
-                    default:
-                        throw `${type} field not found`;
+                let fieldClass = this.fields[type];
+                if(fieldClass) {                    
+                    return fieldClass(block, $el, data);                        
+                }
+                else {
+                    throw `${type} field not found`;
                 }
             }
 
             protected bind() {}
 
-            protected selectBlock() {
-                this.block.editor.selectedBlock = this.block;
-            }
+            protected selectBlock(container?: Container) {
+                this.block.container.selectedBlock.selectBlock(this, container);
+            }            
 
             public getData() : any {
                 return {

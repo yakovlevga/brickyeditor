@@ -2,18 +2,14 @@
 /// <reference path="types/common.d.ts" />
 
 namespace BrickyEditor {
-    export class Editor {
-        private blocks: Array<Block> = [];
+    export class Editor extends Container {
         private templates: any;
 
         public options: EditorOptions;
-        public selectedBlock: Block;
-
         public modal: Modal;
         public htmlTools: HtmlTools;
 
         // UI
-        private $el: JQuery; // jquery element of editor
         private $tools: JQuery; // jquery element of editor tools
         private $filter: JQuery; // blocks filter      
         private $toolsBtn: JQuery; // show tools button
@@ -42,18 +38,15 @@ namespace BrickyEditor {
         } 
 
         constructor($el: JQuery, options: EditorOptions) {
+            super($el);
+            
             let editor = this;
             this.options = new EditorOptions(options);
-            this.$el = $el;
             
             this
                 .loadTemplatesAsync()
                 .done(function() {
-                    if(editor.options.blocks && editor.options.blocks.length) {
-                        editor.options.blocks.forEach(block => {
-                            editor.addBlock(block.template, block.fields);
-                        });
-                    }
+                    editor.loadBlocks(editor.options.blocks);
 
                     if(editor.options.onload) {
                         editor.options.onload(editor);
@@ -144,13 +137,10 @@ namespace BrickyEditor {
 
             // Set is mobile if there is not enough of space for tools
             // or if it's not forced by compactTools in passed settings.
-            editor.checkIsCompactTools(editor);            
-
-            // editor.$tools.toggle(!editor.isMobile);
-            // editor.$toolsBtn.toggle(editor.isMobile);
+            editor.checkIsCompactTools(editor);
 
             for (var templateName in TemplateService.templates) {
-                let block = new Block(null, templateName);
+                let block = new Block(null, null, templateName);
                 let template = TemplateService.templates[templateName];
                 let $template = $(`<div class='template m-1 p-1' data-bricky-template="${templateName}">${block.getHtml(true)}</div>`);
                 $templates.append($template);
@@ -221,73 +211,6 @@ namespace BrickyEditor {
             else {
                 editor.isMobile = editor.compactTools;
             }
-        }
-
-        private addBlock(template: string, data? : Array<Fields.BaseField>, idx? : number) {
-            var block = new Block(this, template, data);
-
-            if(idx == null && this.selectedBlock != null) {
-                idx = this.blocks.indexOf(this.selectedBlock) + 1;
-            }
-
-            if(idx != null) {   
-                this.blocks[idx - 1].$editor.after(block.$editor);
-                this.blocks.splice(idx, 0, block);
-                this.selectedBlock = block;                
-            }
-            else {
-                this.$el.append(block.$editor);
-                this.blocks.push(block);
-            }
-
-            this.selectedBlock = block;
-        }
-
-        public deleteBlock(block: Block) {
-            let idx = this.blocks.indexOf(block);
-            this.blocks.splice(idx, 1);
-            block.$editor.remove();
-            block = null;
-            this.selectedBlock = null;
-        }
-
-        public moveBlock(block: Block, offset: number) {
-            let idx = this.blocks.indexOf(block);
-            let new_idx = idx + offset;
-
-            if (new_idx < this.blocks.length && new_idx >= 0) {
-                var $anchorBlock = this.blocks[new_idx].$editor;
-                if(offset > 0) {
-                    $anchorBlock.after(block.$editor);
-                }
-                else if (offset < 0) {
-                    $anchorBlock.before(block.$editor);
-                }
-
-                this.blocks.splice(idx, 1);
-                this.blocks.splice(new_idx, 0, block);
-            }
-        }
-
-        public copyBlock(block: Block) {
-            let idx = this.blocks.indexOf(block);
-            this.addBlock(block.template, block.getData().fields, idx);
-        }
-        
-        public getData() : any {
-            var blocksData = [];            
-            this.blocks.forEach(block => {
-                blocksData.push(block.getData());
-            });
-            return blocksData;
-        }
-
-        public getHtml() : string {
-            var blocksData = [];
-            this.blocks.forEach(block => {
-                blocksData.push(block.getHtml(true));
-            });
-            return blocksData.join('\n');
         }
     }
 }

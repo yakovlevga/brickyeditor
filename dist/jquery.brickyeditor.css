@@ -423,6 +423,11 @@
     left: 0px;
     -moz-transform: scale(0.5, 1); } }
 
+.brickyeditor-block-wrapper.active {
+  outline: 1px dashed #777; }
+  .brickyeditor-block-wrapper.active > .brickyeditor-block-tools {
+    display: block; }
+
 .brickyeditor-block-wrapper .brickyeditor-block-tools {
   width: 64px;
   position: absolute;
@@ -437,5 +442,17 @@
     .brickyeditor-block-wrapper .brickyeditor-block-tools a:hover {
       color: #aaaaaa !important; }
 
-.brickyeditor-block-wrapper:hover .brickyeditor-block-tools {
-  display: block; }
+[data-bricky-field-type="container"].selected {
+  outline: 1px dotted #777;
+  background: none !important; }
+
+[data-bricky-field-type="container"]:empty {
+  min-height: 50px;
+  background: repeating-linear-gradient(45deg, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2) 10px, rgba(0, 0, 0, 0.3) 10px, rgba(0, 0, 0, 0.3) 20px); }
+
+[data-bricky-field-type="container"]:hover:empty {
+  background: repeating-linear-gradient(45deg, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5) 10px, rgba(0, 0, 0, 0.6) 10px, rgba(0, 0, 0, 0.6) 20px); }
+
+.brickyeditor-field-container:empty {
+  min-height: 50px;
+  background: repeating-linear-gradient(45deg, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2) 10px, rgba(0, 0, 0, 0.3) 10px, rgba(0, 0, 0, 0.3) 20px); }

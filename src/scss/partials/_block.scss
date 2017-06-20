@@ -1,4 +1,13 @@
 .brickyeditor-block-wrapper {
+
+    &.active {
+        > .brickyeditor-block-tools {                
+            display: block;
+        }
+
+        outline: 1px dashed $color-border;
+    }
+
     .brickyeditor-block-tools {
         width: 16*4px;
         position: absolute;
@@ -14,12 +23,6 @@
             &:hover {
                 color: lighten($color-btn-dark, 20%) !important;
             }
-        }
-    }
-
-    &:hover {
-        .brickyeditor-block-tools {                
-            display: block;
         }
     }
 }

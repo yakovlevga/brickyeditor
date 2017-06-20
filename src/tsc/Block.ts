@@ -6,20 +6,34 @@ namespace BrickyEditor {
         public fields: Array<Fields.BaseField> = [];        
 
         public editor: Editor;
+        public container: Container;
         public $editor: JQuery; // block editor
         public $block: JQuery; // block content
         public $tools: JQuery; // block editor tools
 
-        constructor(editor: Editor, templateName: string, data?: Array<Fields.BaseField>) {
+        constructor(editor: Editor, container: Container, templateName: string, data?: Array<Fields.BaseField>) {
             let block = this;
             this.editor = editor;
+            this.container = container;
             this.template = templateName;
 
             let template = TemplateService.getTemplate(templateName);
-            
-            
+                        
             this.$block = $(template.html);
-            this.$editor = this.getBlockTools(this.$block);
+            let $editor = this.getBlockTools(this.$block);
+            this.$editor = $editor;            
+            
+            $editor.hover(
+                () => {
+                    //$(".brickyeditor-block-wrapper").removeClass('active');
+                    $editor.addClass('active');
+                    //return false;
+                },
+                () => {
+                    $editor.removeClass('active');
+                    //return false;
+                }
+            );
 
             this.bindBlockFields(data);
         }
@@ -47,16 +61,16 @@ namespace BrickyEditor {
         private action(action: number) {
             switch (action) {
                 case BlockAction.Delete:
-                    this.editor.deleteBlock(this);
+                    this.container.deleteBlock(this);
                     break;
                 case BlockAction.Up:
-                    this.editor.moveBlock(this, -1);
+                    this.container.moveBlock(this, -1);
                     break;
                 case BlockAction.Down:
-                    this.editor.moveBlock(this, +1);
+                    this.container.moveBlock(this, +1);
                     break;
                 case BlockAction.Copy:
-                    this.editor.copyBlock(this);
+                    this.container.copyBlock(this);
                     break;
                 default:
                     break;
@@ -101,13 +115,16 @@ namespace BrickyEditor {
             };
         }
 
-        public getHtml(trim: Boolean): string {            
+        public getHtml(trim: Boolean, skipAttrRemoving: Boolean = false): string {            
             let $html = this.$block.clone();
             $html
                 .find(Constants.selectorField)
                 .addBack(Constants.selectorField)
                 .each(function(idx, el) {
                     
+                    if(skipAttrRemoving)
+                        return;
+                        
                     // Find attributes names, that we should remove before rendering. 
                     // It's special attributes, that brickyeditor use in service purposes.
                     let attrsToRemove = Common.propsFilterKeys(el.attributes, (k, v) => {
@@ -125,6 +142,25 @@ namespace BrickyEditor {
 
             var html = $html[0].outerHTML;
             return trim ? html.breTotalTrim() : html;
+        }
+
+        public selectBlock(field?: Fields.BaseField, container?: Container) {
+            this.container.selectedBlock.deselectBlock();
+            this.container.selectedBlock = this;
+            this.container.selectedContainer = container;
+
+            if(field && field instanceof Fields.ContainerField) {
+                (field as Fields.ContainerField).select();
+            }
+        }
+
+        public deselectBlock() {
+            this.container.selectedContainer = null;
+            this.fields.forEach(f => {
+                if(f instanceof Fields.ContainerField) {
+                    (f as Fields.ContainerField).deselect();
+                }
+            });
         }
     }
 

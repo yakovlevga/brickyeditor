@@ -17,7 +17,6 @@ namespace BrickyEditor {
                         var file = fields.first(f => f.key === 'file').value;
                         var src = fields.first(f => f.key === 'src').value;
                         if(file) {
-                            debugger;
                             field.setFile(file);
                             field.setSrc(null);
                         }
