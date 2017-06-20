@@ -148,19 +148,10 @@ namespace BrickyEditor {
             this.container.selectedBlock.deselectBlock();
             this.container.selectedBlock = this;
             this.container.selectedContainer = container;
-
-            if(field && field instanceof Fields.ContainerField) {
-                (field as Fields.ContainerField).select();
-            }
         }
 
         public deselectBlock() {
             this.container.selectedContainer = null;
-            this.fields.forEach(f => {
-                if(f instanceof Fields.ContainerField) {
-                    (f as Fields.ContainerField).deselect();
-                }
-            });
         }
     }
 

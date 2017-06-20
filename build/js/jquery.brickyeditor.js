@@ -115,17 +115,9 @@ var BrickyEditor;
             this.container.selectedBlock.deselectBlock();
             this.container.selectedBlock = this;
             this.container.selectedContainer = container;
-            if (field && field instanceof BrickyEditor.Fields.ContainerField) {
-                field.select();
-            }
         };
         Block.prototype.deselectBlock = function () {
             this.container.selectedContainer = null;
-            this.fields.forEach(function (f) {
-                if (f instanceof BrickyEditor.Fields.ContainerField) {
-                    f.deselect();
-                }
-            });
         };
         return Block;
     }());
@@ -295,6 +287,22 @@ var BrickyEditor;
                 this.editor = this;
             }
         }
+        Object.defineProperty(Container.prototype, "selectedContainer", {
+            get: function () {
+                return this._selectedContainer;
+            },
+            set: function (v) {
+                if (this._selectedContainer && this._selectedContainer != v) {
+                    this._selectedContainer.$el.removeClass("selected");
+                }
+                this._selectedContainer = v;
+                if (this._selectedContainer) {
+                    this._selectedContainer.$el.addClass("selected");
+                }
+            },
+            enumerable: true,
+            configurable: true
+        });
         Container.prototype.getData = function () {
             var blocksData = [];
             this.blocks.forEach(function (block) {

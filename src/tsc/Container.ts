@@ -6,7 +6,23 @@ namespace BrickyEditor {
 
         public blocks: Array<Block> = [];
         public selectedBlock: Block;
-        public selectedContainer: Container;
+        
+        private _selectedContainer : Container;
+        public get selectedContainer() : Container {
+            return this._selectedContainer;
+        }
+        public set selectedContainer(v : Container) {
+            if(this._selectedContainer && this._selectedContainer != v) {
+                this._selectedContainer.$el.removeClass("selected");
+            }
+
+            this._selectedContainer = v;
+
+            if(this._selectedContainer) {
+                this._selectedContainer.$el.addClass("selected");
+            }
+        }
+        
         
         constructor($el: JQuery, editor?: Editor) {
             this.$el = $el;
