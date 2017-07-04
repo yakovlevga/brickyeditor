@@ -1,120 +1,87 @@
 <!DOCTYPE html>
 <html>
-    <head>        
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-        <title>BrickyEditor - WYSIWYG longrid editor.</title>
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
-        <link rel="stylesheet" href="lib/css/font-awesome.min.css">
-        <link rel="stylesheet" href="css/jquery.brickyeditor.min.css">
-
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css">
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
-
-        <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js"></script>
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
-
-        <script src="js/jquery.brickyeditor.js"></script>
-        <script>
-            $(function(){
-                $("#editor").brickyeditor({
-
-                    // blocks: [
-                    //     {"template":"h1","fields":[{"type":"html","name":"text","data":{"html":"Lorem ipsum dolor sit amet, consectetur adipiscing elit."}}]},
-                    //     {"template":"h5","fields":[{"type":"html","name":"text","data":{"html":"Lorem ipsum dolor sit amet, consectetur adipiscing elit."}}]},
-                    //     {"template":"img","fields":[{"type":"image","name":"image","data":{"src":"http://placehold.it/600x400"}},{"type":"html","name":"imageCaption","data":{"html":"Lorem ipsum dolor sit amet"}}]}],
-                    onload: function(editor) {
-
-                        $("#renderHtml").on("click", function() {                            
-                            var html = editor.getHtml();             
-                            var $tab = $('#tabHtml');
-                            $tab.find("code").text(html);
-                            hljs.highlightBlock($tab.find("code")[0]);
-                        });
-
-                        $("#renderJson").on("click", function() {
-                            var data = editor.getData();    
-                            var $tab = $('#tabJson');                                                    
-                            $tab.find("code").text(JSON.stringify(data, null, "\t"));
-                            hljs.highlightBlock($tab.find("code")[0]);
-                        });
-                    }
-                });                
-            });
-        </script>
-    </head>
-    <body>
-
-         <header class="navbar navbar-light navbar-toggleable-md bd-navbar">
-            <nav class="container">
-                <div class="d-flex justify-content-between hidden-lg-up">
-                <a class="navbar-brand" href="index.html">
-                    BrickyEditor
-                </a>
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#bd-main-nav" aria-controls="bd-main-nav" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                </div>
-
-                <div class="collapse navbar-collapse" id="bd-main-nav">
-                    <ul class="nav navbar-nav">
-                        <li class="nav-item active">
-                            <a class="nav-item nav-link" href="index.html">BrickyEditor</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-item nav-link active" href="examples.html">Examples</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-item nav-link" href="https://github.com/yakovlevga/brickyeditor">Download</a>
-                        </li>
-                    </ul>
-                </div>
-            </nav>
-        </header>
-
-        <main>
-            <div class="container">
-                <div class="row">
-                    <div class="col-md-12">
-                        <ul class="nav nav-pills justify-content-end">
-                            <li class="nav-item">
-                                <a class="nav-link active" data-toggle="tab" href="#tabEditor" role="tab">Editor</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" id="renderHtml" data-toggle="tab" href="#tabHtml" role="tab">Html</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" id="renderJson" data-toggle="tab" href="#tabJson" role="tab">JSON</a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-                <hr/>
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="tab-content">
-                            <div class="tab-pane active" id="tabEditor" role="tabpanel">
-                                <div id="editor"></div>
-                            </div>
-                            <div class="tab-pane" id="tabHtml" role="tabpanel"><pre><code class="html"></code></pre></div>
-                            <div class="tab-pane" id="tabJson" role="tabpanel"><pre><code class="json"></code></pre></div>
-                        </div>                        
-                    </div>
-                </div>
+  <head>
+    <title>BrickyEditor - WYSIWYG longrid editor.</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css">
+    <link rel="stylesheet" href="lib/css/font-awesome.min.css">
+    <link rel="stylesheet" href="css/jquery.brickyeditor.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css">
+    <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js">   </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+    <script src="js/jquery.brickyeditor.js"></script>
+    <script>
+      function initButtons(editor) {
+          $("#renderHtml").on("click", function() {                            
+              var html = editor.getHtml();             
+              var $tab = $('#tabHtml');
+              $tab.find("code").text(html);
+              hljs.highlightBlock($tab.find("code")[0]);
+          });
+      
+          $("#renderJson").on("click", function() {
+              var data = editor.getData();    
+              var $tab = $('#tabJson');                                                    
+              $tab.find("code").text(JSON.stringify(data, null, "\t"));
+              hljs.highlightBlock($tab.find("code")[0]);
+          });
+      }
+    </script>
+    <script>
+      $(function(){
+          $("#editor").brickyeditor({
+              onload: function(editor) {
+                  initButtons(editor);
+              }
+          });                
+      });
+    </script>
+  </head>
+  <body>
+    <header class="navbar navbar-light navbar-toggleable-md bd-navbar">  
+      <nav class="container">
+        <div class="d-flex justify-content-between hidden-lg-up"><a class="navbar-brand" href="index.html">BrickyEditor</a>
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#bd-main-nav" aria-controls="bd-main-nav" aria-expanded="false" aria-label="Toggle navigation"></button><span class="navbar-toggler-icon"></span>
+        </div>
+        <div class="collapse navbar-collapse" id="bd-main-nav">
+          <ul class="nav navbar-nav">
+                  <li class="nav-item"><a class="nav-item nav-link" href="index.html">BrickyEditor</a></li>
+                  <li class="nav-item"><a class="nav-item nav-link" href="examples.html">Examples</a></li>
+                  <li class="nav-item"><a class="nav-item nav-link" href="https://github.com/yakovlevga/brickyeditor">Download</a></li>
+          </ul>
+        </div>
+      </nav>
+    </header>
+    <main>
+      <div class="container">
+        <div class="row">
+          <div class="col-md-12">
+            <ul class="nav nav-pills justify-content-end">
+              <li class="nav-item"><a class="nav-link active" data-toggle="tab" href="#tabEditor">Editor</a></li>
+              <li class="nav-item"><a class="nav-link" id="renderHtml" data-toggle="tab" href="#tabHtml">Html</a></li>
+              <li class="nav-item"><a class="nav-link" id="renderJson" data-toggle="tab" href="#tabJson">JSON</a></li>
+            </ul>
+            <hr>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12">
+            <div class="tab-content"></div>
+            <div class="tab-pane active" id="tabEditor">
+              <div id="editor"></div>
             </div>
-        </main>
-
-        <!-- Yandex.Metrika counter --> <script type="text/javascript"> (function (d, w, c) { (w[c] = w[c] || []).push(function() { try { w.yaCounter44837338 = new Ya.Metrika({ id:44837338, clickmap:true, trackLinks:true, accurateTrackBounce:true }); } catch(e) { } }); var n = d.getElementsByTagName("script")[0], s = d.createElement("script"), f = function () { n.parentNode.insertBefore(s, n); }; s.type = "text/javascript"; s.async = true; s.src = "https://mc.yandex.ru/metrika/watch.js"; if (w.opera == "[object Opera]") { d.addEventListener("DOMContentLoaded", f, false); } else { f(); } })(document, window, "yandex_metrika_callbacks"); </script> <noscript><div><img src="https://mc.yandex.ru/watch/44837338" style="position:absolute; left:-9999px;" alt="" /></div></noscript> <!-- /Yandex.Metrika counter -->
-        <script>
-            (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-            })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-
-            ga('create', 'UA-56159548-5', 'auto');
-            ga('send', 'pageview');
-
-        </script>
-    </body>
+            <div class="tab-pane" id="tabHtml">
+              <pre></pre>
+            </div>
+            <div class="tab-pane" id="tabJson">
+              <pre></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </body>
 </html>

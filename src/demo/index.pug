@@ -1,0 +1,22 @@
+extends layout/layout.pug
+  
+block vars
+  - var activePage = "index.html";
+
+block content
+  div(class="jumbotron")
+      h1(class="display-4") BrickyEditor
+      p(class="lead") BrickyEditor is the simple WYSIWYG editor, based on block system.
+      hr(class="my-4")        
+      p(class="lead")
+          a(class="btn btn-primary btn-lg" href="examples.html") View examples
+  p.
+      Usually, editors without any frontend background makes a lot of mistakes in html code.<br/>
+      On the other side - there is a lot of WYSIWYG editors, that brings them too much freedom,
+      which leads to different appearence of publications.
+  p.
+      <b>BrickyEditor</b> solve this problems: editors can use only prepared blocks of content and don't need to write any code.<br/> 
+      Your longrids and articles will be in one clean style.
+  p.
+      Since BrickyEditor can save blocks as JSON, not only in rendered HTML, you can easily deliver your content to mobile platforms <br/>
+      and render it natively, without

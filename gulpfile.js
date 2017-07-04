@@ -7,6 +7,7 @@ const   gulp            = require('gulp'),
         rename          = require('gulp-rename'),
         sourcemaps      = require('gulp-sourcemaps');
         sass            = require('gulp-sass'),
+        pug             = require('gulp-pug'),
         browserSync     = require('browser-sync'),        
         reload          = browserSync.reload;
 
@@ -14,18 +15,20 @@ const paths = {
     srcTsConfig: './src/tsc/tsconfig.json',
     srcTsAllFiles: './src/tsc/**/*.ts',
     srcSassAllFiles: './src/scss/**/*.scss',
-    srcSassMain: './src/scss/main.scss',    
+    srcSassMain: './src/scss/main.scss',
+    srcDemo: './src/demo/*.pug',
 
     dist: './dist',
     buildJs: './build/js',
-    buildCss: './build/css'
+    buildCss: './build/css',
+    buildDemo: './build'
 };
 
 // Browser-sync task
 gulp.task('browserSync', function() {
     browserSync({
         server: {
-            baseDir: './'            
+            baseDir: './build',
         }
     });
 });
@@ -65,10 +68,18 @@ gulp.task('sass', function () {
         .pipe(reload({ stream: true }));        
 });
 
+ 
+gulp.task('demo', function buildHTML() {
+  return gulp.src(paths.srcDemo)
+  .pipe(pug({ pretty: true }))
+  .pipe(gulp.dest(paths.buildDemo));
+});
+
 // changes tracking 
 gulp.task('watcher',function(){
     gulp.watch(paths.srcTsAllFiles, ['ts']);
     gulp.watch(paths.srcSassAllFiles, ['sass']);
+    gulp.watch(paths.srcDemo, ['demo']);
 });
 
-gulp.task('default', ['clearBuild', 'ts', 'sass', 'watcher', 'browserSync']);
+gulp.task('default', ['clearBuild', 'ts', 'sass', 'watcher', 'demo', 'browserSync']);

@@ -1,0 +1,25 @@
+doctype html
+html
+  block vars
+  head
+    title BrickyEditor - WYSIWYG longrid editor.
+    meta(charset="utf-8")
+    meta(name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no")
+
+    block styles
+        link(rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css")
+
+    block scripts
+      script(src="https://code.jquery.com/jquery-2.2.4.min.js")
+      script(src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js")
+      script(src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js")    
+    
+  body
+    header(class="navbar navbar-light navbar-toggleable-md bd-navbar")   
+      include ../partial/nav.pug
+
+    main
+      div(class="container")
+        block content
+
+    include ../partial/metrics.pug

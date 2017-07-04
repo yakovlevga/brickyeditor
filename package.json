@@ -12,6 +12,7 @@
     "gulp-clean": "^0.3.2",
     "gulp-clean-css": "^3.4.0",
     "gulp-copy": "^1.0.0",
+    "gulp-pug": "^3.3.0",
     "gulp-rename": "^1.2.2",
     "gulp-sass": "^3.1.0",
     "gulp-sourcemaps": "^2.6.0",

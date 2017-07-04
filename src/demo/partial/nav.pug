@@ -1,0 +1,19 @@
+mixin menuItem(item)
+    li(class= activePage == item.url ? "nav-item active" : "nav-item")
+        a(class="nav-item nav-link" href=item.url)=item.title
+
+nav(class="container")
+    div(class="d-flex justify-content-between hidden-lg-up")
+        a(class="navbar-brand" href="index.html") BrickyEditor
+        button(class="navbar-toggler" type="button" data-toggle="collapse" data-target="#bd-main-nav" aria-controls="bd-main-nav" aria-expanded="false" aria-label="Toggle navigation")
+        span(class="navbar-toggler-icon")
+    div(class="collapse navbar-collapse" id="bd-main-nav")
+        ul(class="nav navbar-nav")
+            - 
+                var menu = [
+                    { title: "BrickyEditor", url: "index.html" },
+                    { title: "Examples", url: "examples.html" },
+                    { title: "Download", url: "https://github.com/yakovlevga/brickyeditor" }
+                ];
+            each item in menu
+                +menuItem(item)

@@ -1,0 +1,51 @@
+extends layout.pug
+
+append styles
+    link(rel="stylesheet" href="lib/css/font-awesome.min.css")
+    link(rel="stylesheet" href="css/jquery.brickyeditor.min.css")
+    //- Code highlight
+    link(rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css")
+    block styles
+
+//- Code highlight
+append scripts
+    script(src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js")
+    script(src="js/jquery.brickyeditor.js")
+    script.
+        function initButtons(editor) {
+            $("#renderHtml").on("click", function() {                            
+                var html = editor.getHtml();             
+                var $tab = $('#tabHtml');
+                $tab.find("code").text(html);
+                hljs.highlightBlock($tab.find("code")[0]);
+            });
+
+            $("#renderJson").on("click", function() {
+                var data = editor.getData();    
+                var $tab = $('#tabJson');                                                    
+                $tab.find("code").text(JSON.stringify(data, null, "\t"));
+                hljs.highlightBlock($tab.find("code")[0]);
+            });
+        }
+    block scripts
+
+block content
+    .row
+        .col-md-12
+            ul.nav.nav-pills.justify-content-end
+                li.nav-item
+                    a.nav-link.active(data-toggle='tab', href='#tabEditor') Editor
+                li.nav-item
+                    a#renderHtml.nav-link(data-toggle='tab', href='#tabHtml') Html
+                li.nav-item
+                    a#renderJson.nav-link(data-toggle='tab', href='#tabJson') JSON
+            hr
+    .row
+        .col-md-12
+            .tab-content
+            #tabEditor.tab-pane.active
+                #editor
+            #tabHtml.tab-pane
+                pre.
+            #tabJson.tab-pane
+                pre.

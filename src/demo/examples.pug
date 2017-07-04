@@ -1,0 +1,11 @@
+extends layout/examples.pug
+
+block scripts
+    script.
+        $(function(){
+            $("#editor").brickyeditor({
+                onload: function(editor) {
+                    initButtons(editor);
+                }
+            });                
+        });
