@@ -1,5 +1,8 @@
 extends layout.pug
 
+block vars
+  - var activePage = "examples.html";
+
 append styles
     link(rel="stylesheet" href="lib/css/font-awesome.min.css")
     link(rel="stylesheet" href="css/jquery.brickyeditor.min.css")
@@ -46,6 +49,8 @@ block content
             #tabEditor.tab-pane.active
                 #editor
             #tabHtml.tab-pane
-                pre.
+                pre
+                    code.html
             #tabJson.tab-pane
-                pre.
+                pre
+                    code.json
