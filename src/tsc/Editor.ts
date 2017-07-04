@@ -13,14 +13,13 @@ namespace BrickyEditor {
         private $tools: JQuery; // jquery element of editor tools
         private $filter: JQuery; // blocks filter      
         private $toolsBtn: JQuery; // show tools button
-
         
-        private compactTools? : Boolean = null;
-        private _isMobile : Boolean;
-        public get isMobile() : Boolean {
+        private compactTools? : boolean = null;
+        private _isMobile : boolean;
+        public get isMobile() : boolean {
             return this._isMobile;
         }
-        public set isMobile(value : Boolean) {
+        public set isMobile(value : boolean) {
             if(this._isMobile == value)
                 return;
                 
@@ -43,15 +42,17 @@ namespace BrickyEditor {
             let editor = this;
             this.options = new EditorOptions(options);
             
-            this
+            editor
                 .loadTemplatesAsync()
                 .done(function() {
+                    // Load blocks into container
                     editor.loadBlocks(editor.options.blocks);
 
+                    // OnLoad handler
                     if(editor.options.onload) {
                         editor.options.onload(editor);
                     }
-                });            
+                });
         }
 
         private loadTemplatesAsync() : JQueryDeferred<any> {
@@ -60,7 +61,7 @@ namespace BrickyEditor {
             let tasks = [];            
 
             // load templates
-            tasks.push(TemplateService
+            tasks.push(Services.TemplateService
                 .loadTemplatesAsync(editor.options.templatesFolder)
                 .done(function() {})
                 .fail(function(err) {
@@ -69,7 +70,7 @@ namespace BrickyEditor {
                 }));
 
             // load modal template
-            tasks.push(TemplateService
+            tasks.push(Services.TemplateService
                 .loadTemplateAsync(editor.options.templatesBaseFolder, Constants.templateModalKey)
                 .done(function(html) {
                     var modal = new Modal(html);
@@ -82,7 +83,7 @@ namespace BrickyEditor {
                 }));
 
             // load tools template
-            TemplateService
+            Services.TemplateService
                 .loadTemplateAsync(editor.options.templatesBaseFolder, Constants.templateToolsKey)
                 .done(function(html) {
                     editor.$tools = $(html);
@@ -98,7 +99,7 @@ namespace BrickyEditor {
                 });
                 
             // load html tools template
-            TemplateService
+            Services.TemplateService
                 .loadTemplateAsync(editor.options.templatesBaseFolder, Constants.templateHtmlToolsKey)
                 .done(function(html) {
                     var htmlTools = new HtmlTools(html, editor);
@@ -139,21 +140,23 @@ namespace BrickyEditor {
             // or if it's not forced by compactTools in passed settings.
             editor.checkIsCompactTools(editor);
 
-            for (var templateName in TemplateService.templates) {
+            for (var templateName in Services.TemplateService.templates) {
                 let block = new Block(null, null, templateName);
-                let template = TemplateService.templates[templateName];
+                let template = Services.TemplateService.templates[templateName];
                 let $template = $(`<div class='template m-1 p-1' data-bricky-template="${templateName}">${block.getHtml(true)}</div>`);
                 $templates.append($template);
 
                 // fill all templates categories
-                Common.arrayEach(template.category, function(category) {
-                    let exists : Boolean = Common.arrayAny(categories, function(x) {
-                        return x.breEqualsInvariant(category);
+                if(template.category) {
+                    template.category.forEach(category => {
+                        let exists = categories.some(c => {
+                            return c.breEqualsInvariant(category);
+                        });
+                        if(!exists) {
+                            categories.push(category);
+                        }
                     });
-                    if(!exists) {
-                        categories.push(category);
-                    }
-                });                             
+                }
             }
 
             $(Constants.selectorTemplate, $templates)

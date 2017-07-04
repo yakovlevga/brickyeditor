@@ -429,7 +429,7 @@
     display: block; }
 
 .brickyeditor-block-wrapper .brickyeditor-block-tools {
-  width: 64px;
+  width: 80 px;
   position: absolute;
   display: none;
   background: white;

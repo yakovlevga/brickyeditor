@@ -11,7 +11,7 @@ namespace BrickyEditor {
 
                 $field.on('click', function() {
                     let url = prompt('Link to embed', 'http://instagr.am/p/fA9uwTtkSN/');
-                    EmbedService
+                    Services.EmbedService
                         .getEmbedAsync(url)
                         .done(function(json){
                             field.data.url = url;

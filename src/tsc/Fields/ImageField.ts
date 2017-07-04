@@ -8,14 +8,14 @@ namespace BrickyEditor {
                 let data = this.data;
 
                 if(!this.data.src) {
-                    this.data.src = TemplateService.getFieldValue($field, 'src');
+                    this.data.src = Services.TemplateService.getFieldValue($field, 'src');
                 }
                 $field.attr("src", this.data.src);                
                 $field.on('click', function() {
                     field.block.editor.modal.promptAsync(field.getPromptParams())                    
                     .done(fields => {
-                        var file = fields.first(f => f.key === 'file').value;
-                        var src = fields.first(f => f.key === 'src').value;
+                        let file = fields.getValue('file');
+                        let src = fields.getValue('src');
                         if(file) {
                             field.setFile(file);
                             field.setSrc(null);
@@ -25,7 +25,7 @@ namespace BrickyEditor {
                             field.setFile(null);
                         }
 
-                        var alt = fields.first(f => f.key === 'alt').value;
+                        let alt = fields.getValue('alt');
                         field.setAlt(alt);
                     });
 

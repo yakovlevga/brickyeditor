@@ -1,5 +1,4 @@
 namespace BrickyEditor {
-    
     export class HtmlTools {
 
         public $control: JQuery; // jquery element of editor html tools
@@ -23,16 +22,16 @@ namespace BrickyEditor {
                             selection = window.getSelection();
                             selection.addRange(range);
                             
-                            var href = fields.first(f => f.key === 'href').value;
+                            var href = fields.getValue('href');
                             if(href) {
                                 document.execCommand(command, false, href);
                                 
-                                var target = fields.first(f => f.key === 'target').value;
+                                var target = fields.getValue('target');
                                 if(target) {
                                     selection.anchorNode.parentElement.setAttribute('target', target);
                                 }
 
-                                var title = fields.first(f => f.key === 'title').value;
+                                var title = fields.getValue('title');
                                 if(title) {
                                     selection.anchorNode.parentElement.setAttribute('title', title);
                                 }

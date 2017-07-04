@@ -13,7 +13,7 @@ namespace BrickyEditor {
 
                 this.data.html = 
                     this.data.html || 
-                    TemplateService.getFieldValue($field, 'html') ||
+                    Services.TemplateService.getFieldValue($field, 'html') ||
                     Constants.dummyText;
 
                 $field.html(this.data.html);

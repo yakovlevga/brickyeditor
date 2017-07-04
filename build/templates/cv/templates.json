@@ -1,0 +1,19 @@
+[
+    { 
+        "file": "header", 
+        "title": "Header", 
+        "category": ["Header"]
+    },
+
+    { 
+        "file": "section-header", 
+        "title": "Section header", 
+        "category": ["Header"]
+    },
+
+    { 
+        "file": "experience", 
+        "title": "Work expirience", 
+        "category": ["Section"]
+    }
+]

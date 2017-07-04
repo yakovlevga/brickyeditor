@@ -25,14 +25,14 @@ namespace BrickyEditor {
             constructor(block: Block, $field: JQuery, data: any) {                
                 this.block = block;
                 this.$field = $field;
-                this.name = TemplateService.getFieldValue($field, "name");
-                this.type = TemplateService.getFieldValue($field, "type");
+                this.name = Services.TemplateService.getFieldValue($field, "name");
+                this.type = Services.TemplateService.getFieldValue($field, "type");
                 this.data = data || {};
                 this.bind();
             }
 
             public static getField(block: Block, $el: JQuery, data?: Fields.BaseField) : BaseField {
-                let type = TemplateService.getFieldValue($el, "type");
+                let type = Services.TemplateService.getFieldValue($el, "type");
                 let fieldClass = this.fields[type];
                 if(fieldClass) {                    
                     return fieldClass(block, $el, data);                        

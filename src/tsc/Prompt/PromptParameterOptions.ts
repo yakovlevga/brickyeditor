@@ -13,7 +13,7 @@ namespace BrickyEditor {
             }
 
             protected getEditor() {
-                var options = Common.arrayMap(this.options, function(opt) {
+                var options = this.options.map(opt => {
                     return `<option value="${opt.value}" ${opt.selected ? "selected" : ""}>${opt.title ? opt.title : opt.value}</option>`;
                 });
                 return $(`<select type="text" id="${this.key}" class="brickyeditor-input" placeholder="${this.placeholder}">${options}</select>`);

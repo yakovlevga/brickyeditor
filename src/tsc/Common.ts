@@ -1,16 +1,21 @@
 // String extensions
 interface String {
     breTotalTrim(): string;
-    breEqualsInvariant(other: String): Boolean;
-    breStartsWith(part: String) : Boolean;    
-    breContains(part: String) : Boolean; 
+    breEqualsInvariant(other: String): boolean;
+    breStartsWith(part: String) : boolean;    
+    breContains(part: String) : boolean; 
 }
 
-String.prototype.breContains = function(part: String) : Boolean   {
+// Array extensions
+interface Array<T> {
+    find(predicate: (search: T) => boolean): T;
+}
+
+String.prototype.breContains = function(part: String) : boolean   {
     return this.indexOf(part) >= 0;
 }
 
-String.prototype.breStartsWith = function(part: String) : Boolean   {
+String.prototype.breStartsWith = function(part: String) : boolean   {
     return this.indexOf(part) == 0;
 }
 
@@ -18,25 +23,33 @@ String.prototype.breTotalTrim = function() : string {
     return this ? this.replace(/\s\s+/g, ' ').trim() : '';
 }
 
-String.prototype.breEqualsInvariant = function(other: String) {    
+String.prototype.breEqualsInvariant = function(other: String) : boolean {    
     return this.toLowerCase() === other.toLowerCase();
 }
 
 // Array extensions
-
-interface Array<T> {
-    first(filter: (elem: T) => Boolean) : T;
-}
-
-Array.prototype.first = function<T>(filter: (elem: T) => Boolean) {
-    for(var i = 0; i < this.length; i++) {
-        var elem = this[i]; 
-        if(filter(this[i])) {
-            return elem;
-        }
+if (!Array.prototype.find) {
+  Array.prototype.find = function(predicate) {
+    if (this == null) {
+      throw new TypeError('Array.prototype.find called on null or undefined');
     }
-    return null;
-}  
+    if (typeof predicate !== 'function') {
+      throw new TypeError('predicate must be a function');
+    }
+    var list = Object(this);
+    var length = list.length >>> 0;
+    var thisArg = arguments[1];
+    var value;
+
+    for (var i = 0; i < length; i++) {
+      value = list[i];
+      if (predicate.call(thisArg, value, i, list)) {
+        return value;
+      }
+    }
+    return undefined;
+  };
+}
 
 namespace BrickyEditor {
     export class Common {        
@@ -76,73 +89,6 @@ namespace BrickyEditor {
             }
 
             return result;
-        }
-
-
-        // Arrays
-
-        static arrayFilter(array, filter, payload?) {
-            let result = [];
-            
-            Common.arrayEach(array, function(element) {
-                if(filter(element)) {
-                    result.push(element);
-                }
-            });
-
-            if(payload) {
-                result.push(payload);
-            }
-
-            return result;
-        }
-
-        static arrayFind(array, filter) : any {
-            Common.arrayEach(array, function(element) {
-                if(filter(element)) {
-                    return element;
-                }
-            });         
-
-            return null;
-        }
-
-        static arrayFindByField(array, fieldName, fieldValue) : any {
-            Common.arrayEach(array, function(element) {
-                if(element.hasOwnProperty(fieldName) && 
-                   element[fieldName] === fieldValue) {
-                    return element;
-                }
-            });
-            
-            return null;
-        }
-
-        static arrayMap(array, map) {
-            let result = [];
-            Common.arrayEach(array, function(element) {
-                result.push(map(element));
-            });
-            return result;
-        }
-
-        static arrayAny(array, filter) : Boolean {
-            var result = false;
-            for (var i = 0; i < array.length; i++) {
-                var element = array[i];
-                if(filter(element)) {
-                    result = true;
-                    break;
-                }   
-            }
-            return result;
-        }
-
-        static arrayEach(array, func) {
-            for (var i = 0; i < array.length; i++) {
-                var element = array[i];
-                func(element);
-            }
         }
     }    
 }

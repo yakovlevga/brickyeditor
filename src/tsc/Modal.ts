@@ -1,7 +1,4 @@
 namespace BrickyEditor {
-    import PromptParameter = Prompt.PromptParameter;
-    import PromptParameterOptions = Prompt.PromptParameterOptions;
-
     export class Modal {
 
         public $control: JQuery; // jquery element of editor tools   
@@ -35,8 +32,8 @@ namespace BrickyEditor {
             this.$control.fadeIn();
         }
 
-        public promptAsync(fields: Array<PromptParameter>) : JQueryDeferred<Array<PromptParameter>> {
-            let result = $.Deferred();
+        public promptAsync(fields: Array<Prompt.PromptParameter>) : JQueryDeferred<Prompt.PromptParameterList> {
+            let result = $.Deferred<Prompt.PromptParameterList>();
             let modal = this;
             let $form = $('<form></form>');
 
@@ -48,7 +45,7 @@ namespace BrickyEditor {
             $ok.on('click', function() {
                 fields.forEach(field => field.parseValue());
                 modal.hideModal();
-                result.resolve(fields);
+                result.resolve(new Prompt.PromptParameterList(fields));
             });
 
             let $cancel = $('<button type="button" class="btn btn-cancel">Cancel</button>');
@@ -61,6 +58,6 @@ namespace BrickyEditor {
 
             modal.showModal($form);
             return result;
-        }
+        }        
     }
 }

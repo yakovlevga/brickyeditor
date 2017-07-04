@@ -17,7 +17,7 @@ namespace BrickyEditor {
             this.container = container;
             this.template = templateName;
 
-            let template = TemplateService.getTemplate(templateName);
+            let template = Services.TemplateService.getTemplate(templateName);
                         
             this.$block = $(template.html);
             let $editor = this.getBlockTools(this.$block);
@@ -85,7 +85,7 @@ namespace BrickyEditor {
                 .addBack(Constants.selectorField)
                 .each(function() {
                     let $field = $(this);
-                    let fieldName = TemplateService.getFieldValue($field, "name");
+                    let fieldName = Services.TemplateService.getFieldValue($field, "name");
                     let fieldData: Fields.BaseField;
                     if(data) {
                         data.forEach(fd => {
@@ -145,13 +145,15 @@ namespace BrickyEditor {
         }
 
         public selectBlock(field?: Fields.BaseField, container?: Container) {
-            this.container.selectedBlock.deselectBlock();
+            if(this.container.selectedBlock) {
+                this.container.selectedBlock.deselectBlock();
+            }
             this.container.selectedBlock = this;
-            this.container.selectedContainer = container;
+            this.container.select(container);
         }
 
         public deselectBlock() {
-            this.container.selectedContainer = null;
+            this.container.deselect(this.container.selectedContainer);
         }
     }
 

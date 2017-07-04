@@ -1,0 +1,70 @@
+[
+    {
+        "group" : "Containers",
+        "templates": [
+            { 
+                "file": "containers/2columns", 
+                "title": "Two columns text"
+            },
+
+            { 
+                "file": "containers/3columns", 
+                "title": "Three columns text"
+            },
+
+            { 
+                "file": "containers/4columns", 
+                "title": "Three columns text"
+            }
+        ]
+    },
+
+    {
+        "group" : "Headers",
+        "templates": [
+            { 
+                "file": "headers/h2", 
+                "title": "Heading 2"
+            },
+
+            { 
+                "file": "headers/h3", 
+                "title": "Heading 3"
+            }
+        ]
+    },
+
+    {
+        "group" : "Text",
+        "templates": [        
+            { 
+                "file": "p", 
+                "title": "Paragraph", 
+                "category": ["Text"]
+            }
+        ]
+    },
+
+    {
+        "group" : "Media",
+        "templates": [            
+            { 
+                "file": "embed", 
+                "title": "Insta", 
+                "category": ["Embed"]
+            },
+            
+            { 
+                "file": "hr", 
+                "title": "Horizontal rule", 
+                "category": ["Delimeters"]
+            },
+
+            { 
+                "file": "img", 
+                "title": "Image", 
+                "category": ["Image"]
+            }
+        ]
+    }
+]

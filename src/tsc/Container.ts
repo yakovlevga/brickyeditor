@@ -21,8 +21,7 @@ namespace BrickyEditor {
             if(this._selectedContainer) {
                 this._selectedContainer.$el.addClass("selected");
             }
-        }
-        
+        }        
         
         constructor($el: JQuery, editor?: Editor) {
             this.$el = $el;
@@ -32,9 +31,23 @@ namespace BrickyEditor {
             else if (this instanceof Editor) {
                 this.editor = this;
             }
-            // else {
-            //     throw 'Editor param can\'t be null. It\'s allowed only if Container instanse is instance of Editor itself.';
-            // }
+        }
+
+        public select(container: Container) {
+            this.selectedContainer = container;
+            if(this.selectedContainer) {
+                this.selectedContainer.$el.on('contextmenu', () => {
+                    this.deselect(container);
+                    return false;
+                });
+            }
+        }
+
+        public deselect(container: Container) {            
+            if(container) {
+                container.$el.off('contextmenu');
+                container.editor.selectedContainer = null;
+            }
         }
 
         public getData() : any {

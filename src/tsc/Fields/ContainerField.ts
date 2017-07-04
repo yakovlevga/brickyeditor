@@ -12,6 +12,7 @@ namespace BrickyEditor {
 
             constructor(block: Block, $field: JQuery, data: any) {
                 super(block, $field, data);
+                debugger;
                 this.container = new Container($field, this.block.editor);
             }            
 
