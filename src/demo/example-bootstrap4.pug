@@ -1,0 +1,61 @@
+extends layout/examples.pug
+
+block scripts
+    script.
+        $(function(){
+            $("#editor").brickyeditor({
+                blocks: [
+                    {
+                        "template": "h1-display",
+                        "html": "<h1 class=\"display-1 mb-4\">BrickyEditor.</h1>",
+                        "fields": [
+                            {
+                                "type": "html",
+                                "name": "text",
+                                "data": {
+                                    "html": "BrickyEditor."
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "template": "p",
+                        "html": "<p>On the other hand, we denounce with righteous indignation and dislike men who are so beguiled and demoralized by the charms of pleasure of the moment, so blinded by desire, that they cannot foresee the pain and trouble that are bound to ensue.</p>",
+                        "fields": [
+                            {
+                                "type": "html",
+                                "name": "text",
+                                "data": {
+                                    "html": "On the other hand, we denounce with righteous indignation and dislike men who are so beguiled and demoralized by the charms of pleasure of the moment, so blinded by desire, that they cannot foresee the pain and trouble that are bound to ensue."
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "template": "img",
+                        "html": "<div class=\"row\"> <div class=\"col-md-12\"> <figure class=\"figure text-center\" style=\"width: 100%\"> <img class=\"figure-img img-fluid\" src=\"https://cdn.pixabay.com/photo/2017/02/20/18/21/sunflower-2083536_960_720.jpg\" alt=\"\"> <figcaption class=\"figure-caption\">(c)&nbsp;<a href=\"https://pixabay.com/photo-2083536/\">jurajko</a>,&nbsp;<span style=\"font-size: 14.4px;\">https://pixabay.com/photo-2083536/</span></figcaption> </figure> </div>\n</div>",
+                        "fields": [
+                            {
+                                "type": "image",
+                                "name": "image",
+                                "data": {
+                                    "src": "https://cdn.pixabay.com/photo/2017/02/20/18/21/sunflower-2083536_960_720.jpg",
+                                    "file": null,
+                                    "alt": ""
+                                }
+                            },
+                            {
+                                "type": "html",
+                                "name": "imageCaption",
+                                "data": {
+                                    "html": "(c)&nbsp;<a href=\"https://pixabay.com/photo-2083536/\">jurajko</a>,&nbsp;<span style=\"font-size: 14.4px;\">https://pixabay.com/photo-2083536/</span>"
+                                }
+                            }
+                        ]
+                    }
+                ],
+                onload: function(editor) {
+                    initButtons(editor);
+                }
+            });                
+        });

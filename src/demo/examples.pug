@@ -1,11 +1,17 @@
-extends layout/examples.pug
+extends layout/layout.pug
+  
+block vars
+  - var activePage = "examples.html";
 
-block scripts
-    script.
-        $(function(){
-            $("#editor").brickyeditor({
-                onload: function(editor) {
-                    initButtons(editor);
-                }
-            });                
-        });
+block content  
+    .row
+        .col-md-12
+            h3
+                a(href="example-bootstrap4.html").
+                    <b>Bootstrap 4</b> Example
+            p Basic example with Bootstrap 4 as layout. There is few predifined common templates for standart article editing.
+
+            h3
+                a(href="example-cv.html").
+                    <b>CV</b> example
+            p CV Editor example based on bootstrap 4

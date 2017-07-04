@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>BrickyEditor - WYSIWYG longrid editor.</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css">
+    <link rel="stylesheet" href="lib/css/font-awesome.min.css">
+    <link rel="stylesheet" href="css/jquery.brickyeditor.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css">
+    <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js">   </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+    <script src="js/jquery.brickyeditor.js"></script>
+    <script>
+      function initButtons(editor) {
+          $("#renderHtml").on("click", function() {                            
+              var html = editor.getHtml();             
+              var $tab = $('#tabHtml');
+              $tab.find("code").text(html);
+              hljs.highlightBlock($tab.find("code")[0]);
+          });
+      
+          $("#renderJson").on("click", function() {
+              var data = editor.getData();    
+              var $tab = $('#tabJson');                                                    
+              $tab.find("code").text(JSON.stringify(data, null, "\t"));
+              hljs.highlightBlock($tab.find("code")[0]);
+          });
+      }
+    </script>
+    <script>
+      $(function(){
+          $("#editor").brickyeditor({
+              blocks: [
+                  {
+                      "template": "h1-display",
+                      "html": "<h1 class=\"display-1 mb-4\">BrickyEditor.</h1>",
+                      "fields": [
+                          {
+                              "type": "html",
+                              "name": "text",
+                              "data": {
+                                  "html": "BrickyEditor."
+                              }
+                          }
+                      ]
+                  },
+                  {
+                      "template": "p",
+                      "html": "<p>On the other hand, we denounce with righteous indignation and dislike men who are so beguiled and demoralized by the charms of pleasure of the moment, so blinded by desire, that they cannot foresee the pain and trouble that are bound to ensue.</p>",
+                      "fields": [
+                          {
+                              "type": "html",
+                              "name": "text",
+                              "data": {
+                                  "html": "On the other hand, we denounce with righteous indignation and dislike men who are so beguiled and demoralized by the charms of pleasure of the moment, so blinded by desire, that they cannot foresee the pain and trouble that are bound to ensue."
+                              }
+                          }
+                      ]
+                  },
+                  {
+                      "template": "img",
+                      "html": "<div class=\"row\"> <div class=\"col-md-12\"> <figure class=\"figure text-center\" style=\"width: 100%\"> <img class=\"figure-img img-fluid\" src=\"https://cdn.pixabay.com/photo/2017/02/20/18/21/sunflower-2083536_960_720.jpg\" alt=\"\"> <figcaption class=\"figure-caption\">(c)&nbsp;<a href=\"https://pixabay.com/photo-2083536/\">jurajko</a>,&nbsp;<span style=\"font-size: 14.4px;\">https://pixabay.com/photo-2083536/</span></figcaption> </figure> </div>\n</div>",
+                      "fields": [
+                          {
+                              "type": "image",
+                              "name": "image",
+                              "data": {
+                                  "src": "https://cdn.pixabay.com/photo/2017/02/20/18/21/sunflower-2083536_960_720.jpg",
+                                  "file": null,
+                                  "alt": ""
+                              }
+                          },
+                          {
+                              "type": "html",
+                              "name": "imageCaption",
+                              "data": {
+                                  "html": "(c)&nbsp;<a href=\"https://pixabay.com/photo-2083536/\">jurajko</a>,&nbsp;<span style=\"font-size: 14.4px;\">https://pixabay.com/photo-2083536/</span>"
+                              }
+                          }
+                      ]
+                  }
+              ],
+              onload: function(editor) {
+                  initButtons(editor);
+              }
+          });                
+      });
+    </script>
+  </head>
+  <body>
+    <header class="navbar navbar-light navbar-toggleable-md bd-navbar">
+      <nav class="container">
+        <div class="d-flex justify-content-between hidden-lg-up"><a class="navbar-brand" href="index.html">BrickyEditor</a>
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#bd-main-nav" aria-controls="bd-main-nav" aria-expanded="false" aria-label="Toggle navigation"></button><span class="navbar-toggler-icon"></span>
+        </div>
+        <div class="collapse navbar-collapse" id="bd-main-nav">
+          <ul class="nav navbar-nav">
+                  <li class="nav-item"><a class="nav-item nav-link" href="index.html">BrickyEditor</a></li>
+                  <li class="nav-item active"><a class="nav-item nav-link" href="examples.html">Examples</a></li>
+                  <li class="nav-item"><a class="nav-item nav-link" href="https://github.com/yakovlevga/brickyeditor">Download</a></li>
+          </ul>
+        </div>
+      </nav>
+    </header>
+    <main>
+      <div class="container">
+        <div class="row">
+          <div class="col-md-12">
+            <ul class="nav nav-pills justify-content-end">
+              <li class="nav-item"><a class="nav-link active" data-toggle="tab" href="#tabEditor" role="tab">Editor</a></li>
+              <li class="nav-item"><a class="nav-link" id="renderHtml" data-toggle="tab" href="#tabHtml" role="tab">Html</a></li>
+              <li class="nav-item"><a class="nav-link" id="renderJson" data-toggle="tab" href="#tabJson" role="tab">JSON</a></li>
+            </ul>
+            <hr>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12">
+            <div class="tab-content">
+              <div class="tab-pane active" id="tabEditor" role="tabpanel">
+                <div id="editor"></div>
+              </div>
+              <div class="tab-pane" id="tabHtml" role="tabpanel">
+                <pre><code class="html"></code></pre>
+              </div>
+              <div class="tab-pane" id="tabJson" role="tabpanel">
+                <pre><code class="json"></code></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>

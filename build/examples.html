@@ -5,40 +5,9 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css">
-    <link rel="stylesheet" href="lib/css/font-awesome.min.css">
-    <link rel="stylesheet" href="css/jquery.brickyeditor.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css">
     <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js">   </script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
-    <script src="js/jquery.brickyeditor.js"></script>
-    <script>
-      function initButtons(editor) {
-          $("#renderHtml").on("click", function() {                            
-              var html = editor.getHtml();             
-              var $tab = $('#tabHtml');
-              $tab.find("code").text(html);
-              hljs.highlightBlock($tab.find("code")[0]);
-          });
-      
-          $("#renderJson").on("click", function() {
-              var data = editor.getData();    
-              var $tab = $('#tabJson');                                                    
-              $tab.find("code").text(JSON.stringify(data, null, "\t"));
-              hljs.highlightBlock($tab.find("code")[0]);
-          });
-      }
-    </script>
-    <script>
-      $(function(){
-          $("#editor").brickyeditor({
-              onload: function(editor) {
-                  initButtons(editor);
-              }
-          });                
-      });
-    </script>
   </head>
   <body>
     <header class="navbar navbar-light navbar-toggleable-md bd-navbar">
@@ -59,26 +28,10 @@
       <div class="container">
         <div class="row">
           <div class="col-md-12">
-            <ul class="nav nav-pills justify-content-end">
-              <li class="nav-item"><a class="nav-link active" data-toggle="tab" href="#tabEditor">Editor</a></li>
-              <li class="nav-item"><a class="nav-link" id="renderHtml" data-toggle="tab" href="#tabHtml">Html</a></li>
-              <li class="nav-item"><a class="nav-link" id="renderJson" data-toggle="tab" href="#tabJson">JSON</a></li>
-            </ul>
-            <hr>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-md-12">
-            <div class="tab-content"></div>
-            <div class="tab-pane active" id="tabEditor">
-              <div id="editor"></div>
-            </div>
-            <div class="tab-pane" id="tabHtml">
-              <pre><code class="html"></code></pre>
-            </div>
-            <div class="tab-pane" id="tabJson">
-              <pre><code class="json"></code></pre>
-            </div>
+            <h3><a href="example-bootstrap4.html"><b>Bootstrap 4</b> Example</a></h3>
+            <p>Basic example with Bootstrap 4 as layout. There is few predifined common templates for standart article editing.</p>
+            <h3><a href="example-cv.html"><b>CV</b> example</a></h3>
+            <p>CV Editor example based on bootstrap 4</p>
           </div>
         </div>
       </div>

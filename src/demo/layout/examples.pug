@@ -37,20 +37,20 @@ block content
         .col-md-12
             ul.nav.nav-pills.justify-content-end
                 li.nav-item
-                    a.nav-link.active(data-toggle='tab', href='#tabEditor') Editor
+                    a.nav-link.active(data-toggle='tab', href='#tabEditor', role="tab") Editor
                 li.nav-item
-                    a#renderHtml.nav-link(data-toggle='tab', href='#tabHtml') Html
+                    a#renderHtml.nav-link(data-toggle='tab', href='#tabHtml', role="tab") Html
                 li.nav-item
-                    a#renderJson.nav-link(data-toggle='tab', href='#tabJson') JSON
+                    a#renderJson.nav-link(data-toggle='tab', href='#tabJson', role="tab") JSON
             hr
     .row
         .col-md-12
             .tab-content
-            #tabEditor.tab-pane.active
-                #editor
-            #tabHtml.tab-pane
-                pre
-                    code.html
-            #tabJson.tab-pane
-                pre
-                    code.json
+                #tabEditor.tab-pane.active(role="tabpanel")
+                    #editor
+                #tabHtml.tab-pane(role="tabpanel")
+                    pre
+                        code.html
+                #tabJson.tab-pane(role="tabpanel")
+                    pre
+                        code.json

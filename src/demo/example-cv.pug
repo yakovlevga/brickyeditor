@@ -1,0 +1,139 @@
+extends layout/examples.pug
+
+block scripts
+    script.
+        $(function(){
+            $("#editor").brickyeditor({
+                templatesFolder: "/templates/cv",
+                blocks: [
+                    {
+                        "template": "header",
+                        "fields": [
+                            {
+                                "type": "html",
+                                "name": "name",
+                                "data": {
+                                    "html": "George Yakovlev"
+                                }
+                            },
+                            {
+                                "type": "html",
+                                "name": "description",
+                                "data": {
+                                    "html": "Fullstack Web-Developer"
+                                }
+                            },
+                            {
+                                "type": "html",
+                                "name": "location",
+                                "data": {
+                                    "html": "Moscow, Russia"
+                                }
+                            },
+                            {
+                                "type": "html",
+                                "name": "phone",
+                                "data": {
+                                    "html": "+7-926-00-0000"
+                                }
+                            },
+                            {
+                                "type": "html",
+                                "name": "email",
+                                "data": {
+                                    "html": "my@email.com"
+                                }
+                            },
+                            {
+                                "type": "html",
+                                "name": "site",
+                                "data": {
+                                    "html": "https://github.com/yakovlevga/brickyeditor"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "template": "section-header",
+                        "fields": [
+                            {
+                                "type": "html",
+                                "name": "header",
+                                "data": {
+                                    "html": "Expirience"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "template": "experience",
+                        "fields": [
+                            {
+                                "type": "html",
+                                "name": "position",
+                                "data": {
+                                    "html": "Lead .NET Developer"
+                                }
+                            },
+                            {
+                                "type": "html",
+                                "name": "company",
+                                "data": {
+                                    "html": "Company LLC"
+                                }
+                            },
+                            {
+                                "type": "html",
+                                "name": "date",
+                                "data": {
+                                    "html": "2015 - 2017"
+                                }
+                            },
+                            {
+                                "type": "html",
+                                "name": "description",
+                                "data": {
+                                    "html": "Description of your expirience"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "template": "experience",
+                        "fields": [
+                            {
+                                "type": "html",
+                                "name": "position",
+                                "data": {
+                                    "html": "Lead Windows Phone Developer"
+                                }
+                            },
+                            {
+                                "type": "html",
+                                "name": "company",
+                                "data": {
+                                    "html": "Company LLC"
+                                }
+                            },
+                            {
+                                "type": "html",
+                                "name": "date",
+                                "data": {
+                                    "html": "2013 - 2015"
+                                }
+                            },
+                            {
+                                "type": "html",
+                                "name": "description",
+                                "data": {
+                                    "html": "Description of your expirience"
+                                }
+                            }
+                        ]
+                    }
+                ],
+                onload: function(editor) {
+                    initButtons(editor);
+                }
+            });                
+        });

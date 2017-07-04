@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>BrickyEditor - WYSIWYG longrid editor.</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css">
+    <link rel="stylesheet" href="lib/css/font-awesome.min.css">
+    <link rel="stylesheet" href="css/jquery.brickyeditor.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css">
+    <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js">   </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+    <script src="js/jquery.brickyeditor.js"></script>
+    <script>
+      function initButtons(editor) {
+          $("#renderHtml").on("click", function() {                            
+              var html = editor.getHtml();             
+              var $tab = $('#tabHtml');
+              $tab.find("code").text(html);
+              hljs.highlightBlock($tab.find("code")[0]);
+          });
+      
+          $("#renderJson").on("click", function() {
+              var data = editor.getData();    
+              var $tab = $('#tabJson');                                                    
+              $tab.find("code").text(JSON.stringify(data, null, "\t"));
+              hljs.highlightBlock($tab.find("code")[0]);
+          });
+      }
+    </script>
+    <script>
+      $(function(){
+          $("#editor").brickyeditor({
+              templatesFolder: "/templates/cv",
+              blocks: [
+                  {
+                      "template": "header",
+                      "fields": [
+                          {
+                              "type": "html",
+                              "name": "name",
+                              "data": {
+                                  "html": "George Yakovlev"
+                              }
+                          },
+                          {
+                              "type": "html",
+                              "name": "description",
+                              "data": {
+                                  "html": "Fullstack Web-Developer"
+                              }
+                          },
+                          {
+                              "type": "html",
+                              "name": "location",
+                              "data": {
+                                  "html": "Moscow, Russia"
+                              }
+                          },
+                          {
+                              "type": "html",
+                              "name": "phone",
+                              "data": {
+                                  "html": "+7-926-00-0000"
+                              }
+                          },
+                          {
+                              "type": "html",
+                              "name": "email",
+                              "data": {
+                                  "html": "my@email.com"
+                              }
+                          },
+                          {
+                              "type": "html",
+                              "name": "site",
+                              "data": {
+                                  "html": "https://github.com/yakovlevga/brickyeditor"
+                              }
+                          }
+                      ]
+                  },
+                  {
+                      "template": "section-header",
+                      "fields": [
+                          {
+                              "type": "html",
+                              "name": "header",
+                              "data": {
+                                  "html": "Expirience"
+                              }
+                          }
+                      ]
+                  },
+                  {
+                      "template": "experience",
+                      "fields": [
+                          {
+                              "type": "html",
+                              "name": "position",
+                              "data": {
+                                  "html": "Lead .NET Developer"
+                              }
+                          },
+                          {
+                              "type": "html",
+                              "name": "company",
+                              "data": {
+                                  "html": "Company LLC"
+                              }
+                          },
+                          {
+                              "type": "html",
+                              "name": "date",
+                              "data": {
+                                  "html": "2015 - 2017"
+                              }
+                          },
+                          {
+                              "type": "html",
+                              "name": "description",
+                              "data": {
+                                  "html": "Description of your expirience"
+                              }
+                          }
+                      ]
+                  },
+                  {
+                      "template": "experience",
+                      "fields": [
+                          {
+                              "type": "html",
+                              "name": "position",
+                              "data": {
+                                  "html": "Lead Windows Phone Developer"
+                              }
+                          },
+                          {
+                              "type": "html",
+                              "name": "company",
+                              "data": {
+                                  "html": "Company LLC"
+                              }
+                          },
+                          {
+                              "type": "html",
+                              "name": "date",
+                              "data": {
+                                  "html": "2013 - 2015"
+                              }
+                          },
+                          {
+                              "type": "html",
+                              "name": "description",
+                              "data": {
+                                  "html": "Description of your expirience"
+                              }
+                          }
+                      ]
+                  }
+              ],
+              onload: function(editor) {
+                  initButtons(editor);
+              }
+          });                
+      });
+    </script>
+  </head>
+  <body>
+    <header class="navbar navbar-light navbar-toggleable-md bd-navbar">
+      <nav class="container">
+        <div class="d-flex justify-content-between hidden-lg-up"><a class="navbar-brand" href="index.html">BrickyEditor</a>
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#bd-main-nav" aria-controls="bd-main-nav" aria-expanded="false" aria-label="Toggle navigation"></button><span class="navbar-toggler-icon"></span>
+        </div>
+        <div class="collapse navbar-collapse" id="bd-main-nav">
+          <ul class="nav navbar-nav">
+                  <li class="nav-item"><a class="nav-item nav-link" href="index.html">BrickyEditor</a></li>
+                  <li class="nav-item active"><a class="nav-item nav-link" href="examples.html">Examples</a></li>
+                  <li class="nav-item"><a class="nav-item nav-link" href="https://github.com/yakovlevga/brickyeditor">Download</a></li>
+          </ul>
+        </div>
+      </nav>
+    </header>
+    <main>
+      <div class="container">
+        <div class="row">
+          <div class="col-md-12">
+            <ul class="nav nav-pills justify-content-end">
+              <li class="nav-item"><a class="nav-link active" data-toggle="tab" href="#tabEditor" role="tab">Editor</a></li>
+              <li class="nav-item"><a class="nav-link" id="renderHtml" data-toggle="tab" href="#tabHtml" role="tab">Html</a></li>
+              <li class="nav-item"><a class="nav-link" id="renderJson" data-toggle="tab" href="#tabJson" role="tab">JSON</a></li>
+            </ul>
+            <hr>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12">
+            <div class="tab-content">
+              <div class="tab-pane active" id="tabEditor" role="tabpanel">
+                <div id="editor"></div>
+              </div>
+              <div class="tab-pane" id="tabHtml" role="tabpanel">
+                <pre><code class="html"></code></pre>
+              </div>
+              <div class="tab-pane" id="tabJson" role="tabpanel">
+                <pre><code class="json"></code></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>
