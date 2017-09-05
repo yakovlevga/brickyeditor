@@ -38,7 +38,11 @@ namespace BrickyEditor {
 
             protected selectBlock(container?: Container) {
                 this.block.container.selectedBlock.selectBlock(this, container);
-            }            
+            }           
+            
+            public settings() {
+                return null;
+            }
 
             public getData() : any {
                 return {

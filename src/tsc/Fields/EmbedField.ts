@@ -3,6 +3,14 @@ namespace BrickyEditor {
     export namespace Fields {
         export class EmbedField extends BaseField {
 
+            public settings() {
+                let field = this;
+                return function() {
+                    field.data.url = prompt('Link to embed media', 'http://instagr.am/p/BYJAes_HEI0/');
+                    field.loadMedia();
+                }
+            }
+
             bind() {         
                 let field = this;
                 let $field = this.$field;
@@ -17,8 +25,6 @@ namespace BrickyEditor {
             
             loadMedia() {
                 let field = this;    
-                let $field = this.$field;
-                
                 if(!field.data || !field.data.url)
                     return;
 
@@ -41,8 +47,11 @@ namespace BrickyEditor {
                                     .fail(function(err) {});
                             }
                         }
-
-                        $field.replaceWith($embed);
+                        
+                        field.$field.empty();
+                        field.$field.removeAttr('class');
+                        field.$field.removeAttr('style');
+                        field.$field.append($embed);
                         field.selectBlock();
                     });
             }

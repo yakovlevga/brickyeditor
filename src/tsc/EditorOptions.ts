@@ -5,6 +5,7 @@ namespace BrickyEditor {
         public onload: any;
         public blocks: Array<Block>;
         public compactTools?: Boolean = null;
+        public ignoreHtml?: Boolean = null
 
         constructor(options: EditorOptions) {
             this.templatesBaseFolder = options.templatesBaseFolder || this.templatesBaseFolder;
@@ -12,7 +13,7 @@ namespace BrickyEditor {
             this.onload = options.onload;
             this.blocks = options.blocks;
             this.compactTools = options.compactTools;
-
+            this.ignoreHtml = options.ignoreHtml || false;
         }
     }
 }

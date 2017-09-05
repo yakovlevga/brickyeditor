@@ -20,22 +20,21 @@ namespace BrickyEditor {
             let template = Services.TemplateService.getTemplate(templateName);
                         
             this.$block = $(template.html);
-            let $editor = this.getBlockTools(this.$block);
-            this.$editor = $editor;            
-            
-            $editor.hover(
-                () => {
-                    //$(".brickyeditor-block-wrapper").removeClass('active');
-                    $editor.addClass('active');
-                    //return false;
-                },
-                () => {
-                    $editor.removeClass('active');
-                    //return false;
-                }
-            );
-
             this.bindBlockFields(data);
+
+            if(editor) {
+                let $editor = this.getBlockTools(this.$block);
+                this.$editor = $editor;            
+                
+                $editor.hover(
+                    () => {
+                        $editor.addClass('active');
+                    },
+                    () => {
+                        $editor.removeClass('active');
+                    }
+                );                
+            }
         }
 
         private getBlockTools($block : JQuery) : JQuery {
@@ -47,9 +46,15 @@ namespace BrickyEditor {
                         <a class='fa fa-copy' data-brickyeditor-block-action='${BlockAction.Copy}'></a>
                         <a class='fa fa-angle-up' data-brickyeditor-block-action='${BlockAction.Up}'></a>
                         <a class='fa fa-angle-down' data-brickyeditor-block-action='${BlockAction.Down}'></a>
+                        <a class='fa fa-cog' data-brickyeditor-block-action='${BlockAction.Edit}'></a>
                     </div>
                 </div>`
             );
+
+            if(!this.hasSettings()) {
+                $(`[data-brickyeditor-block-action='${BlockAction.Edit}']`, $tools).remove();
+            }
+
             $('[data-brickyeditor-block-action]', $tools).on('click', function() {
                 let action = $(this).attr('data-brickyeditor-block-action');                
                 block.action(parseInt(action));
@@ -71,6 +76,9 @@ namespace BrickyEditor {
                     break;
                 case BlockAction.Copy:
                     this.container.copyBlock(this);
+                    break;
+                case BlockAction.Edit:
+                    this.settings();
                     break;
                 default:
                     break;
@@ -103,15 +111,18 @@ namespace BrickyEditor {
         }
 
         public getData(): any {
-            var fieldsData = [];
+            let fieldsData = [];
             this.fields.forEach(field => {
                 fieldsData.push(field.getData());
             });
 
-            return {
+            return this.editor.options.ignoreHtml ? {
                 template: this.template,
-                html: this.getHtml(true),
                 fields: fieldsData
+            } : {
+                template: this.template,
+                fields: fieldsData,
+                html: this.getHtml(true)
             };
         }
 
@@ -155,6 +166,23 @@ namespace BrickyEditor {
         public deselectBlock() {
             this.container.deselect(this.container.selectedContainer);
         }
+
+        private hasSettings() {
+            return this.fields.filter(f => {
+                return f.settings() != null 
+            }).length > 0;
+        }
+
+        // This is not valid for situations when few fields has it's own settings,
+        // need to rework this part. At current moment it's needed only for embed fields.
+        private settings() {
+            return this.fields.forEach(f => {
+                let settingsFunc = f.settings();
+                if(settingsFunc) {
+                    settingsFunc();
+                }
+            });
+        }
     }
 
     enum BlockAction {
@@ -162,6 +190,7 @@ namespace BrickyEditor {
         Settings,
         Copy,
         Up,
-        Down
+        Down,
+        Edit
     };
 }

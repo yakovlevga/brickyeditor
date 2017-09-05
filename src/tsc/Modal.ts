@@ -19,7 +19,7 @@ namespace BrickyEditor {
 
         public hideModal() {            
             let $content = this.$content;
-            this.$control.fadeOut(function() {
+            this.$control.fadeOut('fast', function() {
                 $content.html('');
             });
         }

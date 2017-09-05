@@ -3,6 +3,7 @@ namespace BrickyEditor {
         export class ContainerField extends BaseField {
             public container: Container;
 
+            private _data: any;
             public get data() : any {
                 return this.container ? this.container.getData() : {};
             }
@@ -12,7 +13,6 @@ namespace BrickyEditor {
 
             constructor(block: Block, $field: JQuery, data: any) {
                 super(block, $field, data);
-                debugger;
                 this.container = new Container($field, this.block.editor);
             }            
 

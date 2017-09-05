@@ -19,18 +19,23 @@ var BrickyEditor;
             this.template = templateName;
             var template = BrickyEditor.Services.TemplateService.getTemplate(templateName);
             this.$block = $(template.html);
-            var $editor = this.getBlockTools(this.$block);
-            this.$editor = $editor;
-            $editor.hover(function () {
-                $editor.addClass('active');
-            }, function () {
-                $editor.removeClass('active');
-            });
             this.bindBlockFields(data);
+            if (editor) {
+                var $editor_1 = this.getBlockTools(this.$block);
+                this.$editor = $editor_1;
+                $editor_1.hover(function () {
+                    $editor_1.addClass('active');
+                }, function () {
+                    $editor_1.removeClass('active');
+                });
+            }
         }
         Block.prototype.getBlockTools = function ($block) {
             var block = this;
-            var $tools = $("<div class='brickyeditor-block-wrapper'>\n                    <div  class='brickyeditor-block-tools'>\n                        <a class='fa fa-trash-o' data-brickyeditor-block-action='" + BlockAction.Delete + "'></a>\n                        <a class='fa fa-copy' data-brickyeditor-block-action='" + BlockAction.Copy + "'></a>\n                        <a class='fa fa-angle-up' data-brickyeditor-block-action='" + BlockAction.Up + "'></a>\n                        <a class='fa fa-angle-down' data-brickyeditor-block-action='" + BlockAction.Down + "'></a>\n                    </div>\n                </div>");
+            var $tools = $("<div class='brickyeditor-block-wrapper'>\n                    <div  class='brickyeditor-block-tools'>\n                        <a class='fa fa-trash-o' data-brickyeditor-block-action='" + BlockAction.Delete + "'></a>\n                        <a class='fa fa-copy' data-brickyeditor-block-action='" + BlockAction.Copy + "'></a>\n                        <a class='fa fa-angle-up' data-brickyeditor-block-action='" + BlockAction.Up + "'></a>\n                        <a class='fa fa-angle-down' data-brickyeditor-block-action='" + BlockAction.Down + "'></a>\n                        <a class='fa fa-cog' data-brickyeditor-block-action='" + BlockAction.Edit + "'></a>\n                    </div>\n                </div>");
+            if (!this.hasSettings()) {
+                $("[data-brickyeditor-block-action='" + BlockAction.Edit + "']", $tools).remove();
+            }
             $('[data-brickyeditor-block-action]', $tools).on('click', function () {
                 var action = $(this).attr('data-brickyeditor-block-action');
                 block.action(parseInt(action));
@@ -51,6 +56,9 @@ var BrickyEditor;
                     break;
                 case BlockAction.Copy:
                     this.container.copyBlock(this);
+                    break;
+                case BlockAction.Edit:
+                    this.settings();
                     break;
                 default:
                     break;
@@ -83,10 +91,13 @@ var BrickyEditor;
             this.fields.forEach(function (field) {
                 fieldsData.push(field.getData());
             });
-            return {
+            return this.editor.options.ignoreHtml ? {
                 template: this.template,
-                html: this.getHtml(true),
                 fields: fieldsData
+            } : {
+                template: this.template,
+                fields: fieldsData,
+                html: this.getHtml(true)
             };
         };
         Block.prototype.getHtml = function (trim, skipAttrRemoving) {
@@ -121,6 +132,19 @@ var BrickyEditor;
         Block.prototype.deselectBlock = function () {
             this.container.deselect(this.container.selectedContainer);
         };
+        Block.prototype.hasSettings = function () {
+            return this.fields.filter(function (f) {
+                return f.settings() != null;
+            }).length > 0;
+        };
+        Block.prototype.settings = function () {
+            return this.fields.forEach(function (f) {
+                var settingsFunc = f.settings();
+                if (settingsFunc) {
+                    settingsFunc();
+                }
+            });
+        };
         return Block;
     }());
     BrickyEditor.Block = Block;
@@ -131,6 +155,7 @@ var BrickyEditor;
         BlockAction[BlockAction["Copy"] = 2] = "Copy";
         BlockAction[BlockAction["Up"] = 3] = "Up";
         BlockAction[BlockAction["Down"] = 4] = "Down";
+        BlockAction[BlockAction["Edit"] = 5] = "Edit";
     })(BlockAction || (BlockAction = {}));
     ;
 })(BrickyEditor || (BrickyEditor = {}));
@@ -530,11 +555,13 @@ var BrickyEditor;
             this.templatesBaseFolder = "templates";
             this.templatesFolder = "templates/bootstrap4";
             this.compactTools = null;
+            this.ignoreHtml = null;
             this.templatesBaseFolder = options.templatesBaseFolder || this.templatesBaseFolder;
             this.templatesFolder = options.templatesFolder || this.templatesFolder;
             this.onload = options.onload;
             this.blocks = options.blocks;
             this.compactTools = options.compactTools;
+            this.ignoreHtml = options.ignoreHtml || false;
         }
         return EditorOptions;
     }());
@@ -635,7 +662,7 @@ var BrickyEditor;
         }
         Modal.prototype.hideModal = function () {
             var $content = this.$content;
-            this.$control.fadeOut(function () {
+            this.$control.fadeOut('fast', function () {
                 $content.html('');
             });
         };
@@ -736,6 +763,9 @@ var BrickyEditor;
             BaseField.prototype.selectBlock = function (container) {
                 this.block.container.selectedBlock.selectBlock(this, container);
             };
+            BaseField.prototype.settings = function () {
+                return null;
+            };
             BaseField.prototype.getData = function () {
                 return {
                     type: this.type,
@@ -762,7 +792,6 @@ var BrickyEditor;
             __extends(ContainerField, _super);
             function ContainerField(block, $field, data) {
                 var _this = _super.call(this, block, $field, data) || this;
-                debugger;
                 _this.container = new BrickyEditor.Container($field, _this.block.editor);
                 return _this;
             }
@@ -804,6 +833,13 @@ var BrickyEditor;
             function EmbedField() {
                 return _super !== null && _super.apply(this, arguments) || this;
             }
+            EmbedField.prototype.settings = function () {
+                var field = this;
+                return function () {
+                    field.data.url = prompt('Link to embed media', 'http://instagr.am/p/BYJAes_HEI0/');
+                    field.loadMedia();
+                };
+            };
             EmbedField.prototype.bind = function () {
                 var field = this;
                 var $field = this.$field;
@@ -815,7 +851,6 @@ var BrickyEditor;
             };
             EmbedField.prototype.loadMedia = function () {
                 var field = this;
-                var $field = this.$field;
                 if (!field.data || !field.data.url)
                     return;
                 BrickyEditor.Services.EmbedService
@@ -836,7 +871,10 @@ var BrickyEditor;
                                 .fail(function (err) { });
                         }
                     }
-                    $field.replaceWith($embed);
+                    field.$field.empty();
+                    field.$field.removeAttr('class');
+                    field.$field.removeAttr('style');
+                    field.$field.append($embed);
                     field.selectBlock();
                 });
             };
@@ -1164,10 +1202,6 @@ var BrickyEditor;
                         break;
                     default:
                         break;
-                }
-            };
-            EmbedService.prototype.fixUrl = function (url) {
-                if (url.breContains('instagram.com')) {
                 }
             };
             EmbedService.Instagram = 'Instagram';
