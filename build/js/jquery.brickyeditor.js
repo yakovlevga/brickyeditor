@@ -831,9 +831,7 @@ var BrickyEditor;
                             scriptSrc = "https:" + scriptSrc;
                             $.getScript(scriptSrc)
                                 .done(function (script) {
-                                if (scriptSrc.breContains('instgram') && instgrm) {
-                                    instgrm.Embeds.process();
-                                }
+                                BrickyEditor.Services.EmbedService.processEmbed(json.provider_name);
                             })
                                 .fail(function (err) { });
                         }
@@ -1157,6 +1155,22 @@ var BrickyEditor;
                 });
                 return task;
             };
+            EmbedService.processEmbed = function (provider) {
+                switch (provider) {
+                    case EmbedService.Instagram:
+                        if (instgrm) {
+                            instgrm.Embeds.process();
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            };
+            EmbedService.prototype.fixUrl = function (url) {
+                if (url.breContains('instagram.com')) {
+                }
+            };
+            EmbedService.Instagram = 'Instagram';
             return EmbedService;
         }());
         Services.EmbedService = EmbedService;

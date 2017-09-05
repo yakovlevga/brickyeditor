@@ -1,6 +1,8 @@
 namespace BrickyEditor {
     export namespace Services {
         export class EmbedService {
+            static Instagram : string = 'Instagram';
+
             constructor() {
             }
 
@@ -20,6 +22,19 @@ namespace BrickyEditor {
                 });
 
                 return task;
+            }
+
+            public static processEmbed(provider: string) {
+                switch (provider) {
+                    case EmbedService.Instagram:
+                        if(instgrm) {
+                            instgrm.Embeds.process();
+                        }
+                        break;
+                
+                    default:
+                        break;
+                }
             }
         }
     }      

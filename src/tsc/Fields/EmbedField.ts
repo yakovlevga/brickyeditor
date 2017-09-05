@@ -27,6 +27,7 @@ namespace BrickyEditor {
                     .done(function(json) {
                         field.data.embed = json;
                         let $embed = $(json.html);
+                        
                         let $script = $embed.filter('script');
                         if($script.length > 0) {
                             $script.remove();
@@ -34,10 +35,8 @@ namespace BrickyEditor {
                             if(scriptSrc.breStartsWith('//')) {
                                 scriptSrc = "https:" + scriptSrc;
                                 $.getScript(scriptSrc)
-                                    .done(function(script) {
-                                        if(scriptSrc.breContains('instgram') && instgrm) {
-                                            instgrm.Embeds.process();
-                                        }
+                                    .done(script => {
+                                        Services.EmbedService.processEmbed(json.provider_name);
                                     }) 
                                     .fail(function(err) {});
                             }
