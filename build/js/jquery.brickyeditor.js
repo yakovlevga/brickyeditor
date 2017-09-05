@@ -212,27 +212,27 @@ var BrickyEditor;
     var Constants = (function () {
         function Constants() {
         }
+        Constants.templatesFolder = 'templates/bootstrap4';
+        Constants.field = 'data-bricky-field';
+        Constants.templateModalKey = "modal";
+        Constants.templateToolsKey = "tools";
+        Constants.templateHtmlToolsKey = "htmlTools";
+        Constants.selectorModalContent = ".brickyeditor-modal-content";
+        Constants.selectorModalClose = ".brickyeditor-modal-close";
+        Constants.selectorTemplates = '.templates';
+        Constants.selectorTemplate = '.template';
+        Constants.selectorCancel = '.brickyeditor-cancel';
+        Constants.selectorSave = '.brickyeditor-save';
+        Constants.selectorLoader = '#brickyeditorLoader';
+        Constants.selectorFilter = '#brickyeditorFilter';
+        Constants.selectorField = "[" + Constants.field + "]";
+        Constants.selectorHtmlToolsCommand = '[data-brickyeditor-doc-command]';
+        Constants.selectorHtmlToolsCommandRange = '[data-brickyeditor-doc-command-range]';
+        Constants.selectorBlockWrapper = '.brickyeditor-block-wrapper';
+        Constants.classMobile = "brickyeditor-tools-mobile";
+        Constants.dummyText = "On the other hand, we denounce with righteous indignation and dislike men who are so beguiled and demoralized by the charms of pleasure of the moment, so blinded by desire, that they cannot foresee the pain and trouble that are bound to ensue.";
         return Constants;
     }());
-    Constants.templatesFolder = 'templates/bootstrap4';
-    Constants.field = 'data-bricky-field';
-    Constants.templateModalKey = "modal";
-    Constants.templateToolsKey = "tools";
-    Constants.templateHtmlToolsKey = "htmlTools";
-    Constants.selectorModalContent = ".brickyeditor-modal-content";
-    Constants.selectorModalClose = ".brickyeditor-modal-close";
-    Constants.selectorTemplates = '.templates';
-    Constants.selectorTemplate = '.template';
-    Constants.selectorCancel = '.brickyeditor-cancel';
-    Constants.selectorSave = '.brickyeditor-save';
-    Constants.selectorLoader = '#brickyeditorLoader';
-    Constants.selectorFilter = '#brickyeditorFilter';
-    Constants.selectorField = "[" + Constants.field + "]";
-    Constants.selectorHtmlToolsCommand = '[data-brickyeditor-doc-command]';
-    Constants.selectorHtmlToolsCommandRange = '[data-brickyeditor-doc-command-range]';
-    Constants.selectorBlockWrapper = '.brickyeditor-block-wrapper';
-    Constants.classMobile = "brickyeditor-tools-mobile";
-    Constants.dummyText = "On the other hand, we denounce with righteous indignation and dislike men who are so beguiled and demoralized by the charms of pleasure of the moment, so blinded by desire, that they cannot foresee the pain and trouble that are bound to ensue.";
     BrickyEditor.Constants = Constants;
 })(BrickyEditor || (BrickyEditor = {}));
 var BrickyEditor;
@@ -722,16 +722,6 @@ var BrickyEditor;
                 this.data = data || {};
                 this.bind();
             }
-            Object.defineProperty(BaseField.prototype, "data", {
-                get: function () {
-                    return this._data;
-                },
-                set: function (v) {
-                    this._data = v;
-                },
-                enumerable: true,
-                configurable: true
-            });
             BaseField.getField = function (block, $el, data) {
                 var type = BrickyEditor.Services.TemplateService.getFieldValue($el, "type");
                 var fieldClass = this.fields[type];
@@ -753,14 +743,14 @@ var BrickyEditor;
                     data: this.data
                 };
             };
+            BaseField.fields = {
+                'html': function (block, $el, data) { return new Fields.HtmlField(block, $el, data); },
+                'image': function (block, $el, data) { return new Fields.ImageField(block, $el, data); },
+                'embed': function (block, $el, data) { return new Fields.EmbedField(block, $el, data); },
+                'container': function (block, $el, data) { return new Fields.ContainerField(block, $el, data); }
+            };
             return BaseField;
         }());
-        BaseField.fields = {
-            'html': function (block, $el, data) { return new Fields.HtmlField(block, $el, data); },
-            'image': function (block, $el, data) { return new Fields.ImageField(block, $el, data); },
-            'embed': function (block, $el, data) { return new Fields.EmbedField(block, $el, data); },
-            'container': function (block, $el, data) { return new Fields.ContainerField(block, $el, data); }
-        };
         Fields.BaseField = BaseField;
     })(Fields = BrickyEditor.Fields || (BrickyEditor.Fields = {}));
 })(BrickyEditor || (BrickyEditor = {}));
@@ -817,33 +807,39 @@ var BrickyEditor;
             EmbedField.prototype.bind = function () {
                 var field = this;
                 var $field = this.$field;
-                var data = this.data;
                 $field.on('click', function () {
-                    var url = prompt('Link to embed', 'http://instagr.am/p/fA9uwTtkSN/');
-                    BrickyEditor.Services.EmbedService
-                        .getEmbedAsync(url)
-                        .done(function (json) {
-                        field.data.url = url;
-                        field.data.embed = json;
-                        var $embed = $(json.html);
-                        var $script = $embed.filter('script');
-                        if ($script.length > 0) {
-                            $script.remove();
-                            var scriptSrc = $script.attr('src');
-                            if (scriptSrc.breStartsWith('//')) {
-                                scriptSrc = "http:" + scriptSrc;
-                                $.getScript(scriptSrc)
-                                    .done(function (script) {
-                                    if (scriptSrc.breContains('instgram') && instgrm) {
-                                        instgrm.Embeds.process();
-                                    }
-                                })
-                                    .fail(function (err) { });
-                            }
+                    field.data.url = prompt('Link to embed media', 'http://instagr.am/p/BYJAes_HEI0/');
+                    field.loadMedia();
+                });
+                field.loadMedia();
+            };
+            EmbedField.prototype.loadMedia = function () {
+                var field = this;
+                var $field = this.$field;
+                if (!field.data || !field.data.url)
+                    return;
+                BrickyEditor.Services.EmbedService
+                    .getEmbedAsync(field.data.url)
+                    .done(function (json) {
+                    field.data.embed = json;
+                    var $embed = $(json.html);
+                    var $script = $embed.filter('script');
+                    if ($script.length > 0) {
+                        $script.remove();
+                        var scriptSrc = $script.attr('src');
+                        if (scriptSrc.breStartsWith('//')) {
+                            scriptSrc = "https:" + scriptSrc;
+                            $.getScript(scriptSrc)
+                                .done(function (script) {
+                                if (scriptSrc.breContains('instgram') && instgrm) {
+                                    instgrm.Embeds.process();
+                                }
+                            })
+                                .fail(function (err) { });
                         }
-                        $field.replaceWith($embed);
-                        field.selectBlock();
-                    });
+                    }
+                    $field.replaceWith($embed);
+                    field.selectBlock();
                 });
             };
             return EmbedField;

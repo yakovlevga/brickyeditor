@@ -3,17 +3,9 @@ namespace BrickyEditor {
         export class BaseField {
             public name: string;
             public type: string;
+            public data: any;
             protected block: Block;            
-            protected $field: JQuery;            
-
-            
-            protected _data : any;
-            public get data() : any {
-                return this._data;
-            }
-            public set data(v : any) {
-                this._data = v;
-            }            
+            protected $field: JQuery;      
 
             private static fields = {
                 'html': (block, $el, data) => { return new HtmlField(block, $el, data); },
