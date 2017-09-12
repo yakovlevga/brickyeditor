@@ -1,98 +1,46 @@
 namespace BrickyEditor {
     export namespace Services {
-        export class TemplateService {            
-            static templates : Template[];
+        export class TemplateService {
             constructor() {}
+            static templates: Template[];
 
-            static loadTemplateAsync(folder: string, template: string) : JQueryDeferred<string> {
-                TemplateService.templates = [];
-                var task = $.Deferred<string>();
-                $.get(TemplateService.getTemplateUrl(folder, template))
-                .done(function(html) {
-                    task.resolve(html);
-                })
-                .fail(function(err){
-                    task.reject(err);                
-                });
+            static loadTemplatesAsync(editor: Editor) : JQueryDeferred<Template[]> {
+                var result = $.Deferred<Template[]>();
+                $.get(editor.options.templatesUrl)
+                    .done((data) => {
+                        this.templates = [];
 
-                return task;
-            }
+                        // set custom templates style
+                        let $style = $(data).filter('style');
+                        if($style && $style.length > 0) {
+                            editor.$editor.prepend($style);
+                        }
 
-            // load config file
-            static loadTemplateConfigAsync(folder: string) : JQueryDeferred<any[]> {
-                var task = $.Deferred<any[]>();
-                $.getJSON(TemplateService.getTemplatesConfigUrl(folder))
-                .done(json => {
-                    task.resolve(json);
-                })
-                .fail(e => {
-                    console.log(e);
-                    task.reject(e);                
-                });
-                return task;
-            }
-
-            static filteredTemplates(filter: string) {
-                TemplateService.templates.map(el => {
-                    el.category.filter(c => {
-                        c.toLowerCase() === filter.toLowerCase(); 
-                    });
-                });
-            }
-
-            static loadTemplatesAsync(folder: string) : JQueryDeferred<{}> {
-                var result = $.Deferred();                
-                TemplateService.loadTemplateConfigAsync(folder)
-                    .done(function(result){
-                        result.forEach(t => {
-                            TemplateService.templates.push(new Template(t));
+                        let $templates = $(data).filter('.bre-template');
+                        $templates.each((idx, t) => {
+                            let template = new Template(t);                            
+                            this.templates.push(template);
                         });
+
+                        result.resolve(this.templates);
                     })
-                    .fail(e => {
-                        console.log(e);
-                    })
-                    .then(function() {
-                        var tasks = [];
-                        TemplateService.templates.forEach(t => {
-                            var task = TemplateService
-                                .loadTemplateAsync(folder, t.file)
-                                .done(function(html) {
-                                    t.html = html;
-                                    TemplateService.templates[t.file] = t;
-                                })
-                                .fail(function(err) {
-                                    console.log(err);
-                                });
-
-                            tasks.push(task);
-                        });
-                        
-                        $.when.apply($, tasks).then(function() {
-                            result.resolve();
-                        });
-                    })            
+                    .fail(err => {
+                        console.log('Templates file not found.');
+                        result.fail(err);
+                    });   
 
                 return result;
             }
 
-            static getTemplateUrl(folder: string, template: string) {
-                return `${folder}/${template}.html`;
-            }
+            static getTemplate(templateName: string) : Template {
+                for (var i = 0; i < this.templates.length; i++) {
+                    var template = this.templates[i];
+                    if(template.name.toLowerCase() === templateName.toLowerCase()) {
+                        return template;
+                    }   
+                }
 
-            static getTemplatesConfigUrl(folder: string) {
-                return `${folder}/templates.json`;
-            }
-
-            static getTemplate(name: string) {
-                return TemplateService.templates[name];
-            }
-
-            static removeTemplate(name: string) {
-                delete TemplateService.templates[name];
-            }
-
-            static getFieldValue($el: JQuery, prop: string) : string {
-                return $el.attr(`data-bricky-field-${prop}`);
+                return null;
             }
         }
     }

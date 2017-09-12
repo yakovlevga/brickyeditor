@@ -1,4 +1,12 @@
-.brickyeditor-modal-overlay {
+@import '_base';
+
+@mixin shadow() {
+    -webkit-box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
+    -moz-box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
+}
+
+.bre-modal {
     display: none;
     position: fixed;
     z-index: 102;
@@ -10,22 +18,31 @@
     background-color: rgb(0,0,0); /* Fallback color */
     background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
 
-    .brickyeditor-modal-placeholder {
+    .bre-modal-placeholder {
         background-color: #fefefe;
         margin: 20px auto;
-        border: 1px solid #888;
-        width: 800px;
-        max-width: 90%;
-        padding: 10px;    
+        min-width: 400px;
+        max-width: 800px;
+        -moz-border-radius: 3px;
+        -webkit-border-radius: 3px;
+        border-radius: 3px;
 
-        .brickyeditor-modal-close {
+         @include shadow();
+
+        .bre-modal-close {
             text-align: right;
-            
+            padding: .5rem 1.5rem 0 0;
+
             a {
                 text-decoration: none;
-                color: #555;
-                font-size: 1rem;
+                color: #000000;
+                font-weight: bold;
+                font-size: .8rem;
             }
+        }
+
+        form {
+            padding: 0rem 1.5rem 1.5rem 1.5rem;
         }
     }
 }

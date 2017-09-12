@@ -1,28 +1,39 @@
-.brickyeditor-block-wrapper {
+@import '_base';
 
-    &.active {
-        > .brickyeditor-block-tools {                
+$stroke-offset: 5px;
+$stroke-width: 1px;
+
+.bre-block-wrapper {
+
+    [contenteditable]:focus {
+        outline: none;
+    }
+
+    &.bre-active {
+        outline: 1px dotted $accent-color;
+    }
+
+    &.bre-selected {
+        > .bre-block-tools {                
             display: block;
         }
 
-        outline: 1px dashed $color-border;
+        &.bre-active {
+            outline: 0px dotted $accent-color;
+        }
+
+        border-left: $stroke-width solid $accent-color;        
+        margin-left: -($stroke-width + $stroke-offset);
+        padding-left: $stroke-offset;
     }
 
-    .brickyeditor-block-tools {
-        width: (5*16)px;
+    .bre-block-tools {
+        background: rgba(255, 255, 255, .85);
+        border-radius: 1rem;
+        width: 36px;
+        margin-left: -36px - $stroke-offset - $stroke-width;
         position: absolute;
-        display: none;
-        background: white;
-        opacity: 0.8;
+        display: none;        
         z-index: $fixed-z-index;
-
-        a {
-            color: $color-btn-dark !important;
-            font-weight: bold;
-            cursor: pointer;
-            &:hover {
-                color: lighten($color-btn-dark, 20%) !important;
-            }
-        }
     }
 }

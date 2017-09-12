@@ -5,39 +5,43 @@ namespace BrickyEditor {
             bind() {
                 let field = this;
                 let $field = this.$field;
-                let data = this.data;
 
                 if(!$field.is('[contenteditable]')) {
                     $field.attr('contenteditable', 'true');
                 }                
 
-                this.data.html = 
-                    this.data.html || 
-                    Services.TemplateService.getFieldValue($field, 'html') ||
-                    Constants.dummyText;
+                var html = this.data.html || this.$field.html() || this.block.template.name;
+                this.setHtml(html);
 
                 $field.html(this.data.html);
 
-                $field.on('focus', () => {
-                    this.selectBlock();
+                SelectionUtils.bindTextSelection($field, (rect) => {
+                    this.block.editor.ui.htmlTools.show(rect);
                 });
 
-                $field.on('blur keyup paste input', function() {
-                     data.html = $(this).html().trim()
-                });    
-
-                $field.on('paste', (e) => {
-
+                $field
+                .on('blur keyup paste input', () => { 
+                    this.setHtml($field.html());
+                })
+                .on('paste', (e) => {
+                    e.preventDefault();                    
                     let ev = e.originalEvent as any;                    
-                    let text = ev.clipboardData.getData('text/html');
-                    if(text) {
-                        let $temp = $("<div></div>");
-                        let $text = $(text);
-                        $text.removeAttr("style");                        
-                        $temp.append($text);
-                        ev.clipboardData.setData('text/html', $temp.html());
-                    }
+                    let text = ev.clipboardData.getData('text/plain');                                  
+                    document.execCommand("insertHTML", false, text);
+                })
+                .on('click', (ev) => {
+                    // Prevents the event from bubbling up the DOM tree
+                    field.selectBlock();
+                    ev.stopPropagation();
+                    return false;
                 });
+            }
+
+            setHtml(html: string) {
+                this.data.html = html.trim();
+                if(this.$field.html() !== html) {
+                    this.$field.html(html);
+                }
             }
         }
     }

@@ -1,157 +1,256 @@
-.brickyeditor .m-t-1 {
-  margin-top: 0.25rem; }
+.bre-block-wrapper [contenteditable]:focus {
+  outline: none; }
 
-.brickyeditor .p-t-1 {
-  padding-top: 0.25rem; }
+.bre-block-wrapper.bre-active {
+  outline: 1px dotted #92819F; }
 
-.brickyeditor .m-t-2 {
-  margin-top: 0.5rem; }
+.bre-block-wrapper.bre-selected {
+  border-left: 1px solid #92819F;
+  margin-left: -6px;
+  padding-left: 5px; }
+  .bre-block-wrapper.bre-selected > .bre-block-tools {
+    display: block; }
+  .bre-block-wrapper.bre-selected.bre-active {
+    outline: 0px dotted #92819F; }
 
-.brickyeditor .p-t-2 {
-  padding-top: 0.5rem; }
+.bre-block-wrapper .bre-block-tools {
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 1rem;
+  width: 36px;
+  margin-left: -42px;
+  position: absolute;
+  display: none;
+  z-index: 101; }
 
-.brickyeditor .m-t-3 {
-  margin-top: 0.75rem; }
+.bre-btn {
+  width: 2rem;
+  height: 2rem;
+  cursor: pointer;
+  border-width: 0px;
+  background: #fff;
+  border: 1px solid #92819F;
+  color: #92819F;
+  text-align: center;
+  font-size: 1rem;
+  line-height: 2rem;
+  -webkit-transition: all .25s ease-in 0s;
+  -moz-transition: all .25s ease-in 0s;
+  transition: all .25s ease-in 0s; }
+  .bre-btn:hover {
+    color: #fff;
+    background: #92819F; }
+  .bre-btn:focus {
+    outline-style: none; }
 
-.brickyeditor .p-t-3 {
-  padding-top: 0.75rem; }
+.bre-btn-primary {
+  color: #fff;
+  background-color: #92819F; }
+  .bre-btn-primary:hover {
+    background-color: #796687; }
 
-.brickyeditor .m-t-4 {
-  margin-top: 1rem; }
+.bre-btns {
+  text-align: right; }
+  .bre-btns .bre-btn {
+    width: auto;
+    text-transform: uppercase;
+    padding: 0 1rem;
+    margin-right: .25rem;
+    font-size: .7rem; }
+    .bre-btns .bre-btn:last-child {
+      margin-right: 0; }
 
-.brickyeditor .p-t-4 {
-  padding-top: 1rem; }
+.bre-btn-group .bre-btn {
+  float: left;
+  border-radius: 0;
+  border-left: 0px;
+  padding: 0; }
+  .bre-btn-group .bre-btn:first-child {
+    border-left: 1px solid #92819F;
+    border-radius: .5rem 0 0 .5rem; }
+  .bre-btn-group .bre-btn:last-child {
+    border-radius: 0 .5rem .5rem 0; }
 
-.brickyeditor .m-r-1 {
-  margin-right: 0.25rem; }
+.bre-btn-deck {
+  position: relative;
+  width: 2rem; }
+  .bre-btn-deck .bre-btn {
+    padding: 0;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    border-radius: 2rem;
+    position: absolute;
+    z-index: 101; }
+    .bre-btn-deck .bre-btn:first-child {
+      opacity: 1;
+      z-index: 102; }
+  .bre-btn-deck .bre-btn-active {
+    background-color: #92819F;
+    color: #fff;
+    -webkit-transform: rotate(-90deg);
+    -moz-transform: rotate(-90deg);
+    -o-transform: rotate(-90deg);
+    -ms-transform: rotate(-90deg);
+    transform: rotate(-90deg); }
 
-.brickyeditor .p-r-1 {
-  padding-right: 0.25rem; }
+.bre-html-tools {
+  position: absolute;
+  z-index: 101; }
 
-.brickyeditor .m-r-2 {
-  margin-right: 0.5rem; }
+.bre label.bre-label {
+  display: block;
+  font-weight: bold;
+  font-size: 0.8rem;
+  color: #333333;
+  margin-bottom: .3rem; }
 
-.brickyeditor .p-r-2 {
-  padding-right: 0.5rem; }
+.bre input.bre-input, .bre textarea.bre-textarea, .bre select.bre-select {
+  height: 2rem;
+  vertical-align: middle;
+  display: inline-block;
+  max-width: 100%;
+  width: 100%;
+  background: #fff;
+  font-size: 0.8rem;
+  font-weight: 300;
+  color: #555555;
+  border: 1px solid #DDDDDD;
+  padding: 0 0.8rem;
+  margin-bottom: .5rem;
+  -webkit-transition: all .3s ease-in-out;
+  transition: all .3s ease-in-out; }
+  .bre input.bre-input:focus, .bre textarea.bre-textarea:focus, .bre select.bre-select:focus {
+    outline: none;
+    border-color: #92819F; }
+  .bre input.bre-input:-ms-input-placeholder, .bre input.bre-input::-moz-placeholder, .bre input.bre-input::-webkit-input-placeholder, .bre input.bre-input::placeholder, .bre textarea.bre-textarea:-ms-input-placeholder, .bre textarea.bre-textarea::-moz-placeholder, .bre textarea.bre-textarea::-webkit-input-placeholder, .bre textarea.bre-textarea::placeholder, .bre select.bre-select:-ms-input-placeholder, .bre select.bre-select::-moz-placeholder, .bre select.bre-select::-webkit-input-placeholder, .bre select.bre-select::placeholder {
+    color: #EEEEEE !important; }
 
-.brickyeditor .m-r-3 {
-  margin-right: 0.75rem; }
-
-.brickyeditor .p-r-3 {
-  padding-right: 0.75rem; }
-
-.brickyeditor .m-r-4 {
-  margin-right: 1rem; }
-
-.brickyeditor .p-r-4 {
-  padding-right: 1rem; }
-
-.brickyeditor .m-b-1 {
-  margin-bottom: 0.25rem; }
-
-.brickyeditor .p-b-1 {
-  padding-bottom: 0.25rem; }
-
-.brickyeditor .m-b-2 {
-  margin-bottom: 0.5rem; }
-
-.brickyeditor .p-b-2 {
-  padding-bottom: 0.5rem; }
-
-.brickyeditor .m-b-3 {
-  margin-bottom: 0.75rem; }
-
-.brickyeditor .p-b-3 {
-  padding-bottom: 0.75rem; }
-
-.brickyeditor .m-b-4 {
-  margin-bottom: 1rem; }
-
-.brickyeditor .p-b-4 {
-  padding-bottom: 1rem; }
-
-.brickyeditor .m-l-1 {
-  margin-left: 0.25rem; }
-
-.brickyeditor .p-l-1 {
-  padding-left: 0.25rem; }
-
-.brickyeditor .m-l-2 {
-  margin-left: 0.5rem; }
-
-.brickyeditor .p-l-2 {
-  padding-left: 0.5rem; }
-
-.brickyeditor .m-l-3 {
-  margin-left: 0.75rem; }
-
-.brickyeditor .p-l-3 {
-  padding-left: 0.75rem; }
-
-.brickyeditor .m-l-4 {
-  margin-left: 1rem; }
-
-.brickyeditor .p-l-4 {
-  padding-left: 1rem; }
-
-.brickyeditor .m-1 {
-  margin: 0.25rem; }
-
-.brickyeditor .p-1 {
-  padding: 0.25rem; }
-
-.brickyeditor .m-2 {
-  margin: 0.5rem; }
-
-.brickyeditor .p-2 {
-  padding: 0.5rem; }
-
-.brickyeditor .m-3 {
-  margin: 0.75rem; }
-
-.brickyeditor .p-3 {
-  padding: 0.75rem; }
-
-.brickyeditor .m-4 {
-  margin: 1rem; }
-
-.brickyeditor .p-4 {
-  padding: 1rem; }
-
-.brickyeditor .brickyeditor-oembed {
+.bre .bre-image-input {
   text-align: center; }
-  .brickyeditor .brickyeditor-oembed blockquote,
-  .brickyeditor .brickyeditor-oembed iframe {
-    margin: 0 auto !important; }
+  .bre .bre-image-input label {
+    cursor: pointer;
+    background: transparent;
+    vertical-align: middle;
+    overflow: visible;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0 2rem;
+    font-size: 0.7rem;
+    line-height: 1.75rem;
+    color: #555555;
+    text-align: center;
+    text-decoration: none;
+    text-transform: uppercase;
+    border: 1px solid #DDDDDD;
+    min-height: 2rem;
+    width: 100%;
+    max-width: 100%; }
+    .bre .bre-image-input label:hover {
+      outline: none;
+      border-color: #92819F;
+      color: #92819F; }
+  .bre .bre-image-input img.bre-loaded {
+    max-width: 100%;
+    height: 300px;
+    margin: .5rem 0; }
+  .bre .bre-image-input input[type=file] {
+    width: 0.1px;
+    height: 0.1px;
+    opacity: 0;
+    overflow: hidden;
+    position: absolute;
+    z-index: -1; }
 
-.brickyeditor-tools-show-btn {
+.bre-modal {
+  display: none;
   position: fixed;
+  z-index: 102;
+  left: 0;
   top: 0;
-  right: 0; }
-  .brickyeditor-tools-show-btn .fa {
-    color: #777; }
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: black;
+  /* Fallback color */
+  background-color: rgba(0, 0, 0, 0.4);
+  /* Black w/ opacity */ }
+  .bre-modal .bre-modal-placeholder {
+    background-color: #fefefe;
+    margin: 20px auto;
+    min-width: 400px;
+    max-width: 800px;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    -webkit-box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
+    -moz-box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3); }
+    .bre-modal .bre-modal-placeholder .bre-modal-close {
+      text-align: right;
+      padding: .5rem 1.5rem 0 0; }
+      .bre-modal .bre-modal-placeholder .bre-modal-close a {
+        text-decoration: none;
+        color: #000000;
+        font-weight: bold;
+        font-size: .8rem; }
+    .bre-modal .bre-modal-placeholder form {
+      padding: 0rem 1.5rem 1.5rem 1.5rem; }
 
-.brickyeditor-tools {
+.bre-tools {
   position: fixed;
-  top: 0px;
-  right: 0px;
-  bottom: 0px;
-  z-index: 101;
-  background: #eee;
   width: 245px;
   height: 100%;
-  overflow: hidden; }
-  .brickyeditor-tools .templates {
-    width: 260px;
+  top: 0;
+  right: 0;
+  z-index: 101;
+  background: #eee;
+  overflow: hidden;
+  -webkit-transition: all .15s ease-in 0s;
+  -moz-transition: all .15s ease-in 0s;
+  transition: all .15s ease-in 0s; }
+  .bre-tools .bre-tools-toggle {
+    border: 0;
+    cursor: pointer;
+    border-radius: .5rem 0 0 .5rem;
+    position: fixed;
+    background: #eee;
+    width: 2rem;
+    margin-left: -2rem;
+    margin-top: 2rem;
+    color: #92819F; }
+    .bre-tools .bre-tools-toggle:hover {
+      color: white; }
+    .bre-tools .bre-tools-toggle:focus {
+      outline-style: none; }
+    .bre-tools .bre-tools-toggle > div {
+      -webkit-transition: all .15s ease-in 0s;
+      -moz-transition: all .15s ease-in 0s;
+      transition: all .15s ease-in 0s; }
+  .bre-tools .bre-tools-toggle-collapsed div {
+    -webkit-transform: rotate(-180deg);
+    -moz-transform: rotate(-180deg);
+    -o-transform: rotate(-180deg);
+    -ms-transform: rotate(-180deg);
+    transform: rotate(-180deg); }
+  .bre-tools .bre-tools-templates {
+    width: 245px;
     height: 99%;
     overflow: auto; }
-    .brickyeditor-tools .templates .template {
+    .bre-tools .bre-tools-templates .bre-template {
       cursor: pointer;
       background: #fff;
       zoom: 0.4;
-      user-select: none; }
-      .brickyeditor-tools .templates .template:hover {
+      user-select: none;
+      padding: .5rem;
+      margin: .5rem;
+      -webkit-box-shadow: 0px 1px 5px 0px rgba(115, 115, 115, 0.2);
+      -moz-box-shadow: 0px 1px 5px 0px rgba(115, 115, 115, 0.2);
+      box-shadow: 0px 1px 5px 0px rgba(115, 115, 115, 0.2); }
+      .bre-tools .bre-tools-templates .bre-template:hover {
         background: #f2f2f2; }
+
+.bre-tools-collapsed {
+  right: -196px; }
 
 .brickyeditor-modal-content .brickyeditor-tools-mobile {
   position: relative !important;
@@ -167,292 +266,8 @@
   .brickyeditor-modal-content .brickyeditor-tools-mobile [data-brickyeditor-hide-tools] {
     display: none; }
 
-.brickyeditor .btn {
-  cursor: pointer;
-  display: inline-block;
-  margin: 0 10px 0 0;
-  line-height: 1.8;
-  appearance: none;
-  box-shadow: none;
-  border-radius: 5%;
-  background-color: #fff;
-  border: none; }
-  .brickyeditor .btn:focus {
-    outline: none; }
-  .brickyeditor .btn:hover {
-    color: #000; }
+.bre * {
+  font-family: sans-serif; }
 
-.brickyeditor .btn-ok {
-  background-color: #5cb85c;
-  color: #555; }
-  .brickyeditor .btn-ok:hover {
-    background-color: #449d44;
-    color: #3c3c3c; }
-
-.brickyeditor .btn-cancel {
-  background-color: #eee;
-  color: #555; }
-  .brickyeditor .btn-cancel:hover {
-    background-color: #d5d5d5;
-    color: #3c3c3c; }
-
-.brickyeditor .btn-clear {
-  background-color: transparent;
-  color: #777; }
-  .brickyeditor .btn-clear:hover {
-    background-color: transparent;
-    color: #5e5e5e; }
-
-.brickyeditor-html-tools {
-  position: fixed;
-  top: 0px;
-  left: 0px;
-  z-index: 101;
-  height: 100%; }
-  .brickyeditor-html-tools .panel {
-    position: absolute;
-    background-color: #eee;
-    border-radius: .25rem;
-    padding: .5rem;
-    margin: 0 .5rem;
-    top: 30%;
-    text-align: center; }
-
-.brickyeditor-modal-overlay {
-  display: none;
-  position: fixed;
-  z-index: 102;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  overflow: auto;
-  background-color: black;
-  /* Fallback color */
-  background-color: rgba(0, 0, 0, 0.4);
-  /* Black w/ opacity */ }
-  .brickyeditor-modal-overlay .brickyeditor-modal-placeholder {
-    background-color: #fefefe;
-    margin: 20px auto;
-    border: 1px solid #888;
-    width: 800px;
-    max-width: 90%;
-    padding: 10px; }
-    .brickyeditor-modal-overlay .brickyeditor-modal-placeholder .brickyeditor-modal-close {
-      text-align: right; }
-      .brickyeditor-modal-overlay .brickyeditor-modal-placeholder .brickyeditor-modal-close a {
-        text-decoration: none;
-        color: #555;
-        font-size: 1rem; }
-
-.brickyeditor input, .brickyeditor select {
-  display: block;
-  width: 100%;
-  padding: .5rem .75rem;
-  font-size: 1rem;
-  line-height: 1.25;
-  color: #464a4c;
-  background-color: #fff;
-  border: 1px solid rgba(0, 0, 0, 0.15);
-  border-radius: .25rem; }
-  .brickyeditor input:focus, .brickyeditor select:focus {
-    color: #464a4c;
-    background-color: #fff;
-    border-color: #5cb3fd;
-    outline: 0; }
-
-.brickyeditor .brickyeditor-prompt-field {
-  margin-bottom: 1rem; }
-
-.brickyeditor .brickyeditor-image-input {
-  background: silver;
-  width: 100px;
-  height: 100px;
-  content: 'select file'; }
-  .brickyeditor .brickyeditor-image-input img {
-    cursor: pointer;
-    width: 100px;
-    height: 100px;
-    object-fit: cover; }
-  .brickyeditor .brickyeditor-image-input .brickyeditor-image-input .brickyeditor-image-input-filename {
-    font-style: italic; }
-  .brickyeditor .brickyeditor-image-input > input {
-    display: none; }
-
-[data-bricky-field-type="html"][contenteditable="true"]:focus, [data-bricky-field-type="html"][contenteditable="true"]:hover {
-  outline: 1px dotted #777; }
-
-#brickyeditorLoader {
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  text-align: center;
-  padding-top: 60%; }
-  #brickyeditorLoader #escapingBallG {
-    position: relative;
-    width: 125px;
-    height: 43px;
-    margin: auto; }
-  #brickyeditorLoader .escapingBallG {
-    background-color: black;
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 43px;
-    height: 43px;
-    border-radius: 21px;
-    -o-border-radius: 21px;
-    -ms-border-radius: 21px;
-    -webkit-border-radius: 21px;
-    -moz-border-radius: 21px;
-    animation-name: bounce_escapingBallG;
-    -o-animation-name: bounce_escapingBallG;
-    -ms-animation-name: bounce_escapingBallG;
-    -webkit-animation-name: bounce_escapingBallG;
-    -moz-animation-name: bounce_escapingBallG;
-    animation-duration: 1.5s;
-    -o-animation-duration: 1.5s;
-    -ms-animation-duration: 1.5s;
-    -webkit-animation-duration: 1.5s;
-    -moz-animation-duration: 1.5s;
-    animation-iteration-count: infinite;
-    -o-animation-iteration-count: infinite;
-    -ms-animation-iteration-count: infinite;
-    -webkit-animation-iteration-count: infinite;
-    -moz-animation-iteration-count: infinite;
-    animation-timing-function: linear;
-    -o-animation-timing-function: linear;
-    -ms-animation-timing-function: linear;
-    -webkit-animation-timing-function: linear;
-    -moz-animation-timing-function: linear;
-    animation-delay: 0s;
-    -o-animation-delay: 0s;
-    -ms-animation-delay: 0s;
-    -webkit-animation-delay: 0s;
-    -moz-animation-delay: 0s;
-    transform: scale(0.5, 1);
-    -o-transform: scale(0.5, 1);
-    -ms-transform: scale(0.5, 1);
-    -webkit-transform: scale(0.5, 1);
-    -moz-transform: scale(0.5, 1); }
-
-@keyframes bounce_escapingBallG {
-  0% {
-    left: 0px;
-    transform: scale(0.5, 1); }
-  25% {
-    left: 41px;
-    transform: scale(1, 0.5); }
-  50% {
-    left: 103px;
-    transform: scale(0.5, 1); }
-  75% {
-    left: 41px;
-    transform: scale(1, 0.5); }
-  100% {
-    left: 0px;
-    transform: scale(0.5, 1); } }
-
-@-o-keyframes bounce_escapingBallG {
-  0% {
-    left: 0px;
-    -o-transform: scale(0.5, 1); }
-  25% {
-    left: 41px;
-    -o-transform: scale(1, 0.5); }
-  50% {
-    left: 103px;
-    -o-transform: scale(0.5, 1); }
-  75% {
-    left: 41px;
-    -o-transform: scale(1, 0.5); }
-  100% {
-    left: 0px;
-    -o-transform: scale(0.5, 1); } }
-
-@-ms-keyframes bounce_escapingBallG {
-  #brickyeditorLoader 0% {
-    left: 0px;
-    -ms-transform: scale(0.5, 1); }
-  #brickyeditorLoader 25% {
-    left: 41px;
-    -ms-transform: scale(1, 0.5); }
-  #brickyeditorLoader 50% {
-    left: 103px;
-    -ms-transform: scale(0.5, 1); }
-  #brickyeditorLoader 75% {
-    left: 41px;
-    -ms-transform: scale(1, 0.5); }
-  #brickyeditorLoader 100% {
-    left: 0px;
-    -ms-transform: scale(0.5, 1); } }
-
-@-webkit-keyframes bounce_escapingBallG {
-  0% {
-    left: 0px;
-    -webkit-transform: scale(0.5, 1); }
-  25% {
-    left: 41px;
-    -webkit-transform: scale(1, 0.5); }
-  50% {
-    left: 103px;
-    -webkit-transform: scale(0.5, 1); }
-  75% {
-    left: 41px;
-    -webkit-transform: scale(1, 0.5); }
-  100% {
-    left: 0px;
-    -webkit-transform: scale(0.5, 1); } }
-
-@-moz-keyframes bounce_escapingBallG {
-  0% {
-    left: 0px;
-    -moz-transform: scale(0.5, 1); }
-  25% {
-    left: 41px;
-    -moz-transform: scale(1, 0.5); }
-  50% {
-    left: 103px;
-    -moz-transform: scale(0.5, 1); }
-  75% {
-    left: 41px;
-    -moz-transform: scale(1, 0.5); }
-  100% {
-    left: 0px;
-    -moz-transform: scale(0.5, 1); } }
-
-.brickyeditor-block-wrapper.active {
-  outline: 1px dashed #777; }
-  .brickyeditor-block-wrapper.active > .brickyeditor-block-tools {
-    display: block; }
-
-.brickyeditor-block-wrapper .brickyeditor-block-tools {
-  width: 80 px;
-  position: absolute;
-  display: none;
-  background: white;
-  opacity: 0.8;
-  z-index: 101; }
-  .brickyeditor-block-wrapper .brickyeditor-block-tools a {
-    color: #777 !important;
-    font-weight: bold;
-    cursor: pointer; }
-    .brickyeditor-block-wrapper .brickyeditor-block-tools a:hover {
-      color: #aaaaaa !important; }
-
-[data-bricky-field-type="container"].selected {
-  outline: 1px dotted #777;
-  background: none !important; }
-
-[data-bricky-field-type="container"]:empty {
-  min-height: 50px;
-  background: repeating-linear-gradient(45deg, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2) 10px, rgba(0, 0, 0, 0.3) 10px, rgba(0, 0, 0, 0.3) 20px); }
-
-[data-bricky-field-type="container"]:hover:empty {
-  background: repeating-linear-gradient(45deg, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5) 10px, rgba(0, 0, 0, 0.6) 10px, rgba(0, 0, 0, 0.6) 20px); }
-
-.brickyeditor-field-container:empty {
-  min-height: 50px;
-  background: repeating-linear-gradient(45deg, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2) 10px, rgba(0, 0, 0, 0.3) 10px, rgba(0, 0, 0, 0.3) 20px); }
+.bre-editor {
+  position: relative; }
