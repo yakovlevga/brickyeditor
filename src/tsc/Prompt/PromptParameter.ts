@@ -25,8 +25,8 @@ namespace BrickyEditor {
             public get $control() : JQuery {
                 if(!this._$control) {
                     this._$control = 
-                    $(`<div class="brickyeditor-prompt-field">
-                        <label for="${this.key}">${this.title ? this.title : ''}</label>
+                    $(`<div class="bre-prompt-field">
+                            <label class="bre-label" for="${this.key}">${this.title ? this.title : 'Select file...'}</label>
                         </div>`);
                     this.$input = this.getEditor();
                     this._$control.append(this.$input);
@@ -37,7 +37,7 @@ namespace BrickyEditor {
 
             protected getEditor() {
                 var value = this.value || '';
-                return $(`<input type="text" id="${this.key}" class="brickyeditor-input" placeholder="${this.placeholder}" value="${this.value ? this.value : ''}">`);
+                return $(`<input type="text" id="${this.key}" class="bre-input" placeholder="${this.placeholder}" value="${this.value ? this.value : ''}">`);
             }
 
             public set $control(value: JQuery) {

@@ -1,54 +1,79 @@
 @import '_base';
 
-$block-name : tools;
-
-.brickyeditor-tools-show-btn {
+.bre-tools {    
     position: fixed;
-    top: 0;
-    right: 0;
-
-    .fa {
-        color: $color-btn-dark;
-    }
-}
-
-.#{$base}-#{$block-name} {
-    @include fixed($left: null);
-    background: $panel-background;
     width: $tools-width;
     height: 100%;
+    top: 0;
+    right: 0;
+    z-index: $fixed-z-index;
+    background: $tools-background;    
     overflow: hidden;
 
-    .templates {
-        width: $tools-width + $scrollbar-width;
+    -webkit-transition: all .15s ease-in 0s;
+    -moz-transition: all .15s ease-in 0s;
+    transition: all .15s ease-in 0s;
+
+    .bre-tools-toggle {
+        border: 0;
+        cursor: pointer;
+        border-radius: .5rem 0 0 .5rem;
+        position: fixed;
+        background: $tools-background;
+        width: 2rem;
+        margin-left: -2rem;
+        margin-top: 2rem;
+        color: $accent-color;
+
+        &:hover {
+            color: lighten($tools-background, 10%);
+        }
+
+        &:focus {
+            outline-style: none;
+        }
+
+        > div {
+            -webkit-transition: all .15s ease-in 0s;
+            -moz-transition: all .15s ease-in 0s;
+            transition: all .15s ease-in 0s;
+        }
+    }
+
+    .bre-tools-toggle-collapsed div {
+        -webkit-transform: rotate(-180deg);
+        -moz-transform: rotate(-180deg);
+        -o-transform: rotate(-180deg);
+        -ms-transform: rotate(-180deg);
+        transform: rotate(-180deg);
+    }
+
+    .bre-tools-templates {
+        width: $tools-width;
         height: 99%;
         overflow: auto;    
     
-        .template {
+        .bre-template {
             cursor: pointer;
             background: #fff;
             zoom: 0.4;
             user-select: none;
+            padding: .5rem;
+            margin: .5rem;
+
+            -webkit-box-shadow: 0px 1px 5px 0px rgba(115,115,115,.2);
+            -moz-box-shadow: 0px 1px 5px 0px rgba(115,115,115,.2);
+            box-shadow: 0px 1px 5px 0px rgba(115,115,115,.2);
 
             &:hover {
                 background: darken(#fff, 5%);
             }
         }
     }
+}
 
-    // .brickyeditor-tools .bricky-template {
-    //     cursor: pointer;
-    //     background: #fff;
-    //     padding: 16px 8px;
-    //     margin: 0 6px 6px 12px;
-    //     zoom: 0.5;
-    // }
-
-
-    // .brickyeditor-tools-hidden {
-    //     right: -180px;
-    //     background-color: #ccc;
-    // }    
+.bre-tools-collapsed {
+    right: -($tools-width * 0.8);
 }
 
 // Mobile version

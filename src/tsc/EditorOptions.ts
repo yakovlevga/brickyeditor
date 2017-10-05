@@ -1,15 +1,13 @@
 namespace BrickyEditor {
     export class EditorOptions {
-        public templatesBaseFolder: string = "templates";
-        public templatesFolder: string = "templates/bootstrap4";
+        public templatesUrl: string = "templates/bootstrap4.html";
         public onload: any;
         public blocks: Array<Block>;
         public compactTools?: Boolean = null;
         public ignoreHtml?: Boolean = null
 
         constructor(options: EditorOptions) {
-            this.templatesBaseFolder = options.templatesBaseFolder || this.templatesBaseFolder;
-            this.templatesFolder = options.templatesFolder || this.templatesFolder;
+            this.templatesUrl = options.templatesUrl || this.templatesUrl;
             this.onload = options.onload;
             this.blocks = options.blocks;
             this.compactTools = options.compactTools;

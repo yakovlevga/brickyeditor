@@ -23,21 +23,23 @@ namespace BrickyEditor {
                 var field = this;
                 var img = this.value && this.value.fileContent ? this.value.fileContent : "";                
                 var $editor = $(`
-                <div class='brickyeditor-image-input'>
+                <div class='bre-image-input'>
                     <label for="${this.key}">
-                        <img src="${img}"/>
+                        Select file...
                     </label>                        
-                    <input type="file" id="${this.key}" class="brickyeditor-input" placeholder="${this.placeholder}">
+                    <img src="${img}"/>                    
+                    <input type="file" id="${this.key}" class="bre-input" placeholder="${this.placeholder}">
                 </div>
-                <small class='brickyeditor-image-input-filename'></small>`);
+                <small class='bre-image-input-filename'></small>`);
                 
                 var $file = $('input', $editor);
                 var $filePreview = $('img', $editor);
-                var $fileName = $('.brickyeditor-image-input-filename', $editor);
+                var $fileName = $('.bre-image-input-filename', $editor);
 
                 var value = this.value as PromptParameterImageResult;
                 if(value) {
-                    $filePreview.attr("src", value.fileContent);
+                    $filePreview.attr('src', value.fileContent);
+                    $filePreview.addClass('bre-loaded');
                     $fileName.text(value.fileInfo.name);
                 }
                     
@@ -52,7 +54,8 @@ namespace BrickyEditor {
                             field._value.fileContent = target.result;
                             field._value.fileInfo = new PromptParameterImageResultFile(fileInput.files[0]);
 
-                            $filePreview.attr("src", field._value.fileContent);
+                            $filePreview.attr('src', field._value.fileContent);
+                            $filePreview.addClass('bre-loaded');
                             $fileName.text(field._value.fileInfo.name);
                         }
 

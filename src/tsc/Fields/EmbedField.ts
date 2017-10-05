@@ -1,12 +1,16 @@
-
 namespace BrickyEditor {
     export namespace Fields {
         export class EmbedField extends BaseField {
 
-            public settings() {
-                let field = this;
-                return function() {
-                    field.data.url = prompt('Link to embed media', 'http://instagr.am/p/BYJAes_HEI0/');
+            getSettingsEl() : JQuery {
+                let $el = $('<div style="position: absolute;width: 100%; height: 100px;;text-align: center;font-weight: bold;vertical-align: middle;background: #333;opacity: 0.2;">Change embed element link</div>');
+                this.$field.before($el);
+                return $el;
+            }
+
+            get settings() : (field: BaseField) => void {
+                return (field: EmbedField) => {
+                    field.data.url = prompt('Link to embed media', 'http://instagr.am/p/BO9VX2Vj4fF/');
                     field.loadMedia();
                 }
             }
@@ -16,7 +20,7 @@ namespace BrickyEditor {
                 let $field = this.$field;
                 
                 $field.on('click', function() {
-                    field.data.url = prompt('Link to embed media', 'http://instagr.am/p/BYJAes_HEI0/');
+                    field.data.url = prompt('Link to embed media', 'http://instagr.am/p/BO9VX2Vj4fF/');
                     field.loadMedia();
                 });
 

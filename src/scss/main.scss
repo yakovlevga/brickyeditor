@@ -1,10 +1,16 @@
-@import "partials/_layout";
-@import "partials/_oembed";
-@import "partials/_tools";
+@import "partials/_block";
 @import "partials/_buttons";
 @import "partials/_htmlTools";
-@import "partials/_modal";
 @import "partials/_input";
-@import "partials/_loader";
-@import "partials/_block";
-@import "partials/_container";
+@import "partials/_modal";
+@import "partials/_tools";
+
+.bre {
+    * {
+        font-family: sans-serif;
+    }
+}
+
+.bre-editor {
+    position: relative;
+}

@@ -34,46 +34,103 @@
       $(function(){
           $("#editor").brickyeditor({
               ignoreHtml: true,
-              blocks: [
-                  {
-                      "template": "h1-display",
-                      "html": "<h1 class=\"display-1 mb-4\">BrickyEditor.</h1>",
-                      "fields": [
-                          {
-                              "type": "html",
-                              "name": "text",
-                              "data": {
-                                  "html": "BrickyEditor."
-                              }
-                          }
-                      ]
-                  },
-                  {
-                      "template": "p",
-                      "html": "<p>On the other hand, we denounce with righteous indignation and dislike men who are so beguiled and demoralized by the charms of pleasure of the moment, so blinded by desire, that they cannot foresee the pain and trouble that are bound to ensue.</p>",
-                      "fields": [
-                          {
-                              "type": "html",
-                              "name": "text",
-                              "data": {
-                                  "html": "On the other hand, we denounce with righteous indignation and dislike men who are so beguiled and demoralized by the charms of pleasure of the moment, so blinded by desire, that they cannot foresee the pain and trouble that are bound to ensue."
-                              }
-                          }
-                      ]
-                  },
-                  {
-                      "template": "embed",
-                      "fields": [
-                          {
-                              "type": "embed",
-                              "name": "embed",
-                              "data": {
-                                  "url": "http://instagr.am/p/BYJAes_HEI0/"
-                              }
-                          }
-                      ]
-                  }
-              ],
+              blocks: 
+              [{
+                  "template": "Display Heading 1",
+                  "fields": [
+                      {
+                          "name": "text",
+                          "type": "html",
+                          "html": "Hi! This is bricky editor example."
+                      }
+                  ]
+              },
+              {
+                  "template": "Paragraph Lead",
+                  "fields": [
+                      {
+                          "name": "text",
+                          "type": "html",
+                          "html": "Ok, you put some traditional wysiwyg to your site and give html freedom to your editors.<div>But this freedom played a cruel joke&nbsp;<span style=\"font-size: 1.25rem;\">with you and now you need to correct every article by yourself.</span></div>"
+                      }
+                  ]
+              },
+              {
+                  "template": "Paragraph",
+                  "fields": [
+                      {
+                          "name": "text",
+                          "type": "html",
+                          "html": "I know this situation, cause I'm very often hear something like: \"I don't how this happens, it maked it by itself\". And this poor guys are right - sometimes wysiwygs made \"this\" by themselfs. And one day I decide to correct this situation."
+                      }
+                  ]
+              },
+              {
+                  "template": "Paragraph",
+                  "fields": [
+                      {
+                          "name": "text",
+                          "type": "html",
+                          "html": "If you look closely, you will see, that 99 percents of all articles in web contains some typical blocks. Escpeccialy in pro media: headers, paragraps, photos, embed fragments from social networks, or, maybe, galleries. And I started creation of my own universal WYSIWYG plugin with predifined blocks. Of cource I made some quick googling for plugins of this type, but this field is still pure and have only a few solutions. And the best one is payed and it's vendor locked.&nbsp;I'm not greedy, but I really love open source because it speeds up the evolution of the solution (you know it buy yourself, couse 99% that you come here from github ;))."
+                      }
+                  ]
+              },
+              {
+                  "template": "Blockquote Reverse",
+                  "fields": [
+                      {
+                          "name": "text",
+                          "type": "html",
+                          "html": "I am fond of pigs. Dogs look up to us. Cats look down on us. Pigs treat us as equals."
+                      },
+                      {
+                          "name": "author",
+                          "type": "html",
+                          "html": "Winston Churchill"
+                      },
+                      {
+                          "name": "author",
+                          "type": "html",
+                          "html": "This quote is here, because I need to show, what brickyeditor can. And, yes, I', civ fan."
+                      }
+                  ]
+              },
+              {
+                  "template": "Image with caption",
+                  "fields": [
+                      {
+                          "name": "image",
+                          "type": "image",
+                          "src": "assets/photo.jpg"
+                      },
+                      {
+                          "name": "caption",
+                          "type": "html",
+                          "html": "I don't love to write a lot. So I put here my cats photo, his name is Shprotski."
+                      }
+                  ]
+              },
+              {
+                  "template": "Paragraph Lead",
+                  "fields": [
+                      {
+                          "name": "text",
+                          "type": "html",
+                          "html": "I think I must write more marketing words here, but sorry, I don't have no time for that shit. But I can instagram embed photo, I like it."
+                      }
+                  ]
+              },
+              {
+                  "template": "Embed",
+                  "fields": [
+                      {
+                          "name": "embed",
+                          "type": "embed",
+                          "url": "http://instagr.am/p/BYJAes_HEI0/"
+                      }
+                  ]
+              }
+          ],
               onload: function(editor) {
                   initButtons(editor);
               }

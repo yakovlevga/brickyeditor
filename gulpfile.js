@@ -17,11 +17,13 @@ const paths = {
     srcSassAllFiles: './src/scss/**/*.scss',
     srcSassMain: './src/scss/main.scss',
     srcDemo: './src/demo/*.pug',
+    srcDemoTemplates: './src/demo/templates/*.pug',
 
     dist: './dist',
     buildJs: './build/js',
     buildCss: './build/css',
-    buildDemo: './build'
+    buildDemo: './build',
+    buildDemoTemplates: './build/templates'
 };
 
 // Browser-sync task
@@ -70,16 +72,22 @@ gulp.task('sass', function () {
 
  
 gulp.task('demo', function buildHTML() {
-  return gulp.src(paths.srcDemo)
-  .pipe(pug({ pretty: true }))
-  .pipe(gulp.dest(paths.buildDemo));
+    return gulp.src(paths.srcDemo)
+        .pipe(pug({ pretty: true }))
+        .pipe(gulp.dest(paths.buildDemo));
+});
+
+gulp.task('demoTemplates', function buildHTML() {
+    return gulp.src(paths.srcDemoTemplates)
+        .pipe(pug({ pretty: true }))
+        .pipe(gulp.dest(paths.buildDemoTemplates));
 });
 
 // changes tracking 
 gulp.task('watcher',function(){
     gulp.watch(paths.srcTsAllFiles, ['ts']);
     gulp.watch(paths.srcSassAllFiles, ['sass']);
-    gulp.watch(paths.srcDemo, ['demo']);
+    gulp.watch(paths.srcDemo, ['demo', 'demoTemplates']);
 });
 
-gulp.task('default', ['clearBuild', 'ts', 'sass', 'watcher', 'demo', 'browserSync']);
+gulp.task('default', ['clearBuild', 'ts', 'sass', 'watcher', 'demo', 'demoTemplates', 'browserSync']);

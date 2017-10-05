@@ -6,13 +6,11 @@ namespace BrickyEditor {
                 let field = this;
                 let $field = this.$field;
                 let data = this.data;
+                let editor = field.block.editor;
 
-                if(!this.data.src) {
-                    this.data.src = Services.TemplateService.getFieldValue($field, 'src');
-                }
-                $field.attr("src", this.data.src);                
+                this.setSrc(this.data.src);                
                 $field.on('click', function() {
-                    field.block.editor.modal.promptAsync(field.getPromptParams())                    
+                    editor.ui.modal.promptAsync(field.getPromptParams())                    
                     .done(fields => {
                         let file = fields.getValue('file');
                         let src = fields.getValue('src');
@@ -44,20 +42,35 @@ namespace BrickyEditor {
             setSrc(src) {
                 this.data.src = src;
                 if(src) {
-                    this.$field.attr("src", this.data.src);
+                    if(this.isImg) {
+                        this.$field.attr('src', this.data.src);
+                    }
+                    else {
+                        this.$field.css('background-image', `url(${this.data.src}`);
+                    }
                 }
             }
 
             setAlt(alt) {
                 this.data.alt = alt;
-                this.$field.attr("alt", this.data.alt);
+                this.$field.attr(this.isImg ? 'alt' : 'title' , this.data.alt);
             }
 
             setFile(file) {
                 this.data.file = file;
                 if(file) {
-                    this.$field.attr("src", this.data.file.fileContent);
+                    if(this.isImg) {
+                        this.$field.attr('src', this.data.file.fileContent);
+                    }
+                    else {
+                        this.$field.css('background-image', `url(${this.data.file.fileContent})`);
+                    }
                 }
+            }
+
+            _isImg: Boolean;
+            private get isImg() : Boolean {
+                return this._isImg = this._isImg || this.$field.prop('tagName').toLowerCase() === 'img';
             }
         }
     }
