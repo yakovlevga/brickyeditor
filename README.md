@@ -10,6 +10,8 @@ Your longrids and articles will be in one clean style.
 Since **BrickyEditor** can save blocks as JSON, not only in rendered HTML, you can easily deliver your content to mobile platforms 
 and render it natively, without
 
+![demo gif](https://github.com/yakovlevga/brickyeditor/blob/master/readme/1.gif?raw=true)
+
 ## Demo page
 [see demo for details](http://brickyeditor.info/examples.html)
 
@@ -22,7 +24,6 @@ and render it natively, without
 ```js
 $(function(){
   $("#editor").brickyeditor({
-        templatesBaseFolder: "path/to/base/templates/folder", // by default it's "/templates";
-        templatesFolder: "path/to/templates/folder", // by default it's "/templates/bootstrap4";
+        templatesUrl: "path/to/base/templates/template.html" // by default it's "/templates/bootstrap4.html";
     });
 });
