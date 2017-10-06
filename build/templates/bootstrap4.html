@@ -9,6 +9,18 @@
     .bre-template > blockquote {
         margin-bottom: 0;
     }
+    .bre-template > mb-4,
+    .bre-template > mt-4 {
+        margin: 0;
+    }
+
+    .bre-template > .row > .col-md-6 {
+        width: 50% !important;
+    }
+
+    .bre-template > .row > .col-md-4 {
+        width: 33.33% !important;
+    }
 </style>
 
 <div class="bre-template" data-name="Display Heading 1">
@@ -41,12 +53,9 @@
     
 <div class="bre-template" data-name="Embed">
     <center>
-        <div class="mb-4 mt-4" style="width: 400px; height: 300px; background: #fff; border: 4px solid  #333; text-align: center;" 
-            data-bre-field='{ "name" : "embed", "type": "embed" }'>
-            <h1 class="display-1">< / ></h1>
-            <h1>Embed Element</h1>
-            <h2>Instagram, YouTube, Twitter and etc.</h2>
-        </div>
+        <h4 style="background: #555; color: #fff; padding: 1rem;" data-bre-field='{ "name" : "embed", "type": "embed" }'>
+            &lt; / &gt; Embed
+        </h4>
     </center>
 </div>
 

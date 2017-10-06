@@ -198,12 +198,13 @@
 
 .bre-tools {
   position: fixed;
-  width: 245px;
+  width: 30%;
+  max-width: 245px;
   height: 100%;
   top: 0;
   right: 0;
   z-index: 101;
-  background: #eee;
+  background: rgba(238, 238, 238, 0.5);
   overflow: hidden;
   -webkit-transition: all .15s ease-in 0s;
   -moz-transition: all .15s ease-in 0s;
@@ -233,21 +234,29 @@
     -ms-transform: rotate(-180deg);
     transform: rotate(-180deg); }
   .bre-tools .bre-tools-templates {
-    width: 245px;
+    width: 100%;
     height: 99%;
     overflow: auto; }
     .bre-tools .bre-tools-templates .bre-template {
       cursor: pointer;
       background: #fff;
-      zoom: 0.4;
       user-select: none;
       padding: .5rem;
       margin: .5rem;
       -webkit-box-shadow: 0px 1px 5px 0px rgba(115, 115, 115, 0.2);
       -moz-box-shadow: 0px 1px 5px 0px rgba(115, 115, 115, 0.2);
       box-shadow: 0px 1px 5px 0px rgba(115, 115, 115, 0.2); }
+      .bre-tools .bre-tools-templates .bre-template > *,
+      .bre-tools .bre-tools-templates .bre-template > * > * {
+        zoom: 0.2; }
       .bre-tools .bre-tools-templates .bre-template:hover {
         background: #f2f2f2; }
+    @media (min-width: 576px) and (max-width: 1023px) {
+      .bre-tools .bre-tools-templates .bre-template > * {
+        zoom: 0.3; } }
+    @media (min-width: 1024px) {
+      .bre-tools .bre-tools-templates .bre-template > * {
+        zoom: 0.4; } }
 
 .bre-tools-collapsed {
   right: -196px; }
@@ -262,7 +271,7 @@
     height: 99%;
     overflow: auto; }
     .brickyeditor-modal-content .brickyeditor-tools-mobile .templates .template {
-      zoom: 0.3 !important; }
+      scale: 0.3 !important; }
   .brickyeditor-modal-content .brickyeditor-tools-mobile [data-brickyeditor-hide-tools] {
     display: none; }
 
