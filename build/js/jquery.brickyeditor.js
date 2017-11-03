@@ -683,6 +683,90 @@ var BrickyEditor;
 })(BrickyEditor || (BrickyEditor = {}));
 var BrickyEditor;
 (function (BrickyEditor) {
+    var Services;
+    (function (Services) {
+        var EmbedService = (function () {
+            function EmbedService() {
+            }
+            EmbedService.getEmbedAsync = function (url) {
+                var task = $.Deferred();
+                var url = "https://noembed.com/embed?url=" + url;
+                $.ajax({
+                    url: url,
+                    type: "get",
+                    dataType: "jsonp"
+                })
+                    .done(function (json) {
+                    task.resolve(json);
+                })
+                    .fail(function (err) {
+                    task.reject(err);
+                });
+                return task;
+            };
+            EmbedService.processEmbed = function (provider) {
+                switch (provider) {
+                    case EmbedService.Instagram:
+                        if (instgrm) {
+                            instgrm.Embeds.process();
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            };
+            EmbedService.Instagram = 'Instagram';
+            return EmbedService;
+        }());
+        Services.EmbedService = EmbedService;
+    })(Services = BrickyEditor.Services || (BrickyEditor.Services = {}));
+})(BrickyEditor || (BrickyEditor = {}));
+var BrickyEditor;
+(function (BrickyEditor) {
+    var Services;
+    (function (Services) {
+        var TemplateService = (function () {
+            function TemplateService() {
+            }
+            TemplateService.loadTemplatesAsync = function (editor) {
+                var _this = this;
+                var result = $.Deferred();
+                $.get(editor.options.templatesUrl)
+                    .done(function (data) {
+                    _this.templates = [];
+                    var $style = $(data).filter('style');
+                    if ($style && $style.length > 0) {
+                        editor.$editor.prepend($style);
+                    }
+                    var $templates = $(data).filter('.bre-template');
+                    $templates.each(function (idx, t) {
+                        var template = new BrickyEditor.Template(t);
+                        _this.templates.push(template);
+                    });
+                    result.resolve(_this.templates);
+                })
+                    .fail(function (err) {
+                    console.log('Templates file not found.');
+                    result.fail(err);
+                });
+                return result;
+            };
+            TemplateService.getTemplate = function (templateName) {
+                for (var i = 0; i < this.templates.length; i++) {
+                    var template = this.templates[i];
+                    if (template.name.toLowerCase() === templateName.toLowerCase()) {
+                        return template;
+                    }
+                }
+                return null;
+            };
+            return TemplateService;
+        }());
+        Services.TemplateService = TemplateService;
+    })(Services = BrickyEditor.Services || (BrickyEditor.Services = {}));
+})(BrickyEditor || (BrickyEditor = {}));
+var BrickyEditor;
+(function (BrickyEditor) {
     var Prompt;
     (function (Prompt) {
         var PromptParameter = (function () {
@@ -860,90 +944,6 @@ var BrickyEditor;
         }(Prompt.PromptParameter));
         Prompt.PromptParameterOptions = PromptParameterOptions;
     })(Prompt = BrickyEditor.Prompt || (BrickyEditor.Prompt = {}));
-})(BrickyEditor || (BrickyEditor = {}));
-var BrickyEditor;
-(function (BrickyEditor) {
-    var Services;
-    (function (Services) {
-        var EmbedService = (function () {
-            function EmbedService() {
-            }
-            EmbedService.getEmbedAsync = function (url) {
-                var task = $.Deferred();
-                var url = "https://noembed.com/embed?url=" + url;
-                $.ajax({
-                    url: url,
-                    type: "get",
-                    dataType: "jsonp"
-                })
-                    .done(function (json) {
-                    task.resolve(json);
-                })
-                    .fail(function (err) {
-                    task.reject(err);
-                });
-                return task;
-            };
-            EmbedService.processEmbed = function (provider) {
-                switch (provider) {
-                    case EmbedService.Instagram:
-                        if (instgrm) {
-                            instgrm.Embeds.process();
-                        }
-                        break;
-                    default:
-                        break;
-                }
-            };
-            EmbedService.Instagram = 'Instagram';
-            return EmbedService;
-        }());
-        Services.EmbedService = EmbedService;
-    })(Services = BrickyEditor.Services || (BrickyEditor.Services = {}));
-})(BrickyEditor || (BrickyEditor = {}));
-var BrickyEditor;
-(function (BrickyEditor) {
-    var Services;
-    (function (Services) {
-        var TemplateService = (function () {
-            function TemplateService() {
-            }
-            TemplateService.loadTemplatesAsync = function (editor) {
-                var _this = this;
-                var result = $.Deferred();
-                $.get(editor.options.templatesUrl)
-                    .done(function (data) {
-                    _this.templates = [];
-                    var $style = $(data).filter('style');
-                    if ($style && $style.length > 0) {
-                        editor.$editor.prepend($style);
-                    }
-                    var $templates = $(data).filter('.bre-template');
-                    $templates.each(function (idx, t) {
-                        var template = new BrickyEditor.Template(t);
-                        _this.templates.push(template);
-                    });
-                    result.resolve(_this.templates);
-                })
-                    .fail(function (err) {
-                    console.log('Templates file not found.');
-                    result.fail(err);
-                });
-                return result;
-            };
-            TemplateService.getTemplate = function (templateName) {
-                for (var i = 0; i < this.templates.length; i++) {
-                    var template = this.templates[i];
-                    if (template.name.toLowerCase() === templateName.toLowerCase()) {
-                        return template;
-                    }
-                }
-                return null;
-            };
-            return TemplateService;
-        }());
-        Services.TemplateService = TemplateService;
-    })(Services = BrickyEditor.Services || (BrickyEditor.Services = {}));
 })(BrickyEditor || (BrickyEditor = {}));
 var BrickyEditor;
 (function (BrickyEditor) {
