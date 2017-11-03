@@ -37,3 +37,21 @@ $stroke-width: 1px;
         z-index: $fixed-z-index;
     }
 }
+
+@media (max-width: 767px) { 
+    .bre-block-wrapper {
+        .bre-block-tools {            
+            margin-left: 0px;
+            margin-top: -36px - $stroke-offset - $stroke-width;
+        }
+
+        &.bre-selected {
+            border-top: $stroke-width solid $accent-color;
+            margin-top: -($stroke-width + $stroke-offset);
+            padding-top: $stroke-offset;
+            border-left-width: 0; 
+            margin-left: 0;
+            padding-left: 0;
+        }
+    }
+}

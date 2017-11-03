@@ -211,6 +211,7 @@ var BrickyEditor;
         function EditorOptions(options) {
             this.templatesUrl = "templates/bootstrap4.html";
             this.compactTools = null;
+            this.compactToolsWidth = 768;
             this.ignoreHtml = null;
             this.templatesUrl = options.templatesUrl || this.templatesUrl;
             this.onload = options.onload;
@@ -1205,49 +1206,36 @@ var BrickyEditor;
             this.setModal();
             this.htmlTools = new BrickyEditor.HtmlTools(this.editor);
         }
-        Object.defineProperty(UI.prototype, "isMobile", {
+        Object.defineProperty(UI.prototype, "isCompactTools", {
             get: function () {
-                return this._isMobile;
-            },
-            set: function (value) {
-                if (this._isMobile == value)
-                    return;
-                this._isMobile = value;
-                if (this.$tools != null) {
-                    this.$tools.toggle(!value);
-                    this.$toolsBtn.toggle(value);
-                    if (value) {
-                        this.$tools.addClass(BrickyEditor.Selectors.classMobile);
-                    }
-                    else {
-                        this.$tools.removeClass(BrickyEditor.Selectors.classMobile);
-                    }
+                var compactTools = this.editor.options.compactTools;
+                if (compactTools == null) {
+                    return window.innerWidth < this.editor.options.compactToolsWidth;
+                }
+                else {
+                    return compactTools.valueOf();
                 }
             },
             enumerable: true,
             configurable: true
         });
-        UI.prototype.checkIsCompactTools = function (editor) {
-            if (this.compactTools == null) {
-                var offset = (window.innerWidth - editor.$editor.width()) / 2 - this.$tools.width();
-                this.isMobile = offset <= 0;
-            }
-            else {
-                this.isMobile = this.compactTools;
-            }
-        };
         UI.prototype.setTools = function () {
             var _this = this;
+            this.$tools = $('<div class="bre bre-tools" data-bricky-tools></div>');
             this.$toolsTemplates = $('<div class="bre-tools-templates"></div>');
             this.$toolsLoader = $('<div class="bre-tools-loader"><b>Loading...</b></div>');
-            this.$toolsHideBtn = $('<button class="bre-tools-toggle"><div>></div></button>');
-            this.$tools = $('<div class="bre bre-tools" data-bricky-tools></div>');
+            this.$toolsHideBtn = $('<button class="bre-tools-toggle"><div>►</div></button>');
             this.$tools.append([this.$toolsHideBtn, this.$toolsLoader, this.$toolsTemplates]);
-            this.$toolsHideBtn.on('click', function () {
-                _this.$tools.toggleClass('bre-tools-collapsed', !_this.$toolsHideBtn.hasClass("bre-tools-toggle-collapsed"));
-                _this.$toolsHideBtn.toggleClass("bre-tools-toggle-collapsed");
-            });
+            this.$toolsHideBtn.on('click', function () { return _this.toggleTools(); });
             this.editor.$editor.append(this.$tools);
+            if (this.isCompactTools) {
+                this.$tools.addClass("bre-tools-templates-compact");
+                this.toggleTools();
+            }
+        };
+        UI.prototype.toggleTools = function () {
+            this.$tools.toggleClass('bre-tools-collapsed', !this.$toolsHideBtn.hasClass("bre-tools-toggle-collapsed"));
+            this.$toolsHideBtn.toggleClass("bre-tools-toggle-collapsed");
         };
         UI.prototype.setModal = function () {
             var $modal = $('<div class="bre bre-modal"><div class="bre-modal-placeholder"></div></div>');

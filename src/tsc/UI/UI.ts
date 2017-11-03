@@ -1,7 +1,5 @@
 namespace BrickyEditor {
     export class UI {
-        public compactTools?: boolean;
-
         public editor: Editor;
 
         // Templates
@@ -17,36 +15,15 @@ namespace BrickyEditor {
         // Html Editing Tools
         public htmlTools : HtmlTools;
 
-        private _isMobile : boolean;
-        public get isMobile() : boolean {
-            return this._isMobile;
-        }
-        public set isMobile(value : boolean) {
-            if(this._isMobile == value)
-                return;
-                
-            this._isMobile = value;
-            if(this.$tools != null) {
-                this.$tools.toggle(!value);                
-                this.$toolsBtn.toggle(value);
-                if(value) {
-                    this.$tools.addClass(Selectors.classMobile);
-                }
-                else {
-                    this.$tools.removeClass(Selectors.classMobile);
-                }
-            }
-        } 
-
         // Set is mobile if there is not enough of space for tools
         // or if it's not forced by compactTools in passed settings.
-        private checkIsCompactTools(editor: Editor) {            
-            if(this.compactTools == null) {
-                let offset = (window.innerWidth - editor.$editor.width()) / 2 - this.$tools.width();
-                this.isMobile = offset <= 0;
+        private get isCompactTools() : boolean {
+            var compactTools = this.editor.options.compactTools;
+            if(compactTools == null) {
+                return window.innerWidth < this.editor.options.compactToolsWidth;
             }        
             else {
-                this.isMobile = this.compactTools;
+                return compactTools.valueOf();
             }
         }
 
@@ -60,18 +37,27 @@ namespace BrickyEditor {
         }
 
         private setTools() {
+            this.$tools = $('<div class="bre bre-tools" data-bricky-tools></div>');
+
             this.$toolsTemplates = $('<div class="bre-tools-templates"></div>');
             this.$toolsLoader = $('<div class="bre-tools-loader"><b>Loading...</b></div>');
-            this.$toolsHideBtn = $('<button class="bre-tools-toggle"><div>></div></button>');            
-            this.$tools = $('<div class="bre bre-tools" data-bricky-tools></div>');
+            this.$toolsHideBtn = $('<button class="bre-tools-toggle"><div>►</div></button>');            
+            
             this.$tools.append([this.$toolsHideBtn, this.$toolsLoader, this.$toolsTemplates]);
 
-            this.$toolsHideBtn.on('click', () => {
-                this.$tools.toggleClass('bre-tools-collapsed', !this.$toolsHideBtn.hasClass("bre-tools-toggle-collapsed"));
-                this.$toolsHideBtn.toggleClass("bre-tools-toggle-collapsed"); 
-            });            
+            this.$toolsHideBtn.on('click', () => this.toggleTools());
             
             this.editor.$editor.append(this.$tools);
+
+            if(this.isCompactTools) {
+                this.$tools.addClass("bre-tools-templates-compact");
+                this.toggleTools();
+            }            
+        }
+
+        private toggleTools() {
+            this.$tools.toggleClass('bre-tools-collapsed', !this.$toolsHideBtn.hasClass("bre-tools-toggle-collapsed"));
+            this.$toolsHideBtn.toggleClass("bre-tools-toggle-collapsed"); 
         }
 
         private setModal() {
