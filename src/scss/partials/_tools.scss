@@ -13,7 +13,6 @@
     right: 0;
     z-index: $fixed-z-index;
     background: transparentize($tools-background, .5);
-    overflow: hidden;
 
     -webkit-transition: all .15s ease-in 0s;
     -moz-transition: all .15s ease-in 0s;
