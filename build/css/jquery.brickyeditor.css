@@ -22,6 +22,18 @@
   display: none;
   z-index: 101; }
 
+@media (max-width: 767px) {
+  .bre-block-wrapper .bre-block-tools {
+    margin-left: 0px;
+    margin-top: -42px; }
+  .bre-block-wrapper.bre-selected {
+    border-top: 1px solid #92819F;
+    margin-top: -6px;
+    padding-top: 5px;
+    border-left-width: 0;
+    margin-left: 0;
+    padding-left: 0; } }
+
 .bre-btn {
   width: 2rem;
   height: 2rem;
@@ -209,21 +221,29 @@
   -webkit-transition: all .15s ease-in 0s;
   -moz-transition: all .15s ease-in 0s;
   transition: all .15s ease-in 0s; }
+  .bre-tools.bre-tools-templates-compact {
+    width: 100%; }
+    .bre-tools.bre-tools-templates-compact.bre-tools-collapsed {
+      right: -245px; }
   .bre-tools .bre-tools-toggle {
     border: 0;
     cursor: pointer;
     border-radius: .5rem 0 0 .5rem;
     position: fixed;
-    background: #eee;
+    background: rgba(238, 238, 238, 0.5);
     width: 2rem;
+    height: 2rem;
     margin-left: -2rem;
     margin-top: 2rem;
-    color: #92819F; }
+    padding: 0; }
     .bre-tools .bre-tools-toggle:hover {
       color: white; }
     .bre-tools .bre-tools-toggle:focus {
       outline-style: none; }
     .bre-tools .bre-tools-toggle > div {
+      color: #92819F;
+      line-height: 2rem;
+      font-weight: 700;
       -webkit-transition: all .15s ease-in 0s;
       -moz-transition: all .15s ease-in 0s;
       transition: all .15s ease-in 0s; }
@@ -260,20 +280,6 @@
 
 .bre-tools-collapsed {
   right: -196px; }
-
-.brickyeditor-modal-content .brickyeditor-tools-mobile {
-  position: relative !important;
-  width: 100% !important;
-  height: 100%;
-  overflow: hidden; }
-  .brickyeditor-modal-content .brickyeditor-tools-mobile .templates {
-    width: 100% !important;
-    height: 99%;
-    overflow: auto; }
-    .brickyeditor-modal-content .brickyeditor-tools-mobile .templates .template {
-      scale: 0.3 !important; }
-  .brickyeditor-modal-content .brickyeditor-tools-mobile [data-brickyeditor-hide-tools] {
-    display: none; }
 
 .bre * {
   font-family: sans-serif; }

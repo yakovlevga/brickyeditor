@@ -4,6 +4,7 @@ namespace BrickyEditor {
         public onload: any;
         public blocks: Array<Block>;
         public compactTools?: Boolean = null;
+        public compactToolsWidth: number = 768;
         public ignoreHtml?: Boolean = null
 
         constructor(options: EditorOptions) {
