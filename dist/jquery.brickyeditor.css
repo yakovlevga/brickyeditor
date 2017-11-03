@@ -217,7 +217,6 @@
   right: 0;
   z-index: 101;
   background: rgba(238, 238, 238, 0.5);
-  overflow: hidden;
   -webkit-transition: all .15s ease-in 0s;
   -moz-transition: all .15s ease-in 0s;
   transition: all .15s ease-in 0s; }
