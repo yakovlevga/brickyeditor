@@ -5,7 +5,7 @@ namespace BrickyEditor {
         public $editor: JQuery; // block editor
 
         // Block actions
-        private static actions: BlockAction[] = [ 
+        private static actions: BlockAction[] = [
             { 'icon' : 'ellipsis-h' },
             { 'icon' : 'trash-o',       'action': (block) => block.delete() },
             { 'icon' : 'copy',          'action': (block) => block.copy() },
@@ -14,7 +14,7 @@ namespace BrickyEditor {
         ];
 
         constructor(
-            private block: Block, 
+            private block: Block,
             public $block: JQuery,
             data?: Array<Fields.BaseField>) {
 
@@ -23,7 +23,7 @@ namespace BrickyEditor {
                 this.buildEditorUI();
             }
 
-            this.bindFields(data);    
+            this.bindFields(data);
         }
 
         public delete() {
@@ -33,8 +33,8 @@ namespace BrickyEditor {
         /**
          * Generate block editor wrapper with block tools.
          */
-        private buildEditorUI() {            
-            this.$tools = $('<div class="bre-block-tools bre-btn-deck"></div>');            
+        private buildEditorUI() {
+            this.$tools = $('<div class="bre-block-tools bre-btn-deck"></div>');
             BlockUI.actions.forEach(action => {
                 var $btn = this.buildButton(action);
                 this.$tools.append($btn);
@@ -58,8 +58,8 @@ namespace BrickyEditor {
          * @param action Block action
          */
         private buildButton(action: BlockAction) : JQuery {
-            let $el = $(`<button class="bre-btn"><i class="fa fa-${action.icon}"></i></button>`);
-            if(action.action) {                
+            let $el = $(`<button type="button" class="bre-btn"><i class="fa fa-${action.icon}"></i></button>`);
+            if(action.action) {
                 $el.on('click', () => action.action(this.block));
             }
             return $el;
@@ -78,7 +78,7 @@ namespace BrickyEditor {
                     let $field = $(elem);
                     let field = Fields.BaseField.createField(this.block, $field, data);
                     this.block.fields.push(field);
-                });  
+                });
         }
-    }  
+    }
 }

@@ -1,7 +1,7 @@
 namespace BrickyEditor {
     export class HtmlTools {
         private $control: JQuery;
-        
+
         constructor(private editor: Editor) {
             this.setControl();
         }
@@ -16,7 +16,7 @@ namespace BrickyEditor {
             { icon: 'repeat', command: 'Redo', range: false },
         ];
 
-        private setControl() {            
+        private setControl() {
             let $panel = $('<div class="bre-html-tools-panel"></div>');
             this.buttons.forEach(b => {
                 let $btn = this.getButtonElement(b.icon, b.command, b.range);
@@ -29,22 +29,22 @@ namespace BrickyEditor {
         }
 
         private getButtonElement(icon: string, command: string, rangeCommand: boolean = true) : JQuery {
-            let $btn = $(`<button class="bre-btn"><i class="fa fa-${icon}"></i></button>`);
+            let $btn = $(`<button type="button" class="bre-btn"><i class="fa fa-${icon}"></i></button>`);
 
             $btn.on('click', () => {
                 let selection = window.getSelection();
                 let selectionRange = selection.rangeCount > 0 ? selection.getRangeAt(0) : null;
-                
+
                 if(rangeCommand && !selectionRange)
                     return;
 
                 if(command == 'CreateLink') {
-                    this.editor.ui.modal.promptAsync(this.getLinkPromptParams(selection))                    
-                    .done(fields => {                        
+                    this.editor.ui.modal.promptAsync(this.getLinkPromptParams(selection))
+                    .done(fields => {
                         var href = fields.getValue('href');
                         if(href) {
                             document.execCommand(command, false, href);
-                            
+
                             var target = fields.getValue('target');
                             if(target) {
                                 selection.anchorNode.parentElement.setAttribute('target', target);
@@ -60,8 +60,8 @@ namespace BrickyEditor {
                 else {
                     document.execCommand(command);
                 }
-                
-                return false;        
+
+                return false;
             });
 
             return $btn;
@@ -110,6 +110,6 @@ namespace BrickyEditor {
                     ['Top', '_top'],
                 ], target)
             ];
-        }       
+        }
     }
 }
