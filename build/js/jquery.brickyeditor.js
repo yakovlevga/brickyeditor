@@ -374,7 +374,7 @@ var BrickyEditor;
         };
         BlockUI.prototype.buildButton = function (action) {
             var _this = this;
-            var $el = $("<button class=\"bre-btn\"><i class=\"fa fa-" + action.icon + "\"></i></button>");
+            var $el = $("<button type=\"button\" class=\"bre-btn\"><i class=\"fa fa-" + action.icon + "\"></i></button>");
             if (action.action) {
                 $el.on('click', function () { return action.action(_this.block); });
             }
@@ -975,7 +975,7 @@ var BrickyEditor;
         HtmlTools.prototype.getButtonElement = function (icon, command, rangeCommand) {
             var _this = this;
             if (rangeCommand === void 0) { rangeCommand = true; }
-            var $btn = $("<button class=\"bre-btn\"><i class=\"fa fa-" + icon + "\"></i></button>");
+            var $btn = $("<button type=\"button\" class=\"bre-btn\"><i class=\"fa fa-" + icon + "\"></i></button>");
             $btn.on('click', function () {
                 var selection = window.getSelection();
                 var selectionRange = selection.rangeCount > 0 ? selection.getRangeAt(0) : null;
@@ -1224,7 +1224,7 @@ var BrickyEditor;
             this.$tools = $('<div class="bre bre-tools" data-bricky-tools></div>');
             this.$toolsTemplates = $('<div class="bre-tools-templates"></div>');
             this.$toolsLoader = $('<div class="bre-tools-loader"><b>Loading...</b></div>');
-            this.$toolsHideBtn = $('<button class="bre-tools-toggle"><div>►</div></button>');
+            this.$toolsHideBtn = $('<button type="button" class="bre-tools-toggle"><div>►</div></button>');
             this.$tools.append([this.$toolsHideBtn, this.$toolsLoader, this.$toolsTemplates]);
             this.$toolsHideBtn.on('click', function () { return _this.toggleTools(); });
             this.editor.$editor.append(this.$tools);
