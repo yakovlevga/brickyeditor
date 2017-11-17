@@ -213,11 +213,13 @@ var BrickyEditor;
             this.compactTools = null;
             this.compactToolsWidth = 768;
             this.ignoreHtml = null;
+            this.htmlToolsButtons = null;
             this.templatesUrl = options.templatesUrl || this.templatesUrl;
             this.onload = options.onload;
             this.blocks = options.blocks;
             this.compactTools = options.compactTools;
             this.ignoreHtml = options.ignoreHtml || false;
+            this.htmlToolsButtons = options.htmlToolsButtons || null;
         }
         return EditorOptions;
     }());
@@ -951,30 +953,34 @@ var BrickyEditor;
         function HtmlTools(editor) {
             this.editor = editor;
             this.buttons = [
-                { icon: 'bold', command: 'Bold', range: true },
-                { icon: 'italic', command: 'Italic', range: true },
-                { icon: 'link', command: 'CreateLink', range: true },
-                { icon: 'list-ul', command: 'insertUnorderedList', range: true },
-                { icon: 'list-ol', command: 'insertOrderedList', range: true },
-                { icon: 'undo', command: 'Undo', range: false },
-                { icon: 'repeat', command: 'Redo', range: false },
+                { icon: 'bold', command: 'Bold', range: true, aValueArgument: null },
+                { icon: 'italic', command: 'Italic', range: true, aValueArgument: null },
+                { icon: 'link', command: 'CreateLink', range: true, aValueArgument: null },
+                { icon: 'list-ul', command: 'insertUnorderedList', range: true, aValueArgument: null },
+                { icon: 'list-ol', command: 'insertOrderedList', range: true, aValueArgument: null },
+                { icon: 'undo', command: 'Undo', range: false, aValueArgument: null },
+                { icon: 'repeat', command: 'Redo', range: false, aValueArgument: null },
             ];
+            if (editor.options.htmlToolsButtons) {
+                this.buttons = editor.options.htmlToolsButtons;
+            }
             this.setControl();
         }
         HtmlTools.prototype.setControl = function () {
             var _this = this;
             var $panel = $('<div class="bre-html-tools-panel"></div>');
             this.buttons.forEach(function (b) {
-                var $btn = _this.getButtonElement(b.icon, b.command, b.range);
+                var $btn = _this.getButtonElement(b.icon, b.command, b.range, b.aValueArgument);
                 $panel.append($btn);
             });
             this.$control = $('<div class="bre-html-tools bre-btn-group"></div>');
             this.$control.append($panel).hide();
             this.editor.$editor.append(this.$control);
         };
-        HtmlTools.prototype.getButtonElement = function (icon, command, rangeCommand) {
+        HtmlTools.prototype.getButtonElement = function (icon, command, rangeCommand, aValueArgument) {
             var _this = this;
             if (rangeCommand === void 0) { rangeCommand = true; }
+            if (aValueArgument === void 0) { aValueArgument = null; }
             var $btn = $("<button type=\"button\" class=\"bre-btn\"><i class=\"fa fa-" + icon + "\"></i></button>");
             $btn.on('click', function () {
                 var selection = window.getSelection();
@@ -999,7 +1005,10 @@ var BrickyEditor;
                     });
                 }
                 else {
-                    document.execCommand(command);
+                    if (typeof (aValueArgument) === 'string') {
+                        var valueArgument = aValueArgument.replace('%%SELECTION%%', selection.toString());
+                    }
+                    document.execCommand(command, false, valueArgument);
                 }
                 return false;
             });

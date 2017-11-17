@@ -3,23 +3,26 @@ namespace BrickyEditor {
         private $control: JQuery;
 
         constructor(private editor: Editor) {
+			if (editor.options.htmlToolsButtons) {
+				this.buttons = editor.options.htmlToolsButtons;
+			}
             this.setControl();
         }
 
         private buttons = [
-            { icon: 'bold', command: 'Bold', range: true },
-            { icon: 'italic', command: 'Italic', range: true },
-            { icon: 'link', command: 'CreateLink', range: true },
-            { icon: 'list-ul', command: 'insertUnorderedList', range: true },
-            { icon: 'list-ol', command: 'insertOrderedList', range: true },
-            { icon: 'undo', command: 'Undo', range: false },
-            { icon: 'repeat', command: 'Redo', range: false },
+            { icon: 'bold', command: 'Bold', range: true, aValueArgument: null },
+            { icon: 'italic', command: 'Italic', range: true, aValueArgument: null },
+            { icon: 'link', command: 'CreateLink', range: true, aValueArgument: null },
+            { icon: 'list-ul', command: 'insertUnorderedList', range: true, aValueArgument: null },
+            { icon: 'list-ol', command: 'insertOrderedList', range: true, aValueArgument: null },
+            { icon: 'undo', command: 'Undo', range: false, aValueArgument: null },
+            { icon: 'repeat', command: 'Redo', range: false, aValueArgument: null },
         ];
 
         private setControl() {
             let $panel = $('<div class="bre-html-tools-panel"></div>');
             this.buttons.forEach(b => {
-                let $btn = this.getButtonElement(b.icon, b.command, b.range);
+                let $btn = this.getButtonElement(b.icon, b.command, b.range, b.aValueArgument);
                 $panel.append($btn);
             });
 
@@ -28,7 +31,7 @@ namespace BrickyEditor {
             this.editor.$editor.append(this.$control);
         }
 
-        private getButtonElement(icon: string, command: string, rangeCommand: boolean = true) : JQuery {
+        private getButtonElement(icon: string, command: string, rangeCommand: boolean = true, aValueArgument: string = null) : JQuery {
             let $btn = $(`<button type="button" class="bre-btn"><i class="fa fa-${icon}"></i></button>`);
 
             $btn.on('click', () => {
@@ -58,7 +61,10 @@ namespace BrickyEditor {
                     });
                 }
                 else {
-                    document.execCommand(command);
+					if (typeof(aValueArgument) === 'string') {
+						var valueArgument = aValueArgument.replace('%%SELECTION%%', selection.toString());
+					}
+                    document.execCommand(command, false, valueArgument);
                 }
 
                 return false;

@@ -5,7 +5,8 @@ namespace BrickyEditor {
         public blocks: Array<Block>;
         public compactTools?: Boolean = null;
         public compactToolsWidth: number = 768;
-        public ignoreHtml?: Boolean = null
+        public ignoreHtml?: Boolean = null;
+        public htmlToolsButtons?: Array<HtmlToolsButton> = null;
 
         constructor(options: EditorOptions) {
             this.templatesUrl = options.templatesUrl || this.templatesUrl;
@@ -13,6 +14,7 @@ namespace BrickyEditor {
             this.blocks = options.blocks;
             this.compactTools = options.compactTools;
             this.ignoreHtml = options.ignoreHtml || false;
+			this.htmlToolsButtons = options.htmlToolsButtons || null;
         }
     }
 }
