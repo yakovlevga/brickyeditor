@@ -2,13 +2,20 @@
 interface String {
     breTotalTrim(): string;
     breEqualsInvariant(other: String): boolean;
-    breStartsWith(part: String) : boolean;    
-    breContains(part: String) : boolean; 
+    breStartsWith(part: String) : boolean;
+    breContains(part: String) : boolean;
 }
 
 // Array extensions
 interface Array<T> {
     find(predicate: (search: T) => boolean): T;
+}
+
+interface HtmlToolsButton {
+	icon: string;
+	command: string;
+	range: boolean;
+	aValueArgument: string;
 }
 
 String.prototype.breContains = function(part: String) : boolean   {
@@ -23,7 +30,7 @@ String.prototype.breTotalTrim = function() : string {
     return this ? this.replace(/\s\s+/g, ' ').trim() : '';
 }
 
-String.prototype.breEqualsInvariant = function(other: String) : boolean {    
+String.prototype.breEqualsInvariant = function(other: String) : boolean {
     return this.toLowerCase() === other.toLowerCase();
 }
 
@@ -52,12 +59,12 @@ if (!Array.prototype.find) {
 }
 
 namespace BrickyEditor {
-    export class Common {        
+    export class Common {
 
         // Selection
         static getSelectedText() {
             let text = "";
-            let doc = document as any; 
+            let doc = document as any;
             if (window.getSelection) {
                 text = window.getSelection().toString();
             } else if (doc.selection && doc.selection.type != "Control") {
@@ -71,7 +78,7 @@ namespace BrickyEditor {
             for (var key in obj) {
                 if (obj.hasOwnProperty(key)) {
                     var value = obj[key];
-                    func(key, value);    
+                    func(key, value);
                 }
             }
         }
@@ -90,5 +97,5 @@ namespace BrickyEditor {
 
             return result;
         }
-    }    
+    }
 }
