@@ -1,0 +1,178 @@
+<style>
+    .bre-template > h1,
+    .bre-template > h2,
+    .bre-template > h3,
+    .bre-template > h4,
+    .bre-template > h5,
+    .bre-template > h6,
+    .bre-template > p,
+    .bre-template > blockquote {
+        margin-bottom: 0;
+    }
+    .bre-template > mb-4,
+    .bre-template > mt-4 {
+        margin: 0;
+    }
+
+    .bre-template > .row > .col-md-6 {
+        width: 50% !important;
+    }
+
+    .bre-template > .row > .col-md-4 {
+        width: 33.33% !important;
+    }
+</style>
+
+<div class="bre-template" data-name="Display Heading 1">
+    <h2 class="display-2" data-bre-field='{ "name" : "text", "type": "html" }'></h1>
+</div>
+
+<div class="bre-template" data-name="Heading 1">
+    <h1 data-bre-field='{ "name" : "text", "type": "html" }'></h1>
+</div>
+
+<div class="bre-template" data-name="Heading 2">
+    <h2 data-bre-field='{ "name" : "text", "type": "html" }'></h2>
+</div>
+
+<div class="bre-template" data-name="Heading 3">
+    <h3 data-bre-field='{ "name" : "text", "type": "html" }'></h3>
+</div>
+
+<div class="bre-template" data-name="Paragraph Lead">
+    <p class="lead" data-bre-field='{ "name" : "text", "type": "html" }'>
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+    </p>
+</div>
+
+<div class="bre-template" data-name="Paragraph">
+    <p data-bre-field='{ "name" : "text", "type": "html" }'>
+        Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+    </p>
+</div>
+    
+<div class="bre-template" data-name="Embed">
+    <center>
+        <h4 style="background: #555; color: #fff; padding: 1rem;" data-bre-field='{ "name" : "embed", "type": "embed" }'>
+            &lt; / &gt; Embed
+        </h4>
+    </center>
+</div>
+
+<div class="bre-template" data-name="Image with caption">
+    <div class="row">            
+        <div class="col-md-12">
+            <figure class="figure text-center" style="width: 100%">
+                <img class="figure-img img-fluid" data-bre-field="{ 'name' : 'image', 'type' : 'image', 'src' : 'assets/photo.jpg'}" />
+                <figcaption class="figure-caption" data-bre-field="{ 'name' : 'caption', 'type' : 'html'}">Lorem ipsum dolor sit amet</figcaption>
+            </figure>
+        </div>
+    </div>
+</div>
+
+<div class="bre-template" data-name="2 Column Text">
+    <div class="row">
+        <div class="col-md-6 col-sm-12">
+            <p data-bre-field='{ "name" : "column1", "type": "html" }'>
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+            </p>
+        </div>
+        <div class="col-md-6 col-sm-12">
+            <p data-bre-field='{ "name" : "column2", "type": "html" }'>
+                    Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+            </p>
+        </div>
+    </div>    
+</div>
+
+<div class="bre-template" data-name="3 Column Text">
+    <div class="row">
+        <div class="col-md-4 col-sm-12">
+            <p data-bre-field='{ "name" : "column1", "type": "html" }'>
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+            </p>
+        </div>
+        <div class="col-md-4 col-sm-12">
+            <p data-bre-field='{ "name" : "column2", "type": "html" }'>
+                    Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+            </p>
+        </div>
+        <div class="col-md-4 col-sm-12">
+            <p data-bre-field='{ "name" : "column3", "type": "html" }'>
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+            </p>
+        </div>
+    </div>
+</div>
+
+
+<div class="bre-template" data-name="2 Column Image and Text">
+        <div class="row">
+            <div class="col-md-6 col-sm-12">
+                <img class="img-fluid" style="width: 100%" data-bre-field="{ 'name' : 'image1', 'type' : 'image', 'src' : 'assets/photo.jpg'}">
+                <p data-bre-field='{ "name" : "column1", "type": "html" }'>
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                </p>
+            </div>
+            <div class="col-md-6 col-sm-12">
+                <img class="img-fluid" style="width: 100%" data-bre-field="{ 'name' : 'image2', 'type' : 'image', 'src' : 'assets/photo.jpg'}">
+                <p data-bre-field='{ "name" : "column2", "type": "html" }'>
+                    Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                </p>
+            </div>
+        </div>    
+    </div>
+    
+    <div class="bre-template" data-name="3 Column Image and Text">
+        <div class="row">
+            <div class="col-md-4 col-sm-12">
+                <img class="img-fluid" style="width: 100%" data-bre-field="{ 'name' : 'image1', 'type' : 'image', 'src' : 'assets/photo.jpg'}">
+                <p data-bre-field='{ "name" : "column1", "type": "html" }'>
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                </p>
+            </div>
+            <div class="col-md-4 col-sm-12">
+                <img class="img-fluid" style="width: 100%" data-bre-field="{ 'name' : 'image2', 'type' : 'image', 'src' : 'assets/photo.jpg'}">
+                <p data-bre-field='{ "name" : "column2", "type": "html" }'>
+                    Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                </p>
+            </div>
+            <div class="col-md-4 col-sm-12">
+                <img class="img-fluid" style="width: 100%" data-bre-field="{ 'name' : 'image3', 'type' : 'image', 'src' : 'assets/photo.jpg'}">
+                <p data-bre-field='{ "name" : "column3", "type": "html" }'>
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                </p>
+            </div>
+        </div>
+    </div>
+    
+
+<div class="bre-template" data-name="Blockquote">
+    <blockquote class="blockquote">
+        <p class="mb-0" data-bre-field='{ "name" : "text", "type": "html" }'>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat a ante.</p>
+        <footer class="blockquote-footer">
+            <span data-bre-field='{ "name" : "author", "type": "html" }'>Someone famous in </span>
+            <cite data-bre-field='{ "name" : "source", "type": "html" }'>Source Title</cite>
+        </footer>
+    </blockquote>
+</div>
+
+<div class="bre-template" data-name="Blockquote Reverse">
+    <blockquote class="blockquote blockquote-reverse">
+        <p class="mb-0" data-bre-field='{ "name" : "text", "type": "html" }'>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat a ante.</p>
+        <footer class="blockquote-footer">
+            <span data-bre-field='{ "name" : "author", "type": "html"}'>Someone famous in</span>
+            <cite data-bre-field='{ "name" : "source", "type": "html" }'>Source Title</cite>
+        </footer>
+    </blockquote>
+</div>
+
+<div class="bre-template" data-name="Media">
+    <div class="media">
+        <img class="d-flex align-self-start mr-3" data-bre-field="{ 'name' : 'image', 'type' : 'image', 'src' : 'assets/photo_sm.jpg'}">
+        <div class="media-body">
+            <h5 class="mt-0" data-bre-field='{ "name" : "author", "type": "html" }'>Top-aligned media</h5>
+            <p data-bre-field='{ "name" : "author", "type": "html" }'>Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.</p>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,102 @@
+<style>
+    .bre-template > h1,
+    .bre-template > h2,
+    .bre-template > h3,
+    .bre-template > h4,
+    .bre-template > h5,
+    .bre-template > h6,
+    .bre-template > p,
+    .bre-template > blockquote,
+    .bre-template > .mb-1, 
+    .bre-template > .mb-2, 
+    .bre-template > .mb-3, 
+    .bre-template > .mb-4 {
+        margin-bottom: 0 !important;
+    }
+
+    .bre-template > .mt-1, 
+    .bre-template > .mt-2, 
+    .bre-template > .mt-3, 
+    .bre-template > .mt-4 {
+        margin-top: 0 !important;
+    }
+</style>
+
+<div class="bre-template" data-name="Header">
+    <div class="bre-template-preview">
+        <h1 class="display-2">John Doe</h1>
+        <h3>Web-Developer</h3>
+        <i class="fa fa-link"></i>
+    </div>
+    <div class="row mb-4">
+        <div class="col-md-2">
+            <div style="width: 100%; height: 100%; background-position: center center; background-size: cover;" data-bre-field="{ 'name' : 'image', 'type' : 'image', 'src' : 'assets/photo.jpg'}" />
+        </div>
+        <div class="col-md-7">
+            <h1 class="display-2" data-bre-field='{ "name" : "name", "type": "html", "html": "George Yakovlev" }'></h1>
+            <h3 class="text-muted" data-bre-field='{ "name" : "description", "type": "html", "html": "Fullstack Web-Developer" }'></h3>
+        </div>
+        <div class="col-md-3">
+            <ul class="list-unstyled mt-4">
+                <li>
+                    <i class="fa fa-map-marker text-muted font-weight-bold"></i> 
+                    <span data-bre-field='{ "name" : "location", "type": "html", "html": "Moscow, Russia" }'></span>
+                </li>
+                <li>
+                    <i class="fa fa-phone text-muted font-weight-bold"></i> 
+                    <span data-bre-field='{ "name" : "phone", "type": "html", "html": "+7-926-00-0000" }'></span>
+                </li>
+                <li>
+                    <i class="fa fa-at text-muted font-weight-bold"></i> 
+                    <span data-bre-field='{ "name" : "email", "type": "html", "html": "yakovlev.ga@gmail.com" }'></span>
+                </li>
+                <li>
+                    <i class="fa fa-link text-muted font-weight-bold"></i>
+                    <a href="#" data-bre-field='{ "name" : "site", "type": "html", "html": "https://github.com/yakovlevga" }'></a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="bre-template" data-name="Experience">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="ml-4 mb-2">
+                <h4 data-bre-field='{ "name" : "position", "type": "html", "html": "Developer" }'></h4>
+                <h5 class="text-info" data-bre-field='{ "name" : "company", "type": "html", "html": "Company LLC" }'></h5>
+                <strong>
+                    <span data-bre-field='{ "name" : "start", "type": "html", "html": "2015" }'></span> - <span data-bre-field='{ "name" : "finish", "type": "html", "html": "2017" }'></span>
+                </strong>                
+                <p data-bre-field='{ "name" : "description", "type": "html", "html": "Description of your expirience" }'></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="bre-template" data-name="Education">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="ml-4 mb-2">
+                <h4 data-bre-field='{ "name" : "place", "type": "html", "html": "Moscow State University" }'></h4>
+                <h5 class="text-info" data-bre-field='{ "name" : "facultity", "type": "html", "html": "Physics, Master in Condensed Matter Physics" }'></h5>
+                <strong>
+                    <span data-bre-field='{ "name" : "start", "type": "html", "html": "2003" }'></span> - <span data-bre-field='{ "name" : "finish", "type": "html", "html": "2009" }'></span>
+                </strong>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="bre-template" data-name="Section Header">
+    <h2 class="mt-4" style="font-family: sans-serif" data-bre-field='{ "name" : "header", "type": "html", "html": "Section Header" }'></h2>
+    <hr/>
+</div>
+
+<div class="bre-template" data-name="Paragraph">
+    <p data-bre-field='{ "name" : "text", "type": "html" }'></p>
+</div>
+
+<div class="bre-template" data-name="Paragraph Lead">
+    <p class="lead" data-bre-field='{ "name" : "text", "type": "html" }'></p>
+</div>

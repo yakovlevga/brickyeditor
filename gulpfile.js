@@ -75,6 +75,18 @@ gulp.task(taskCompileTypescriptES6, function () {
     ];
 });
 
+// Typescript ES6 compilation task
+gulp.task(taskCompileTypescriptES6, function() {
+    const tsProject = ts.createProject(srcTypescriptConfigES6);
+    const tsResult = gulp.src(srcTypescript)
+        .pipe(tsProject());    
+    
+    return [
+        tsResult.js
+        .pipe(gulp.dest(distFolder))
+        .pipe(reload({ stream: true }))];
+});
+
 // Sass task
 gulp.task(taskCompileSass, function () {
     return gulp.src(srcSassMain)

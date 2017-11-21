@@ -13,16 +13,14 @@
     <script src="js/jquery.brickyeditor.js"></script>
     <script>
         $(function(){
-            $.get('data.json')
-            .done(function(blocks) {
-                    $("#editor").brickyeditor({
-                        ignoreHtml: true,
-                        blocks: blocks,
-                        templatesUrl: 'templates.html',
-                        onload: function(editor) {                            
-                        }
-                    });
-                });
+          $("#editor").brickyeditor({
+              ignoreHtml: true,
+              blocksUrl: 'data.json',
+              templatesUrl: 'templates.html',
+              onload: function(editor) {
+                console.log('BrickyEditor loaded');                          
+              }
+          });
         });
     </script>
   </head>
@@ -49,6 +47,7 @@
           </div>
         </div>
       </div>
-    </main>
-  </body>
+    </div>
+  </main>
+</body>
 </html>

@@ -5,27 +5,27 @@ namespace BrickyEditor {
             public title: string;
             public placeholder: string;
             public value: any;
-            
-            protected _$control : JQuery;
-            protected $input : JQuery;            
+
+            protected _$control: JQuery;
+            protected $input: JQuery;
 
             constructor(key: string, title: string, value: any, placeholder?: string) {
                 this.key = key;
                 this.title = title;
                 this.placeholder = placeholder || '';
                 this.value = value;
-            }  
+            }
 
-            public parseValue() {                                
+            public parseValue() {
                 this.value = this.$input.val();
                 this.$control = null
                 delete this._$control;
             }
 
-            public get $control() : JQuery {
-                if(!this._$control) {
-                    this._$control = 
-                    $(`<div class="bre-prompt-field">
+            public get $control(): JQuery {
+                if (!this._$control) {
+                    this._$control =
+                        $(`<div class="bre-prompt-field">
                             <label class="bre-label" for="${this.key}">${this.title ? this.title : 'Select file...'}</label>
                         </div>`);
                     this.$input = this.getEditor();
@@ -42,7 +42,7 @@ namespace BrickyEditor {
 
             public set $control(value: JQuery) {
                 this._$control = value;
-            }               
-        }        
+            }
+        }
     }
 }

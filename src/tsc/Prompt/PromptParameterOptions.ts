@@ -3,13 +3,13 @@ namespace BrickyEditor {
         export class PromptParameterOptions extends PromptParameter {
             public options: Array<PromptParameterOption>;
 
-            constructor(key: string, title: string, options: Array<Array<any>>, value?: any, placeholder? : string) {
+            constructor(key: string, title: string, options: Array<Array<any>>, value?: any, placeholder?: string) {
                 super(key, title, value, placeholder);
 
                 this.options = [];
                 options.forEach(kv => {
                     this.options.push(new PromptParameterOption(kv[0], kv[1], kv[1] == value));
-                });      
+                });
             }
 
             protected getEditor() {

@@ -6,27 +6,27 @@ namespace BrickyEditor {
         public $html: JQuery;
         public $preview: JQuery;
 
-        constructor(el: Element){
+        constructor(el: Element) {
             const previewSelector = '.bre-template-preview';
-            
+
             let $template = $(el);
             let data = $template.data();
-            
+
             this.name = data.name;
             this.category = data.cactegory || [];
 
             this.$html = $template.contents().not(previewSelector);
             this.$preview = $(previewSelector, $template).contents();
-            
-            if(!this.$preview.length) {
-                let block = new Block(null, this);
+
+            if (!this.$preview.length) {
+                let block = new Block(this, true);
                 let blockEl = block.getHtml(true);
                 this.$preview = $(blockEl);
             }
         }
 
-        public getPreview() : JQuery {
-            let $template = $(`<div class='bre-template'></div>`);   
+        public getPreview(): JQuery {
+            let $template = $(`<div class='bre-template'></div>`);
             $template.append(this.$preview);
             return $template;
         }

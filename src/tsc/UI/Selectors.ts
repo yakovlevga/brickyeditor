@@ -1,7 +1,7 @@
 namespace BrickyEditor {
     export class Selectors {
 
-        public static field = 'data-bre-field';     
+        public static field = 'data-bre-field';
         public static selectorField = `[${Selectors.field}]`;
 
         public static classMobile = 'brickyeditor-tools-mobile';

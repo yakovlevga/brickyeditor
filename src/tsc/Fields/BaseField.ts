@@ -10,21 +10,20 @@ namespace BrickyEditor {
                 return name;
             }
 
+            public $field: JQuery;
             public name: string;
             public data: any;
+            private onSelect: () => void;
 
-            protected block: Block;            
-            protected $field: JQuery;
-            
             protected settings: (field: BaseField) => void;
             protected getSettingsEl(): JQuery {
                 return null;
             }
 
-            constructor(block: Block, $field: JQuery, data: any) {
+            constructor($field: JQuery, data: any, onSelect: () => void) {
                 this.$field = $field;
-                this.block = block;
                 this.data = data;
+                this.onSelect = onSelect;
                 this.bind();
             }
 
@@ -39,36 +38,36 @@ namespace BrickyEditor {
 
             private static registerField() {
                 // check if already registered to avoid dublicates
-                if(this._fields.hasOwnProperty(this.type)) {
+                if (this._fields.hasOwnProperty(this.type)) {
                     delete this._fields[this.type];
                 }
-                
+
                 // add field class to registered fields
                 this._fields[this.type] = this;
             }
 
-            public static createField(block, $el: JQuery, data) : BaseField {
-                let fieldData = $el.data().breField;
-                
+            public static createField($field: JQuery, data, onSelect: () => void): BaseField {
+                let fieldData = $field.data().breField;
+
                 if (!fieldData) {
-                    throw `There is no any data in field ${$el.html()} of block ${block.name}`;
+                    throw `There is no any data in field ${$field.html()}`;
                 }
 
                 // sometimes we 'accedently' put our data into single quotes, so let's try to correct it!
-                if(typeof fieldData === 'string') {
+                if (typeof fieldData === 'string') {
                     fieldData = JSON.parse(fieldData.replace(/'/g, '"'));
                 }
 
                 if (!fieldData.name) {
-                    throw `There is no name in data of field ${$el.html()} of block ${block.name}`;
+                    throw `There is no name in data of field ${$field.html()}`;
                 }
 
                 // if data passed
-                if(data) {                    
+                if (data) {
                     let addFieldData = {};
                     for (var idx = 0; idx < data.length; idx++) {
                         let field = data[idx];
-                        if(field.name.toLowerCase() === fieldData.name.toLowerCase()) {
+                        if (field.name.toLowerCase() === fieldData.name.toLowerCase()) {
                             // get current field data
                             addFieldData = field;
                             break;
@@ -76,17 +75,17 @@ namespace BrickyEditor {
                     }
 
                     // if there is some additional data, pass it to data object
-                    if(addFieldData) {
+                    if (addFieldData) {
                         fieldData = $.extend(fieldData, addFieldData);
                     }
                 }
 
-                let type = fieldData.type;                
-                if(type != null) {
+                let type = fieldData.type;
+                if (type != null) {
                     // find field constructor in registered fields
-                    if(this._fields.hasOwnProperty(type)){
-                        var field = this._fields[type];
-                        return new field(block, $el, fieldData);
+                    if (this._fields.hasOwnProperty(type)) {
+                        const field = this._fields[type];
+                        return new field($field, fieldData, onSelect);
                     }
                     else {
                         throw `${type} field not found`;
@@ -97,10 +96,10 @@ namespace BrickyEditor {
                 }
             }
 
-            protected bind() {}
+            protected bind() { }
 
             protected selectBlock() {
-                this.block.select();
+                this.onSelect();
             }
         }
     }
