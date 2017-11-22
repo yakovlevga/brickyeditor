@@ -307,6 +307,10 @@ var BrickyEditor;
             var $html = this.ui.$block.clone(false, false)
                 .wrap('<div></div>')
                 .parent();
+            $('.bre-temp-container', $html).each(function (idx, el) {
+                var $el = $(el);
+                $el.replaceWith($el.children());
+            });
             ['contenteditable', 'data-bre-field'].forEach(function (attr) {
                 $("[" + attr + "]", $html).each(function (idx, el) {
                     el.removeAttribute(attr);
@@ -1008,11 +1012,30 @@ var BrickyEditor;
                     if (typeof (aValueArgument) === 'string') {
                         var valueArgument = aValueArgument.replace('%%SELECTION%%', selection.toString());
                     }
-                    document.execCommand(command, false, valueArgument);
+                    try {
+                        document.execCommand(command, false, valueArgument);
+                    }
+                    catch (_a) {
+                        _this.wrapSelectionToContainer(selection);
+                        document.execCommand(command, false, valueArgument);
+                    }
                 }
                 return false;
             });
             return $btn;
+        };
+        HtmlTools.prototype.wrapSelectionToContainer = function (selection) {
+            var $wrapper = $('<div class="bre-temp-container" contenteditable="true"></div>');
+            var $container = $(selection.anchorNode.parentElement);
+            $wrapper.html($container.html());
+            $container
+                .empty()
+                .append($wrapper)
+                .removeAttr("contenteditable");
+            var range = document.createRange();
+            range.selectNodeContents($wrapper[0]);
+            selection.removeAllRanges();
+            selection.addRange(range);
         };
         HtmlTools.prototype.show = function (rect) {
             if (rect && rect.width > 1) {

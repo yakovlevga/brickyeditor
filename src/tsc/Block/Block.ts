@@ -64,11 +64,17 @@ namespace BrickyEditor {
                 .wrap('<div></div>')
                 .parent();
 
+            // Firefox execCommand hack
+            $('.bre-temp-container', $html).each((idx, el) => {
+                let $el = $(el);
+                $el.replaceWith($el.children());
+            });
+
             ['contenteditable', 'data-bre-field'].forEach((attr) => {
                 $(`[${attr}]`, $html).each((idx, el) => {
                     el.removeAttribute(attr);
                 });
-            });
+            });            
 
             return trim ? $html.html().breTotalTrim() : $html.html();
         }
