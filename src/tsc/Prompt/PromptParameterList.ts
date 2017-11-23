@@ -7,7 +7,7 @@ namespace BrickyEditor {
                 this.params = params;
             }
 
-            getValue(key: string) : any {
+            getValue(key: string): any {
                 let param = this.params.find(p => {
                     return p.key === key;
                 });

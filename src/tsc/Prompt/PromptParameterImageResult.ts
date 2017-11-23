@@ -2,7 +2,7 @@ namespace BrickyEditor {
     export namespace Prompt {
         export class PromptParameterImageResult {
             public fileContent: string;
-            public fileInfo: PromptParameterImageResultFile; 
+            public fileInfo: PromptParameterImageResultFile;
         }
 
         export class PromptParameterImageResultFile {

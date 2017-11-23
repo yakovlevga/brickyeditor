@@ -1,41 +1,41 @@
 namespace BrickyEditor {
     export class BlockUI {
 
-        public $tools: JQuery; // block tools
         public $editor: JQuery; // block editor
+        public $tools: JQuery; // block tools        
+        public $block: JQuery; // block tools        
 
-        // Block actions
-        private static actions: BlockAction[] = [
-            { 'icon' : 'ellipsis-h' },
-            { 'icon' : 'trash-o',       'action': (block) => block.delete() },
-            { 'icon' : 'copy',          'action': (block) => block.copy() },
-            { 'icon' : 'angle-up',      'action': (block) => block.move(-1) },
-            { 'icon' : 'angle-down',    'action': (block) => block.move(+1) }
-        ];
-
-        constructor(
-            private block: Block,
-            public $block: JQuery,
-            data?: Array<Fields.BaseField>) {
-
-            // When we call constructor for templates previews, we pass null editor.
-            if(this.block.editor) {
-                this.buildEditorUI();
-            }
-
-            this.bindFields(data);
-        }
+        private onSelect: () => void;
 
         public delete() {
             this.$editor.remove();
         }
 
+        constructor(            
+            $block: JQuery,
+            preview: boolean,
+            actions: BlockUIAction[],
+            onSelect?: () => void) {
+
+            this.$block = $block;
+            this.onSelect = onSelect;            
+
+            // When we call constructor for templates previews, we pass null editor.
+            if (!preview) {
+                this.buildEditorUI(actions);
+            }
+        }
+
+        public toggleSelection(isOn: boolean) {
+            this.$editor.toggleClass("bre-selected", isOn);
+        }
+
         /**
          * Generate block editor wrapper with block tools.
          */
-        private buildEditorUI() {
+        private buildEditorUI(actions: BlockUIAction[]) {
             this.$tools = $('<div class="bre-block-tools bre-btn-deck"></div>');
-            BlockUI.actions.forEach(action => {
+            actions.forEach(action => {
                 var $btn = this.buildButton(action);
                 this.$tools.append($btn);
             });
@@ -49,36 +49,20 @@ namespace BrickyEditor {
                 () => { this.$editor.addClass('bre-active'); },
                 () => { this.$editor.removeClass('bre-active'); });
 
-            this.$block.on('click', () => this.block.select());
+            this.$block.on('click', () => this.onSelect());
         }
 
         /**
          * Build button element with icon and action
          *
-         * @param action Block action
+         * @param action Button action
          */
-        private buildButton(action: BlockAction) : JQuery {
+        private buildButton(action: BlockUIAction): JQuery {
             let $el = $(`<button type="button" class="bre-btn"><i class="fa fa-${action.icon}"></i></button>`);
-            if(action.action) {
-                $el.on('click', () => action.action(this.block));
+            if (action.action) {
+                $el.on('click', () => action.action());
             }
             return $el;
-        }
-
-        /**
-         * Find and bind block fields
-         *
-         * @param data Array of block fields data
-         */
-        private bindFields(data?: Array<Fields.BaseField>) {
-            this.$block
-                .find(Selectors.selectorField)
-                .addBack(Selectors.selectorField)
-                .each((idx, elem) => {
-                    let $field = $(elem);
-                    let field = Fields.BaseField.createField(this.block, $field, data);
-                    this.block.fields.push(field);
-                });
         }
     }
 }

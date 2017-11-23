@@ -1,41 +1,37 @@
 namespace BrickyEditor {
     export namespace Services {
         export class EmbedService {
-            static Instagram : string = 'Instagram';
+            static Instagram: string = 'Instagram';
 
             constructor() {
             }
 
-            public static getEmbedAsync(url: string) : JQueryDeferred<any> {
-                var task = $.Deferred();
-                var url = `https://noembed.com/embed?url=${url}`;
-                $.ajax({
-                    url: url,
-                    type: "get",                    
-                    dataType: "jsonp"
-                })            
-                .done(function(json) {
-                    task.resolve(json);
-                })
-                .fail(function(err){
-                    task.reject(err);                
+            public static getEmbedAsync(embedUrl: string): Promise<any> {
+                const url = `https://noembed.com/embed?url=${embedUrl}`;
+                return new Promise<any>(async (resolve, reject) => {
+                    const params = { url: url, type: "get", dataType: "jsonp" };
+                    try {
+                        const data = await $.ajax(params);
+                        resolve(data);
+                    }
+                    catch (err) {
+                        reject(err);
+                    }
                 });
-
-                return task;
             }
 
             public static processEmbed(provider: string) {
                 switch (provider) {
                     case EmbedService.Instagram:
-                        if(instgrm) {
+                        if (instgrm) {
                             instgrm.Embeds.process();
                         }
                         break;
-                
+
                     default:
                         break;
                 }
             }
         }
-    }      
+    }
 }

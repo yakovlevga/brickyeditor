@@ -34,7 +34,7 @@ namespace BrickyEditor {
         private getButtonElement(icon: string, command: string, rangeCommand: boolean = true, aValueArgument: string = null): JQuery {
             let $btn = $(`<button type="button" class="bre-btn"><i class="fa fa-${icon}"></i></button>`);
 
-            $btn.on('click', () => {
+            $btn.on('click', async () => {
                 let selection = window.getSelection();
                 let selectionRange = selection.rangeCount > 0 ? selection.getRangeAt(0) : null;
 
@@ -42,23 +42,22 @@ namespace BrickyEditor {
                     return;
 
                 if (command == 'CreateLink') {
-                    this.editor.ui.modal.promptAsync(this.getLinkPromptParams(selection))
-                        .done(fields => {
-                            var href = fields.getValue('href');
-                            if (href) {
-                                document.execCommand(command, false, href);
+                    const params = this.getLinkPromptParams(selection);
+                    const fields = await Editor.UI.modal.promptAsync(params);
+                    const href = fields.getValue('href');
+                    if (href) {
+                        document.execCommand(command, false, href);
 
-                                var target = fields.getValue('target');
-                                if (target) {
-                                    selection.anchorNode.parentElement.setAttribute('target', target);
-                                }
+                        var target = fields.getValue('target');
+                        if (target) {
+                            selection.anchorNode.parentElement.setAttribute('target', target);
+                        }
 
-                                var title = fields.getValue('title');
-                                if (title) {
-                                    selection.anchorNode.parentElement.setAttribute('title', title);
-                                }
-                            }
-                        });
+                        var title = fields.getValue('title');
+                        if (title) {
+                            selection.anchorNode.parentElement.setAttribute('title', title);
+                        }
+                    }
                 }
                 else {
                     if (typeof (aValueArgument) === 'string') {

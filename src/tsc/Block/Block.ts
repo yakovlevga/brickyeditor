@@ -1,65 +1,108 @@
 namespace BrickyEditor {
-    export class Block {        
-        public fields: Array<Fields.BaseField> = [];   
+    export class Block {
+        public fields: Array<Fields.BaseField> = [];
         public ui: BlockUI;
 
         constructor(
-            public editor: Editor,
-            public template: Template, 
-            data?: Array<Fields.BaseField>) {
+            public template: Template,
+            preview: boolean,
+            data?: Array<Fields.BaseField>,
+            private onDelete?: (block: Block) => void,
+            private onSelect?: (block: Block) => void,
+            private onDeselect?: (block: Block) => void,
+            private onCopy?: (block: Block) => void,
+            private onMove?: (block: Block, offset: number) => void) {
 
-            // Get block jquery element from passed template.
-            var $block = template.$html.clone();
+            this.template = template;
+
+            const block = this;
+            const $block = template.$html.clone();
+
+            block.bindFields($block, data);
+
+            const actions = this.getActions();
 
             // Build block UI
-            this.ui = new BlockUI(this, $block, data);    
+            this.ui = new BlockUI($block, preview, actions, () => this.select());
+        }
+
+        /**
+         * Finds and binds block fields
+         *
+         * @param data Array of block fields data
+         */
+        private bindFields($block: JQuery, data?: Array<Fields.BaseField>) {
+            const block = this;
+            const $fields = $block
+                .find(Selectors.selectorField)
+                .addBack(Selectors.selectorField);
+
+            $fields.each((idx, elem) => {
+                let $field = $(elem);
+                let field = Fields.BaseField.createField($field, data, () => block.select());
+                this.fields.push(field);
+            });
+        }
+
+        private getActions() : BlockUIAction[] {
+            const block = this;
+            let actions = [
+                new BlockUIAction('ellipsis-h'),
+                new BlockUIAction('trash-o', () => block.delete()),
+                new BlockUIAction('copy', () => block.clone()),
+                new BlockUIAction('angle-up', () => block.move(-1)),
+                new BlockUIAction('angle-down', () => block.move(1))
+            ]
+            return actions;
         }
 
         public delete() {
             this.ui.delete();
-            this.editor.deleteBlock(this);            
+            this.onDelete(this);
         }
 
-        public move(offset: number) {  
-            this.editor.moveBlock(this, offset);
+        public move(offset: number) {
+            this.onMove(this, offset);
         }
 
-        public copy() {
-            this.editor.copyBlock(this);
+        public clone() {
+            this.onCopy(this);
         }
 
-        public insert(idx?: number) {
-            var editor = this.editor;
-
-            idx = idx || editor.blocks.length;                        
-            if(editor.selectedBlock) {
-                idx = editor.selectedBlockIndex + 1;
-            }
-
-            editor.blocks.splice(idx, 0, this);
-            if(idx == 0) {
-                editor.$editor.append(this.ui.$editor);
-            }
-            else {
-                editor.blocks[idx - 1].ui.$editor.after(this.ui.$editor);
-            }
+        public select() {
+            this.ui.toggleSelection(true);
+            this.onSelect(this);
         }
 
-        public getData(): any {
+        public deselect() {
+            this.ui.toggleSelection(false);
+            this.onDeselect(this);
+        }
+
+        public scrollTo() {
+            // todo: move to block ui
+            var top = this.ui.$editor.offset().top - 100;
+            top = top > 0 ? top : 0;
+            $('html, body').animate({
+                scrollTop: top
+            }, 'fast');
+        }
+
+        public getData(ignoreHtml?: Boolean): any {
             let fieldsData = [];
             this.fields.forEach(field => {
                 fieldsData.push(field.data);
             });
 
             let data = { template: this.template.name, fields: fieldsData };
-            if(!this.editor.options.ignoreHtml) {
+            if (!ignoreHtml) {
                 data['html'] = this.getHtml(true);
             }
-            
+
             return data;
         }
 
-        public getHtml(trim: Boolean, skipAttrRemoving: Boolean = false): string {        
+        public getHtml(trim: Boolean, skipAttrRemoving: Boolean = false): string {
             let $html = this.ui.$block.clone(false, false)
                 .wrap('<div></div>')
                 .parent();
@@ -77,27 +120,6 @@ namespace BrickyEditor {
             });            
 
             return trim ? $html.html().breTotalTrim() : $html.html();
-        }
-
-        public select() {
-            this.ui.$editor.addClass("bre-selected");
-
-            this.editor.selectBlock(this);
-        }
-
-        public deselect() {            
-            this.ui.$editor.removeClass("bre-selected");
-            UI.toggleBtnDeck(this.ui.$tools, true);
-            
-            this.editor.deselectBlock(this);            
-        }
-
-        public scrollTo() {
-            var top = this.ui.$editor.offset().top - 100;
-            top = top > 0 ? top : 0;
-            $('html, body').animate({
-                scrollTop: top
-            }, 'fast');
         }
     }
 }

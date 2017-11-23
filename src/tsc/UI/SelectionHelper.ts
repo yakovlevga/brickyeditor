@@ -1,6 +1,6 @@
 namespace BrickyEditor {
     export class SelectionHelper {
-        static getSelectedText() : string {            
+        static getSelectedText(): string {
             let sel = window.getSelection();
             return sel.getRangeAt(0).toString();
         }

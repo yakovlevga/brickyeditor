@@ -6,32 +6,28 @@ namespace BrickyEditor {
                 let field = this;
                 let $field = this.$field;
                 let data = this.data;
-                let editor = field.block.editor;
 
-                this.setSrc(this.data.src);                
-                $field.on('click', function() {
-                    editor.ui.modal.promptAsync(field.getPromptParams())                    
-                    .done(fields => {
-                        let file = fields.getValue('file');
-                        let src = fields.getValue('src');
-                        if(file) {
-                            field.setFile(file);
-                            field.setSrc(null);
-                        }
-                        else if (src) {
-                            field.setSrc(src);
-                            field.setFile(null);
-                        }
+                this.setSrc(this.data.src);
+                $field.on('click', async () => {
+                    const fields = await Editor.UI.modal.promptAsync(field.getPromptParams());                    
+                    const file = fields.getValue('file');
+                    const src = fields.getValue('src');
+                    if (file) {
+                        field.setFile(file);
+                        field.setSrc(null);
+                    }
+                    else if (src) {
+                        field.setSrc(src);
+                        field.setFile(null);
+                    }
 
-                        let alt = fields.getValue('alt');
-                        field.setAlt(alt);
-                    });
-
+                    let alt = fields.getValue('alt');
+                    field.setAlt(alt);
                     field.selectBlock();
                 });
             }
 
-            private getPromptParams() : Array<Prompt.PromptParameter> {
+            private getPromptParams(): Array<Prompt.PromptParameter> {
                 return [
                     new Prompt.PromptParameter('src', 'Image Link', this.data.url, 'image url'),
                     new Prompt.PromptParameterImage('file', 'or Upload file', this.data.file, 'select file'),
@@ -41,8 +37,8 @@ namespace BrickyEditor {
 
             setSrc(src) {
                 this.data.src = src;
-                if(src) {
-                    if(this.isImg) {
+                if (src) {
+                    if (this.isImg) {
                         this.$field.attr('src', this.data.src);
                     }
                     else {
@@ -53,13 +49,13 @@ namespace BrickyEditor {
 
             setAlt(alt) {
                 this.data.alt = alt;
-                this.$field.attr(this.isImg ? 'alt' : 'title' , this.data.alt);
+                this.$field.attr(this.isImg ? 'alt' : 'title', this.data.alt);
             }
 
             setFile(file) {
                 this.data.file = file;
-                if(file) {
-                    if(this.isImg) {
+                if (file) {
+                    if (this.isImg) {
                         this.$field.attr('src', this.data.file.fileContent);
                     }
                     else {
@@ -69,7 +65,7 @@ namespace BrickyEditor {
             }
 
             _isImg: Boolean;
-            private get isImg() : Boolean {
+            private get isImg(): Boolean {
                 return this._isImg = this._isImg || this.$field.prop('tagName').toLowerCase() === 'img';
             }
         }

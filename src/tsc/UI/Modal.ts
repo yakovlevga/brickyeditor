@@ -13,10 +13,10 @@ namespace BrickyEditor {
             private $cancelBtn: JQuery) {
 
             var modal = this;
-            
-            $closeBtn.on('click', function() {
+
+            $closeBtn.on('click', function () {
                 modal.hideModal();
-            });  
+            });
         }
 
         public hideModal() {
@@ -24,13 +24,13 @@ namespace BrickyEditor {
             this.$control.fadeOut();
         }
 
-        public showModal($html? : JQuery, showBtns: boolean = true) {
+        public showModal($html?: JQuery, showBtns: boolean = true) {
             this.saveSelection();
             this.$btns.toggle(showBtns);
 
-            if($html) {
+            if ($html) {
                 this.$form.append($html);
-                if(!$html.is(':visible')) {
+                if (!$html.is(':visible')) {
                     $html.show();
                 }
             }
@@ -38,42 +38,44 @@ namespace BrickyEditor {
             this.$control.fadeIn();
         }
 
-        public promptAsync(fields: Array<Prompt.PromptParameter>) : JQueryDeferred<Prompt.PromptParameterList> {
-            let result = $.Deferred<Prompt.PromptParameterList>();
-            let modal = this;
+        public promptAsync(fields: Array<Prompt.PromptParameter>): Promise<Prompt.PromptParameterList> {
+            const modal = this;
 
-            //  clear form
-            this.$form.children().not(this.$btns).remove();
-            // add fields
-            fields.forEach(field => {
-                this.$btns.before(field.$control);
+            return new Promise<Prompt.PromptParameterList>((resolve, reject) => {
+                //  clear form
+                modal.$form.children().not(this.$btns).remove();
+
+                // add fields
+                fields.forEach(field => {
+                    this.$btns.before(field.$control);
+                });
+
+                modal.$okBtn.on('click', () => {
+                    fields.forEach(field => field.parseValue());
+                    modal.hideModal();
+                    const list = new Prompt.PromptParameterList(fields);
+                    resolve(list);
+                });
+
+                modal.$cancelBtn.on('click', () => {
+                    modal.hideModal();
+                    reject(fields);
+                });
+
+                modal.showModal();
             });
-
-            this.$okBtn.on('click', function() {
-                fields.forEach(field => field.parseValue());
-                modal.hideModal();
-                result.resolve(new Prompt.PromptParameterList(fields));
-            });
-
-            this.$cancelBtn.on('click', function() {
-                modal.hideModal();
-                result.reject(fields);
-            });
-
-            modal.showModal();
-            return result;
-        }        
+        }
 
         saveSelection() {
-            let selection = window.getSelection();            
+            let selection = window.getSelection();
             this.selectionRanges = [];
             for (var idx = 0; idx < selection.rangeCount; idx++) {
                 this.selectionRanges.push(selection.getRangeAt(idx));
             }
         }
-        
+
         restoreSelection() {
-            if(!this.selectionRanges || this.selectionRanges.length == 0)
+            if (!this.selectionRanges || this.selectionRanges.length == 0)
                 return;
 
             let selection = window.getSelection();
