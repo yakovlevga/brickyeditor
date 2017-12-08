@@ -154,9 +154,8 @@ var BrickyEditor;
                         case 2:
                             blocks = _a.sent();
                             this.loadBlocks(blocks);
-                            if (this.options.onload) {
-                                this.options.onload(this);
-                            }
+                            this.isLoaded = true;
+                            this.trigger(BrickyEditor.Events.onLoad, this);
                             return [2];
                     }
                 });
@@ -276,6 +275,10 @@ var BrickyEditor;
             else {
                 this.blocks[idx - 1].ui.$editor.after(block.ui.$editor);
             }
+            if (this.isLoaded) {
+                this.trigger(BrickyEditor.Events.onBlockAdd, { block: block, idx: idx });
+                this.trigger(BrickyEditor.Events.onChange, { blocks: this.getData(), html: this.getHtml() });
+            }
         };
         Editor.prototype.deleteBlock = function (block) {
             var idx = this.blocks.indexOf(block);
@@ -290,6 +293,8 @@ var BrickyEditor;
             else {
                 this.selectedBlock = null;
             }
+            this.trigger(BrickyEditor.Events.onBlockDelete, { block: block, idx: idx });
+            this.trigger(BrickyEditor.Events.onChange, { blocks: this.getData(), html: this.getHtml() });
         };
         Editor.prototype.moveBlock = function (block, offset) {
             var idx = this.blocks.indexOf(block);
@@ -305,6 +310,8 @@ var BrickyEditor;
             }
             this.blocks.splice(idx, 1);
             this.blocks.splice(new_idx, 0, block);
+            this.trigger(BrickyEditor.Events.onBlockMove, { block: block, from: idx, to: new_idx });
+            this.trigger(BrickyEditor.Events.onChange, { blocks: this.getData(), html: this.getHtml() });
             block.scrollTo();
         };
         Editor.prototype.copyBlock = function (block) {
@@ -318,9 +325,19 @@ var BrickyEditor;
                 this.selectedBlock.deselect();
             }
             this.selectedBlock = block;
+            this.trigger(BrickyEditor.Events.onBlockSelect, { block: block });
         };
         Editor.prototype.deselectBlock = function (block) {
             this.selectedBlock = null;
+            this.trigger(BrickyEditor.Events.onBlockDeselect, { block: block });
+        };
+        Editor.prototype.trigger = function (event, data) {
+            this.$editor.trigger('bre.' + event, data);
+            BrickyEditor.Common.propsEach(this.options, function (key, value) {
+                if (key.breEqualsInvariant(event)) {
+                    value(data);
+                }
+            });
         };
         return Editor;
     }());
@@ -336,7 +353,13 @@ var BrickyEditor;
             this.ignoreHtml = null;
             this.htmlToolsButtons = null;
             this.templatesUrl = options.templatesUrl || this.templatesUrl;
-            this.onload = options.onload;
+            this.onLoad = options.onLoad || options.onload;
+            this.onChange = options.onChange;
+            this.onBlockAdd = options.onBlockAdd;
+            this.onBlockDelete = options.onBlockDelete;
+            this.onBlockMove = options.onBlockMove;
+            this.onBlockSelect = options.onBlockSelect;
+            this.onBlockDeselect = options.onBlockDeselect;
             this.blocksUrl = options.blocksUrl || null;
             this.blocks = options.blocks || null;
             this.compactTools = options.compactTools;
@@ -348,6 +371,22 @@ var BrickyEditor;
         return EditorOptions;
     }());
     BrickyEditor.EditorOptions = EditorOptions;
+})(BrickyEditor || (BrickyEditor = {}));
+var BrickyEditor;
+(function (BrickyEditor) {
+    var Events = (function () {
+        function Events() {
+        }
+        Events.onLoad = 'onLoad';
+        Events.onChange = 'onChange';
+        Events.onBlockAdd = 'onBlockAdd';
+        Events.onBlockDelete = 'onBlockDelete';
+        Events.onBlockMove = 'onBlockMove';
+        Events.onBlockSelect = 'onBlockSelect';
+        Events.onBlockDeselect = 'onBlockDeselect';
+        return Events;
+    }());
+    BrickyEditor.Events = Events;
 })(BrickyEditor || (BrickyEditor = {}));
 (function ($) {
     $.fn.brickyeditor = function (options) {
@@ -381,6 +420,169 @@ var BrickyEditor;
         return Template;
     }());
     BrickyEditor.Template = Template;
+})(BrickyEditor || (BrickyEditor = {}));
+var BrickyEditor;
+(function (BrickyEditor) {
+    var Block = (function () {
+        function Block(template, preview, data, onDelete, onSelect, onDeselect, onCopy, onMove) {
+            var _this = this;
+            this.template = template;
+            this.onDelete = onDelete;
+            this.onSelect = onSelect;
+            this.onDeselect = onDeselect;
+            this.onCopy = onCopy;
+            this.onMove = onMove;
+            this.fields = [];
+            this.template = template;
+            var block = this;
+            var $block = template.$html.clone();
+            block.bindFields($block, data);
+            var actions = this.getActions();
+            this.ui = new BrickyEditor.BlockUI($block, preview, actions, function () { return _this.select(); });
+        }
+        Block.prototype.bindFields = function ($block, data) {
+            var _this = this;
+            var block = this;
+            var $fields = $block
+                .find(BrickyEditor.Selectors.selectorField)
+                .addBack(BrickyEditor.Selectors.selectorField);
+            $fields.each(function (idx, elem) {
+                var $field = $(elem);
+                var field = BrickyEditor.Fields.BaseField.createField($field, data, function () { return block.select(); });
+                _this.fields.push(field);
+            });
+        };
+        Block.prototype.getActions = function () {
+            var block = this;
+            var actions = [
+                new BrickyEditor.BlockUIAction('ellipsis-h'),
+                new BrickyEditor.BlockUIAction('trash-o', function () { return block.delete(); }),
+                new BrickyEditor.BlockUIAction('copy', function () { return block.clone(); }),
+                new BrickyEditor.BlockUIAction('angle-up', function () { return block.move(-1); }),
+                new BrickyEditor.BlockUIAction('angle-down', function () { return block.move(1); })
+            ];
+            return actions;
+        };
+        Block.prototype.delete = function () {
+            this.ui.delete();
+            this.onDelete(this);
+        };
+        Block.prototype.move = function (offset) {
+            this.onMove(this, offset);
+        };
+        Block.prototype.clone = function () {
+            this.onCopy(this);
+        };
+        Block.prototype.select = function () {
+            this.ui.toggleSelection(true);
+            this.onSelect(this);
+        };
+        Block.prototype.deselect = function () {
+            this.ui.toggleSelection(false);
+            this.onDeselect(this);
+        };
+        Block.prototype.scrollTo = function () {
+            var top = this.ui.$editor.offset().top - 100;
+            top = top > 0 ? top : 0;
+            $('html, body').animate({
+                scrollTop: top
+            }, 'fast');
+        };
+        Block.prototype.getData = function (ignoreHtml) {
+            var fieldsData = [];
+            this.fields.forEach(function (field) {
+                fieldsData.push(field.data);
+            });
+            var data = { template: this.template.name, fields: fieldsData };
+            if (!ignoreHtml) {
+                data['html'] = this.getHtml(true);
+            }
+            return data;
+        };
+        Block.prototype.getHtml = function (trim, skipAttrRemoving) {
+            if (skipAttrRemoving === void 0) { skipAttrRemoving = false; }
+            var $html = this.ui.$block.clone(false, false)
+                .wrap('<div></div>')
+                .parent();
+            $('.bre-temp-container', $html).each(function (idx, el) {
+                var $el = $(el);
+                $el.replaceWith($el.children());
+            });
+            ['contenteditable', 'data-bre-field'].forEach(function (attr) {
+                $("[" + attr + "]", $html).each(function (idx, el) {
+                    el.removeAttribute(attr);
+                });
+            });
+            return trim ? $html.html().breTotalTrim() : $html.html();
+        };
+        return Block;
+    }());
+    BrickyEditor.Block = Block;
+})(BrickyEditor || (BrickyEditor = {}));
+var BrickyEditor;
+(function (BrickyEditor) {
+    var BlockAction = (function () {
+        function BlockAction(icon, action, title) {
+            this.icon = icon;
+            this.action = action;
+            this.title = title;
+        }
+        return BlockAction;
+    }());
+    BrickyEditor.BlockAction = BlockAction;
+})(BrickyEditor || (BrickyEditor = {}));
+var BrickyEditor;
+(function (BrickyEditor) {
+    var BlockUI = (function () {
+        function BlockUI($block, preview, actions, onSelect) {
+            this.$block = $block;
+            this.onSelect = onSelect;
+            if (!preview) {
+                this.buildEditorUI(actions);
+            }
+        }
+        BlockUI.prototype.delete = function () {
+            this.$editor.remove();
+        };
+        BlockUI.prototype.toggleSelection = function (isOn) {
+            this.$editor.toggleClass("bre-selected", isOn);
+        };
+        BlockUI.prototype.buildEditorUI = function (actions) {
+            var _this = this;
+            this.$tools = $('<div class="bre-block-tools bre-btn-deck"></div>');
+            actions.forEach(function (action) {
+                var $btn = _this.buildButton(action);
+                _this.$tools.append($btn);
+            });
+            BrickyEditor.UI.initBtnDeck(this.$tools);
+            this.$editor = $('<div class="bre-block-wrapper"></div>');
+            this.$editor.append(this.$tools);
+            this.$editor.append(this.$block);
+            this.$editor.hover(function () { _this.$editor.addClass('bre-active'); }, function () { _this.$editor.removeClass('bre-active'); });
+            this.$block.on('click', function () { return _this.onSelect(); });
+        };
+        BlockUI.prototype.buildButton = function (action) {
+            var $el = $("<button type=\"button\" class=\"bre-btn\"><i class=\"fa fa-" + action.icon + "\"></i></button>");
+            if (action.action) {
+                $el.on('click', function () { return action.action(); });
+            }
+            return $el;
+        };
+        return BlockUI;
+    }());
+    BrickyEditor.BlockUI = BlockUI;
+})(BrickyEditor || (BrickyEditor = {}));
+var BrickyEditor;
+(function (BrickyEditor) {
+    var BlockUIAction = (function () {
+        function BlockUIAction(icon, action, title) {
+            this.icon = icon;
+            this.action = action;
+            this.title = title;
+        }
+        return BlockUIAction;
+    }());
+    BrickyEditor.BlockUIAction = BlockUIAction;
 })(BrickyEditor || (BrickyEditor = {}));
 var BrickyEditor;
 (function (BrickyEditor) {
@@ -686,166 +888,183 @@ var BrickyEditor;
 })(BrickyEditor || (BrickyEditor = {}));
 var BrickyEditor;
 (function (BrickyEditor) {
-    var Block = (function () {
-        function Block(template, preview, data, onDelete, onSelect, onDeselect, onCopy, onMove) {
-            var _this = this;
-            this.template = template;
-            this.onDelete = onDelete;
-            this.onSelect = onSelect;
-            this.onDeselect = onDeselect;
-            this.onCopy = onCopy;
-            this.onMove = onMove;
-            this.fields = [];
-            this.template = template;
-            var block = this;
-            var $block = template.$html.clone();
-            block.bindFields($block, data);
-            var actions = this.getActions();
-            this.ui = new BrickyEditor.BlockUI($block, preview, actions, function () { return _this.select(); });
-        }
-        Block.prototype.bindFields = function ($block, data) {
-            var _this = this;
-            var block = this;
-            var $fields = $block
-                .find(BrickyEditor.Selectors.selectorField)
-                .addBack(BrickyEditor.Selectors.selectorField);
-            $fields.each(function (idx, elem) {
-                var $field = $(elem);
-                var field = BrickyEditor.Fields.BaseField.createField($field, data, function () { return block.select(); });
-                _this.fields.push(field);
-            });
-        };
-        Block.prototype.getActions = function () {
-            var block = this;
-            var actions = [
-                new BrickyEditor.BlockUIAction('ellipsis-h'),
-                new BrickyEditor.BlockUIAction('trash-o', function () { return block.delete(); }),
-                new BrickyEditor.BlockUIAction('copy', function () { return block.clone(); }),
-                new BrickyEditor.BlockUIAction('angle-up', function () { return block.move(-1); }),
-                new BrickyEditor.BlockUIAction('angle-down', function () { return block.move(1); })
-            ];
-            return actions;
-        };
-        Block.prototype.delete = function () {
-            this.ui.delete();
-            this.onDelete(this);
-        };
-        Block.prototype.move = function (offset) {
-            this.onMove(this, offset);
-        };
-        Block.prototype.clone = function () {
-            this.onCopy(this);
-        };
-        Block.prototype.select = function () {
-            this.ui.toggleSelection(true);
-            this.onSelect(this);
-        };
-        Block.prototype.deselect = function () {
-            this.ui.toggleSelection(false);
-            this.onDeselect(this);
-        };
-        Block.prototype.scrollTo = function () {
-            var top = this.ui.$editor.offset().top - 100;
-            top = top > 0 ? top : 0;
-            $('html, body').animate({
-                scrollTop: top
-            }, 'fast');
-        };
-        Block.prototype.getData = function (ignoreHtml) {
-            var fieldsData = [];
-            this.fields.forEach(function (field) {
-                fieldsData.push(field.data);
-            });
-            var data = { template: this.template.name, fields: fieldsData };
-            if (!ignoreHtml) {
-                data['html'] = this.getHtml(true);
+    var Prompt;
+    (function (Prompt) {
+        var PromptParameter = (function () {
+            function PromptParameter(key, title, value, placeholder) {
+                this.key = key;
+                this.title = title;
+                this.placeholder = placeholder || '';
+                this.value = value;
             }
-            return data;
-        };
-        Block.prototype.getHtml = function (trim, skipAttrRemoving) {
-            if (skipAttrRemoving === void 0) { skipAttrRemoving = false; }
-            var $html = this.ui.$block.clone(false, false)
-                .wrap('<div></div>')
-                .parent();
-            $('.bre-temp-container', $html).each(function (idx, el) {
-                var $el = $(el);
-                $el.replaceWith($el.children());
+            PromptParameter.prototype.parseValue = function () {
+                this.value = this.$input.val();
+                this.$control = null;
+                delete this._$control;
+            };
+            Object.defineProperty(PromptParameter.prototype, "$control", {
+                get: function () {
+                    if (!this._$control) {
+                        this._$control =
+                            $("<div class=\"bre-prompt-field\">\n                            <label class=\"bre-label\" for=\"" + this.key + "\">" + (this.title ? this.title : 'Select file...') + "</label>\n                        </div>");
+                        this.$input = this.getEditor();
+                        this._$control.append(this.$input);
+                    }
+                    return this._$control;
+                },
+                set: function (value) {
+                    this._$control = value;
+                },
+                enumerable: true,
+                configurable: true
             });
-            ['contenteditable', 'data-bre-field'].forEach(function (attr) {
-                $("[" + attr + "]", $html).each(function (idx, el) {
-                    el.removeAttribute(attr);
+            PromptParameter.prototype.getEditor = function () {
+                var value = this.value || '';
+                return $("<input type=\"text\" id=\"" + this.key + "\" class=\"bre-input\" placeholder=\"" + this.placeholder + "\" value=\"" + (this.value ? this.value : '') + "\">");
+            };
+            return PromptParameter;
+        }());
+        Prompt.PromptParameter = PromptParameter;
+    })(Prompt = BrickyEditor.Prompt || (BrickyEditor.Prompt = {}));
+})(BrickyEditor || (BrickyEditor = {}));
+var BrickyEditor;
+(function (BrickyEditor) {
+    var Prompt;
+    (function (Prompt) {
+        var PromptParameterImage = (function (_super) {
+            __extends(PromptParameterImage, _super);
+            function PromptParameterImage(key, title, value, placeholder) {
+                var _this = _super.call(this, key, title, value, placeholder) || this;
+                if (value) {
+                    _this._value = value;
+                }
+                return _this;
+            }
+            PromptParameterImage.prototype.parseValue = function () {
+                this.value = this._value;
+                this.$control = null;
+                delete this._$control;
+                this._value = null;
+                delete this._value;
+            };
+            PromptParameterImage.prototype.getEditor = function () {
+                var field = this;
+                var img = this.value && this.value.fileContent ? this.value.fileContent : "";
+                var $editor = $("\n                <div class='bre-image-input'>\n                    <label for=\"" + this.key + "\">\n                        Select file...\n                    </label>                        \n                    <img src=\"" + img + "\"/>                    \n                    <input type=\"file\" id=\"" + this.key + "\" class=\"bre-input\" placeholder=\"" + this.placeholder + "\">\n                </div>\n                <small class='bre-image-input-filename'></small>");
+                var $file = $('input', $editor);
+                var $filePreview = $('img', $editor);
+                var $fileName = $('.bre-image-input-filename', $editor);
+                var value = this.value;
+                if (value) {
+                    $filePreview.attr('src', value.fileContent);
+                    $filePreview.addClass('bre-loaded');
+                    $fileName.text(value.fileInfo.name);
+                }
+                $file.change(function () {
+                    var fileInput = this;
+                    if (fileInput.files && fileInput.files[0]) {
+                        var reader = new FileReader();
+                        reader.onload = function (ev) {
+                            var target = ev.target;
+                            field._value = new Prompt.PromptParameterImageResult();
+                            field._value.fileContent = target.result;
+                            field._value.fileInfo = new Prompt.PromptParameterImageResultFile(fileInput.files[0]);
+                            $filePreview.attr('src', field._value.fileContent);
+                            $filePreview.addClass('bre-loaded');
+                            $fileName.text(field._value.fileInfo.name);
+                        };
+                        reader.readAsDataURL(fileInput.files[0]);
+                    }
                 });
-            });
-            return trim ? $html.html().breTotalTrim() : $html.html();
-        };
-        return Block;
-    }());
-    BrickyEditor.Block = Block;
+                return $editor;
+            };
+            return PromptParameterImage;
+        }(Prompt.PromptParameter));
+        Prompt.PromptParameterImage = PromptParameterImage;
+    })(Prompt = BrickyEditor.Prompt || (BrickyEditor.Prompt = {}));
 })(BrickyEditor || (BrickyEditor = {}));
 var BrickyEditor;
 (function (BrickyEditor) {
-    var BlockAction = (function () {
-        function BlockAction(icon, action, title) {
-            this.icon = icon;
-            this.action = action;
-            this.title = title;
-        }
-        return BlockAction;
-    }());
-    BrickyEditor.BlockAction = BlockAction;
-})(BrickyEditor || (BrickyEditor = {}));
-var BrickyEditor;
-(function (BrickyEditor) {
-    var BlockUI = (function () {
-        function BlockUI($block, preview, actions, onSelect) {
-            this.$block = $block;
-            this.onSelect = onSelect;
-            if (!preview) {
-                this.buildEditorUI(actions);
+    var Prompt;
+    (function (Prompt) {
+        var PromptParameterImageResult = (function () {
+            function PromptParameterImageResult() {
             }
-        }
-        BlockUI.prototype.delete = function () {
-            this.$editor.remove();
-        };
-        BlockUI.prototype.toggleSelection = function (isOn) {
-            this.$editor.toggleClass("bre-selected", isOn);
-        };
-        BlockUI.prototype.buildEditorUI = function (actions) {
-            var _this = this;
-            this.$tools = $('<div class="bre-block-tools bre-btn-deck"></div>');
-            actions.forEach(function (action) {
-                var $btn = _this.buildButton(action);
-                _this.$tools.append($btn);
-            });
-            BrickyEditor.UI.initBtnDeck(this.$tools);
-            this.$editor = $('<div class="bre-block-wrapper"></div>');
-            this.$editor.append(this.$tools);
-            this.$editor.append(this.$block);
-            this.$editor.hover(function () { _this.$editor.addClass('bre-active'); }, function () { _this.$editor.removeClass('bre-active'); });
-            this.$block.on('click', function () { return _this.onSelect(); });
-        };
-        BlockUI.prototype.buildButton = function (action) {
-            var $el = $("<button type=\"button\" class=\"bre-btn\"><i class=\"fa fa-" + action.icon + "\"></i></button>");
-            if (action.action) {
-                $el.on('click', function () { return action.action(); });
+            return PromptParameterImageResult;
+        }());
+        Prompt.PromptParameterImageResult = PromptParameterImageResult;
+        var PromptParameterImageResultFile = (function () {
+            function PromptParameterImageResultFile(file) {
+                this.name = file.name;
+                this.size = file.size;
+                this.type = file.type;
+                this.lastModified = file.lastModified;
+                this.lastModifiedDate = file.lastModifiedDate;
             }
-            return $el;
-        };
-        return BlockUI;
-    }());
-    BrickyEditor.BlockUI = BlockUI;
+            return PromptParameterImageResultFile;
+        }());
+        Prompt.PromptParameterImageResultFile = PromptParameterImageResultFile;
+    })(Prompt = BrickyEditor.Prompt || (BrickyEditor.Prompt = {}));
 })(BrickyEditor || (BrickyEditor = {}));
 var BrickyEditor;
 (function (BrickyEditor) {
-    var BlockUIAction = (function () {
-        function BlockUIAction(icon, action, title) {
-            this.icon = icon;
-            this.action = action;
-            this.title = title;
-        }
-        return BlockUIAction;
-    }());
-    BrickyEditor.BlockUIAction = BlockUIAction;
+    var Prompt;
+    (function (Prompt) {
+        var PromptParameterList = (function () {
+            function PromptParameterList(params) {
+                this.params = params;
+            }
+            PromptParameterList.prototype.getValue = function (key) {
+                var param = this.params.find(function (p) {
+                    return p.key === key;
+                });
+                return param ? param.value : null;
+            };
+            return PromptParameterList;
+        }());
+        Prompt.PromptParameterList = PromptParameterList;
+    })(Prompt = BrickyEditor.Prompt || (BrickyEditor.Prompt = {}));
+})(BrickyEditor || (BrickyEditor = {}));
+var BrickyEditor;
+(function (BrickyEditor) {
+    var Prompt;
+    (function (Prompt) {
+        var PromptParameterOption = (function () {
+            function PromptParameterOption(title, value, selected) {
+                if (selected === void 0) { selected = false; }
+                this.title = title;
+                this.value = value;
+                this.selected = selected;
+            }
+            return PromptParameterOption;
+        }());
+        Prompt.PromptParameterOption = PromptParameterOption;
+    })(Prompt = BrickyEditor.Prompt || (BrickyEditor.Prompt = {}));
+})(BrickyEditor || (BrickyEditor = {}));
+var BrickyEditor;
+(function (BrickyEditor) {
+    var Prompt;
+    (function (Prompt) {
+        var PromptParameterOptions = (function (_super) {
+            __extends(PromptParameterOptions, _super);
+            function PromptParameterOptions(key, title, options, value, placeholder) {
+                var _this = _super.call(this, key, title, value, placeholder) || this;
+                _this.options = [];
+                options.forEach(function (kv) {
+                    _this.options.push(new Prompt.PromptParameterOption(kv[0], kv[1], kv[1] == value));
+                });
+                return _this;
+            }
+            PromptParameterOptions.prototype.getEditor = function () {
+                var options = this.options.map(function (opt) {
+                    return "<option value=\"" + opt.value + "\" " + (opt.selected ? "selected" : "") + ">" + (opt.title ? opt.title : opt.value) + "</option>";
+                });
+                return $("<select type=\"text\" id=\"" + this.key + "\" class=\"brickyeditor-input\" placeholder=\"" + this.placeholder + "\">" + options + "</select>");
+            };
+            return PromptParameterOptions;
+        }(Prompt.PromptParameter));
+        Prompt.PromptParameterOptions = PromptParameterOptions;
+    })(Prompt = BrickyEditor.Prompt || (BrickyEditor.Prompt = {}));
 })(BrickyEditor || (BrickyEditor = {}));
 var BrickyEditor;
 (function (BrickyEditor) {
@@ -1349,184 +1568,4 @@ var BrickyEditor;
         return UI;
     }());
     BrickyEditor.UI = UI;
-})(BrickyEditor || (BrickyEditor = {}));
-var BrickyEditor;
-(function (BrickyEditor) {
-    var Prompt;
-    (function (Prompt) {
-        var PromptParameter = (function () {
-            function PromptParameter(key, title, value, placeholder) {
-                this.key = key;
-                this.title = title;
-                this.placeholder = placeholder || '';
-                this.value = value;
-            }
-            PromptParameter.prototype.parseValue = function () {
-                this.value = this.$input.val();
-                this.$control = null;
-                delete this._$control;
-            };
-            Object.defineProperty(PromptParameter.prototype, "$control", {
-                get: function () {
-                    if (!this._$control) {
-                        this._$control =
-                            $("<div class=\"bre-prompt-field\">\n                            <label class=\"bre-label\" for=\"" + this.key + "\">" + (this.title ? this.title : 'Select file...') + "</label>\n                        </div>");
-                        this.$input = this.getEditor();
-                        this._$control.append(this.$input);
-                    }
-                    return this._$control;
-                },
-                set: function (value) {
-                    this._$control = value;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            PromptParameter.prototype.getEditor = function () {
-                var value = this.value || '';
-                return $("<input type=\"text\" id=\"" + this.key + "\" class=\"bre-input\" placeholder=\"" + this.placeholder + "\" value=\"" + (this.value ? this.value : '') + "\">");
-            };
-            return PromptParameter;
-        }());
-        Prompt.PromptParameter = PromptParameter;
-    })(Prompt = BrickyEditor.Prompt || (BrickyEditor.Prompt = {}));
-})(BrickyEditor || (BrickyEditor = {}));
-var BrickyEditor;
-(function (BrickyEditor) {
-    var Prompt;
-    (function (Prompt) {
-        var PromptParameterImage = (function (_super) {
-            __extends(PromptParameterImage, _super);
-            function PromptParameterImage(key, title, value, placeholder) {
-                var _this = _super.call(this, key, title, value, placeholder) || this;
-                if (value) {
-                    _this._value = value;
-                }
-                return _this;
-            }
-            PromptParameterImage.prototype.parseValue = function () {
-                this.value = this._value;
-                this.$control = null;
-                delete this._$control;
-                this._value = null;
-                delete this._value;
-            };
-            PromptParameterImage.prototype.getEditor = function () {
-                var field = this;
-                var img = this.value && this.value.fileContent ? this.value.fileContent : "";
-                var $editor = $("\n                <div class='bre-image-input'>\n                    <label for=\"" + this.key + "\">\n                        Select file...\n                    </label>                        \n                    <img src=\"" + img + "\"/>                    \n                    <input type=\"file\" id=\"" + this.key + "\" class=\"bre-input\" placeholder=\"" + this.placeholder + "\">\n                </div>\n                <small class='bre-image-input-filename'></small>");
-                var $file = $('input', $editor);
-                var $filePreview = $('img', $editor);
-                var $fileName = $('.bre-image-input-filename', $editor);
-                var value = this.value;
-                if (value) {
-                    $filePreview.attr('src', value.fileContent);
-                    $filePreview.addClass('bre-loaded');
-                    $fileName.text(value.fileInfo.name);
-                }
-                $file.change(function () {
-                    var fileInput = this;
-                    if (fileInput.files && fileInput.files[0]) {
-                        var reader = new FileReader();
-                        reader.onload = function (ev) {
-                            var target = ev.target;
-                            field._value = new Prompt.PromptParameterImageResult();
-                            field._value.fileContent = target.result;
-                            field._value.fileInfo = new Prompt.PromptParameterImageResultFile(fileInput.files[0]);
-                            $filePreview.attr('src', field._value.fileContent);
-                            $filePreview.addClass('bre-loaded');
-                            $fileName.text(field._value.fileInfo.name);
-                        };
-                        reader.readAsDataURL(fileInput.files[0]);
-                    }
-                });
-                return $editor;
-            };
-            return PromptParameterImage;
-        }(Prompt.PromptParameter));
-        Prompt.PromptParameterImage = PromptParameterImage;
-    })(Prompt = BrickyEditor.Prompt || (BrickyEditor.Prompt = {}));
-})(BrickyEditor || (BrickyEditor = {}));
-var BrickyEditor;
-(function (BrickyEditor) {
-    var Prompt;
-    (function (Prompt) {
-        var PromptParameterImageResult = (function () {
-            function PromptParameterImageResult() {
-            }
-            return PromptParameterImageResult;
-        }());
-        Prompt.PromptParameterImageResult = PromptParameterImageResult;
-        var PromptParameterImageResultFile = (function () {
-            function PromptParameterImageResultFile(file) {
-                this.name = file.name;
-                this.size = file.size;
-                this.type = file.type;
-                this.lastModified = file.lastModified;
-                this.lastModifiedDate = file.lastModifiedDate;
-            }
-            return PromptParameterImageResultFile;
-        }());
-        Prompt.PromptParameterImageResultFile = PromptParameterImageResultFile;
-    })(Prompt = BrickyEditor.Prompt || (BrickyEditor.Prompt = {}));
-})(BrickyEditor || (BrickyEditor = {}));
-var BrickyEditor;
-(function (BrickyEditor) {
-    var Prompt;
-    (function (Prompt) {
-        var PromptParameterList = (function () {
-            function PromptParameterList(params) {
-                this.params = params;
-            }
-            PromptParameterList.prototype.getValue = function (key) {
-                var param = this.params.find(function (p) {
-                    return p.key === key;
-                });
-                return param ? param.value : null;
-            };
-            return PromptParameterList;
-        }());
-        Prompt.PromptParameterList = PromptParameterList;
-    })(Prompt = BrickyEditor.Prompt || (BrickyEditor.Prompt = {}));
-})(BrickyEditor || (BrickyEditor = {}));
-var BrickyEditor;
-(function (BrickyEditor) {
-    var Prompt;
-    (function (Prompt) {
-        var PromptParameterOption = (function () {
-            function PromptParameterOption(title, value, selected) {
-                if (selected === void 0) { selected = false; }
-                this.title = title;
-                this.value = value;
-                this.selected = selected;
-            }
-            return PromptParameterOption;
-        }());
-        Prompt.PromptParameterOption = PromptParameterOption;
-    })(Prompt = BrickyEditor.Prompt || (BrickyEditor.Prompt = {}));
-})(BrickyEditor || (BrickyEditor = {}));
-var BrickyEditor;
-(function (BrickyEditor) {
-    var Prompt;
-    (function (Prompt) {
-        var PromptParameterOptions = (function (_super) {
-            __extends(PromptParameterOptions, _super);
-            function PromptParameterOptions(key, title, options, value, placeholder) {
-                var _this = _super.call(this, key, title, value, placeholder) || this;
-                _this.options = [];
-                options.forEach(function (kv) {
-                    _this.options.push(new Prompt.PromptParameterOption(kv[0], kv[1], kv[1] == value));
-                });
-                return _this;
-            }
-            PromptParameterOptions.prototype.getEditor = function () {
-                var options = this.options.map(function (opt) {
-                    return "<option value=\"" + opt.value + "\" " + (opt.selected ? "selected" : "") + ">" + (opt.title ? opt.title : opt.value) + "</option>";
-                });
-                return $("<select type=\"text\" id=\"" + this.key + "\" class=\"brickyeditor-input\" placeholder=\"" + this.placeholder + "\">" + options + "</select>");
-            };
-            return PromptParameterOptions;
-        }(Prompt.PromptParameter));
-        Prompt.PromptParameterOptions = PromptParameterOptions;
-    })(Prompt = BrickyEditor.Prompt || (BrickyEditor.Prompt = {}));
 })(BrickyEditor || (BrickyEditor = {}));

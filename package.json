@@ -5,13 +5,9 @@
   "main": "gulpfile.js",
   "dependencies": {},
   "devDependencies": {
-<<<<<<< HEAD
-    "@types/es6-promise": "0.0.33",
-=======
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.0",
     "babel-preset-es2015": "^6.24.1",
->>>>>>> 317f26d... Tests added.
     "browser-sync": "^2.18.12",
     "chai": "^4.1.2",
     "gulp": "^3.9.1",
