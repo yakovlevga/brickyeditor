@@ -10,7 +10,7 @@ namespace BrickyEditor {
                     $field.attr('contenteditable', 'true');
                 }
 
-                var html = this.data.html || this.$field.html();// || this.block.template.name;
+                var html = this.data.html || this.$field.html();
                 this.setHtml(html);
 
                 $field.html(this.data.html);

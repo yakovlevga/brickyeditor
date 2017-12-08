@@ -1,8 +1,12 @@
 /// <reference path="types/jquery.d.ts" />
-/// <reference path="types/common.d.ts" />
+/// <reference path="types/common.d.ts" />import { debug } from "util";
+
+
 
 namespace BrickyEditor {
     export class Editor {
+        private isLoaded: boolean;
+
         public $editor: JQuery
         public static UI: UI;        
         public options: EditorOptions;
@@ -27,9 +31,6 @@ namespace BrickyEditor {
             this.options = new EditorOptions(options);
 
             Editor.UI = new UI(this);
-
-            //todo: future feature
-            //this.setupHotkeys();
         }
 
         public async initAsync() {
@@ -44,10 +45,9 @@ namespace BrickyEditor {
             const blocks = await this.tryLoadInitialBlocksAsync();
             this.loadBlocks(blocks)
             
-            // Call onload handler if exists
-            if (this.options.onload) {
-                this.options.onload(this);
-            }
+            // Trigger jQuery event
+            this.isLoaded = true;
+            this.trigger(Events.onLoad, this);
         }
 
         // load initial blocks
@@ -99,37 +99,6 @@ namespace BrickyEditor {
                 return true;
             });
         }
-
-        // todo: move to constants
-        // keyUp: number = 38;
-        // keyDown: number = 40;
-        // keyDelete: number = 46;
-        // keyBackspace: number = 8;
-
-        // private setupHotkeys() {
-        //     document.onkeydown = (ev: KeyboardEvent) => {         
-        //         if((ev.metaKey || ev.ctrlKey) && this.selectedBlock) {
-        //             let prevent = false;
-        //             if(ev.keyCode === this.keyUp) {
-        //                 this.moveBlock(this.selectedBlock, -1);
-        //                 prevent = true;
-        //             }
-        //             else if(ev.keyCode === this.keyDown) {
-        //                 this.moveBlock(this.selectedBlock, 1);
-        //                 prevent = true;
-        //             }
-        //             else if(ev.keyCode === this.keyDelete ||
-        //                 ev.keyCode === this.keyBackspace) {
-        //                 this.deleteBlock(this.selectedBlock);
-        //             }
-
-        //             if(prevent) {
-        //                 ev.preventDefault();
-        //                 return false;
-        //             }
-        //         }
-        //     };
-        // }
 
         public getData(): any {
             var blocksData = [];
@@ -199,6 +168,12 @@ namespace BrickyEditor {
             else { // todo: move to block ui
                 this.blocks[idx - 1].ui.$editor.after(block.ui.$editor);
             }
+
+            // Trigger jQuery event
+            if(this.isLoaded) {
+                this.trigger(Events.onBlockAdd, { block: block, idx: idx});
+                this.trigger(Events.onChange, { blocks: this.getData(), html: this.getHtml() });
+            }
         }
 
         private deleteBlock(block: Block) {
@@ -215,6 +190,10 @@ namespace BrickyEditor {
             else {
                 this.selectedBlock = null;
             }
+
+            // Trigger jQuery event
+            this.trigger(Events.onBlockDelete, { block: block, idx: idx});
+            this.trigger(Events.onChange, { blocks: this.getData(), html: this.getHtml() });
         }
 
         private moveBlock(block: Block, offset: number) {
@@ -235,6 +214,11 @@ namespace BrickyEditor {
             this.blocks.splice(idx, 1);
             this.blocks.splice(new_idx, 0, block);
 
+            // Trigger jQuery event
+            this.trigger(Events.onBlockMove, { block: block, from: idx, to: new_idx });
+            this.trigger(Events.onChange, { blocks: this.getData(), html: this.getHtml() });
+
+            // Scroll to block
             block.scrollTo();
         }
 
@@ -252,10 +236,25 @@ namespace BrickyEditor {
             }
 
             this.selectedBlock = block;
+
+            // Trigger jQuery event
+            this.trigger(Events.onBlockSelect, { block: block });
         }
 
         private deselectBlock(block: Block) {
             this.selectedBlock = null;
+
+            // Trigger jQuery event
+            this.trigger(Events.onBlockDeselect, { block: block });
+        }
+
+        private trigger(event: string, data: any) {
+            this.$editor.trigger('bre.' + event, data);
+            Common.propsEach(this.options, (key, value) => {
+                if(key.breEqualsInvariant(event)) {
+                    value(data);
+                }
+            });
         }
     }
 }

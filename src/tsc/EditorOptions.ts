@@ -2,8 +2,24 @@ namespace BrickyEditor {
     export class EditorOptions {
         /** Url to predifined templates */
         public templatesUrl: string = "templates/bootstrap4.html";
+        
         /** OnLoad callback */
-        public onload: any;
+        public onload: any; // depricated callback
+        public onLoad: any;
+
+        /** OnChange callback */
+        public onChange: any;
+        /** onBlockAdd callback */
+        public onBlockAdd: any;
+        /** onBlockDelete callback */
+        public onBlockDelete: any;
+        /** onBlockMove callback */
+        public onBlockMove: any;
+        /** onBlockSelect callback */
+        public onBlockSelect: any;
+        /** onBlockDeselect callback */
+        public onBlockDeselect: any;
+
         /** Url to fetch initial blocks, overrides initial blocks property */
         public blocksUrl: string;
         /** Inital block data */
@@ -23,7 +39,15 @@ namespace BrickyEditor {
 
         constructor(options: EditorOptions) {
             this.templatesUrl = options.templatesUrl || this.templatesUrl;
-            this.onload = options.onload;
+            
+            this.onLoad = options.onLoad || options.onload;
+            this.onChange = options.onChange;
+            this.onBlockAdd = options.onBlockAdd;
+            this.onBlockDelete = options.onBlockDelete;
+            this.onBlockMove = options.onBlockMove;
+            this.onBlockSelect = options.onBlockSelect;
+            this.onBlockDeselect = options.onBlockDeselect;
+
             this.blocksUrl = options.blocksUrl || null;
             this.blocks = options.blocks || null;
             this.compactTools = options.compactTools;
