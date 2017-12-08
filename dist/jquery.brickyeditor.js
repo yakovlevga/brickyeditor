@@ -256,7 +256,15 @@ var BrickyEditor;
         Editor.prototype.addBlock = function (template, data, idx, select) {
             var _this = this;
             if (select === void 0) { select = true; }
-            var block = new BrickyEditor.Block(template, false, data, function (block) { return _this.deleteBlock(block); }, function (block) { return _this.selectBlock(block); }, function (block) { return _this.deselectBlock(block); }, function (block) { return _this.copyBlock(block); }, function (block, offset) { return _this.moveBlock(block, offset); });
+            var onUpdate = function (block, property, oldValue, newValue) {
+                _this.trigger(BrickyEditor.Events.onBlockUpdate, {
+                    block: block,
+                    property: property,
+                    oldValue: oldValue,
+                    newValue: newValue
+                });
+            };
+            var block = new BrickyEditor.Block(template, false, data, function (block) { return _this.deleteBlock(block); }, function (block) { return _this.selectBlock(block); }, function (block) { return _this.deselectBlock(block); }, function (block) { return _this.copyBlock(block); }, function (block, offset) { return _this.moveBlock(block, offset); }, onUpdate);
             this.insertBlock(block, idx);
             if (select) {
                 block.select();
@@ -362,6 +370,7 @@ var BrickyEditor;
             this.onBlockMove = options.onBlockMove;
             this.onBlockSelect = options.onBlockSelect;
             this.onBlockDeselect = options.onBlockDeselect;
+            this.onBlockUpdate = options.onBlockUpdate;
             this.blocksUrl = options.blocksUrl || null;
             this.blocks = options.blocks || null;
             this.compactTools = options.compactTools;
@@ -386,6 +395,7 @@ var BrickyEditor;
         Events.onBlockMove = 'onBlockMove';
         Events.onBlockSelect = 'onBlockSelect';
         Events.onBlockDeselect = 'onBlockDeselect';
+        Events.onBlockUpdate = 'onBlockUpdate';
         return Events;
     }());
     BrickyEditor.Events = Events;
@@ -426,7 +436,7 @@ var BrickyEditor;
 var BrickyEditor;
 (function (BrickyEditor) {
     var Block = (function () {
-        function Block(template, preview, data, onDelete, onSelect, onDeselect, onCopy, onMove) {
+        function Block(template, preview, data, onDelete, onSelect, onDeselect, onCopy, onMove, onUpdate) {
             var _this = this;
             this.template = template;
             this.onDelete = onDelete;
@@ -434,6 +444,7 @@ var BrickyEditor;
             this.onDeselect = onDeselect;
             this.onCopy = onCopy;
             this.onMove = onMove;
+            this.onUpdate = onUpdate;
             this.fields = [];
             this.template = template;
             var block = this;
@@ -449,8 +460,13 @@ var BrickyEditor;
                 .find(BrickyEditor.Selectors.selectorField)
                 .addBack(BrickyEditor.Selectors.selectorField);
             $fields.each(function (idx, elem) {
+                var onUpdate = function (property, oldValue, newValue) {
+                    if (_this.onUpdate) {
+                        _this.onUpdate(block, property, oldValue, newValue);
+                    }
+                };
                 var $field = $(elem);
-                var field = BrickyEditor.Fields.BaseField.createField($field, data, function () { return block.select(); });
+                var field = BrickyEditor.Fields.BaseField.createField($field, data, function () { return block.select(); }, onUpdate);
                 _this.fields.push(field);
             });
         };
@@ -591,10 +607,11 @@ var BrickyEditor;
     var Fields;
     (function (Fields) {
         var BaseField = (function () {
-            function BaseField($field, data, onSelect) {
+            function BaseField($field, data, onSelect, onUpdate) {
                 this.$field = $field;
                 this.data = data;
                 this.onSelect = onSelect;
+                this.onUpdate = onUpdate;
                 this.bind();
             }
             Object.defineProperty(BaseField, "type", {
@@ -622,7 +639,7 @@ var BrickyEditor;
                 }
                 this._fields[this.type] = this;
             };
-            BaseField.createField = function ($field, data, onSelect) {
+            BaseField.createField = function ($field, data, onSelect, onUpdate) {
                 var fieldData = $field.data().breField;
                 if (!fieldData) {
                     throw "There is no any data in field " + $field.html();
@@ -650,7 +667,7 @@ var BrickyEditor;
                 if (type != null) {
                     if (this._fields.hasOwnProperty(type)) {
                         var field = this._fields[type];
-                        return new field($field, fieldData, onSelect);
+                        return new field($field, fieldData, onSelect, onUpdate);
                     }
                     else {
                         throw type + " field not found";
@@ -663,6 +680,16 @@ var BrickyEditor;
             BaseField.prototype.bind = function () { };
             BaseField.prototype.selectBlock = function () {
                 this.onSelect();
+            };
+            BaseField.prototype.updateProperty = function (prop, value, fireUpdate) {
+                if (fireUpdate === void 0) { fireUpdate = true; }
+                var oldValue = this.data[prop];
+                if (oldValue === value)
+                    return;
+                this.data[prop] = value;
+                if (fireUpdate) {
+                    this.onUpdate(prop, oldValue, value);
+                }
             };
             BaseField._fields = {};
             return BaseField;
@@ -687,8 +714,9 @@ var BrickyEditor;
             Object.defineProperty(EmbedField.prototype, "settings", {
                 get: function () {
                     return function (field) {
-                        field.data.url = prompt('Link to embed media', 'http://instagr.am/p/BO9VX2Vj4fF/');
-                        field.loadMedia();
+                        var url = prompt('Link to embed media', 'http://instagr.am/p/BO9VX2Vj4fF/');
+                        field.setUrl(url);
+                        field.loadMedia(true);
                     };
                 },
                 enumerable: true,
@@ -699,20 +727,22 @@ var BrickyEditor;
                 var field = this;
                 var $field = this.$field;
                 $field.on('click', function () { return __awaiter(_this, void 0, void 0, function () {
+                    var url;
                     return __generator(this, function (_a) {
                         switch (_a.label) {
                             case 0:
-                                field.data.url = prompt('Link to embed media', 'http://instagr.am/p/BO9VX2Vj4fF/');
-                                return [4, field.loadMedia()];
+                                url = prompt('Link to embed media', 'http://instagr.am/p/BO9VX2Vj4fF/');
+                                field.setUrl(url);
+                                return [4, field.loadMedia(true)];
                             case 1:
                                 _a.sent();
                                 return [2];
                         }
                     });
                 }); });
-                field.loadMedia();
+                field.loadMedia(false);
             };
-            EmbedField.prototype.loadMedia = function () {
+            EmbedField.prototype.loadMedia = function (fireUpdate) {
                 return __awaiter(this, void 0, void 0, function () {
                     var field, json, $embed, $script, scriptSrc;
                     return __generator(this, function (_a) {
@@ -724,7 +754,7 @@ var BrickyEditor;
                                 return [4, BrickyEditor.Services.EmbedService.getEmbedAsync(field.data.url)];
                             case 1:
                                 json = _a.sent();
-                                field.data.embed = json;
+                                field.setEmbed(json, fireUpdate);
                                 $embed = $(json.html);
                                 $script = $embed.filter('script');
                                 if ($script.length > 0) {
@@ -749,6 +779,13 @@ var BrickyEditor;
                     });
                 });
             };
+            EmbedField.prototype.setEmbed = function (value, fireUpdate) {
+                if (fireUpdate === void 0) { fireUpdate = true; }
+                this.updateProperty('embed', value, fireUpdate);
+            };
+            EmbedField.prototype.setUrl = function (value) {
+                this.updateProperty('url', value);
+            };
             return EmbedField;
         }(Fields.BaseField));
         Fields.EmbedField = EmbedField;
@@ -771,7 +808,7 @@ var BrickyEditor;
                     $field.attr('contenteditable', 'true');
                 }
                 var html = this.data.html || this.$field.html();
-                this.setHtml(html);
+                this.setHtml(html, false);
                 $field.html(this.data.html);
                 BrickyEditor.SelectionUtils.bindTextSelection($field, function (rect) {
                     BrickyEditor.Editor.UI.htmlTools.show(rect);
@@ -792,11 +829,13 @@ var BrickyEditor;
                     return false;
                 });
             };
-            HtmlField.prototype.setHtml = function (html) {
-                this.data.html = html.trim();
-                if (this.$field.html() !== html) {
-                    this.$field.html(html);
+            HtmlField.prototype.setHtml = function (value, fireUpdate) {
+                if (fireUpdate === void 0) { fireUpdate = true; }
+                value = value.trim();
+                if (this.$field.html() !== value) {
+                    this.$field.html(value);
                 }
+                this.updateProperty('html', value, fireUpdate);
             };
             return HtmlField;
         }(Fields.BaseField));
@@ -817,7 +856,7 @@ var BrickyEditor;
                 var field = this;
                 var $field = this.$field;
                 var data = this.data;
-                this.setSrc(this.data.src);
+                this.setSrc(this.data.src, false);
                 $field.on('click', function () { return __awaiter(_this, void 0, void 0, function () {
                     var fields, file, src, alt;
                     return __generator(this, function (_a) {
@@ -850,31 +889,32 @@ var BrickyEditor;
                     new BrickyEditor.Prompt.PromptParameter('alt', 'Alt', this.data.alt, 'alt attribute value '),
                 ];
             };
-            ImageField.prototype.setSrc = function (src) {
-                this.data.src = src;
+            ImageField.prototype.setSrc = function (src, fireUpdate) {
+                if (fireUpdate === void 0) { fireUpdate = true; }
                 if (src) {
                     if (this.isImg) {
-                        this.$field.attr('src', this.data.src);
+                        this.$field.attr('src', src);
                     }
                     else {
-                        this.$field.css('background-image', "url(" + this.data.src);
+                        this.$field.css('background-image', "url(" + src);
                     }
                 }
+                this.updateProperty('src', src, fireUpdate);
             };
             ImageField.prototype.setAlt = function (alt) {
-                this.data.alt = alt;
-                this.$field.attr(this.isImg ? 'alt' : 'title', this.data.alt);
+                this.$field.attr(this.isImg ? 'alt' : 'title', alt);
+                this.updateProperty('alt', alt);
             };
             ImageField.prototype.setFile = function (file) {
-                this.data.file = file;
                 if (file) {
                     if (this.isImg) {
-                        this.$field.attr('src', this.data.file.fileContent);
+                        this.$field.attr('src', file.fileContent);
                     }
                     else {
-                        this.$field.css('background-image', "url(" + this.data.file.fileContent + ")");
+                        this.$field.css('background-image', "url(" + file.fileContent + ")");
                     }
                 }
+                this.updateProperty('file', file);
             };
             Object.defineProperty(ImageField.prototype, "isImg", {
                 get: function () {

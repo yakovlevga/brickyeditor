@@ -11,7 +11,7 @@ namespace BrickyEditor {
                 }
 
                 var html = this.data.html || this.$field.html();
-                this.setHtml(html);
+                this.setHtml(html, false);
 
                 $field.html(this.data.html);
 
@@ -37,11 +37,12 @@ namespace BrickyEditor {
                     });
             }
 
-            setHtml(html: string) {
-                this.data.html = html.trim();
-                if (this.$field.html() !== html) {
-                    this.$field.html(html);
+            setHtml(value: string, fireUpdate: boolean = true) {
+                value = value.trim();
+                if (this.$field.html() !== value) {
+                    this.$field.html(value);
                 }
+                this.updateProperty('html', value, fireUpdate);
             }
         }
     }

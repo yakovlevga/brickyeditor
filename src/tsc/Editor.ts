@@ -1,7 +1,5 @@
 /// <reference path="types/jquery.d.ts" />
-/// <reference path="types/common.d.ts" />import { debug } from "util";
-
-
+/// <reference path="types/common.d.ts" />
 
 namespace BrickyEditor {
     export class Editor {
@@ -137,6 +135,15 @@ namespace BrickyEditor {
             idx?: number,
             select: boolean = true) {
 
+            const onUpdate = (block, property, oldValue, newValue) => { 
+                this.trigger(Events.onBlockUpdate, {
+                    block : block, 
+                    property: property, 
+                    oldValue: oldValue, 
+                    newValue: newValue
+                });
+            };
+
             let block = new Block(
                 template, 
                 false, 
@@ -145,7 +152,8 @@ namespace BrickyEditor {
                 block => this.selectBlock(block),
                 block => this.deselectBlock(block),
                 block => this.copyBlock(block),
-                (block, offset) => this.moveBlock(block, offset));
+                (block, offset) => this.moveBlock(block, offset),
+                onUpdate);
 
             this.insertBlock(block, idx);
 

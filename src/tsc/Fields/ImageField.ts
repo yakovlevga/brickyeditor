@@ -7,7 +7,7 @@ namespace BrickyEditor {
                 let $field = this.$field;
                 let data = this.data;
 
-                this.setSrc(this.data.src);
+                this.setSrc(this.data.src, false);
                 $field.on('click', async () => {
                     const fields = await Editor.UI.modal.promptAsync(field.getPromptParams());                    
                     const file = fields.getValue('file');
@@ -35,33 +35,33 @@ namespace BrickyEditor {
                 ];
             }
 
-            setSrc(src) {
-                this.data.src = src;
+            setSrc(src: string, fireUpdate: boolean = true) {
                 if (src) {
                     if (this.isImg) {
-                        this.$field.attr('src', this.data.src);
+                        this.$field.attr('src', src);
                     }
                     else {
-                        this.$field.css('background-image', `url(${this.data.src}`);
+                        this.$field.css('background-image', `url(${src}`);
                     }
                 }
+                this.updateProperty('src', src, fireUpdate);
             }
 
             setAlt(alt) {
-                this.data.alt = alt;
-                this.$field.attr(this.isImg ? 'alt' : 'title', this.data.alt);
+                this.$field.attr(this.isImg ? 'alt' : 'title', alt);
+                this.updateProperty('alt', alt);
             }
 
             setFile(file) {
-                this.data.file = file;
                 if (file) {
                     if (this.isImg) {
-                        this.$field.attr('src', this.data.file.fileContent);
+                        this.$field.attr('src', file.fileContent);
                     }
                     else {
-                        this.$field.css('background-image', `url(${this.data.file.fileContent})`);
+                        this.$field.css('background-image', `url(${file.fileContent})`);
                     }
                 }
+                this.updateProperty('file', file);
             }
 
             _isImg: Boolean;

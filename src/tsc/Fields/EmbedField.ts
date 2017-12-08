@@ -10,8 +10,9 @@ namespace BrickyEditor {
 
             get settings(): (field: BaseField) => void {
                 return (field: EmbedField) => {
-                    field.data.url = prompt('Link to embed media', 'http://instagr.am/p/BO9VX2Vj4fF/');
-                    field.loadMedia();
+                    const url = prompt('Link to embed media', 'http://instagr.am/p/BO9VX2Vj4fF/');
+                    field.setUrl(url);
+                    field.loadMedia(true);
                 }
             }
 
@@ -19,22 +20,23 @@ namespace BrickyEditor {
                 let field = this;
                 let $field = this.$field;
                 
-                $field.on('click', async () => {
-                    field.data.url = prompt('Link to embed media', 'http://instagr.am/p/BO9VX2Vj4fF/');
-                    await field.loadMedia();
+                $field.on('click', async () => {                    
+                    const url = prompt('Link to embed media', 'http://instagr.am/p/BO9VX2Vj4fF/');
+                    field.setUrl(url);
+                    await field.loadMedia(true);
                 });
 
-                field.loadMedia();
+                field.loadMedia(false);
             }
 
-            async loadMedia() {
+            async loadMedia(fireUpdate: boolean) {
                 let field = this;
                 if (!field.data || !field.data.url)
                     return;
 
                 const json = await Services.EmbedService.getEmbedAsync(field.data.url);
                 
-                field.data.embed = json;
+                field.setEmbed(json, fireUpdate);
                 const $embed = $(json.html);
 
                 const $script = $embed.filter('script');
@@ -56,6 +58,14 @@ namespace BrickyEditor {
                 field.$field.removeAttr('style');
                 field.$field.append($embed);
                 field.selectBlock();
+            }
+
+            setEmbed(value: any, fireUpdate: boolean = true) {
+                this.updateProperty('embed', value, fireUpdate);
+            }
+
+            setUrl(value: string) {
+                this.updateProperty('url', value);
             }
         }
     }

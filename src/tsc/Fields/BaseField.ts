@@ -14,16 +14,18 @@ namespace BrickyEditor {
             public name: string;
             public data: any;
             private onSelect: () => void;
+            private onUpdate: (property, oldValue, newValue) => void;
 
             protected settings: (field: BaseField) => void;
             protected getSettingsEl(): JQuery {
                 return null;
             }
 
-            constructor($field: JQuery, data: any, onSelect: () => void) {
+            constructor($field: JQuery, data: any, onSelect: () => void, onUpdate: (property, oldValue, newValue) => void) {
                 this.$field = $field;
                 this.data = data;
                 this.onSelect = onSelect;
+                this.onUpdate = onUpdate;
                 this.bind();
             }
 
@@ -46,9 +48,13 @@ namespace BrickyEditor {
                 this._fields[this.type] = this;
             }
 
-            public static createField($field: JQuery, data, onSelect: () => void): BaseField {
-                let fieldData = $field.data().breField;
+            public static createField(
+                $field: JQuery, 
+                data: any, 
+                onSelect: () => void, 
+                onUpdate: (property, oldValue, newValue) => void): BaseField {
 
+                let fieldData = $field.data().breField;
                 if (!fieldData) {
                     throw `There is no any data in field ${$field.html()}`;
                 }
@@ -85,7 +91,7 @@ namespace BrickyEditor {
                     // find field constructor in registered fields
                     if (this._fields.hasOwnProperty(type)) {
                         const field = this._fields[type];
-                        return new field($field, fieldData, onSelect);
+                        return new field($field, fieldData, onSelect, onUpdate);
                     }
                     else {
                         throw `${type} field not found`;
@@ -100,6 +106,18 @@ namespace BrickyEditor {
 
             protected selectBlock() {
                 this.onSelect();
+            }
+
+            protected updateProperty(prop: string, value: any, fireUpdate:boolean = true) {                
+                const oldValue = this.data[prop];                
+                if(oldValue === value)
+                    return;
+
+                this.data[prop] = value;
+                
+                if(fireUpdate) {
+                    this.onUpdate(prop, oldValue, value);
+                }
             }
         }
     }
