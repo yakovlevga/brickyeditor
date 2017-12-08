@@ -8,6 +8,6 @@ namespace BrickyEditor {
         public static onBlockMove = 'onBlockMove';
         public static onBlockSelect = 'onBlockSelect';
         public static onBlockDeselect = 'onBlockDeselect';
-
+        public static onBlockUpdate = 'onBlockUpdate';
     }
 }

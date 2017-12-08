@@ -19,6 +19,8 @@ namespace BrickyEditor {
         public onBlockSelect: any;
         /** onBlockDeselect callback */
         public onBlockDeselect: any;
+        /** onBlockUpdate callback */
+        public onBlockUpdate: any;
 
         /** Url to fetch initial blocks, overrides initial blocks property */
         public blocksUrl: string;
@@ -47,6 +49,7 @@ namespace BrickyEditor {
             this.onBlockMove = options.onBlockMove;
             this.onBlockSelect = options.onBlockSelect;
             this.onBlockDeselect = options.onBlockDeselect;
+            this.onBlockUpdate = options.onBlockUpdate;
 
             this.blocksUrl = options.blocksUrl || null;
             this.blocks = options.blocks || null;

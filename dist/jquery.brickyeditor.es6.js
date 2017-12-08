@@ -306,6 +306,7 @@ var BrickyEditor;
     Events.onBlockMove = 'onBlockMove';
     Events.onBlockSelect = 'onBlockSelect';
     Events.onBlockDeselect = 'onBlockDeselect';
+    Events.onBlockUpdated = 'onBlockUpdated';
     BrickyEditor.Events = Events;
 })(BrickyEditor || (BrickyEditor = {}));
 (function ($) {
@@ -343,13 +344,14 @@ var BrickyEditor;
 var BrickyEditor;
 (function (BrickyEditor) {
     class Block {
-        constructor(template, preview, data, onDelete, onSelect, onDeselect, onCopy, onMove) {
+        constructor(template, preview, data, onDelete, onSelect, onDeselect, onCopy, onMove, onUpdate) {
             this.template = template;
             this.onDelete = onDelete;
             this.onSelect = onSelect;
             this.onDeselect = onDeselect;
             this.onCopy = onCopy;
             this.onMove = onMove;
+            this.onUpdate = onUpdate;
             this.fields = [];
             this.template = template;
             const block = this;
@@ -364,8 +366,12 @@ var BrickyEditor;
                 .find(BrickyEditor.Selectors.selectorField)
                 .addBack(BrickyEditor.Selectors.selectorField);
             $fields.each((idx, elem) => {
+                const onUpdate = (property, oldValue, newValue) => {
+                    debugger;
+                    this.onUpdate(block, property, oldValue, newValue);
+                };
                 let $field = $(elem);
-                let field = BrickyEditor.Fields.BaseField.createField($field, data, () => block.select());
+                let field = BrickyEditor.Fields.BaseField.createField($field, data, () => block.select(), onUpdate);
                 this.fields.push(field);
             });
         }
@@ -500,10 +506,11 @@ var BrickyEditor;
     let Fields;
     (function (Fields) {
         class BaseField {
-            constructor($field, data, onSelect) {
+            constructor($field, data, onSelect, onUpdate) {
                 this.$field = $field;
                 this.data = data;
                 this.onSelect = onSelect;
+                this.onUpdate = onUpdate;
                 this.bind();
             }
             static get type() {
@@ -527,7 +534,7 @@ var BrickyEditor;
                 }
                 this._fields[this.type] = this;
             }
-            static createField($field, data, onSelect) {
+            static createField($field, data, onSelect, onUpdate) {
                 let fieldData = $field.data().breField;
                 if (!fieldData) {
                     throw `There is no any data in field ${$field.html()}`;
@@ -569,6 +576,15 @@ var BrickyEditor;
             selectBlock() {
                 this.onSelect();
             }
+            updateProperty(prop, value, fireUpdate = true) {
+                const oldValue = this.data[prop];
+                if (oldValue === value)
+                    return;
+                this.data[prop] = value;
+                if (fireUpdate) {
+                    this.onUpdate(prop, oldValue, value);
+                }
+            }
         }
         BaseField._fields = {};
         Fields.BaseField = BaseField;
@@ -586,7 +602,8 @@ var BrickyEditor;
             }
             get settings() {
                 return (field) => {
-                    field.data.url = prompt('Link to embed media', 'http://instagr.am/p/BO9VX2Vj4fF/');
+                    const url = prompt('Link to embed media', 'http://instagr.am/p/BO9VX2Vj4fF/');
+                    field.setUrl(url);
                     field.loadMedia();
                 };
             }
@@ -594,7 +611,8 @@ var BrickyEditor;
                 let field = this;
                 let $field = this.$field;
                 $field.on('click', () => __awaiter(this, void 0, void 0, function* () {
-                    field.data.url = prompt('Link to embed media', 'http://instagr.am/p/BO9VX2Vj4fF/');
+                    const url = prompt('Link to embed media', 'http://instagr.am/p/BO9VX2Vj4fF/');
+                    field.setUrl(url);
                     yield field.loadMedia();
                 }));
                 field.loadMedia();
@@ -605,7 +623,7 @@ var BrickyEditor;
                     if (!field.data || !field.data.url)
                         return;
                     const json = yield BrickyEditor.Services.EmbedService.getEmbedAsync(field.data.url);
-                    field.data.embed = json;
+                    field.setEmbed(json);
                     const $embed = $(json.html);
                     const $script = $embed.filter('script');
                     if ($script.length > 0) {
@@ -626,6 +644,12 @@ var BrickyEditor;
                     field.$field.append($embed);
                     field.selectBlock();
                 });
+            }
+            setEmbed(value) {
+                this.updateProperty('embed', value);
+            }
+            setUrl(value) {
+                this.updateProperty('url', value);
             }
         }
         Fields.EmbedField = EmbedField;
@@ -664,11 +688,12 @@ var BrickyEditor;
                     return false;
                 });
             }
-            setHtml(html) {
-                this.data.html = html.trim();
-                if (this.$field.html() !== html) {
-                    this.$field.html(html);
+            setHtml(value) {
+                value = value.trim();
+                if (this.$field.html() !== value) {
+                    this.$field.html(value);
                 }
+                this.updateProperty('html', value);
             }
         }
         Fields.HtmlField = HtmlField;
@@ -709,30 +734,30 @@ var BrickyEditor;
                 ];
             }
             setSrc(src) {
-                this.data.src = src;
                 if (src) {
                     if (this.isImg) {
-                        this.$field.attr('src', this.data.src);
+                        this.$field.attr('src', src);
                     }
                     else {
-                        this.$field.css('background-image', `url(${this.data.src}`);
+                        this.$field.css('background-image', `url(${src}`);
                     }
                 }
+                this.updateProperty('src', src);
             }
             setAlt(alt) {
-                this.data.alt = alt;
-                this.$field.attr(this.isImg ? 'alt' : 'title', this.data.alt);
+                this.$field.attr(this.isImg ? 'alt' : 'title', alt);
+                this.updateProperty('alt', alt);
             }
             setFile(file) {
-                this.data.file = file;
                 if (file) {
                     if (this.isImg) {
-                        this.$field.attr('src', this.data.file.fileContent);
+                        this.$field.attr('src', file.fileContent);
                     }
                     else {
-                        this.$field.css('background-image', `url(${this.data.file.fileContent})`);
+                        this.$field.css('background-image', `url(${file.fileContent})`);
                     }
                 }
+                this.updateProperty('file', file);
             }
             get isImg() {
                 return this._isImg = this._isImg || this.$field.prop('tagName').toLowerCase() === 'img';
