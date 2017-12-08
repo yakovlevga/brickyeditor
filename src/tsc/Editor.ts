@@ -249,9 +249,12 @@ namespace BrickyEditor {
         }
 
         private trigger(event: string, data: any) {
-            this.$editor.trigger('bre.' + event, data);
-            Common.propsEach(this.options, (key, value) => {
-                if(key.breEqualsInvariant(event)) {
+            const editor = this;
+            const $editor = this.$editor;
+
+            $editor.trigger('bre.' + event, data);
+            Common.propsEach(editor.options, (key, value) => {
+                if(key.breEqualsInvariant(event) && value) {
                     value(data);
                 }
             });
