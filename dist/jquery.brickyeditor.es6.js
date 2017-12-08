@@ -179,7 +179,15 @@ var BrickyEditor;
             }
         }
         addBlock(template, data, idx, select = true) {
-            let block = new BrickyEditor.Block(template, false, data, block => this.deleteBlock(block), block => this.selectBlock(block), block => this.deselectBlock(block), block => this.copyBlock(block), (block, offset) => this.moveBlock(block, offset));
+            const onUpdate = (block, property, oldValue, newValue) => {
+                this.trigger(BrickyEditor.Events.onBlockUpdate, {
+                    block: block,
+                    property: property,
+                    oldValue: oldValue,
+                    newValue: newValue
+                });
+            };
+            let block = new BrickyEditor.Block(template, false, data, block => this.deleteBlock(block), block => this.selectBlock(block), block => this.deselectBlock(block), block => this.copyBlock(block), (block, offset) => this.moveBlock(block, offset), onUpdate);
             this.insertBlock(block, idx);
             if (select) {
                 block.select();
@@ -284,6 +292,7 @@ var BrickyEditor;
             this.onBlockMove = options.onBlockMove;
             this.onBlockSelect = options.onBlockSelect;
             this.onBlockDeselect = options.onBlockDeselect;
+            this.onBlockUpdate = options.onBlockUpdate;
             this.blocksUrl = options.blocksUrl || null;
             this.blocks = options.blocks || null;
             this.compactTools = options.compactTools;
@@ -306,7 +315,7 @@ var BrickyEditor;
     Events.onBlockMove = 'onBlockMove';
     Events.onBlockSelect = 'onBlockSelect';
     Events.onBlockDeselect = 'onBlockDeselect';
-    Events.onBlockUpdated = 'onBlockUpdated';
+    Events.onBlockUpdate = 'onBlockUpdate';
     BrickyEditor.Events = Events;
 })(BrickyEditor || (BrickyEditor = {}));
 (function ($) {
@@ -367,8 +376,9 @@ var BrickyEditor;
                 .addBack(BrickyEditor.Selectors.selectorField);
             $fields.each((idx, elem) => {
                 const onUpdate = (property, oldValue, newValue) => {
-                    debugger;
-                    this.onUpdate(block, property, oldValue, newValue);
+                    if (this.onUpdate) {
+                        this.onUpdate(block, property, oldValue, newValue);
+                    }
                 };
                 let $field = $(elem);
                 let field = BrickyEditor.Fields.BaseField.createField($field, data, () => block.select(), onUpdate);
@@ -500,271 +510,6 @@ var BrickyEditor;
         }
     }
     BrickyEditor.BlockUIAction = BlockUIAction;
-})(BrickyEditor || (BrickyEditor = {}));
-var BrickyEditor;
-(function (BrickyEditor) {
-    let Fields;
-    (function (Fields) {
-        class BaseField {
-            constructor($field, data, onSelect, onUpdate) {
-                this.$field = $field;
-                this.data = data;
-                this.onSelect = onSelect;
-                this.onUpdate = onUpdate;
-                this.bind();
-            }
-            static get type() {
-                var name = this.name;
-                name = name.replace('Field', '');
-                name = name.substring(0, 1).toLowerCase() + name.substring(1);
-                return name;
-            }
-            getSettingsEl() {
-                return null;
-            }
-            static registerCommonFields() {
-                Fields.HtmlField.registerField();
-                Fields.ImageField.registerField();
-                Fields.EmbedField.registerField();
-            }
-            ;
-            static registerField() {
-                if (this._fields.hasOwnProperty(this.type)) {
-                    delete this._fields[this.type];
-                }
-                this._fields[this.type] = this;
-            }
-            static createField($field, data, onSelect, onUpdate) {
-                let fieldData = $field.data().breField;
-                if (!fieldData) {
-                    throw `There is no any data in field ${$field.html()}`;
-                }
-                if (typeof fieldData === 'string') {
-                    fieldData = JSON.parse(fieldData.replace(/'/g, '"'));
-                }
-                if (!fieldData.name) {
-                    throw `There is no name in data of field ${$field.html()}`;
-                }
-                if (data) {
-                    let addFieldData = {};
-                    for (var idx = 0; idx < data.length; idx++) {
-                        let field = data[idx];
-                        if (field.name.toLowerCase() === fieldData.name.toLowerCase()) {
-                            addFieldData = field;
-                            break;
-                        }
-                    }
-                    if (addFieldData) {
-                        fieldData = $.extend(fieldData, addFieldData);
-                    }
-                }
-                let type = fieldData.type;
-                if (type != null) {
-                    if (this._fields.hasOwnProperty(type)) {
-                        const field = this._fields[type];
-                        return new field($field, fieldData, onSelect);
-                    }
-                    else {
-                        throw `${type} field not found`;
-                    }
-                }
-                else {
-                    throw `Field type not defined in data-bre-field attribute`;
-                }
-            }
-            bind() { }
-            selectBlock() {
-                this.onSelect();
-            }
-            updateProperty(prop, value, fireUpdate = true) {
-                const oldValue = this.data[prop];
-                if (oldValue === value)
-                    return;
-                this.data[prop] = value;
-                if (fireUpdate) {
-                    this.onUpdate(prop, oldValue, value);
-                }
-            }
-        }
-        BaseField._fields = {};
-        Fields.BaseField = BaseField;
-    })(Fields = BrickyEditor.Fields || (BrickyEditor.Fields = {}));
-})(BrickyEditor || (BrickyEditor = {}));
-var BrickyEditor;
-(function (BrickyEditor) {
-    let Fields;
-    (function (Fields) {
-        class EmbedField extends Fields.BaseField {
-            getSettingsEl() {
-                let $el = $('<div style="position: absolute;width: 100%; height: 100px;;text-align: center;font-weight: bold;vertical-align: middle;background: #333;opacity: 0.2;">Change embed element link</div>');
-                this.$field.before($el);
-                return $el;
-            }
-            get settings() {
-                return (field) => {
-                    const url = prompt('Link to embed media', 'http://instagr.am/p/BO9VX2Vj4fF/');
-                    field.setUrl(url);
-                    field.loadMedia();
-                };
-            }
-            bind() {
-                let field = this;
-                let $field = this.$field;
-                $field.on('click', () => __awaiter(this, void 0, void 0, function* () {
-                    const url = prompt('Link to embed media', 'http://instagr.am/p/BO9VX2Vj4fF/');
-                    field.setUrl(url);
-                    yield field.loadMedia();
-                }));
-                field.loadMedia();
-            }
-            loadMedia() {
-                return __awaiter(this, void 0, void 0, function* () {
-                    let field = this;
-                    if (!field.data || !field.data.url)
-                        return;
-                    const json = yield BrickyEditor.Services.EmbedService.getEmbedAsync(field.data.url);
-                    field.setEmbed(json);
-                    const $embed = $(json.html);
-                    const $script = $embed.filter('script');
-                    if ($script.length > 0) {
-                        $script.remove();
-                        var scriptSrc = $script.attr('src');
-                        if (scriptSrc.breStartsWith('//')) {
-                            scriptSrc = "https:" + scriptSrc;
-                            $.getScript(scriptSrc)
-                                .done(script => {
-                                BrickyEditor.Services.EmbedService.processEmbed(json.provider_name);
-                            })
-                                .fail(function (err) { });
-                        }
-                    }
-                    field.$field.empty();
-                    field.$field.removeAttr('class');
-                    field.$field.removeAttr('style');
-                    field.$field.append($embed);
-                    field.selectBlock();
-                });
-            }
-            setEmbed(value) {
-                this.updateProperty('embed', value);
-            }
-            setUrl(value) {
-                this.updateProperty('url', value);
-            }
-        }
-        Fields.EmbedField = EmbedField;
-    })(Fields = BrickyEditor.Fields || (BrickyEditor.Fields = {}));
-})(BrickyEditor || (BrickyEditor = {}));
-var BrickyEditor;
-(function (BrickyEditor) {
-    let Fields;
-    (function (Fields) {
-        class HtmlField extends Fields.BaseField {
-            bind() {
-                let field = this;
-                let $field = this.$field;
-                if (!$field.is('[contenteditable]')) {
-                    $field.attr('contenteditable', 'true');
-                }
-                var html = this.data.html || this.$field.html();
-                this.setHtml(html);
-                $field.html(this.data.html);
-                BrickyEditor.SelectionUtils.bindTextSelection($field, (rect) => {
-                    BrickyEditor.Editor.UI.htmlTools.show(rect);
-                });
-                $field
-                    .on('blur keyup paste input', () => {
-                    this.setHtml($field.html());
-                })
-                    .on('paste', (e) => {
-                    e.preventDefault();
-                    let ev = e.originalEvent;
-                    let text = ev.clipboardData.getData('text/plain');
-                    document.execCommand("insertHTML", false, text);
-                })
-                    .on('click', (ev) => {
-                    field.selectBlock();
-                    ev.stopPropagation();
-                    return false;
-                });
-            }
-            setHtml(value) {
-                value = value.trim();
-                if (this.$field.html() !== value) {
-                    this.$field.html(value);
-                }
-                this.updateProperty('html', value);
-            }
-        }
-        Fields.HtmlField = HtmlField;
-    })(Fields = BrickyEditor.Fields || (BrickyEditor.Fields = {}));
-})(BrickyEditor || (BrickyEditor = {}));
-var BrickyEditor;
-(function (BrickyEditor) {
-    let Fields;
-    (function (Fields) {
-        class ImageField extends Fields.BaseField {
-            bind() {
-                let field = this;
-                let $field = this.$field;
-                let data = this.data;
-                this.setSrc(this.data.src);
-                $field.on('click', () => __awaiter(this, void 0, void 0, function* () {
-                    const fields = yield BrickyEditor.Editor.UI.modal.promptAsync(field.getPromptParams());
-                    const file = fields.getValue('file');
-                    const src = fields.getValue('src');
-                    if (file) {
-                        field.setFile(file);
-                        field.setSrc(null);
-                    }
-                    else if (src) {
-                        field.setSrc(src);
-                        field.setFile(null);
-                    }
-                    let alt = fields.getValue('alt');
-                    field.setAlt(alt);
-                    field.selectBlock();
-                }));
-            }
-            getPromptParams() {
-                return [
-                    new BrickyEditor.Prompt.PromptParameter('src', 'Image Link', this.data.url, 'image url'),
-                    new BrickyEditor.Prompt.PromptParameterImage('file', 'or Upload file', this.data.file, 'select file'),
-                    new BrickyEditor.Prompt.PromptParameter('alt', 'Alt', this.data.alt, 'alt attribute value '),
-                ];
-            }
-            setSrc(src) {
-                if (src) {
-                    if (this.isImg) {
-                        this.$field.attr('src', src);
-                    }
-                    else {
-                        this.$field.css('background-image', `url(${src}`);
-                    }
-                }
-                this.updateProperty('src', src);
-            }
-            setAlt(alt) {
-                this.$field.attr(this.isImg ? 'alt' : 'title', alt);
-                this.updateProperty('alt', alt);
-            }
-            setFile(file) {
-                if (file) {
-                    if (this.isImg) {
-                        this.$field.attr('src', file.fileContent);
-                    }
-                    else {
-                        this.$field.css('background-image', `url(${file.fileContent})`);
-                    }
-                }
-                this.updateProperty('file', file);
-            }
-            get isImg() {
-                return this._isImg = this._isImg || this.$field.prop('tagName').toLowerCase() === 'img';
-            }
-        }
-        Fields.ImageField = ImageField;
-    })(Fields = BrickyEditor.Fields || (BrickyEditor.Fields = {}));
 })(BrickyEditor || (BrickyEditor = {}));
 var BrickyEditor;
 (function (BrickyEditor) {
@@ -937,6 +682,271 @@ var BrickyEditor;
         }
         Prompt.PromptParameterOptions = PromptParameterOptions;
     })(Prompt = BrickyEditor.Prompt || (BrickyEditor.Prompt = {}));
+})(BrickyEditor || (BrickyEditor = {}));
+var BrickyEditor;
+(function (BrickyEditor) {
+    let Fields;
+    (function (Fields) {
+        class BaseField {
+            constructor($field, data, onSelect, onUpdate) {
+                this.$field = $field;
+                this.data = data;
+                this.onSelect = onSelect;
+                this.onUpdate = onUpdate;
+                this.bind();
+            }
+            static get type() {
+                var name = this.name;
+                name = name.replace('Field', '');
+                name = name.substring(0, 1).toLowerCase() + name.substring(1);
+                return name;
+            }
+            getSettingsEl() {
+                return null;
+            }
+            static registerCommonFields() {
+                Fields.HtmlField.registerField();
+                Fields.ImageField.registerField();
+                Fields.EmbedField.registerField();
+            }
+            ;
+            static registerField() {
+                if (this._fields.hasOwnProperty(this.type)) {
+                    delete this._fields[this.type];
+                }
+                this._fields[this.type] = this;
+            }
+            static createField($field, data, onSelect, onUpdate) {
+                let fieldData = $field.data().breField;
+                if (!fieldData) {
+                    throw `There is no any data in field ${$field.html()}`;
+                }
+                if (typeof fieldData === 'string') {
+                    fieldData = JSON.parse(fieldData.replace(/'/g, '"'));
+                }
+                if (!fieldData.name) {
+                    throw `There is no name in data of field ${$field.html()}`;
+                }
+                if (data) {
+                    let addFieldData = {};
+                    for (var idx = 0; idx < data.length; idx++) {
+                        let field = data[idx];
+                        if (field.name.toLowerCase() === fieldData.name.toLowerCase()) {
+                            addFieldData = field;
+                            break;
+                        }
+                    }
+                    if (addFieldData) {
+                        fieldData = $.extend(fieldData, addFieldData);
+                    }
+                }
+                let type = fieldData.type;
+                if (type != null) {
+                    if (this._fields.hasOwnProperty(type)) {
+                        const field = this._fields[type];
+                        return new field($field, fieldData, onSelect, onUpdate);
+                    }
+                    else {
+                        throw `${type} field not found`;
+                    }
+                }
+                else {
+                    throw `Field type not defined in data-bre-field attribute`;
+                }
+            }
+            bind() { }
+            selectBlock() {
+                this.onSelect();
+            }
+            updateProperty(prop, value, fireUpdate = true) {
+                const oldValue = this.data[prop];
+                if (oldValue === value)
+                    return;
+                this.data[prop] = value;
+                if (fireUpdate) {
+                    this.onUpdate(prop, oldValue, value);
+                }
+            }
+        }
+        BaseField._fields = {};
+        Fields.BaseField = BaseField;
+    })(Fields = BrickyEditor.Fields || (BrickyEditor.Fields = {}));
+})(BrickyEditor || (BrickyEditor = {}));
+var BrickyEditor;
+(function (BrickyEditor) {
+    let Fields;
+    (function (Fields) {
+        class EmbedField extends Fields.BaseField {
+            getSettingsEl() {
+                let $el = $('<div style="position: absolute;width: 100%; height: 100px;;text-align: center;font-weight: bold;vertical-align: middle;background: #333;opacity: 0.2;">Change embed element link</div>');
+                this.$field.before($el);
+                return $el;
+            }
+            get settings() {
+                return (field) => {
+                    const url = prompt('Link to embed media', 'http://instagr.am/p/BO9VX2Vj4fF/');
+                    field.setUrl(url);
+                    field.loadMedia(true);
+                };
+            }
+            bind() {
+                let field = this;
+                let $field = this.$field;
+                $field.on('click', () => __awaiter(this, void 0, void 0, function* () {
+                    const url = prompt('Link to embed media', 'http://instagr.am/p/BO9VX2Vj4fF/');
+                    field.setUrl(url);
+                    yield field.loadMedia(true);
+                }));
+                field.loadMedia(false);
+            }
+            loadMedia(fireUpdate) {
+                return __awaiter(this, void 0, void 0, function* () {
+                    let field = this;
+                    if (!field.data || !field.data.url)
+                        return;
+                    const json = yield BrickyEditor.Services.EmbedService.getEmbedAsync(field.data.url);
+                    field.setEmbed(json, fireUpdate);
+                    const $embed = $(json.html);
+                    const $script = $embed.filter('script');
+                    if ($script.length > 0) {
+                        $script.remove();
+                        var scriptSrc = $script.attr('src');
+                        if (scriptSrc.breStartsWith('//')) {
+                            scriptSrc = "https:" + scriptSrc;
+                            $.getScript(scriptSrc)
+                                .done(script => {
+                                BrickyEditor.Services.EmbedService.processEmbed(json.provider_name);
+                            })
+                                .fail(function (err) { });
+                        }
+                    }
+                    field.$field.empty();
+                    field.$field.removeAttr('class');
+                    field.$field.removeAttr('style');
+                    field.$field.append($embed);
+                    field.selectBlock();
+                });
+            }
+            setEmbed(value, fireUpdate = true) {
+                this.updateProperty('embed', value, fireUpdate);
+            }
+            setUrl(value) {
+                this.updateProperty('url', value);
+            }
+        }
+        Fields.EmbedField = EmbedField;
+    })(Fields = BrickyEditor.Fields || (BrickyEditor.Fields = {}));
+})(BrickyEditor || (BrickyEditor = {}));
+var BrickyEditor;
+(function (BrickyEditor) {
+    let Fields;
+    (function (Fields) {
+        class HtmlField extends Fields.BaseField {
+            bind() {
+                let field = this;
+                let $field = this.$field;
+                if (!$field.is('[contenteditable]')) {
+                    $field.attr('contenteditable', 'true');
+                }
+                var html = this.data.html || this.$field.html();
+                this.setHtml(html, false);
+                $field.html(this.data.html);
+                BrickyEditor.SelectionUtils.bindTextSelection($field, (rect) => {
+                    BrickyEditor.Editor.UI.htmlTools.show(rect);
+                });
+                $field
+                    .on('blur keyup paste input', () => {
+                    this.setHtml($field.html());
+                })
+                    .on('paste', (e) => {
+                    e.preventDefault();
+                    let ev = e.originalEvent;
+                    let text = ev.clipboardData.getData('text/plain');
+                    document.execCommand("insertHTML", false, text);
+                })
+                    .on('click', (ev) => {
+                    field.selectBlock();
+                    ev.stopPropagation();
+                    return false;
+                });
+            }
+            setHtml(value, fireUpdate = true) {
+                value = value.trim();
+                if (this.$field.html() !== value) {
+                    this.$field.html(value);
+                }
+                this.updateProperty('html', value, fireUpdate);
+            }
+        }
+        Fields.HtmlField = HtmlField;
+    })(Fields = BrickyEditor.Fields || (BrickyEditor.Fields = {}));
+})(BrickyEditor || (BrickyEditor = {}));
+var BrickyEditor;
+(function (BrickyEditor) {
+    let Fields;
+    (function (Fields) {
+        class ImageField extends Fields.BaseField {
+            bind() {
+                let field = this;
+                let $field = this.$field;
+                let data = this.data;
+                this.setSrc(this.data.src, false);
+                $field.on('click', () => __awaiter(this, void 0, void 0, function* () {
+                    const fields = yield BrickyEditor.Editor.UI.modal.promptAsync(field.getPromptParams());
+                    const file = fields.getValue('file');
+                    const src = fields.getValue('src');
+                    if (file) {
+                        field.setFile(file);
+                        field.setSrc(null);
+                    }
+                    else if (src) {
+                        field.setSrc(src);
+                        field.setFile(null);
+                    }
+                    let alt = fields.getValue('alt');
+                    field.setAlt(alt);
+                    field.selectBlock();
+                }));
+            }
+            getPromptParams() {
+                return [
+                    new BrickyEditor.Prompt.PromptParameter('src', 'Image Link', this.data.url, 'image url'),
+                    new BrickyEditor.Prompt.PromptParameterImage('file', 'or Upload file', this.data.file, 'select file'),
+                    new BrickyEditor.Prompt.PromptParameter('alt', 'Alt', this.data.alt, 'alt attribute value '),
+                ];
+            }
+            setSrc(src, fireUpdate = true) {
+                if (src) {
+                    if (this.isImg) {
+                        this.$field.attr('src', src);
+                    }
+                    else {
+                        this.$field.css('background-image', `url(${src}`);
+                    }
+                }
+                this.updateProperty('src', src, fireUpdate);
+            }
+            setAlt(alt) {
+                this.$field.attr(this.isImg ? 'alt' : 'title', alt);
+                this.updateProperty('alt', alt);
+            }
+            setFile(file) {
+                if (file) {
+                    if (this.isImg) {
+                        this.$field.attr('src', file.fileContent);
+                    }
+                    else {
+                        this.$field.css('background-image', `url(${file.fileContent})`);
+                    }
+                }
+                this.updateProperty('file', file);
+            }
+            get isImg() {
+                return this._isImg = this._isImg || this.$field.prop('tagName').toLowerCase() === 'img';
+            }
+        }
+        Fields.ImageField = ImageField;
+    })(Fields = BrickyEditor.Fields || (BrickyEditor.Fields = {}));
 })(BrickyEditor || (BrickyEditor = {}));
 var BrickyEditor;
 (function (BrickyEditor) {
