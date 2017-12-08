@@ -263,6 +263,7 @@ var BrickyEditor;
                     oldValue: oldValue,
                     newValue: newValue
                 });
+                _this.trigger(BrickyEditor.Events.onChange, { blocks: _this.getData(), html: _this.getHtml() });
             };
             var block = new BrickyEditor.Block(template, false, data, function (block) { return _this.deleteBlock(block); }, function (block) { return _this.selectBlock(block); }, function (block) { return _this.deselectBlock(block); }, function (block) { return _this.copyBlock(block); }, function (block, offset) { return _this.moveBlock(block, offset); }, onUpdate);
             this.insertBlock(block, idx);
@@ -1110,118 +1111,6 @@ var BrickyEditor;
 })(BrickyEditor || (BrickyEditor = {}));
 var BrickyEditor;
 (function (BrickyEditor) {
-    var Services;
-    (function (Services) {
-        var EmbedService = (function () {
-            function EmbedService() {
-            }
-            EmbedService.getEmbedAsync = function (embedUrl) {
-                var _this = this;
-                var url = "https://noembed.com/embed?url=" + embedUrl;
-                return new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
-                    var params, data, err_1;
-                    return __generator(this, function (_a) {
-                        switch (_a.label) {
-                            case 0:
-                                params = { url: url, type: "get", dataType: "jsonp" };
-                                _a.label = 1;
-                            case 1:
-                                _a.trys.push([1, 3, , 4]);
-                                return [4, $.ajax(params)];
-                            case 2:
-                                data = _a.sent();
-                                resolve(data);
-                                return [3, 4];
-                            case 3:
-                                err_1 = _a.sent();
-                                reject(err_1);
-                                return [3, 4];
-                            case 4: return [2];
-                        }
-                    });
-                }); });
-            };
-            EmbedService.processEmbed = function (provider) {
-                switch (provider) {
-                    case EmbedService.Instagram:
-                        if (instgrm) {
-                            instgrm.Embeds.process();
-                        }
-                        break;
-                    default:
-                        break;
-                }
-            };
-            EmbedService.Instagram = 'Instagram';
-            return EmbedService;
-        }());
-        Services.EmbedService = EmbedService;
-    })(Services = BrickyEditor.Services || (BrickyEditor.Services = {}));
-})(BrickyEditor || (BrickyEditor = {}));
-var BrickyEditor;
-(function (BrickyEditor) {
-    var Services;
-    (function (Services) {
-        var TemplateService = (function () {
-            function TemplateService() {
-            }
-            TemplateService.loadTemplatesAsync = function (editor) {
-                return __awaiter(this, void 0, void 0, function () {
-                    var _this = this;
-                    var templates, url;
-                    return __generator(this, function (_a) {
-                        this.templates = [];
-                        templates = this.templates;
-                        url = editor.options.templatesUrl;
-                        return [2, new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
-                                var _this = this;
-                                var data, $style, $templates, err_2;
-                                return __generator(this, function (_a) {
-                                    switch (_a.label) {
-                                        case 0:
-                                            _a.trys.push([0, 2, , 3]);
-                                            return [4, $.get(url)];
-                                        case 1:
-                                            data = _a.sent();
-                                            $style = $(data).filter('style');
-                                            if ($style && $style.length > 0) {
-                                                editor.$editor.prepend($style);
-                                            }
-                                            $templates = $(data).filter('.bre-template');
-                                            $templates.each(function (idx, t) {
-                                                var template = new BrickyEditor.Template(t);
-                                                _this.templates.push(template);
-                                            });
-                                            resolve(this.templates);
-                                            return [3, 3];
-                                        case 2:
-                                            err_2 = _a.sent();
-                                            console.log('Templates file not found.');
-                                            reject(err_2);
-                                            return [3, 3];
-                                        case 3: return [2];
-                                    }
-                                });
-                            }); })];
-                    });
-                });
-            };
-            TemplateService.getTemplate = function (templateName) {
-                for (var i = 0; i < this.templates.length; i++) {
-                    var template = this.templates[i];
-                    if (template.name.toLowerCase() === templateName.toLowerCase()) {
-                        return template;
-                    }
-                }
-                return null;
-            };
-            return TemplateService;
-        }());
-        Services.TemplateService = TemplateService;
-    })(Services = BrickyEditor.Services || (BrickyEditor.Services = {}));
-})(BrickyEditor || (BrickyEditor = {}));
-var BrickyEditor;
-(function (BrickyEditor) {
     var HtmlTools = (function () {
         function HtmlTools(editor) {
             this.editor = editor;
@@ -1610,4 +1499,116 @@ var BrickyEditor;
         return UI;
     }());
     BrickyEditor.UI = UI;
+})(BrickyEditor || (BrickyEditor = {}));
+var BrickyEditor;
+(function (BrickyEditor) {
+    var Services;
+    (function (Services) {
+        var EmbedService = (function () {
+            function EmbedService() {
+            }
+            EmbedService.getEmbedAsync = function (embedUrl) {
+                var _this = this;
+                var url = "https://noembed.com/embed?url=" + embedUrl;
+                return new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
+                    var params, data, err_1;
+                    return __generator(this, function (_a) {
+                        switch (_a.label) {
+                            case 0:
+                                params = { url: url, type: "get", dataType: "jsonp" };
+                                _a.label = 1;
+                            case 1:
+                                _a.trys.push([1, 3, , 4]);
+                                return [4, $.ajax(params)];
+                            case 2:
+                                data = _a.sent();
+                                resolve(data);
+                                return [3, 4];
+                            case 3:
+                                err_1 = _a.sent();
+                                reject(err_1);
+                                return [3, 4];
+                            case 4: return [2];
+                        }
+                    });
+                }); });
+            };
+            EmbedService.processEmbed = function (provider) {
+                switch (provider) {
+                    case EmbedService.Instagram:
+                        if (instgrm) {
+                            instgrm.Embeds.process();
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            };
+            EmbedService.Instagram = 'Instagram';
+            return EmbedService;
+        }());
+        Services.EmbedService = EmbedService;
+    })(Services = BrickyEditor.Services || (BrickyEditor.Services = {}));
+})(BrickyEditor || (BrickyEditor = {}));
+var BrickyEditor;
+(function (BrickyEditor) {
+    var Services;
+    (function (Services) {
+        var TemplateService = (function () {
+            function TemplateService() {
+            }
+            TemplateService.loadTemplatesAsync = function (editor) {
+                return __awaiter(this, void 0, void 0, function () {
+                    var _this = this;
+                    var templates, url;
+                    return __generator(this, function (_a) {
+                        this.templates = [];
+                        templates = this.templates;
+                        url = editor.options.templatesUrl;
+                        return [2, new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
+                                var _this = this;
+                                var data, $style, $templates, err_2;
+                                return __generator(this, function (_a) {
+                                    switch (_a.label) {
+                                        case 0:
+                                            _a.trys.push([0, 2, , 3]);
+                                            return [4, $.get(url)];
+                                        case 1:
+                                            data = _a.sent();
+                                            $style = $(data).filter('style');
+                                            if ($style && $style.length > 0) {
+                                                editor.$editor.prepend($style);
+                                            }
+                                            $templates = $(data).filter('.bre-template');
+                                            $templates.each(function (idx, t) {
+                                                var template = new BrickyEditor.Template(t);
+                                                _this.templates.push(template);
+                                            });
+                                            resolve(this.templates);
+                                            return [3, 3];
+                                        case 2:
+                                            err_2 = _a.sent();
+                                            console.log('Templates file not found.');
+                                            reject(err_2);
+                                            return [3, 3];
+                                        case 3: return [2];
+                                    }
+                                });
+                            }); })];
+                    });
+                });
+            };
+            TemplateService.getTemplate = function (templateName) {
+                for (var i = 0; i < this.templates.length; i++) {
+                    var template = this.templates[i];
+                    if (template.name.toLowerCase() === templateName.toLowerCase()) {
+                        return template;
+                    }
+                }
+                return null;
+            };
+            return TemplateService;
+        }());
+        Services.TemplateService = TemplateService;
+    })(Services = BrickyEditor.Services || (BrickyEditor.Services = {}));
 })(BrickyEditor || (BrickyEditor = {}));

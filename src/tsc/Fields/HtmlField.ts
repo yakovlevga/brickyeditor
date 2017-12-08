@@ -12,7 +12,6 @@ namespace BrickyEditor {
 
                 var html = this.data.html || this.$field.html();
                 this.setHtml(html, false);
-
                 $field.html(this.data.html);
 
                 SelectionUtils.bindTextSelection($field, (rect) => {

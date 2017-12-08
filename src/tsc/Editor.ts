@@ -142,6 +142,7 @@ namespace BrickyEditor {
                     oldValue: oldValue, 
                     newValue: newValue
                 });
+                this.trigger(Events.onChange, { blocks: this.getData(), html: this.getHtml() });
             };
 
             let block = new Block(
