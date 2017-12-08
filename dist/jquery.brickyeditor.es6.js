@@ -102,6 +102,7 @@ var BrickyEditor;
                 Editor.UI.setTemplates(templates);
                 const blocks = yield this.tryLoadInitialBlocksAsync();
                 this.loadBlocks(blocks);
+                this.isLoaded = true;
                 this.trigger(BrickyEditor.Events.onLoad, this);
             });
         }
@@ -184,8 +185,6 @@ var BrickyEditor;
                 block.select();
                 block.scrollTo();
             }
-            this.trigger(BrickyEditor.Events.onBlockAdd, { block: block });
-            this.trigger(BrickyEditor.Events.onChange, { blocks: this.getData(), html: this.getHtml() });
         }
         insertBlock(block, idx) {
             idx = idx || this.blocks.length;
@@ -199,8 +198,10 @@ var BrickyEditor;
             else {
                 this.blocks[idx - 1].ui.$editor.after(block.ui.$editor);
             }
-            this.trigger(BrickyEditor.Events.onBlockInsert, { block: block, idx: idx });
-            this.trigger(BrickyEditor.Events.onChange, { blocks: this.getData(), html: this.getHtml() });
+            if (this.isLoaded) {
+                this.trigger(BrickyEditor.Events.onBlockAdd, { block: block, idx: idx });
+                this.trigger(BrickyEditor.Events.onChange, { blocks: this.getData(), html: this.getHtml() });
+            }
         }
         deleteBlock(block) {
             const idx = this.blocks.indexOf(block);
@@ -254,9 +255,11 @@ var BrickyEditor;
             this.trigger(BrickyEditor.Events.onBlockDeselect, { block: block });
         }
         trigger(event, data) {
-            this.$editor.trigger('bre.' + event, data);
-            BrickyEditor.Common.propsEach(this.options, (key, value) => {
-                if (key.breEqualsInvariant(event)) {
+            const editor = this;
+            const $editor = this.$editor;
+            $editor.trigger('bre.' + event, data);
+            BrickyEditor.Common.propsEach(editor.options, (key, value) => {
+                if (key.breEqualsInvariant(event) && value) {
                     value(data);
                 }
             });
@@ -274,7 +277,13 @@ var BrickyEditor;
             this.ignoreHtml = null;
             this.htmlToolsButtons = null;
             this.templatesUrl = options.templatesUrl || this.templatesUrl;
-            this.onload = options.onload;
+            this.onLoad = options.onLoad || options.onload;
+            this.onChange = options.onChange;
+            this.onBlockAdd = options.onBlockAdd;
+            this.onBlockDelete = options.onBlockDelete;
+            this.onBlockMove = options.onBlockMove;
+            this.onBlockSelect = options.onBlockSelect;
+            this.onBlockDeselect = options.onBlockDeselect;
             this.blocksUrl = options.blocksUrl || null;
             this.blocks = options.blocks || null;
             this.compactTools = options.compactTools;
@@ -293,7 +302,6 @@ var BrickyEditor;
     Events.onLoad = 'onLoad';
     Events.onChange = 'onChange';
     Events.onBlockAdd = 'onBlockAdd';
-    Events.onBlockInsert = 'onBlockInsert';
     Events.onBlockDelete = 'onBlockDelete';
     Events.onBlockMove = 'onBlockMove';
     Events.onBlockSelect = 'onBlockSelect';

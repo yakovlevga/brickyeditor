@@ -18,29 +18,8 @@
         ignoreHtml: true,
         blocksUrl: 'data.json',
         templatesUrl: 'templates.html',
-        onload: function (editor) {
-          console.log('BrickyEditor loaded.');
-        },
-        onChange: function(data) {
-          console.log('BrickyEditor content changed. Blocks count: ' + data.blocks.length);
-        },
         onBlockAdd: function(data) {
           console.log('BrickyEditor block added.');
-        },
-        onBlockInsert: function(data) {
-          console.log('BrickyEditor block inserted.');
-        },
-        onBlockDelete: function(data) {
-          console.log('BrickyEditor block deleted.');
-        },
-        onBlockMove: function(data) {
-          console.log('BrickyEditor block moved.');
-        },
-        onBlockSelect: function(data) {
-          console.log('BrickyEditor block selected.');
-        },
-        onBlockDeselect: function(data) {
-          console.log('BrickyEditor block deselected.');
         }
       });
     });

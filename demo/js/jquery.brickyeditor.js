@@ -332,9 +332,11 @@ var BrickyEditor;
             this.trigger(BrickyEditor.Events.onBlockDeselect, { block: block });
         };
         Editor.prototype.trigger = function (event, data) {
-            this.$editor.trigger('bre.' + event, data);
-            BrickyEditor.Common.propsEach(this.options, function (key, value) {
-                if (key.breEqualsInvariant(event)) {
+            var editor = this;
+            var $editor = this.$editor;
+            $editor.trigger('bre.' + event, data);
+            BrickyEditor.Common.propsEach(editor.options, function (key, value) {
+                if (key.breEqualsInvariant(event) && value) {
                     value(data);
                 }
             });
