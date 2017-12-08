@@ -263,6 +263,7 @@ var BrickyEditor;
                     oldValue: oldValue,
                     newValue: newValue
                 });
+                _this.trigger(BrickyEditor.Events.onChange, { blocks: _this.getData(), html: _this.getHtml() });
             };
             var block = new BrickyEditor.Block(template, false, data, function (block) { return _this.deleteBlock(block); }, function (block) { return _this.selectBlock(block); }, function (block) { return _this.deselectBlock(block); }, function (block) { return _this.copyBlock(block); }, function (block, offset) { return _this.moveBlock(block, offset); }, onUpdate);
             this.insertBlock(block, idx);
@@ -604,186 +605,6 @@ var BrickyEditor;
 })(BrickyEditor || (BrickyEditor = {}));
 var BrickyEditor;
 (function (BrickyEditor) {
-    var Prompt;
-    (function (Prompt) {
-        var PromptParameter = (function () {
-            function PromptParameter(key, title, value, placeholder) {
-                this.key = key;
-                this.title = title;
-                this.placeholder = placeholder || '';
-                this.value = value;
-            }
-            PromptParameter.prototype.parseValue = function () {
-                this.value = this.$input.val();
-                this.$control = null;
-                delete this._$control;
-            };
-            Object.defineProperty(PromptParameter.prototype, "$control", {
-                get: function () {
-                    if (!this._$control) {
-                        this._$control =
-                            $("<div class=\"bre-prompt-field\">\n                            <label class=\"bre-label\" for=\"" + this.key + "\">" + (this.title ? this.title : 'Select file...') + "</label>\n                        </div>");
-                        this.$input = this.getEditor();
-                        this._$control.append(this.$input);
-                    }
-                    return this._$control;
-                },
-                set: function (value) {
-                    this._$control = value;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            PromptParameter.prototype.getEditor = function () {
-                var value = this.value || '';
-                return $("<input type=\"text\" id=\"" + this.key + "\" class=\"bre-input\" placeholder=\"" + this.placeholder + "\" value=\"" + (this.value ? this.value : '') + "\">");
-            };
-            return PromptParameter;
-        }());
-        Prompt.PromptParameter = PromptParameter;
-    })(Prompt = BrickyEditor.Prompt || (BrickyEditor.Prompt = {}));
-})(BrickyEditor || (BrickyEditor = {}));
-var BrickyEditor;
-(function (BrickyEditor) {
-    var Prompt;
-    (function (Prompt) {
-        var PromptParameterImage = (function (_super) {
-            __extends(PromptParameterImage, _super);
-            function PromptParameterImage(key, title, value, placeholder) {
-                var _this = _super.call(this, key, title, value, placeholder) || this;
-                if (value) {
-                    _this._value = value;
-                }
-                return _this;
-            }
-            PromptParameterImage.prototype.parseValue = function () {
-                this.value = this._value;
-                this.$control = null;
-                delete this._$control;
-                this._value = null;
-                delete this._value;
-            };
-            PromptParameterImage.prototype.getEditor = function () {
-                var field = this;
-                var img = this.value && this.value.fileContent ? this.value.fileContent : "";
-                var $editor = $("\n                <div class='bre-image-input'>\n                    <label for=\"" + this.key + "\">\n                        Select file...\n                    </label>                        \n                    <img src=\"" + img + "\"/>                    \n                    <input type=\"file\" id=\"" + this.key + "\" class=\"bre-input\" placeholder=\"" + this.placeholder + "\">\n                </div>\n                <small class='bre-image-input-filename'></small>");
-                var $file = $('input', $editor);
-                var $filePreview = $('img', $editor);
-                var $fileName = $('.bre-image-input-filename', $editor);
-                var value = this.value;
-                if (value) {
-                    $filePreview.attr('src', value.fileContent);
-                    $filePreview.addClass('bre-loaded');
-                    $fileName.text(value.fileInfo.name);
-                }
-                $file.change(function () {
-                    var fileInput = this;
-                    if (fileInput.files && fileInput.files[0]) {
-                        var reader = new FileReader();
-                        reader.onload = function (ev) {
-                            var target = ev.target;
-                            field._value = new Prompt.PromptParameterImageResult();
-                            field._value.fileContent = target.result;
-                            field._value.fileInfo = new Prompt.PromptParameterImageResultFile(fileInput.files[0]);
-                            $filePreview.attr('src', field._value.fileContent);
-                            $filePreview.addClass('bre-loaded');
-                            $fileName.text(field._value.fileInfo.name);
-                        };
-                        reader.readAsDataURL(fileInput.files[0]);
-                    }
-                });
-                return $editor;
-            };
-            return PromptParameterImage;
-        }(Prompt.PromptParameter));
-        Prompt.PromptParameterImage = PromptParameterImage;
-    })(Prompt = BrickyEditor.Prompt || (BrickyEditor.Prompt = {}));
-})(BrickyEditor || (BrickyEditor = {}));
-var BrickyEditor;
-(function (BrickyEditor) {
-    var Prompt;
-    (function (Prompt) {
-        var PromptParameterImageResult = (function () {
-            function PromptParameterImageResult() {
-            }
-            return PromptParameterImageResult;
-        }());
-        Prompt.PromptParameterImageResult = PromptParameterImageResult;
-        var PromptParameterImageResultFile = (function () {
-            function PromptParameterImageResultFile(file) {
-                this.name = file.name;
-                this.size = file.size;
-                this.type = file.type;
-                this.lastModified = file.lastModified;
-                this.lastModifiedDate = file.lastModifiedDate;
-            }
-            return PromptParameterImageResultFile;
-        }());
-        Prompt.PromptParameterImageResultFile = PromptParameterImageResultFile;
-    })(Prompt = BrickyEditor.Prompt || (BrickyEditor.Prompt = {}));
-})(BrickyEditor || (BrickyEditor = {}));
-var BrickyEditor;
-(function (BrickyEditor) {
-    var Prompt;
-    (function (Prompt) {
-        var PromptParameterList = (function () {
-            function PromptParameterList(params) {
-                this.params = params;
-            }
-            PromptParameterList.prototype.getValue = function (key) {
-                var param = this.params.find(function (p) {
-                    return p.key === key;
-                });
-                return param ? param.value : null;
-            };
-            return PromptParameterList;
-        }());
-        Prompt.PromptParameterList = PromptParameterList;
-    })(Prompt = BrickyEditor.Prompt || (BrickyEditor.Prompt = {}));
-})(BrickyEditor || (BrickyEditor = {}));
-var BrickyEditor;
-(function (BrickyEditor) {
-    var Prompt;
-    (function (Prompt) {
-        var PromptParameterOption = (function () {
-            function PromptParameterOption(title, value, selected) {
-                if (selected === void 0) { selected = false; }
-                this.title = title;
-                this.value = value;
-                this.selected = selected;
-            }
-            return PromptParameterOption;
-        }());
-        Prompt.PromptParameterOption = PromptParameterOption;
-    })(Prompt = BrickyEditor.Prompt || (BrickyEditor.Prompt = {}));
-})(BrickyEditor || (BrickyEditor = {}));
-var BrickyEditor;
-(function (BrickyEditor) {
-    var Prompt;
-    (function (Prompt) {
-        var PromptParameterOptions = (function (_super) {
-            __extends(PromptParameterOptions, _super);
-            function PromptParameterOptions(key, title, options, value, placeholder) {
-                var _this = _super.call(this, key, title, value, placeholder) || this;
-                _this.options = [];
-                options.forEach(function (kv) {
-                    _this.options.push(new Prompt.PromptParameterOption(kv[0], kv[1], kv[1] == value));
-                });
-                return _this;
-            }
-            PromptParameterOptions.prototype.getEditor = function () {
-                var options = this.options.map(function (opt) {
-                    return "<option value=\"" + opt.value + "\" " + (opt.selected ? "selected" : "") + ">" + (opt.title ? opt.title : opt.value) + "</option>";
-                });
-                return $("<select type=\"text\" id=\"" + this.key + "\" class=\"brickyeditor-input\" placeholder=\"" + this.placeholder + "\">" + options + "</select>");
-            };
-            return PromptParameterOptions;
-        }(Prompt.PromptParameter));
-        Prompt.PromptParameterOptions = PromptParameterOptions;
-    })(Prompt = BrickyEditor.Prompt || (BrickyEditor.Prompt = {}));
-})(BrickyEditor || (BrickyEditor = {}));
-var BrickyEditor;
-(function (BrickyEditor) {
     var Fields;
     (function (Fields) {
         var BaseField = (function () {
@@ -1110,115 +931,183 @@ var BrickyEditor;
 })(BrickyEditor || (BrickyEditor = {}));
 var BrickyEditor;
 (function (BrickyEditor) {
-    var Services;
-    (function (Services) {
-        var EmbedService = (function () {
-            function EmbedService() {
+    var Prompt;
+    (function (Prompt) {
+        var PromptParameter = (function () {
+            function PromptParameter(key, title, value, placeholder) {
+                this.key = key;
+                this.title = title;
+                this.placeholder = placeholder || '';
+                this.value = value;
             }
-            EmbedService.getEmbedAsync = function (embedUrl) {
-                var _this = this;
-                var url = "https://noembed.com/embed?url=" + embedUrl;
-                return new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
-                    var params, data, err_1;
-                    return __generator(this, function (_a) {
-                        switch (_a.label) {
-                            case 0:
-                                params = { url: url, type: "get", dataType: "jsonp" };
-                                _a.label = 1;
-                            case 1:
-                                _a.trys.push([1, 3, , 4]);
-                                return [4, $.ajax(params)];
-                            case 2:
-                                data = _a.sent();
-                                resolve(data);
-                                return [3, 4];
-                            case 3:
-                                err_1 = _a.sent();
-                                reject(err_1);
-                                return [3, 4];
-                            case 4: return [2];
-                        }
-                    });
-                }); });
+            PromptParameter.prototype.parseValue = function () {
+                this.value = this.$input.val();
+                this.$control = null;
+                delete this._$control;
             };
-            EmbedService.processEmbed = function (provider) {
-                switch (provider) {
-                    case EmbedService.Instagram:
-                        if (instgrm) {
-                            instgrm.Embeds.process();
-                        }
-                        break;
-                    default:
-                        break;
-                }
+            Object.defineProperty(PromptParameter.prototype, "$control", {
+                get: function () {
+                    if (!this._$control) {
+                        this._$control =
+                            $("<div class=\"bre-prompt-field\">\n                            <label class=\"bre-label\" for=\"" + this.key + "\">" + (this.title ? this.title : 'Select file...') + "</label>\n                        </div>");
+                        this.$input = this.getEditor();
+                        this._$control.append(this.$input);
+                    }
+                    return this._$control;
+                },
+                set: function (value) {
+                    this._$control = value;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            PromptParameter.prototype.getEditor = function () {
+                var value = this.value || '';
+                return $("<input type=\"text\" id=\"" + this.key + "\" class=\"bre-input\" placeholder=\"" + this.placeholder + "\" value=\"" + (this.value ? this.value : '') + "\">");
             };
-            EmbedService.Instagram = 'Instagram';
-            return EmbedService;
+            return PromptParameter;
         }());
-        Services.EmbedService = EmbedService;
-    })(Services = BrickyEditor.Services || (BrickyEditor.Services = {}));
+        Prompt.PromptParameter = PromptParameter;
+    })(Prompt = BrickyEditor.Prompt || (BrickyEditor.Prompt = {}));
 })(BrickyEditor || (BrickyEditor = {}));
 var BrickyEditor;
 (function (BrickyEditor) {
-    var Services;
-    (function (Services) {
-        var TemplateService = (function () {
-            function TemplateService() {
-            }
-            TemplateService.loadTemplatesAsync = function (editor) {
-                return __awaiter(this, void 0, void 0, function () {
-                    var _this = this;
-                    var templates, url;
-                    return __generator(this, function (_a) {
-                        this.templates = [];
-                        templates = this.templates;
-                        url = editor.options.templatesUrl;
-                        return [2, new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
-                                var _this = this;
-                                var data, $style, $templates, err_2;
-                                return __generator(this, function (_a) {
-                                    switch (_a.label) {
-                                        case 0:
-                                            _a.trys.push([0, 2, , 3]);
-                                            return [4, $.get(url)];
-                                        case 1:
-                                            data = _a.sent();
-                                            $style = $(data).filter('style');
-                                            if ($style && $style.length > 0) {
-                                                editor.$editor.prepend($style);
-                                            }
-                                            $templates = $(data).filter('.bre-template');
-                                            $templates.each(function (idx, t) {
-                                                var template = new BrickyEditor.Template(t);
-                                                _this.templates.push(template);
-                                            });
-                                            resolve(this.templates);
-                                            return [3, 3];
-                                        case 2:
-                                            err_2 = _a.sent();
-                                            console.log('Templates file not found.');
-                                            reject(err_2);
-                                            return [3, 3];
-                                        case 3: return [2];
-                                    }
-                                });
-                            }); })];
-                    });
-                });
-            };
-            TemplateService.getTemplate = function (templateName) {
-                for (var i = 0; i < this.templates.length; i++) {
-                    var template = this.templates[i];
-                    if (template.name.toLowerCase() === templateName.toLowerCase()) {
-                        return template;
-                    }
+    var Prompt;
+    (function (Prompt) {
+        var PromptParameterImage = (function (_super) {
+            __extends(PromptParameterImage, _super);
+            function PromptParameterImage(key, title, value, placeholder) {
+                var _this = _super.call(this, key, title, value, placeholder) || this;
+                if (value) {
+                    _this._value = value;
                 }
-                return null;
+                return _this;
+            }
+            PromptParameterImage.prototype.parseValue = function () {
+                this.value = this._value;
+                this.$control = null;
+                delete this._$control;
+                this._value = null;
+                delete this._value;
             };
-            return TemplateService;
+            PromptParameterImage.prototype.getEditor = function () {
+                var field = this;
+                var img = this.value && this.value.fileContent ? this.value.fileContent : "";
+                var $editor = $("\n                <div class='bre-image-input'>\n                    <label for=\"" + this.key + "\">\n                        Select file...\n                    </label>                        \n                    <img src=\"" + img + "\"/>                    \n                    <input type=\"file\" id=\"" + this.key + "\" class=\"bre-input\" placeholder=\"" + this.placeholder + "\">\n                </div>\n                <small class='bre-image-input-filename'></small>");
+                var $file = $('input', $editor);
+                var $filePreview = $('img', $editor);
+                var $fileName = $('.bre-image-input-filename', $editor);
+                var value = this.value;
+                if (value) {
+                    $filePreview.attr('src', value.fileContent);
+                    $filePreview.addClass('bre-loaded');
+                    $fileName.text(value.fileInfo.name);
+                }
+                $file.change(function () {
+                    var fileInput = this;
+                    if (fileInput.files && fileInput.files[0]) {
+                        var reader = new FileReader();
+                        reader.onload = function (ev) {
+                            var target = ev.target;
+                            field._value = new Prompt.PromptParameterImageResult();
+                            field._value.fileContent = target.result;
+                            field._value.fileInfo = new Prompt.PromptParameterImageResultFile(fileInput.files[0]);
+                            $filePreview.attr('src', field._value.fileContent);
+                            $filePreview.addClass('bre-loaded');
+                            $fileName.text(field._value.fileInfo.name);
+                        };
+                        reader.readAsDataURL(fileInput.files[0]);
+                    }
+                });
+                return $editor;
+            };
+            return PromptParameterImage;
+        }(Prompt.PromptParameter));
+        Prompt.PromptParameterImage = PromptParameterImage;
+    })(Prompt = BrickyEditor.Prompt || (BrickyEditor.Prompt = {}));
+})(BrickyEditor || (BrickyEditor = {}));
+var BrickyEditor;
+(function (BrickyEditor) {
+    var Prompt;
+    (function (Prompt) {
+        var PromptParameterImageResult = (function () {
+            function PromptParameterImageResult() {
+            }
+            return PromptParameterImageResult;
         }());
-        Services.TemplateService = TemplateService;
-    })(Services = BrickyEditor.Services || (BrickyEditor.Services = {}));
+        Prompt.PromptParameterImageResult = PromptParameterImageResult;
+        var PromptParameterImageResultFile = (function () {
+            function PromptParameterImageResultFile(file) {
+                this.name = file.name;
+                this.size = file.size;
+                this.type = file.type;
+                this.lastModified = file.lastModified;
+                this.lastModifiedDate = file.lastModifiedDate;
+            }
+            return PromptParameterImageResultFile;
+        }());
+        Prompt.PromptParameterImageResultFile = PromptParameterImageResultFile;
+    })(Prompt = BrickyEditor.Prompt || (BrickyEditor.Prompt = {}));
+})(BrickyEditor || (BrickyEditor = {}));
+var BrickyEditor;
+(function (BrickyEditor) {
+    var Prompt;
+    (function (Prompt) {
+        var PromptParameterList = (function () {
+            function PromptParameterList(params) {
+                this.params = params;
+            }
+            PromptParameterList.prototype.getValue = function (key) {
+                var param = this.params.find(function (p) {
+                    return p.key === key;
+                });
+                return param ? param.value : null;
+            };
+            return PromptParameterList;
+        }());
+        Prompt.PromptParameterList = PromptParameterList;
+    })(Prompt = BrickyEditor.Prompt || (BrickyEditor.Prompt = {}));
+})(BrickyEditor || (BrickyEditor = {}));
+var BrickyEditor;
+(function (BrickyEditor) {
+    var Prompt;
+    (function (Prompt) {
+        var PromptParameterOption = (function () {
+            function PromptParameterOption(title, value, selected) {
+                if (selected === void 0) { selected = false; }
+                this.title = title;
+                this.value = value;
+                this.selected = selected;
+            }
+            return PromptParameterOption;
+        }());
+        Prompt.PromptParameterOption = PromptParameterOption;
+    })(Prompt = BrickyEditor.Prompt || (BrickyEditor.Prompt = {}));
+})(BrickyEditor || (BrickyEditor = {}));
+var BrickyEditor;
+(function (BrickyEditor) {
+    var Prompt;
+    (function (Prompt) {
+        var PromptParameterOptions = (function (_super) {
+            __extends(PromptParameterOptions, _super);
+            function PromptParameterOptions(key, title, options, value, placeholder) {
+                var _this = _super.call(this, key, title, value, placeholder) || this;
+                _this.options = [];
+                options.forEach(function (kv) {
+                    _this.options.push(new Prompt.PromptParameterOption(kv[0], kv[1], kv[1] == value));
+                });
+                return _this;
+            }
+            PromptParameterOptions.prototype.getEditor = function () {
+                var options = this.options.map(function (opt) {
+                    return "<option value=\"" + opt.value + "\" " + (opt.selected ? "selected" : "") + ">" + (opt.title ? opt.title : opt.value) + "</option>";
+                });
+                return $("<select type=\"text\" id=\"" + this.key + "\" class=\"brickyeditor-input\" placeholder=\"" + this.placeholder + "\">" + options + "</select>");
+            };
+            return PromptParameterOptions;
+        }(Prompt.PromptParameter));
+        Prompt.PromptParameterOptions = PromptParameterOptions;
+    })(Prompt = BrickyEditor.Prompt || (BrickyEditor.Prompt = {}));
 })(BrickyEditor || (BrickyEditor = {}));
 var BrickyEditor;
 (function (BrickyEditor) {
@@ -1610,4 +1499,116 @@ var BrickyEditor;
         return UI;
     }());
     BrickyEditor.UI = UI;
+})(BrickyEditor || (BrickyEditor = {}));
+var BrickyEditor;
+(function (BrickyEditor) {
+    var Services;
+    (function (Services) {
+        var EmbedService = (function () {
+            function EmbedService() {
+            }
+            EmbedService.getEmbedAsync = function (embedUrl) {
+                var _this = this;
+                var url = "https://noembed.com/embed?url=" + embedUrl;
+                return new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
+                    var params, data, err_1;
+                    return __generator(this, function (_a) {
+                        switch (_a.label) {
+                            case 0:
+                                params = { url: url, type: "get", dataType: "jsonp" };
+                                _a.label = 1;
+                            case 1:
+                                _a.trys.push([1, 3, , 4]);
+                                return [4, $.ajax(params)];
+                            case 2:
+                                data = _a.sent();
+                                resolve(data);
+                                return [3, 4];
+                            case 3:
+                                err_1 = _a.sent();
+                                reject(err_1);
+                                return [3, 4];
+                            case 4: return [2];
+                        }
+                    });
+                }); });
+            };
+            EmbedService.processEmbed = function (provider) {
+                switch (provider) {
+                    case EmbedService.Instagram:
+                        if (instgrm) {
+                            instgrm.Embeds.process();
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            };
+            EmbedService.Instagram = 'Instagram';
+            return EmbedService;
+        }());
+        Services.EmbedService = EmbedService;
+    })(Services = BrickyEditor.Services || (BrickyEditor.Services = {}));
+})(BrickyEditor || (BrickyEditor = {}));
+var BrickyEditor;
+(function (BrickyEditor) {
+    var Services;
+    (function (Services) {
+        var TemplateService = (function () {
+            function TemplateService() {
+            }
+            TemplateService.loadTemplatesAsync = function (editor) {
+                return __awaiter(this, void 0, void 0, function () {
+                    var _this = this;
+                    var templates, url;
+                    return __generator(this, function (_a) {
+                        this.templates = [];
+                        templates = this.templates;
+                        url = editor.options.templatesUrl;
+                        return [2, new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
+                                var _this = this;
+                                var data, $style, $templates, err_2;
+                                return __generator(this, function (_a) {
+                                    switch (_a.label) {
+                                        case 0:
+                                            _a.trys.push([0, 2, , 3]);
+                                            return [4, $.get(url)];
+                                        case 1:
+                                            data = _a.sent();
+                                            $style = $(data).filter('style');
+                                            if ($style && $style.length > 0) {
+                                                editor.$editor.prepend($style);
+                                            }
+                                            $templates = $(data).filter('.bre-template');
+                                            $templates.each(function (idx, t) {
+                                                var template = new BrickyEditor.Template(t);
+                                                _this.templates.push(template);
+                                            });
+                                            resolve(this.templates);
+                                            return [3, 3];
+                                        case 2:
+                                            err_2 = _a.sent();
+                                            console.log('Templates file not found.');
+                                            reject(err_2);
+                                            return [3, 3];
+                                        case 3: return [2];
+                                    }
+                                });
+                            }); })];
+                    });
+                });
+            };
+            TemplateService.getTemplate = function (templateName) {
+                for (var i = 0; i < this.templates.length; i++) {
+                    var template = this.templates[i];
+                    if (template.name.toLowerCase() === templateName.toLowerCase()) {
+                        return template;
+                    }
+                }
+                return null;
+            };
+            return TemplateService;
+        }());
+        Services.TemplateService = TemplateService;
+    })(Services = BrickyEditor.Services || (BrickyEditor.Services = {}));
 })(BrickyEditor || (BrickyEditor = {}));
