@@ -1,8 +1,32 @@
 {
   "name": "brickyeditor",
-  "version": "0.5.0",
-  "description": "WYSIWYG Block editor",
-  "main": "gulpfile.js",
+  "version": "0.8.0",
+  "author": {
+    "name": "George Yakovlev", 
+    "email" : "yakovlev.ga@gmail.com", 
+    "url" : "https://www.facebook.com/george.yakovlev"
+  },
+  "description": "WYSIWYG block editor jQuery plugin.",
+  "license": "MIT",
+  "homepage": "https://github.com/yakovlevga/brickyeditor",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/jquery.brickyeditor.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yakovlevga/brickyeditor.git"
+  },
+  "keywords": [
+    "wysiwyg",
+    "wysiwyg editor",
+    "longrid",
+    "block editor",
+    "editor",
+    "bootstrap",
+    "jquery",
+    "jquery-plugin"
+  ],
   "dependencies": {},
   "devDependencies": {
     "babel-cli": "^6.26.0",
@@ -27,24 +51,9 @@
   "scripts": {
     "test": "mocha --compilers js:babel-core/register --recursive"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://yakovlev_ga@bitbucket.org/yakovlevga/brickyeditor.git"
-  },
-  "keywords": [
-    "wysiwyg",
-    "longrid",
-    "block",
-    "editor",
-    "html",
-    "bootstrap"
-  ],
   "babel": {
     "presets": [
       "es2015"
     ]
-  },
-  "author": "George Yakovlev",
-  "license": "MIT",
-  "homepage": "https://bitbucket.org/yakovlevga/brickyeditor#readme"
+  }  
 }
