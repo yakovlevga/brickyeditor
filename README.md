@@ -67,10 +67,10 @@ There is a list of options, you could pass to init: $("#editor").brickyeditor(op
 | onLoad(editor) | Callback, which called after brickyeditor initialization. |
 | onChange(blocksJson, blocksHtml) | Callback, which called when any change happened with blocks (add/remove/content changed). |
 | onBlockAdd(block, idx) | Callback, which called when new block added. |
-| onBlockDelete(block, idx) | Callback, which called when block removeed. |
+| onBlockDelete(block, idx) | Callback, which called when block removed. |
 | onBlockMove(block, from, to) | Callback, which called when block moved (up/down). |
 | onBlockSelect(block) | Callback, which called when block selected.  |
-| onBlockDeselect(block) | Callback, which called when block deseclted.  |
+| onBlockDeselect(block) | Callback, which called when block desected.  |
 | onBlockUpdate(block, property, oldValue, newValue) | Callback, which called when block updated.  |
 
 ### Template system
