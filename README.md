@@ -22,20 +22,23 @@ and render it natively, without
 `npm istall brickyeditor`
 ### Yarn
 `yarn add brickyeditor`
-important: jquery is not included as dependency in npm and yarn packages. Add it by yourself, if you don't use 
+
+important: jquery is not included as dependency in npm and yarn packages. Add it by yourself, if you don't use it in global scope.
 
 ## CDNs
 ### jsDelivr
+`<script src="https://cdn.jsdelivr.net/npm/brickyeditor/dist/jquery.brickyeditor.min.js"></script>`
+`<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/brickyeditor/dist/jquery.brickyeditor.min.css">`
 https://cdn.jsdelivr.net/npm/brickyeditor/dist/jquery.brickyeditor.min.css
 https://cdn.jsdelivr.net/npm/brickyeditor/dist/jquery.brickyeditor.min.js
 
-Basic templates: https://cdn.jsdelivr.net/npm/brickyeditor/dist/templates/bootstrap4.html
+Basic templates url: https://cdn.jsdelivr.net/npm/brickyeditor/dist/templates/bootstrap4.html
 
 ### unpkg
-https://unpkg.com/brickyeditor/dist/jquery.brickyeditor.min.css
-https://unpkg.com/brickyeditor/dist/jquery.brickyeditor.min.js
+`<script src="https://unpkg.com/brickyeditor/dist/jquery.brickyeditor.min.css"></script>`
+`<link rel="stylesheet" href="https://unpkg.com/brickyeditor/dist/jquery.brickyeditor.min.js">`
 
-Basic templates: https://unpkg.com/brickyeditor/dist/templates/bootstrap4.html
+Basic templates url: https://unpkg.com/brickyeditor/dist/templates/bootstrap4.html
 
 ## Basic usage
 1. If you don't want to use CDN or package manager, just copy files from brickyeditor\dist to your site folder.
