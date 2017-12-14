@@ -28,11 +28,13 @@ important: jquery is not included as dependency in npm and yarn packages. Add it
 ### jsDelivr
 https://cdn.jsdelivr.net/npm/brickyeditor/dist/jquery.brickyeditor.min.css
 https://cdn.jsdelivr.net/npm/brickyeditor/dist/jquery.brickyeditor.min.js
+
 Basic templates: https://cdn.jsdelivr.net/npm/brickyeditor/dist/templates/bootstrap4.html
 
 ### unpkg
 https://unpkg.com/brickyeditor/dist/jquery.brickyeditor.min.css
 https://unpkg.com/brickyeditor/dist/jquery.brickyeditor.min.js
+
 Basic templates: https://unpkg.com/brickyeditor/dist/templates/bootstrap4.html
 
 ## Basic usage
