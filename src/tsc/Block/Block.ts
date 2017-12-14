@@ -2,6 +2,7 @@ namespace BrickyEditor {
     export class Block {
         public fields: Array<Fields.BaseField> = [];
         public ui: BlockUI;
+        public selectedField: Fields.BaseField;
 
         constructor(
             public template: Template,
@@ -27,6 +28,13 @@ namespace BrickyEditor {
             this.ui = new BlockUI($block, preview, actions, () => this.select());
         }
 
+        public isContainer() : boolean {
+            if(!this.selectedField)
+                return false;
+
+            return this.selectedField instanceof Fields.ContainerField;
+        }
+
         /**
          * Finds and binds block fields
          *
@@ -44,8 +52,11 @@ namespace BrickyEditor {
                         this.onUpdate(block, property, oldValue, newValue);
                     }
                 };
+                const onSelect = (field: Fields.BaseField) => {
+                    block.select(field);
+                };
                 let $field = $(elem);                
-                let field = Fields.BaseField.createField($field, data, () => block.select(), onUpdate);
+                let field = Fields.BaseField.createField($field, data, onSelect, onUpdate);
                 this.fields.push(field);
             });
         }
@@ -75,12 +86,28 @@ namespace BrickyEditor {
             this.onCopy(this);
         }
 
-        public select() {
+        public select(field?: Fields.BaseField) {
+            if(field === this.selectedField)
+                return;
+                
+            if(field === null) {
+                field = this.fields[0];
+            }
+
+            if(this.selectedField) {
+                this.selectedField.deselect();
+            }
+
+            this.selectedField = field;
             this.ui.toggleSelection(true);
             this.onSelect(this);
         }
 
         public deselect() {
+            this.selectedField = null;
+            this.fields.forEach(f => {
+                f.deselect()
+            });
             this.ui.toggleSelection(false);
             this.onDeselect(this);
         }
@@ -108,23 +135,26 @@ namespace BrickyEditor {
             return data;
         }
 
-        public getHtml(trim: Boolean, skipAttrRemoving: Boolean = false): string {
-            let $html = this.ui.$block.clone(false, false)
+        public getHtml(trim: Boolean): string {
+            let $html = this.template.$html.clone(false, false)
                 .wrap('<div></div>')
                 .parent();
 
-            // Firefox execCommand hack
-            $('.bre-temp-container', $html).each((idx, el) => {
-                let $el = $(el);
-                $el.replaceWith($el.children());
-            });
+            let fieldsHtml = {};
+            this.fields.forEach(field => {
+                const name = field.name || field.data.name;
+                fieldsHtml[name] = field.getEl();
+            });    
 
-            ['contenteditable', 'data-bre-field'].forEach((attr) => {
-                $(`[${attr}]`, $html).each((idx, el) => {
-                    el.removeAttribute(attr);
+            $html
+                .find(Selectors.selectorField)
+                .addBack(Selectors.selectorField)
+                .each((idx, elem) => {
+                    const name = $(elem).data().breField.name;
+                    const $field = fieldsHtml[name];
+                    $(elem).replaceWith($field);
                 });
-            });            
-
+                
             return trim ? $html.html().breTotalTrim() : $html.html();
         }
     }

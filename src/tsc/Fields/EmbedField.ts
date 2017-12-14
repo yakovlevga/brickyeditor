@@ -57,7 +57,7 @@ namespace BrickyEditor {
                 field.$field.removeAttr('class');
                 field.$field.removeAttr('style');
                 field.$field.append($embed);
-                field.selectBlock();
+                field.select();
             }
 
             setEmbed(value: any, fireUpdate: boolean = true) {

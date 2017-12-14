@@ -18,11 +18,8 @@
         ignoreHtml: true,
         blocksUrl: 'data.json',
         templatesUrl: 'templates.html',
-        onBlockAdd: function(data) {
-          console.log('BrickyEditor block added.');
-        },
-        onBlockUpdate: function(data) {
-          console.log('BrickyEditor block updated. Property: ' + data.property + ', New value:' + data.newValue);
+        onChange: function(data) {
+          console.log(data.html);
         }
       });
     });

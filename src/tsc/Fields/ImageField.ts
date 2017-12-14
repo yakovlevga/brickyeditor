@@ -23,7 +23,7 @@ namespace BrickyEditor {
 
                     let alt = fields.getValue('alt');
                     field.setAlt(alt);
-                    field.selectBlock();
+                    field.select();
                 });
             }
 

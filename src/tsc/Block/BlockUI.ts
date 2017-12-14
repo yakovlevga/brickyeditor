@@ -60,7 +60,11 @@ namespace BrickyEditor {
         private buildButton(action: BlockUIAction): JQuery {
             let $el = $(`<button type="button" class="bre-btn"><i class="fa fa-${action.icon}"></i></button>`);
             if (action.action) {
-                $el.on('click', () => action.action());
+                $el.on('click', (ev) => {
+                    action.action()
+                    ev.stopPropagation();
+                    return false;
+                });
             }
             return $el;
         }

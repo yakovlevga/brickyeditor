@@ -280,6 +280,9 @@
 .bre-tools-collapsed {
   right: -196px; }
 
+.bre-field-selected {
+  outline: dotted 1px #DDDDDD; }
+
 .bre * {
   font-family: sans-serif; }
 

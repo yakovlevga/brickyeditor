@@ -89,8 +89,10 @@ namespace BrickyEditor {
             let editor = this.editor;
             templates.forEach(template => {
                 let $preview = template.getPreview();
-                $preview.on('click', () => {
+                $preview.on('click', (ev) => {
                     editor.addBlock(template);
+                    ev.stopPropagation();
+                    return false;
                 });
                 this.$toolsTemplates.append($preview);
             });
@@ -100,8 +102,10 @@ namespace BrickyEditor {
             var $btns = $('.bre-btn', $btnsDeck);
             var $firstBtn = $btns.eq(0);
 
-            $firstBtn.on('click', function () {
+            $firstBtn.on('click', (ev) => {
                 UI.toggleBtnDeck($btnsDeck);
+                ev.stopPropagation();
+                return false;
             });
         }
 

@@ -6,8 +6,8 @@ namespace BrickyEditor {
                 let field = this;
                 let $field = this.$field;
 
-                if (!$field.is('[contenteditable]')) {
-                    $field.attr('contenteditable', 'true');
+                if (!$field.is(Selectors.selectorContentEditable)) {
+                    $field.attr(Selectors.attrContentEditable, 'true');
                 }
 
                 var html = this.data.html || this.$field.html();
@@ -30,7 +30,7 @@ namespace BrickyEditor {
                     })
                     .on('click', (ev) => {
                         // Prevents the event from bubbling up the DOM tree
-                        field.selectBlock();
+                        field.select();
                         ev.stopPropagation();
                         return false;
                     });
@@ -42,6 +42,12 @@ namespace BrickyEditor {
                     this.$field.html(value);
                 }
                 this.updateProperty('html', value, fireUpdate);
+            }
+
+            public getEl(): JQuery {
+                let $el = super.getEl();
+                $el.removeAttr(Selectors.attrContentEditable);
+                return $el;
             }
         }
     }
