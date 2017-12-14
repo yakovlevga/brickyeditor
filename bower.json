@@ -1,0 +1,37 @@
+{
+  "name": "brickyeditor",
+  "description": "WYSIWYG block editor jQuery plugin.",
+  "main": "./dist/jquery.brickyeditor.js",
+  "authors": [
+    "George Yakovlev <yakovlev.ga@gmail.com>"
+  ],
+  "license": "MIT",
+  "keywords": [
+    "wysiwyg",
+    "wysiwyg",
+    "editor",
+    "longrid",
+    "block",
+    "editor",
+    "editor",
+    "bootstrap",
+    "jquery",
+    "jquery-plugin"
+  ],
+  "homepage": "https://github.com/yakovlevga/brickyeditor",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests",
+    "src",
+    "demo",
+    "readme",
+    "gulpfile.js",
+    "package.json"
+  ],
+  "dependencies": {
+    "jquery": ">=1.12.1"
+  }
+}
