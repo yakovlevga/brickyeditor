@@ -150,7 +150,11 @@ namespace BrickyEditor {
                 .find(Selectors.selectorField)
                 .addBack(Selectors.selectorField)
                 .each((idx, elem) => {
-                    const name = $(elem).data().breField.name;
+                    let fieldData = $(elem).data().breField;
+                    if(typeof fieldData === 'string') {
+                        fieldData = JSON.parse(fieldData.replace(/'/g, '"'));
+                    }
+                    const name = fieldData.name;
                     const $field = fieldsHtml[name];
                     $(elem).replaceWith($field);
                 });

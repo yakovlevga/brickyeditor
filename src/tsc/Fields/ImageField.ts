@@ -9,20 +9,22 @@ namespace BrickyEditor {
 
                 this.setSrc(this.data.src, false);
                 $field.on('click', async () => {
-                    const fields = await Editor.UI.modal.promptAsync(field.getPromptParams());                    
-                    const file = fields.getValue('file');
-                    const src = fields.getValue('src');
-                    if (file) {
-                        field.setFile(file);
-                        field.setSrc(null);
-                    }
-                    else if (src) {
-                        field.setSrc(src);
-                        field.setFile(null);
-                    }
+                    const fields = await Editor.UI.modal.promptAsync(field.getPromptParams());
+                    if(fields != null) {
+                        const file = fields.getValue('file');
+                        const src = fields.getValue('src');
+                        if (file) {
+                            field.setFile(file);
+                            field.setSrc(null);
+                        }
+                        else if (src) {
+                            field.setSrc(src);
+                            field.setFile(null);
+                        }
 
-                    let alt = fields.getValue('alt');
-                    field.setAlt(alt);
+                        let alt = fields.getValue('alt');
+                        field.setAlt(alt);
+                    }
                     field.select();
                 });
             }

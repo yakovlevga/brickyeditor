@@ -16,17 +16,11 @@ namespace BrickyEditor {
             Fields.BaseField.registerCommonFields();
             
             this.$editor = $editor;
-            this.$editor.addClass('bre-editor');            
+            this.$editor.addClass(Selectors.classEditor);            
             this.options = new EditorOptions(options);
             this.container = this.createContainer();
 
-            Editor.UI = new UI(this);
-
-            // $(document).on('click', () => {
-            //     if(this.container.selectedBlock) {
-            //         this.container.selectedBlock.deselect();
-            //     }
-            // });
+            Editor.UI = new UI(this);            
         }
 
         private createContainer(): BlocksContainer {

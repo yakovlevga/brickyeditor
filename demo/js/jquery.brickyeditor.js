@@ -72,7 +72,10 @@ var BrickyEditor;
             this.blocks.forEach(function (block) {
                 blocksHtml.push(block.getHtml(true));
             });
-            return blocksHtml.join('\n');
+            var blocksHtmlJoined = blocksHtml.join('\n');
+            var $el = this.$element.clone(false, false).html(blocksHtmlJoined).wrap('<div></div>');
+            var html = $('<div></div>').append($el).html();
+            return html;
         };
         BlocksContainer.prototype.addBlock = function (template, data, idx, select) {
             var _this = this;
@@ -97,6 +100,7 @@ var BrickyEditor;
                 this.blocks[idx - 1].ui.$editor.after(block.ui.$editor);
             }
             this.onAddBlock(block, idx);
+            block.select(null);
             this.togglePlaceholderIfNeed();
         };
         BlocksContainer.prototype.deleteBlock = function (block) {
@@ -247,7 +251,7 @@ var BrickyEditor;
         function Editor($editor, options) {
             BrickyEditor.Fields.BaseField.registerCommonFields();
             this.$editor = $editor;
-            this.$editor.addClass('bre-editor');
+            this.$editor.addClass(BrickyEditor.Selectors.classEditor);
             this.options = new BrickyEditor.EditorOptions(options);
             this.container = this.createContainer();
             Editor.UI = new BrickyEditor.UI(this);
@@ -467,32 +471,6 @@ var BrickyEditor;
 }(jQuery));
 var BrickyEditor;
 (function (BrickyEditor) {
-    var Template = (function () {
-        function Template(el) {
-            var previewSelector = '.bre-template-preview';
-            var $template = $(el);
-            var data = $template.data();
-            this.name = data.name;
-            this.category = data.cactegory || [];
-            this.$html = $template.contents().not(previewSelector);
-            this.$preview = $(previewSelector, $template).contents();
-            if (!this.$preview.length) {
-                var block = new BrickyEditor.Block(this, true);
-                var blockEl = block.getHtml(true);
-                this.$preview = $(blockEl);
-            }
-        }
-        Template.prototype.getPreview = function () {
-            var $template = $("<div class='bre-template'></div>");
-            $template.append(this.$preview);
-            return $template;
-        };
-        return Template;
-    }());
-    BrickyEditor.Template = Template;
-})(BrickyEditor || (BrickyEditor = {}));
-var BrickyEditor;
-(function (BrickyEditor) {
     var Block = (function () {
         function Block(template, preview, data, onDelete, onSelect, onDeselect, onCopy, onMove, onUpdate) {
             var _this = this;
@@ -609,7 +587,11 @@ var BrickyEditor;
                 .find(BrickyEditor.Selectors.selectorField)
                 .addBack(BrickyEditor.Selectors.selectorField)
                 .each(function (idx, elem) {
-                var name = $(elem).data().breField.name;
+                var fieldData = $(elem).data().breField;
+                if (typeof fieldData === 'string') {
+                    fieldData = JSON.parse(fieldData.replace(/'/g, '"'));
+                }
+                var name = fieldData.name;
                 var $field = fieldsHtml[name];
                 $(elem).replaceWith($field);
             });
@@ -1006,18 +988,20 @@ var BrickyEditor;
                             case 0: return [4, BrickyEditor.Editor.UI.modal.promptAsync(field.getPromptParams())];
                             case 1:
                                 fields = _a.sent();
-                                file = fields.getValue('file');
-                                src = fields.getValue('src');
-                                if (file) {
-                                    field.setFile(file);
-                                    field.setSrc(null);
+                                if (fields != null) {
+                                    file = fields.getValue('file');
+                                    src = fields.getValue('src');
+                                    if (file) {
+                                        field.setFile(file);
+                                        field.setSrc(null);
+                                    }
+                                    else if (src) {
+                                        field.setSrc(src);
+                                        field.setFile(null);
+                                    }
+                                    alt = fields.getValue('alt');
+                                    field.setAlt(alt);
                                 }
-                                else if (src) {
-                                    field.setSrc(src);
-                                    field.setFile(null);
-                                }
-                                alt = fields.getValue('alt');
-                                field.setAlt(alt);
                                 field.select();
                                 return [2];
                         }
@@ -1317,7 +1301,7 @@ var BrickyEditor;
                         url = editor.options.templatesUrl;
                         return [2, new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
                                 var _this = this;
-                                var data, $style, $templates, err_2;
+                                var data, $style, $data, $groups, templates_1, defaultGroupName, group, err_2;
                                 return __generator(this, function (_a) {
                                     switch (_a.label) {
                                         case 0:
@@ -1329,11 +1313,18 @@ var BrickyEditor;
                                             if ($style && $style.length > 0) {
                                                 editor.$editor.prepend($style);
                                             }
-                                            $templates = $(data).filter('.bre-template');
-                                            $templates.each(function (idx, t) {
-                                                var template = new BrickyEditor.Template(t);
-                                                _this.templates.push(template);
+                                            $data = $("<div>" + data + "</div>");
+                                            $groups = $(BrickyEditor.Selectors.selectorTemplateGroup, $data);
+                                            $groups.each(function (idx, el) {
+                                                var $group = $(el);
+                                                var templates = _this.getTemplates($group);
+                                                _this.templates.push(new BrickyEditor.TemplateGroup($group.attr('title'), templates));
+                                                $group.remove();
                                             });
+                                            templates_1 = this.getTemplates($data);
+                                            defaultGroupName = this.templates.length > 0 ? 'Other templates' : '';
+                                            group = new BrickyEditor.TemplateGroup(defaultGroupName, templates_1);
+                                            this.templates.push(group);
                                             resolve(this.templates);
                                             return [3, 3];
                                         case 2:
@@ -1348,11 +1339,23 @@ var BrickyEditor;
                     });
                 });
             };
+            TemplateService.getTemplates = function ($el) {
+                var templates = [];
+                var $templates = $(BrickyEditor.Selectors.selectorTemplate, $el);
+                $templates.each(function (idx, t) {
+                    var template = new BrickyEditor.Template(t);
+                    templates.push(template);
+                });
+                return templates;
+            };
             TemplateService.getTemplate = function (templateName) {
-                for (var i = 0; i < this.templates.length; i++) {
-                    var template = this.templates[i];
-                    if (template.name.toLowerCase() === templateName.toLowerCase()) {
-                        return template;
+                for (var gi = 0; gi < this.templates.length; gi++) {
+                    var group = this.templates[gi];
+                    for (var ti = 0; ti < group.templates.length; ti++) {
+                        var template = group.templates[ti];
+                        if (template.name.toLowerCase() === templateName.toLowerCase()) {
+                            return template;
+                        }
                     }
                 }
                 return null;
@@ -1361,6 +1364,43 @@ var BrickyEditor;
         }());
         Services.TemplateService = TemplateService;
     })(Services = BrickyEditor.Services || (BrickyEditor.Services = {}));
+})(BrickyEditor || (BrickyEditor = {}));
+var BrickyEditor;
+(function (BrickyEditor) {
+    var Template = (function () {
+        function Template(el) {
+            var previewSelector = BrickyEditor.Selectors.selectorTemplatePreview;
+            var $template = $(el);
+            var data = $template.data();
+            this.name = data.name;
+            this.category = data.cactegory || [];
+            this.$html = $template.contents().not(previewSelector);
+            this.$preview = $(previewSelector, $template).contents();
+            if (!this.$preview.length) {
+                var block = new BrickyEditor.Block(this, true);
+                var blockEl = block.getHtml(true);
+                this.$preview = $(blockEl);
+            }
+        }
+        Template.prototype.getPreview = function () {
+            var $template = $("<div class='" + BrickyEditor.Selectors.classTemplate + "'></div>");
+            $template.append(this.$preview);
+            return $template;
+        };
+        return Template;
+    }());
+    BrickyEditor.Template = Template;
+})(BrickyEditor || (BrickyEditor = {}));
+var BrickyEditor;
+(function (BrickyEditor) {
+    var TemplateGroup = (function () {
+        function TemplateGroup(name, templates) {
+            this.name = name;
+            this.templates = templates;
+        }
+        return TemplateGroup;
+    }());
+    BrickyEditor.TemplateGroup = TemplateGroup;
 })(BrickyEditor || (BrickyEditor = {}));
 var BrickyEditor;
 (function (BrickyEditor) {
@@ -1546,7 +1586,7 @@ var BrickyEditor;
                 });
                 modal.$cancelBtn.on('click', function () {
                     modal.hideModal();
-                    reject(fields);
+                    resolve(null);
                 });
                 modal.showModal();
             });
@@ -1641,6 +1681,12 @@ var BrickyEditor;
         Selectors.selectorContentEditable = 'contenteditable';
         Selectors.attrField = 'data-bre-field';
         Selectors.selectorField = "[" + Selectors.attrField + "]";
+        Selectors.classEditor = 'bre-editor';
+        Selectors.classTemplate = 'bre-template';
+        Selectors.selectorTemplate = "." + Selectors.classTemplate;
+        Selectors.classTemplateGroup = 'bre-template-group';
+        Selectors.selectorTemplateGroup = "." + Selectors.classTemplateGroup;
+        Selectors.selectorTemplatePreview = '.bre-template-preview';
         Selectors.classMobile = 'brickyeditor-tools-mobile';
         Selectors.htmlToolsCommand = 'data-bre-doc-command';
         Selectors.htmlToolsCommandRange = 'data-bre-doc-command-range';
@@ -1714,18 +1760,31 @@ var BrickyEditor;
         UI.prototype.toggleToolsLoader = function (toggle) {
             this.$toolsLoader.toggle(toggle);
         };
-        UI.prototype.setTemplates = function (templates) {
+        UI.prototype.setTemplates = function (templateGroups) {
             var _this = this;
             var editor = this.editor;
-            templates.forEach(function (template) {
-                var $preview = template.getPreview();
-                $preview.on('click', function (ev) {
-                    editor.addBlock(template);
-                    ev.stopPropagation();
-                    return false;
+            templateGroups.forEach(function (group) {
+                if (group.templates.length === 0)
+                    return;
+                var $header = $("<div class='" + BrickyEditor.Selectors.classTemplateGroup + "'>" + group.name + "</div>");
+                _this.$toolsTemplates.append($header);
+                var $group = $('<div></div>');
+                group.templates.forEach(function (template) {
+                    var $preview = template.getPreview();
+                    $preview.attr('title', template.name);
+                    $preview.on('click', function (ev) {
+                        editor.addBlock(template);
+                        ev.stopPropagation();
+                        return false;
+                    });
+                    $group.append($preview);
                 });
-                _this.$toolsTemplates.append($preview);
+                $header.on('click', function () {
+                    $group.toggle();
+                });
+                _this.$toolsTemplates.append($group);
             });
+            ;
         };
         UI.initBtnDeck = function ($btnsDeck) {
             var $btns = $('.bre-btn', $btnsDeck);

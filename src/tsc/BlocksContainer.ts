@@ -32,7 +32,11 @@ namespace BrickyEditor {
             this.blocks.forEach(block => {
                 blocksHtml.push(block.getHtml(true));
             });
-            return blocksHtml.join('\n');
+
+            var blocksHtmlJoined = blocksHtml.join('\n');
+            let $el = this.$element.clone(false, false).html(blocksHtmlJoined).wrap('<div></div>');
+            const html = $('<div></div>').append($el).html();
+            return html;
         }
 
         public addBlock(
@@ -75,6 +79,7 @@ namespace BrickyEditor {
             }
 
             this.onAddBlock(block, idx);
+            block.select(null);
 
             this.togglePlaceholderIfNeed();
         }

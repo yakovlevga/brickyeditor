@@ -85,17 +85,31 @@ namespace BrickyEditor {
             this.$toolsLoader.toggle(toggle);
         }
 
-        public setTemplates(templates: Template[]) {
+        public setTemplates(templateGroups: TemplateGroup[]) {
             let editor = this.editor;
-            templates.forEach(template => {
-                let $preview = template.getPreview();
-                $preview.on('click', (ev) => {
-                    editor.addBlock(template);
-                    ev.stopPropagation();
-                    return false;
+            templateGroups.forEach(group => {
+                if(group.templates.length === 0)
+                    return;
+
+                let $header = $(`<div class='${Selectors.classTemplateGroup}'>${group.name}</div>`);
+                this.$toolsTemplates.append($header);
+                let $group = $('<div></div>');
+                group.templates.forEach(template => {
+                    let $preview = template.getPreview();
+                    $preview.attr('title', template.name);
+                    $preview.on('click', (ev) => {
+                        editor.addBlock(template);
+                        ev.stopPropagation();
+                        return false;
+                    });
+                    $group.append($preview);
+                })
+
+                $header.on('click', () => {
+                    $group.toggle();
                 });
-                this.$toolsTemplates.append($preview);
-            });
+                this.$toolsTemplates.append($group);
+            });;
         }
 
         public static initBtnDeck($btnsDeck: JQuery) {

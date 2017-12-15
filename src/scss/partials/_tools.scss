@@ -70,6 +70,15 @@
         height: 99%;
         overflow: auto;    
     
+        .bre-template-group {
+            color: $accent-color;
+            font-size: .5rem;
+            padding: .5rem .5rem 0rem .5rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            cursor: pointer;
+        }
+
         .bre-template {
 
             > *,
@@ -89,6 +98,24 @@
 
             &:hover {
                 background: darken(#fff, 5%);
+            }
+
+            .bre-field-container {
+                padding: 1rem;
+                border: 1px solid $border-color;
+                border-right-width: 0px;
+                text-align: center;     
+                font-weight: bold;
+                font-size: 1rem;
+                color: $accent-color;
+
+                &::after {
+                    content: '\2295';
+                }
+            }
+
+            .bre-field-container:last-child {
+                border-right-width: 1px;
             }
         }        
 

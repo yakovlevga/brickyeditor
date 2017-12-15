@@ -7,7 +7,7 @@ namespace BrickyEditor {
         public $preview: JQuery;
 
         constructor(el: Element) {
-            const previewSelector = '.bre-template-preview';
+            const previewSelector = Selectors.selectorTemplatePreview;
 
             let $template = $(el);
             let data = $template.data();
@@ -26,7 +26,7 @@ namespace BrickyEditor {
         }
 
         public getPreview(): JQuery {
-            let $template = $(`<div class='bre-template'></div>`);
+            let $template = $(`<div class='${Selectors.classTemplate}'></div>`);
             $template.append(this.$preview);
             return $template;
         }
