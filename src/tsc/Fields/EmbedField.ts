@@ -10,9 +10,7 @@ namespace BrickyEditor {
 
             get settings(): (field: BaseField) => void {
                 return (field: EmbedField) => {
-                    const url = prompt('Link to embed media', 'http://instagr.am/p/BO9VX2Vj4fF/');
-                    field.setUrl(url);
-                    field.loadMedia(true);
+                    this.showEmbedLoaderAsync(field);
                 }
             }
 
@@ -20,13 +18,28 @@ namespace BrickyEditor {
                 let field = this;
                 let $field = this.$field;
                 
-                $field.on('click', async () => {                    
-                    const url = prompt('Link to embed media', 'http://instagr.am/p/BO9VX2Vj4fF/');
-                    field.setUrl(url);
-                    await field.loadMedia(true);
+                $field.on('click', async () => {
+                    this.showEmbedLoaderAsync(field);
                 });
 
                 field.loadMedia(false);
+            }
+
+            private async showEmbedLoaderAsync(field) {
+                const fields = await Editor.UI.modal.promptAsync(field.getPromptParams());
+                if(fields != null) {
+                    const url = fields.getValue('url');
+                    if (url) {
+                        field.setUrl(url);
+                        await field.loadMedia(true);
+                    }
+                }
+            }
+
+            private getPromptParams(): Array<Prompt.PromptParameter> {
+                return [
+                    new Prompt.PromptParameter('url', EditorStrings.embedFieldLinkTitle, this.data.url || 'http://instagr.am/p/BO9VX2Vj4fF/', EditorStrings.embedFieldLinkPlaceholder)
+                ];
             }
 
             async loadMedia(fireUpdate: boolean) {

@@ -64,7 +64,7 @@ namespace BrickyEditor {
             /// Load templates
             Editor.UI.toggleToolsLoader(true);
 
-            const templates = await Services.TemplateService.loadTemplatesAsync(this);    
+            const templates = await Services.TemplateService.loadTemplatesAsync(this.options.templatesUrl, this.$editor, this.onError);    
             Editor.UI.toggleToolsLoader(false);
             Editor.UI.setTemplates(templates);
 
@@ -85,8 +85,8 @@ namespace BrickyEditor {
                     try {
                         const blocks = await $.get(url);
                         resolve(blocks);
-                    } catch (error) {
-                        console.log('Blocks file not found.');
+                    } catch (error) {    
+                        this.onError(EditorStrings.errorBlocksFileNotFound(url));
                         reject(error);
                     }
                 }
@@ -144,7 +144,8 @@ namespace BrickyEditor {
                         this.container.addBlock(template, block.fields, null, false);
                     }
                     else {
-                        console.log(`Template ${block.template} not found.`);
+                        const message = EditorStrings.errorBlockTemplateNotFound(block.template);
+                        this.onError(message);
                     }
                 });
             }
@@ -163,6 +164,10 @@ namespace BrickyEditor {
                 }                
             }
             return container;
+        }
+
+        public onError(message: string, code: number = 0) {
+            this.options.onError({ message: message, code: code});
         }
 
         private trigger(event: string, data: any) {

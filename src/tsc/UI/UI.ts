@@ -60,12 +60,12 @@ namespace BrickyEditor {
 
         private setModal() {
             let $modal = $('<div class="bre bre-modal"><div class="bre-modal-placeholder"></div></div>');
-            let $modalCloseBtn = $('<div class="bre-modal-close"><a href="#">close ✖</a></div>');
+            let $modalCloseBtn = $(`<div class="bre-modal-close"><a href="#">${EditorStrings.buttonClose} ✖</a></div>`);
             let $modalContent = $('<div class="bre-modal-content"></div>');
             let $modalForm = $('<form></form>');
             let $modalBtns = $('<div class="bre-btns"></div>');
-            let $modalOk = $('<button type="button" class="bre-btn bre-btn-primary">Ok</button>');
-            let $modalCancel = $('<button type="button" class="bre-btn">Cancel</button>');
+            let $modalOk = $(`<button type="button" class="bre-btn bre-btn-primary">${EditorStrings.buttonOk}</button>`);
+            let $modalCancel = $(`<button type="button" class="bre-btn">${EditorStrings.buttonCancel}</button>`);
 
             $modalBtns.append($modalOk);
             $modalBtns.append($modalCancel);

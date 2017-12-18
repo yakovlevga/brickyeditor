@@ -128,14 +128,14 @@ namespace BrickyEditor {
             }
 
             return [
-                new Prompt.PromptParameter('href', 'Url', href, 'Url'),
-                new Prompt.PromptParameter('title', 'Title', title, 'Title'),
-                new Prompt.PromptParameterOptions('target', 'Target', [
+                new Prompt.PromptParameter('href', EditorStrings.htmlEditorLinkUrlTitle, href, EditorStrings.htmlEditorLinkUrlPlaceholder),
+                new Prompt.PromptParameter('title',  EditorStrings.htmlEditorLinkTitleTitle, title, EditorStrings.htmlEditorLinkTitlePlaceholder),
+                new Prompt.PromptParameterOptions('target',  EditorStrings.htmlEditorLinkTargetTitle, [
                     ['', ''],
-                    ['Blank', '_blank'],
-                    ['Self', '_self'],
-                    ['Parent', '_parent'],
-                    ['Top', '_top'],
+                    [EditorStrings.htmlEditorLinkTargetBlank, '_blank'],
+                    [EditorStrings.htmlEditorLinkTargetSelf, '_self'],
+                    [EditorStrings.htmlEditorLinkTargetParent, '_parent'],
+                    [EditorStrings.htmlEditorLinkTargetTop, '_top'],
                 ], target)
             ];
         }

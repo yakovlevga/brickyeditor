@@ -4,10 +4,13 @@ namespace BrickyEditor {
             
             static templates: TemplateGroup[];
 
-            static async loadTemplatesAsync(editor: Editor): Promise<TemplateGroup[]> {
+            static async loadTemplatesAsync(
+                url: string, 
+                $editor: JQuery, 
+                onError: (message: string, code?: number) => any): Promise<TemplateGroup[]> {
+                
                 this.templates = [];
                 const templates = this.templates;
-                const url = editor.options.templatesUrl;
                 
                 return new Promise<TemplateGroup[]>(async (resolve, reject) => {
                     
@@ -17,7 +20,7 @@ namespace BrickyEditor {
                         // set custom templates style
                         const $style = $(data).filter('style');
                         if ($style && $style.length > 0) {
-                            editor.$editor.prepend($style);
+                            $editor.prepend($style);
                         }
 
                         let $data = $(`<div>${data}</div>`);
@@ -31,14 +34,14 @@ namespace BrickyEditor {
                                                     
                         // the rest ungroupped templates
                         let templates = this.getTemplates($data);
-                        let defaultGroupName = this.templates.length > 0 ? 'Other templates' : '';
+                        let defaultGroupName = this.templates.length > 0 ? EditorStrings.defaultTemplatesGroupName : '';
                         let group = new TemplateGroup(defaultGroupName, templates);
                         this.templates.push(group);
 
                         resolve(this.templates);
                     }
                     catch (err) {
-                        console.log('Templates file not found.');
+                        onError(EditorStrings.errorTemplatesFileNotFound(url));
                         reject(err);
                     }
                 });
@@ -61,7 +64,7 @@ namespace BrickyEditor {
                     const group = this.templates[gi];
                     for (var ti = 0; ti < group.templates.length; ti++) {
                         const template = group.templates[ti];
-                        if (template.name.toLowerCase() === templateName.toLowerCase()) {
+                        if (template.name.breEqualsInvariant(templateName)) {
                             return template;
                         }
                     }

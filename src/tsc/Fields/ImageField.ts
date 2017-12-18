@@ -31,9 +31,9 @@ namespace BrickyEditor {
 
             private getPromptParams(): Array<Prompt.PromptParameter> {
                 return [
-                    new Prompt.PromptParameter('src', 'Image Link', this.data.url, 'image url'),
-                    new Prompt.PromptParameterImage('file', 'or Upload file', this.data.file, 'select file'),
-                    new Prompt.PromptParameter('alt', 'Alt', this.data.alt, 'alt attribute value '),
+                    new Prompt.PromptParameter('src', EditorStrings.imageFieldLinkTitle, this.data.url, EditorStrings.imageFieldLinkPlaceholder),
+                    new Prompt.PromptParameterImage('file', EditorStrings.imageFieldUploadTitle, this.data.file, EditorStrings.imageFieldUploadButton),
+                    new Prompt.PromptParameter('alt', EditorStrings.imageFieldAltTitle, this.data.alt, EditorStrings.imageFieldAltPlaceholder),
                 ];
             }
 
