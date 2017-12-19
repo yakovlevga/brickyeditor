@@ -59,7 +59,7 @@ namespace BrickyEditor {
 
                 modal.$cancelBtn.on('click', () => {
                     modal.hideModal();
-                    reject(fields);
+                    resolve(null);
                 });
 
                 modal.showModal();

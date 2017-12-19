@@ -4,38 +4,67 @@
 namespace BrickyEditor {
     export class Editor {
         private isLoaded: boolean;
+        private container: BlocksContainer;
 
         public $editor: JQuery
         public static UI: UI;        
         public options: EditorOptions;
-        public blocks: Array<Block> = [];
-        public selectedBlock: Block;
-        public get selectedBlockIndex() {
-            if (this.selectedBlock) {
-                return this.blocks.indexOf(this.selectedBlock);
-            }
-            return -1;
-        }
-
-        private compactTools?: boolean = null;
 
         constructor(
             $editor: JQuery,
             options: EditorOptions) {
             Fields.BaseField.registerCommonFields();
-
+            
             this.$editor = $editor;
-            this.$editor.addClass('bre-editor');            
+            this.$editor.addClass(Selectors.classEditor);            
             this.options = new EditorOptions(options);
+            this.container = this.createContainer();
 
-            Editor.UI = new UI(this);
+            Editor.UI = new UI(this);            
+        }
+
+        private createContainer(): BlocksContainer {
+            const onAdd = (block: Block, idx: number) => {
+                if(this.isLoaded) {
+                    this.trigger(Events.onBlockAdd, { block: block, idx: idx});
+                    this.trigger(Events.onChange, { blocks: this.getData(), html: this.getHtml() });
+                }
+            };
+
+            const onDelete = (block: Block, idx: number) => {
+                this.trigger(Events.onBlockDelete, { block: block, idx: idx});
+                this.trigger(Events.onChange, { blocks: this.getData(), html: this.getHtml() });
+            }
+
+            const onUpdate = (block, property, oldValue, newValue) => { 
+                this.trigger(Events.onBlockUpdate, {
+                    block : block, 
+                    property: property, 
+                    oldValue: oldValue, 
+                    newValue: newValue
+                });
+                this.trigger(Events.onChange, { blocks: this.getData(), html: this.getHtml() });
+            };
+
+            return new BlocksContainer(
+                this.$editor,
+                onAdd,
+                onDelete,
+                (block: Block) => { this.trigger(Events.onBlockSelect, { block: block }); },
+                (block: Block) => { this.trigger(Events.onBlockDeselect, { block: block }); },
+                (block: Block, from: number, to: number) => {
+                    this.trigger(Events.onBlockMove, { block: block, from: from, to: to });
+                    this.trigger(Events.onChange, { blocks: this.getData(), html: this.getHtml() });
+                },
+                onUpdate
+            );
         }
 
         public async initAsync() {
             /// Load templates
             Editor.UI.toggleToolsLoader(true);
 
-            const templates = await Services.TemplateService.loadTemplatesAsync(this);    
+            const templates = await Services.TemplateService.loadTemplatesAsync(this.options.templatesUrl, this.$editor, this.onError);    
             Editor.UI.toggleToolsLoader(false);
             Editor.UI.setTemplates(templates);
 
@@ -56,8 +85,8 @@ namespace BrickyEditor {
                     try {
                         const blocks = await $.get(url);
                         resolve(blocks);
-                    } catch (error) {
-                        console.log('Blocks file not found.');
+                    } catch (error) {    
+                        this.onError(EditorStrings.errorBlocksFileNotFound(url));
                         reject(error);
                     }
                 }
@@ -99,19 +128,11 @@ namespace BrickyEditor {
         }
 
         public getData(): any {
-            var blocksData = [];
-            this.blocks.forEach(block => {
-                blocksData.push(block.getData(this.options.ignoreHtml));
-            });
-            return blocksData;
+            return this.container.getData(this.options.ignoreHtml);
         }
 
         public getHtml(): string {
-            var blocksData = [];
-            this.blocks.forEach(block => {
-                blocksData.push(block.getHtml(true));
-            });
-            return blocksData.join('\n');
+            return this.container.getHtml();
         }
 
         /// BLOCKS
@@ -120,141 +141,33 @@ namespace BrickyEditor {
                 blocks.forEach(block => {
                     let template = Services.TemplateService.getTemplate(block.template);
                     if (template) {
-                        this.addBlock(template, block.fields, null, false);
+                        this.container.addBlock(template, block.fields, null, false);
                     }
                     else {
-                        console.log(`Template ${block.template} not found.`);
+                        const message = EditorStrings.errorBlockTemplateNotFound(block.template);
+                        this.onError(message);
                     }
                 });
             }
         }
 
-        public addBlock(
-            template: Template,
-            data?: Array<Fields.BaseField>,
-            idx?: number,
-            select: boolean = true) {
-
-            const onUpdate = (block, property, oldValue, newValue) => { 
-                this.trigger(Events.onBlockUpdate, {
-                    block : block, 
-                    property: property, 
-                    oldValue: oldValue, 
-                    newValue: newValue
-                });
-                this.trigger(Events.onChange, { blocks: this.getData(), html: this.getHtml() });
-            };
-
-            let block = new Block(
-                template, 
-                false, 
-                data,
-                block => this.deleteBlock(block),
-                block => this.selectBlock(block),
-                block => this.deselectBlock(block),
-                block => this.copyBlock(block),
-                (block, offset) => this.moveBlock(block, offset),
-                onUpdate);
-
-            this.insertBlock(block, idx);
-
-            if (select) {
-                block.select();
-                block.scrollTo();
-            }
+        public addBlock(template: Template) {
+            const container = this.getContainer(this.container);
+            container.addBlock(template, null, null, true);
         }
 
-        private insertBlock(block: Block, idx?: number) {
-            idx = idx || this.blocks.length;
-            if (this.selectedBlock) {
-                idx = this.selectedBlockIndex + 1;
+        private getContainer(container: BlocksContainer) {
+            if(container.selectedBlock && container.selectedBlock.isContainer()) {
+                const field = container.selectedBlock.selectedField as Fields.ContainerField;
+                if(field) {
+                    return this.getContainer(field.container);
+                }                
             }
-
-            this.blocks.splice(idx, 0, block);
-            if (idx == 0) {  // todo: move to block ui
-                this.$editor.append(block.ui.$editor);
-            }
-            else { // todo: move to block ui
-                this.blocks[idx - 1].ui.$editor.after(block.ui.$editor);
-            }
-
-            // Trigger jQuery event
-            if(this.isLoaded) {
-                this.trigger(Events.onBlockAdd, { block: block, idx: idx});
-                this.trigger(Events.onChange, { blocks: this.getData(), html: this.getHtml() });
-            }
+            return container;
         }
 
-        private deleteBlock(block: Block) {
-            const idx = this.blocks.indexOf(block);
-            this.blocks.splice(idx, 1);
-            block = null;
-
-            if (idx < this.blocks.length) {
-                this.blocks[idx].select();
-            }
-            else if (this.blocks.length > 0) {
-                this.blocks[idx - 1].select();
-            }
-            else {
-                this.selectedBlock = null;
-            }
-
-            // Trigger jQuery event
-            this.trigger(Events.onBlockDelete, { block: block, idx: idx});
-            this.trigger(Events.onChange, { blocks: this.getData(), html: this.getHtml() });
-        }
-
-        private moveBlock(block: Block, offset: number) {
-            const idx = this.blocks.indexOf(block);
-            const new_idx = idx + offset;
-
-            if (new_idx >= this.blocks.length || new_idx < 0)
-                return;
-
-            var $anchorBlock = this.blocks[new_idx].ui.$editor;
-            if (offset > 0) {
-                $anchorBlock.after(block.ui.$editor);
-            }
-            else if (offset < 0) {
-                $anchorBlock.before(block.ui.$editor);
-            }
-
-            this.blocks.splice(idx, 1);
-            this.blocks.splice(new_idx, 0, block);
-
-            // Trigger jQuery event
-            this.trigger(Events.onBlockMove, { block: block, from: idx, to: new_idx });
-            this.trigger(Events.onChange, { blocks: this.getData(), html: this.getHtml() });
-
-            // Scroll to block
-            block.scrollTo();
-        }
-
-        private copyBlock(block: Block) {
-            const idx = this.blocks.indexOf(block) + 1;
-            const copy = this.addBlock(block.template, block.getData().fields, idx, true);
-        }
-
-        private selectBlock(block: Block) {
-            if (this.selectedBlock === block)
-                return;
-
-            if (this.selectedBlock) {
-                this.selectedBlock.deselect();
-            }
-
-            this.selectedBlock = block;
-
-            // Trigger jQuery event
-            this.trigger(Events.onBlockSelect, { block: block });
-        }
-
-        private deselectBlock(block: Block) {
-            this.selectedBlock = null;
-
-            // Trigger jQuery event
-            this.trigger(Events.onBlockDeselect, { block: block });
+        public onError(message: string, code: number = 0) {
+            this.options.onError({ message: message, code: code});
         }
 
         private trigger(event: string, data: any) {

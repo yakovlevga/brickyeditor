@@ -13,7 +13,7 @@ namespace BrickyEditor {
             public $field: JQuery;
             public name: string;
             public data: any;
-            private onSelect: () => void;
+            private onSelect: (field: BaseField) => void;
             private onUpdate: (property, oldValue, newValue) => void;
 
             protected settings: (field: BaseField) => void;
@@ -21,7 +21,12 @@ namespace BrickyEditor {
                 return null;
             }
 
-            constructor($field: JQuery, data: any, onSelect: () => void, onUpdate: (property, oldValue, newValue) => void) {
+            constructor(
+                $field: JQuery, 
+                data: any, 
+                onSelect: (field: BaseField) => void, 
+                onUpdate: (property, oldValue, newValue) => void) {
+
                 this.$field = $field;
                 this.data = data;
                 this.onSelect = onSelect;
@@ -36,6 +41,7 @@ namespace BrickyEditor {
                 HtmlField.registerField();
                 ImageField.registerField();
                 EmbedField.registerField();
+                ContainerField.registerField();
             };
 
             private static registerField() {
@@ -51,7 +57,7 @@ namespace BrickyEditor {
             public static createField(
                 $field: JQuery, 
                 data: any, 
-                onSelect: () => void, 
+                onSelect: (field: BaseField) => void, 
                 onUpdate: (property, oldValue, newValue) => void): BaseField {
 
                 let fieldData = $field.data().breField;
@@ -104,8 +110,19 @@ namespace BrickyEditor {
 
             protected bind() { }
 
-            protected selectBlock() {
-                this.onSelect();
+            protected select() {
+                this.$field.addClass(Selectors.selectorFieldSelected);
+                this.onSelect(this);
+            }
+
+            public deselect() {
+                this.$field.removeClass(Selectors.selectorFieldSelected);
+            }
+
+            public getEl() : JQuery {
+                let $el = this.$field.clone(false);
+                $el.removeAttr(Selectors.attrField);
+                return $el;
             }
 
             protected updateProperty(prop: string, value: any, fireUpdate:boolean = true) {                

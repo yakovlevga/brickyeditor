@@ -8,7 +8,7 @@ BrickyEditor.Fields.TestField = (function (baseField) {
         var _this = this;
         var $field = this.$field;
         if (!$field.is('[contenteditable]')) {
-            $field.attr('contenteditable', 'true');
+            $field.attr(Selectors.attrContentEditable, 'true');
         }
         var html = this.data.html || this.$field.html() || this.block.template.name;
         this.setHtml(html);

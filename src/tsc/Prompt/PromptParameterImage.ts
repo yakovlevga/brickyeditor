@@ -25,7 +25,7 @@ namespace BrickyEditor {
                 var $editor = $(`
                 <div class='bre-image-input'>
                     <label for="${this.key}">
-                        Select file...
+                        ${this.placeholder}
                     </label>                        
                     <img src="${img}"/>                    
                     <input type="file" id="${this.key}" class="bre-input" placeholder="${this.placeholder}">

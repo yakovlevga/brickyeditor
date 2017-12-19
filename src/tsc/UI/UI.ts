@@ -60,12 +60,12 @@ namespace BrickyEditor {
 
         private setModal() {
             let $modal = $('<div class="bre bre-modal"><div class="bre-modal-placeholder"></div></div>');
-            let $modalCloseBtn = $('<div class="bre-modal-close"><a href="#">close ✖</a></div>');
+            let $modalCloseBtn = $(`<div class="bre-modal-close"><a href="#">${EditorStrings.buttonClose} ✖</a></div>`);
             let $modalContent = $('<div class="bre-modal-content"></div>');
             let $modalForm = $('<form></form>');
             let $modalBtns = $('<div class="bre-btns"></div>');
-            let $modalOk = $('<button type="button" class="bre-btn bre-btn-primary">Ok</button>');
-            let $modalCancel = $('<button type="button" class="bre-btn">Cancel</button>');
+            let $modalOk = $(`<button type="button" class="bre-btn bre-btn-primary">${EditorStrings.buttonOk}</button>`);
+            let $modalCancel = $(`<button type="button" class="bre-btn">${EditorStrings.buttonCancel}</button>`);
 
             $modalBtns.append($modalOk);
             $modalBtns.append($modalCancel);
@@ -85,23 +85,41 @@ namespace BrickyEditor {
             this.$toolsLoader.toggle(toggle);
         }
 
-        public setTemplates(templates: Template[]) {
+        public setTemplates(templateGroups: TemplateGroup[]) {
             let editor = this.editor;
-            templates.forEach(template => {
-                let $preview = template.getPreview();
-                $preview.on('click', () => {
-                    editor.addBlock(template);
+            templateGroups.forEach(group => {
+                if(group.templates.length === 0)
+                    return;
+
+                let $header = $(`<div class='${Selectors.classTemplateGroup}'>${group.name}</div>`);
+                this.$toolsTemplates.append($header);
+                let $group = $('<div></div>');
+                group.templates.forEach(template => {
+                    let $preview = template.getPreview();
+                    $preview.attr('title', template.name);
+                    $preview.on('click', (ev) => {
+                        editor.addBlock(template);
+                        ev.stopPropagation();
+                        return false;
+                    });
+                    $group.append($preview);
+                })
+
+                $header.on('click', () => {
+                    $group.toggle();
                 });
-                this.$toolsTemplates.append($preview);
-            });
+                this.$toolsTemplates.append($group);
+            });;
         }
 
         public static initBtnDeck($btnsDeck: JQuery) {
             var $btns = $('.bre-btn', $btnsDeck);
             var $firstBtn = $btns.eq(0);
 
-            $firstBtn.on('click', function () {
+            $firstBtn.on('click', (ev) => {
                 UI.toggleBtnDeck($btnsDeck);
+                ev.stopPropagation();
+                return false;
             });
         }
 

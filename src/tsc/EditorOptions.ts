@@ -7,6 +7,11 @@ namespace BrickyEditor {
         public onload: any; // depricated callback
         public onLoad: any;
 
+        /** OnError callback */
+        public onError: any = (data: any) => {
+            console.log(data.message);
+        }
+
         /** OnChange callback */
         public onChange: any;
         /** onBlockAdd callback */
@@ -50,6 +55,7 @@ namespace BrickyEditor {
             this.onBlockSelect = options.onBlockSelect;
             this.onBlockDeselect = options.onBlockDeselect;
             this.onBlockUpdate = options.onBlockUpdate;
+            this.onError = options.onError || this.onError;
 
             this.blocksUrl = options.blocksUrl || null;
             this.blocks = options.blocks || null;

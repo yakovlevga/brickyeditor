@@ -9,29 +9,31 @@ namespace BrickyEditor {
 
                 this.setSrc(this.data.src, false);
                 $field.on('click', async () => {
-                    const fields = await Editor.UI.modal.promptAsync(field.getPromptParams());                    
-                    const file = fields.getValue('file');
-                    const src = fields.getValue('src');
-                    if (file) {
-                        field.setFile(file);
-                        field.setSrc(null);
-                    }
-                    else if (src) {
-                        field.setSrc(src);
-                        field.setFile(null);
-                    }
+                    const fields = await Editor.UI.modal.promptAsync(field.getPromptParams());
+                    if(fields != null) {
+                        const file = fields.getValue('file');
+                        const src = fields.getValue('src');
+                        if (file) {
+                            field.setFile(file);
+                            field.setSrc(null);
+                        }
+                        else if (src) {
+                            field.setSrc(src);
+                            field.setFile(null);
+                        }
 
-                    let alt = fields.getValue('alt');
-                    field.setAlt(alt);
-                    field.selectBlock();
+                        let alt = fields.getValue('alt');
+                        field.setAlt(alt);
+                    }
+                    field.select();
                 });
             }
 
             private getPromptParams(): Array<Prompt.PromptParameter> {
                 return [
-                    new Prompt.PromptParameter('src', 'Image Link', this.data.url, 'image url'),
-                    new Prompt.PromptParameterImage('file', 'or Upload file', this.data.file, 'select file'),
-                    new Prompt.PromptParameter('alt', 'Alt', this.data.alt, 'alt attribute value '),
+                    new Prompt.PromptParameter('src', EditorStrings.imageFieldLinkTitle, this.data.url, EditorStrings.imageFieldLinkPlaceholder),
+                    new Prompt.PromptParameterImage('file', EditorStrings.imageFieldUploadTitle, this.data.file, EditorStrings.imageFieldUploadButton),
+                    new Prompt.PromptParameter('alt', EditorStrings.imageFieldAltTitle, this.data.alt, EditorStrings.imageFieldAltPlaceholder),
                 ];
             }
 
