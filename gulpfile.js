@@ -11,25 +11,30 @@ const srcTypescriptFolder = './src/tsc',
     srcTypescriptConfig = srcTypescriptFolder + '/tsconfig.json',
     srcTypescriptConfigES6 = srcTypescriptFolder + '/tsconfig.es6.json',
     srcTypescript = srcTypescriptFolder + '/**/*.ts',
+    srcJsFolder = './src/js',
+    srcJsLocales = srcJsFolder + '/locales/*.js',
 
     srcSassFolder = './src/scss',
     srcSass = srcSassFolder + '/**/*.scss',
     srcSassMain = srcSassFolder + '/main.scss',
 
     distFolder = './dist',
+    distLocalesFolder = distFolder + '/locales',
 
     demoFolder = './demo',
     demoJs = demoFolder + '/js',
+    demoJsLocales = demoJs + '/locales',
     demoCss = demoFolder + '/css',
 
     taskBrowserSync = 'browserSync',
     taskCompileTypescript = 'ts',
     taskCompileTypescriptES6 = 'ts_es6',
-    taskCompileSass = 'sass',
+    taskCopyLocales = 'copy_locales',
+    taskCompileSass = 'sass',    
     taskWatcher = 'watch';
 
 // Browser-sync task
-gulp.task(taskBrowserSync, function () {
+gulp.task(taskBrowserSync, () => {
     browserSync({
         server: {
             baseDir: demoFolder,
@@ -38,7 +43,7 @@ gulp.task(taskBrowserSync, function () {
 });
 
 // Typescript task
-gulp.task(taskCompileTypescript, function () {
+gulp.task(taskCompileTypescript, () => {
     const tsProject = ts.createProject(srcTypescriptConfig);
     const tsResult = gulp.src(srcTypescript)
         .pipe(tsProject());
@@ -61,7 +66,7 @@ gulp.task(taskCompileTypescript, function () {
 });
 
 // Typescript ES6 compilation task
-gulp.task(taskCompileTypescriptES6, function () {
+gulp.task(taskCompileTypescriptES6, () => {
     const tsProject = ts.createProject(srcTypescriptConfigES6);
     const tsResult = gulp.src(srcTypescript)
         .pipe(tsProject());
@@ -75,8 +80,15 @@ gulp.task(taskCompileTypescriptES6, function () {
     ];
 });
 
+// Copy locales task
+gulp.task(taskCopyLocales, () => {
+    return gulp.src(srcJsLocales)
+        .pipe(gulp.dest(demoJsLocales))
+        .pipe(gulp.dest(distLocalesFolder));
+})
+
 // Sass task
-gulp.task(taskCompileSass, function () {
+gulp.task(taskCompileSass, () => {
     return gulp.src(srcSassMain)
         .pipe(sass())
         .pipe(rename('jquery.brickyeditor.css'))
@@ -93,7 +105,7 @@ gulp.task(taskCompileSass, function () {
 });
 
 // Changes tracking task 
-gulp.task(taskWatcher, function () {
+gulp.task(taskWatcher, () => {
     gulp.watch(srcTypescript, [taskCompileTypescript]);
     gulp.watch(srcSass, [taskCompileSass]);
 });
@@ -101,6 +113,7 @@ gulp.task(taskWatcher, function () {
 gulp.task('default', [
     taskCompileTypescript,
     taskCompileTypescriptES6,
+    taskCopyLocales,
     taskCompileSass,
     taskWatcher,
     taskBrowserSync
@@ -109,5 +122,6 @@ gulp.task('default', [
 gulp.task('build', [
     taskCompileTypescript,
     taskCompileTypescriptES6,
+    taskCopyLocales,
     taskCompileSass
 ]);

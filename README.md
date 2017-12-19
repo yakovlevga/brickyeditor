@@ -80,10 +80,12 @@ There is a list of options, you could pass to init: $("#editor").brickyeditor(op
 
 ### Template system
 
-In current version there are 3 type of fields you can use inside your templates.
- - Html Field - *Any html tag with possibility to edit content with base formatting (bold, italic, links, lists).*
- - Image Field - *Div or img tag, that allows to upload image in base64 format.*
- - Embed Field - *Embed field for instagram, youtube, twitter and other providers. Based on [https://noembed.com](https://noembed.com) service.*
+There are 4 base types of fields you can use inside your templates:
+ - **Html Field** - *Any html tag with possibility to edit content with base formatting (bold, italic, links, lists).*
+ - **Image Field** - *Div or img tag, that allows to upload image in base64 format.*
+ - **Embed Field** - *Embed field for instagram, youtube, twitter and other providers. Based on [https://noembed.com](https://noembed.com) service.*
+ - **Container Field** - *Container tag, that allows to put other templates inside. It's useful if you want to use layout templates.*
+
 Fields tags should be marked with attribute `data-bre-field="{ 'name' : 'caption', 'type' : 'html'}"`, with field settings inside it. 
 
 All templates should be placed inside `<div class="bre-template" data-name="Template Name"></div>`. 
@@ -102,3 +104,24 @@ If you want custom preview for your template, you could wrap preview html inside
 In this sample two editable fields - img (field type - image) and figcaption (field type = html). 
 Editor will get _templates/image-with-caption.jpg_ image as preview to render block inside tools panel.
 You could find more examples in `build/templates folder`.
+
+##Template groups
+You could use template grouping inside your template file for better semantics. Put templates inside div with class='bre-template-group' and set 'title' attribute to name the group.
+```html
+<div class="bre-template-group" title="Containers">
+    <div class="bre-template" data-name="Columns-2">
+        <div class="row">
+            <div class="col-md-6" data-bre-field='{ "name" : "col1", "type": "container" }'></div>
+            <div class="col-md-6" data-bre-field='{ "name" : "col2", "type": "container" }'></div>
+        </div>
+    </div>
+
+    <div class="bre-template" data-name="Columns-3">
+        <div class="row">
+            <div class="col-md-4" data-bre-field='{ "name" : "col1", "type": "container" }'></div>
+            <div class="col-md-4" data-bre-field='{ "name" : "col2", "type": "container" }'></div>
+            <div class="col-md-4" data-bre-field='{ "name" : "col3", "type": "container" }'></div>
+        </div>
+    </div>
+</>
+```

@@ -391,6 +391,15 @@ var BrickyEditor;
     EditorStrings.imageFieldUploadButton = 'Select file';
     EditorStrings.imageFieldAltTitle = 'Alt';
     EditorStrings.imageFieldAltPlaceholder = 'Image \'alt\' attribute value';
+    EditorStrings.htmlEditorLinkUrlTitle = 'Url';
+    EditorStrings.htmlEditorLinkUrlPlaceholder = 'http://put-your-link.here';
+    EditorStrings.htmlEditorLinkTitleTitle = 'Title';
+    EditorStrings.htmlEditorLinkTitlePlaceholder = 'Title attribute for link';
+    EditorStrings.htmlEditorLinkTargetTitle = 'Target';
+    EditorStrings.htmlEditorLinkTargetBlank = 'Blank';
+    EditorStrings.htmlEditorLinkTargetSelf = 'Self';
+    EditorStrings.htmlEditorLinkTargetParent = 'Parent';
+    EditorStrings.htmlEditorLinkTargetTop = 'Top';
     EditorStrings.buttonClose = 'close';
     EditorStrings.buttonOk = 'Ok';
     EditorStrings.buttonCancel = 'Cancel';
@@ -1357,14 +1366,14 @@ var BrickyEditor;
                 target = a.attr('target');
             }
             return [
-                new BrickyEditor.Prompt.PromptParameter('href', 'Url', href, 'Url'),
-                new BrickyEditor.Prompt.PromptParameter('title', 'Title', title, 'Title'),
-                new BrickyEditor.Prompt.PromptParameterOptions('target', 'Target', [
+                new BrickyEditor.Prompt.PromptParameter('href', BrickyEditor.EditorStrings.htmlEditorLinkUrlTitle, href, BrickyEditor.EditorStrings.htmlEditorLinkUrlPlaceholder),
+                new BrickyEditor.Prompt.PromptParameter('title', BrickyEditor.EditorStrings.htmlEditorLinkTitleTitle, title, BrickyEditor.EditorStrings.htmlEditorLinkTitlePlaceholder),
+                new BrickyEditor.Prompt.PromptParameterOptions('target', BrickyEditor.EditorStrings.htmlEditorLinkTargetTitle, [
                     ['', ''],
-                    ['Blank', '_blank'],
-                    ['Self', '_self'],
-                    ['Parent', '_parent'],
-                    ['Top', '_top'],
+                    [BrickyEditor.EditorStrings.htmlEditorLinkTargetBlank, '_blank'],
+                    [BrickyEditor.EditorStrings.htmlEditorLinkTargetSelf, '_self'],
+                    [BrickyEditor.EditorStrings.htmlEditorLinkTargetParent, '_parent'],
+                    [BrickyEditor.EditorStrings.htmlEditorLinkTargetTop, '_top'],
                 ], target)
             ];
         }

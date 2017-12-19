@@ -1295,43 +1295,6 @@ var BrickyEditor;
 })(BrickyEditor || (BrickyEditor = {}));
 var BrickyEditor;
 (function (BrickyEditor) {
-    var Template = (function () {
-        function Template(el) {
-            var previewSelector = BrickyEditor.Selectors.selectorTemplatePreview;
-            var $template = $(el);
-            var data = $template.data();
-            this.name = data.name;
-            this.category = data.cactegory || [];
-            this.$html = $template.contents().not(previewSelector);
-            this.$preview = $(previewSelector, $template).contents();
-            if (!this.$preview.length) {
-                var block = new BrickyEditor.Block(this, true);
-                var blockEl = block.getHtml(true);
-                this.$preview = $(blockEl);
-            }
-        }
-        Template.prototype.getPreview = function () {
-            var $template = $("<div class='" + BrickyEditor.Selectors.classTemplate + "'></div>");
-            $template.append(this.$preview);
-            return $template;
-        };
-        return Template;
-    }());
-    BrickyEditor.Template = Template;
-})(BrickyEditor || (BrickyEditor = {}));
-var BrickyEditor;
-(function (BrickyEditor) {
-    var TemplateGroup = (function () {
-        function TemplateGroup(name, templates) {
-            this.name = name;
-            this.templates = templates;
-        }
-        return TemplateGroup;
-    }());
-    BrickyEditor.TemplateGroup = TemplateGroup;
-})(BrickyEditor || (BrickyEditor = {}));
-var BrickyEditor;
-(function (BrickyEditor) {
     var Services;
     (function (Services) {
         var EmbedService = (function () {
@@ -1459,6 +1422,43 @@ var BrickyEditor;
         }());
         Services.TemplateService = TemplateService;
     })(Services = BrickyEditor.Services || (BrickyEditor.Services = {}));
+})(BrickyEditor || (BrickyEditor = {}));
+var BrickyEditor;
+(function (BrickyEditor) {
+    var Template = (function () {
+        function Template(el) {
+            var previewSelector = BrickyEditor.Selectors.selectorTemplatePreview;
+            var $template = $(el);
+            var data = $template.data();
+            this.name = data.name;
+            this.category = data.cactegory || [];
+            this.$html = $template.contents().not(previewSelector);
+            this.$preview = $(previewSelector, $template).contents();
+            if (!this.$preview.length) {
+                var block = new BrickyEditor.Block(this, true);
+                var blockEl = block.getHtml(true);
+                this.$preview = $(blockEl);
+            }
+        }
+        Template.prototype.getPreview = function () {
+            var $template = $("<div class='" + BrickyEditor.Selectors.classTemplate + "'></div>");
+            $template.append(this.$preview);
+            return $template;
+        };
+        return Template;
+    }());
+    BrickyEditor.Template = Template;
+})(BrickyEditor || (BrickyEditor = {}));
+var BrickyEditor;
+(function (BrickyEditor) {
+    var TemplateGroup = (function () {
+        function TemplateGroup(name, templates) {
+            this.name = name;
+            this.templates = templates;
+        }
+        return TemplateGroup;
+    }());
+    BrickyEditor.TemplateGroup = TemplateGroup;
 })(BrickyEditor || (BrickyEditor = {}));
 var BrickyEditor;
 (function (BrickyEditor) {
