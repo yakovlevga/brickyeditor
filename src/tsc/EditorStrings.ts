@@ -16,6 +16,8 @@ namespace BrickyEditor {
         static imageFieldAltTitle = 'Alt';
         static imageFieldAltPlaceholder = 'Image \'alt\' attribute value';
 
+        static imageFieldUrlSubtitle = 'Link to open on image click';
+
         static htmlEditorLinkUrlTitle = 'Url';
         static htmlEditorLinkUrlPlaceholder = 'http://put-your-link.here';
 

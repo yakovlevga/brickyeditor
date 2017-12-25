@@ -470,6 +470,7 @@ var BrickyEditor;
         EditorStrings.imageFieldUploadButton = 'Select file';
         EditorStrings.imageFieldAltTitle = 'Alt';
         EditorStrings.imageFieldAltPlaceholder = 'Image \'alt\' attribute value';
+        EditorStrings.imageFieldUrlSubtitle = 'Link to open on image click';
         EditorStrings.htmlEditorLinkUrlTitle = 'Url';
         EditorStrings.htmlEditorLinkUrlPlaceholder = 'http://put-your-link.here';
         EditorStrings.htmlEditorLinkTitleTitle = 'Title';
@@ -503,6 +504,40 @@ var BrickyEditor;
         return Events;
     }());
     BrickyEditor.Events = Events;
+})(BrickyEditor || (BrickyEditor = {}));
+var BrickyEditor;
+(function (BrickyEditor) {
+    var HtmlLinkParams = (function () {
+        function HtmlLinkParams(href, title, target) {
+            if (href === void 0) { href = ''; }
+            if (title === void 0) { title = ''; }
+            if (target === void 0) { target = ''; }
+            this.href = href;
+            this.title = title;
+            this.target = target;
+        }
+        HtmlLinkParams.prototype.getLinkPromptParams = function () {
+            return [
+                new BrickyEditor.Prompt.PromptParameter('href', BrickyEditor.EditorStrings.htmlEditorLinkUrlTitle, this.href, BrickyEditor.EditorStrings.htmlEditorLinkUrlPlaceholder),
+                new BrickyEditor.Prompt.PromptParameter('title', BrickyEditor.EditorStrings.htmlEditorLinkTitleTitle, this.title, BrickyEditor.EditorStrings.htmlEditorLinkTitlePlaceholder),
+                new BrickyEditor.Prompt.PromptParameterOptions('target', BrickyEditor.EditorStrings.htmlEditorLinkTargetTitle, [
+                    ['', ''],
+                    [BrickyEditor.EditorStrings.htmlEditorLinkTargetBlank, '_blank'],
+                    [BrickyEditor.EditorStrings.htmlEditorLinkTargetSelf, '_self'],
+                    [BrickyEditor.EditorStrings.htmlEditorLinkTargetParent, '_parent'],
+                    [BrickyEditor.EditorStrings.htmlEditorLinkTargetTop, '_top'],
+                ], this.target)
+            ];
+        };
+        HtmlLinkParams.getLinkFromParams = function (fields) {
+            var href = fields.getValue('href');
+            var title = fields.getValue('title');
+            var target = fields.getValue('target');
+            return new HtmlLinkParams(href, title, target);
+        };
+        return HtmlLinkParams;
+    }());
+    BrickyEditor.HtmlLinkParams = HtmlLinkParams;
 })(BrickyEditor || (BrickyEditor = {}));
 (function ($) {
     $.fn.brickyeditor = function (options) {
@@ -1041,7 +1076,7 @@ var BrickyEditor;
                 var data = this.data;
                 this.setSrc(this.data.src, false);
                 $field.on('click', function () { return __awaiter(_this, void 0, void 0, function () {
-                    var fields, file, src, alt;
+                    var fields, file, src, alt, link;
                     return __generator(this, function (_a) {
                         switch (_a.label) {
                             case 0: return [4, BrickyEditor.Editor.UI.modal.promptAsync(field.getPromptParams())];
@@ -1060,6 +1095,8 @@ var BrickyEditor;
                                     }
                                     alt = fields.getValue('alt');
                                     field.setAlt(alt);
+                                    link = BrickyEditor.HtmlLinkParams.getLinkFromParams(fields);
+                                    this.setLink(link);
                                 }
                                 field.select();
                                 return [2];
@@ -1068,11 +1105,15 @@ var BrickyEditor;
                 }); });
             };
             ImageField.prototype.getPromptParams = function () {
-                return [
+                var params = [
                     new BrickyEditor.Prompt.PromptParameter('src', BrickyEditor.EditorStrings.imageFieldLinkTitle, this.data.url, BrickyEditor.EditorStrings.imageFieldLinkPlaceholder),
                     new BrickyEditor.Prompt.PromptParameterImage('file', BrickyEditor.EditorStrings.imageFieldUploadTitle, this.data.file, BrickyEditor.EditorStrings.imageFieldUploadButton),
                     new BrickyEditor.Prompt.PromptParameter('alt', BrickyEditor.EditorStrings.imageFieldAltTitle, this.data.alt, BrickyEditor.EditorStrings.imageFieldAltPlaceholder),
+                    new BrickyEditor.Prompt.PromptParameter(null, BrickyEditor.EditorStrings.imageFieldUrlSubtitle, null, null),
                 ];
+                var link = this.data.link ? this.data.link : new BrickyEditor.HtmlLinkParams();
+                var linkParams = link.getLinkPromptParams();
+                return params.concat(linkParams);
             };
             ImageField.prototype.setSrc = function (src, fireUpdate) {
                 if (fireUpdate === void 0) { fireUpdate = true; }
@@ -1101,6 +1142,27 @@ var BrickyEditor;
                 }
                 this.updateProperty('file', file);
             };
+            ImageField.prototype.setLink = function (url) {
+                if (url && url.href) {
+                    if (!this.$link) {
+                        this.$link = $("<a href='" + url.href + "' title='" + url.title + "' target='" + url.target + "'></a>");
+                        this.$link.on('click', function (ev) {
+                            ev.stopPropagation();
+                            return false;
+                        });
+                        this.$field.wrap(this.$link);
+                    }
+                    else {
+                        this.$link.attr(url.href);
+                    }
+                }
+                else if (this.$link) {
+                    this.$field.unwrap();
+                    this.$link = null;
+                    delete this.$link;
+                }
+                this.updateProperty('link', url);
+            };
             Object.defineProperty(ImageField.prototype, "isImg", {
                 get: function () {
                     return this._isImg = this._isImg || this.$field.prop('tagName').toLowerCase() === 'img';
@@ -1108,6 +1170,16 @@ var BrickyEditor;
                 enumerable: true,
                 configurable: true
             });
+            ImageField.prototype.getEl = function () {
+                var $el = _super.prototype.getEl.call(this);
+                var link = this.data.link;
+                if (link && link.href) {
+                    var $link = $("<a href='" + link.href + "' title='" + link.title + "' target='" + link.target + "'></a>");
+                    $link.append($el);
+                    return $link;
+                }
+                return $el;
+            };
             return ImageField;
         }(Fields.BaseField));
         Fields.ImageField = ImageField;
@@ -1125,7 +1197,9 @@ var BrickyEditor;
                 this.value = value;
             }
             PromptParameter.prototype.parseValue = function () {
-                this.value = this.$input.val();
+                if (this.$input) {
+                    this.value = this.$input.val();
+                }
                 this.$control = null;
                 delete this._$control;
             };
@@ -1133,9 +1207,11 @@ var BrickyEditor;
                 get: function () {
                     if (!this._$control) {
                         this._$control =
-                            $("<div class=\"bre-prompt-field\">\n                            <label class=\"bre-label\" for=\"" + this.key + "\">" + (this.title ? this.title : 'Select file...') + "</label>\n                        </div>");
-                        this.$input = this.getEditor();
-                        this._$control.append(this.$input);
+                            $("<div class=" + (this.key ? "bre-prompt-field" : "bre-prompt-subtitle") + ">\n                            <label class=\"bre-label\" for=\"" + this.key + "\">" + (this.title ? this.title : 'Select file...') + "</label>\n                        </div>");
+                        this.$input = this.key ? this.getEditor() : null;
+                        if (this.$input != null) {
+                            this._$control.append(this.$input);
+                        }
                     }
                     return this._$control;
                 },
@@ -1496,7 +1572,7 @@ var BrickyEditor;
             if (aValueArgument === void 0) { aValueArgument = null; }
             var $btn = $("<button type=\"button\" class=\"bre-btn\"><i class=\"fa fa-" + icon + "\"></i></button>");
             $btn.on('click', function () { return __awaiter(_this, void 0, void 0, function () {
-                var selection, selectionRange, params, fields, href, target, title, valueArgument;
+                var selection, selectionRange, params, fields, link, valueArgument;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
@@ -1505,20 +1581,18 @@ var BrickyEditor;
                             if (rangeCommand && !selectionRange)
                                 return [2];
                             if (!(command == 'CreateLink')) return [3, 2];
-                            params = this.getLinkPromptParams(selection);
+                            params = this.getLinkPromptParamsInternal(selection);
                             return [4, BrickyEditor.Editor.UI.modal.promptAsync(params)];
                         case 1:
                             fields = _a.sent();
-                            href = fields.getValue('href');
-                            if (href) {
-                                document.execCommand(command, false, href);
-                                target = fields.getValue('target');
-                                if (target) {
-                                    selection.anchorNode.parentElement.setAttribute('target', target);
+                            link = BrickyEditor.HtmlLinkParams.getLinkFromParams(fields);
+                            if (link.href) {
+                                document.execCommand(command, false, link.href);
+                                if (link.target) {
+                                    selection.anchorNode.parentElement.setAttribute('target', link.target);
                                 }
-                                title = fields.getValue('title');
-                                if (title) {
-                                    selection.anchorNode.parentElement.setAttribute('title', title);
+                                if (link.title) {
+                                    selection.anchorNode.parentElement.setAttribute('title', link.title);
                                 }
                             }
                             return [3, 3];
@@ -1573,25 +1647,16 @@ var BrickyEditor;
                 this.$control.hide();
             }
         };
-        HtmlTools.prototype.getLinkPromptParams = function (selection) {
-            var href = '', title = '', target = '';
-            if (selection.anchorNode && selection.anchorNode.parentNode.nodeName.breEqualsInvariant('a')) {
+        HtmlTools.prototype.getLinkPromptParamsInternal = function (selection) {
+            var link;
+            if (selection && selection.anchorNode && selection.anchorNode.parentNode.nodeName.breEqualsInvariant('a')) {
                 var a = $(selection.anchorNode.parentNode);
-                href = a.attr('href');
-                title = a.attr('title');
-                target = a.attr('target');
+                link = new BrickyEditor.HtmlLinkParams(a.attr('href'), a.attr('title'), a.attr('target'));
             }
-            return [
-                new BrickyEditor.Prompt.PromptParameter('href', BrickyEditor.EditorStrings.htmlEditorLinkUrlTitle, href, BrickyEditor.EditorStrings.htmlEditorLinkUrlPlaceholder),
-                new BrickyEditor.Prompt.PromptParameter('title', BrickyEditor.EditorStrings.htmlEditorLinkTitleTitle, title, BrickyEditor.EditorStrings.htmlEditorLinkTitlePlaceholder),
-                new BrickyEditor.Prompt.PromptParameterOptions('target', BrickyEditor.EditorStrings.htmlEditorLinkTargetTitle, [
-                    ['', ''],
-                    [BrickyEditor.EditorStrings.htmlEditorLinkTargetBlank, '_blank'],
-                    [BrickyEditor.EditorStrings.htmlEditorLinkTargetSelf, '_self'],
-                    [BrickyEditor.EditorStrings.htmlEditorLinkTargetParent, '_parent'],
-                    [BrickyEditor.EditorStrings.htmlEditorLinkTargetTop, '_top'],
-                ], target)
-            ];
+            else {
+                link = new BrickyEditor.HtmlLinkParams();
+            }
+            return link.getLinkPromptParams();
         };
         return HtmlTools;
     }());

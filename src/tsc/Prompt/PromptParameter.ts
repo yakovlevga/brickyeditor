@@ -17,7 +17,9 @@ namespace BrickyEditor {
             }
 
             public parseValue() {
-                this.value = this.$input.val();
+                if(this.$input) {
+                    this.value = this.$input.val();
+                }
                 this.$control = null
                 delete this._$control;
             }
@@ -25,11 +27,13 @@ namespace BrickyEditor {
             public get $control(): JQuery {
                 if (!this._$control) {
                     this._$control =
-                        $(`<div class="bre-prompt-field">
+                        $(`<div class=${this.key ? "bre-prompt-field" : "bre-prompt-subtitle"}>
                             <label class="bre-label" for="${this.key}">${this.title ? this.title : 'Select file...'}</label>
                         </div>`);
-                    this.$input = this.getEditor();
-                    this._$control.append(this.$input);
+                    this.$input = this.key ? this.getEditor() : null;
+                    if(this.$input != null) {
+                        this._$control.append(this.$input);
+                    }
                 }
 
                 return this._$control;

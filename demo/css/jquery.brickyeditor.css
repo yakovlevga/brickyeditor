@@ -116,6 +116,9 @@
   color: #333333;
   margin-bottom: .3rem; }
 
+.bre .bre-prompt-subtitle label.bre-label {
+  color: #777; }
+
 .bre input.bre-input, .bre textarea.bre-textarea, .bre select.bre-select {
   height: 2rem;
   vertical-align: middle;
