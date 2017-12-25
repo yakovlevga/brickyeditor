@@ -42,20 +42,17 @@ namespace BrickyEditor {
                     return;
 
                 if (command == 'CreateLink') {
-                    const params = this.getLinkPromptParams(selection);
+                    const params = this.getLinkPromptParamsInternal(selection);
                     const fields = await Editor.UI.modal.promptAsync(params);
-                    const href = fields.getValue('href');
-                    if (href) {
-                        document.execCommand(command, false, href);
-
-                        var target = fields.getValue('target');
-                        if (target) {
-                            selection.anchorNode.parentElement.setAttribute('target', target);
+                    const link = HtmlLinkParams.getLinkFromParams(fields);
+                    
+                    if (link.href) {
+                        document.execCommand(command, false, link.href);
+                        if (link.target) {
+                            selection.anchorNode.parentElement.setAttribute('target', link.target);
                         }
-
-                        var title = fields.getValue('title');
-                        if (title) {
-                            selection.anchorNode.parentElement.setAttribute('title', title);
+                        if (link.title) {
+                            selection.anchorNode.parentElement.setAttribute('title', link.title);
                         }
                     }
                 }
@@ -118,26 +115,18 @@ namespace BrickyEditor {
             }
         }
 
-        private getLinkPromptParams(selection: Selection): Array<Prompt.PromptParameter> {
-            var href = '', title = '', target = '';
-            if (selection.anchorNode && selection.anchorNode.parentNode.nodeName.breEqualsInvariant('a')) {
+        private getLinkPromptParamsInternal(selection: Selection): Prompt.PromptParameter[] {
+            var link: HtmlLinkParams;
+
+            if (selection && selection.anchorNode && selection.anchorNode.parentNode.nodeName.breEqualsInvariant('a')) {
                 var a = $(selection.anchorNode.parentNode);
-                href = a.attr('href');
-                title = a.attr('title');
-                target = a.attr('target');
+                link = new HtmlLinkParams(a.attr('href'),a.attr('title'), a.attr('target'));
+            }
+            else {
+                link = new HtmlLinkParams();
             }
 
-            return [
-                new Prompt.PromptParameter('href', EditorStrings.htmlEditorLinkUrlTitle, href, EditorStrings.htmlEditorLinkUrlPlaceholder),
-                new Prompt.PromptParameter('title',  EditorStrings.htmlEditorLinkTitleTitle, title, EditorStrings.htmlEditorLinkTitlePlaceholder),
-                new Prompt.PromptParameterOptions('target',  EditorStrings.htmlEditorLinkTargetTitle, [
-                    ['', ''],
-                    [EditorStrings.htmlEditorLinkTargetBlank, '_blank'],
-                    [EditorStrings.htmlEditorLinkTargetSelf, '_self'],
-                    [EditorStrings.htmlEditorLinkTargetParent, '_parent'],
-                    [EditorStrings.htmlEditorLinkTargetTop, '_top'],
-                ], target)
-            ];
-        }
+            return link.getLinkPromptParams();
+        }        
     }
 }

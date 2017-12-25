@@ -14,6 +14,8 @@ $.extend(BrickyEditor.EditorStrings, {
     imageFieldAltTitle: 'Альтернативный текст (alt)',
     imageFieldAltPlaceholder: 'Аттрибут \'alt\' для картинки',
 
+    imageFieldUrlSubtitle: 'Ссылка для открытия по клику на картинку',
+
     htmlEditorLinkUrlTitle: 'Ссылка',
     htmlEditorLinkUrlPlaceholder: 'http://ваша-ссылка.здесь',
 

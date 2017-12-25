@@ -9,6 +9,12 @@
         margin-bottom: .3rem;
     } 
 
+    .bre-prompt-subtitle {
+        label.bre-label {
+            color: $subtitle-font-color;
+        }
+    }
+
     input.bre-input, textarea.bre-textarea, select.bre-select {
         height: 2rem;
         vertical-align: middle;
