@@ -14,6 +14,8 @@ $.extend(BrickyEditor.EditorStrings, {
     imageFieldAltTitle: 'Alt',
     imageFieldAltPlaceholder: 'Image \'alt\' attribute value',
 
+    imageFieldUrlSubtitle: 'Link to open on image click',
+
     htmlEditorLinkUrlTitle: 'Url',
     htmlEditorLinkUrlPlaceholder: 'http://put-your-link.here',
 

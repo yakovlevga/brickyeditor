@@ -6,6 +6,8 @@ namespace BrickyEditor {
         public $html: JQuery;
         public $preview: JQuery;
 
+        public loaded: boolean = true;
+
         constructor(el: Element) {
             const previewSelector = Selectors.selectorTemplatePreview;
 
@@ -21,7 +23,13 @@ namespace BrickyEditor {
             if (!this.$preview.length) {
                 let block = new Block(this, true);
                 let blockEl = block.getHtml(true);
-                this.$preview = $(blockEl);
+
+                if(blockEl === null) {
+                    this.loaded = false;
+                }
+                else {
+                    this.$preview = $(blockEl);
+                }
             }
         }
 

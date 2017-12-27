@@ -205,6 +205,7 @@ var BrickyEditor;
 (function (BrickyEditor) {
     class Editor {
         constructor($editor, options) {
+            this.onError = (message, code = 0) => this.options.onError({ message: message, code: code });
             BrickyEditor.Fields.BaseField.registerCommonFields();
             this.$editor = $editor;
             this.$editor.addClass(BrickyEditor.Selectors.classEditor);
@@ -239,8 +240,9 @@ var BrickyEditor;
         }
         initAsync() {
             return __awaiter(this, void 0, void 0, function* () {
+                const editor = this;
                 Editor.UI.toggleToolsLoader(true);
-                const templates = yield BrickyEditor.Services.TemplateService.loadTemplatesAsync(this.options.templatesUrl, this.$editor, this.onError);
+                const templates = yield BrickyEditor.Services.TemplateService.loadTemplatesAsync(editor.options.templatesUrl, editor.$editor, editor.onError);
                 Editor.UI.toggleToolsLoader(false);
                 Editor.UI.setTemplates(templates);
                 const blocks = yield this.tryLoadInitialBlocksAsync();
@@ -252,6 +254,7 @@ var BrickyEditor;
         tryLoadInitialBlocksAsync() {
             return __awaiter(this, void 0, void 0, function* () {
                 const url = this.options.blocksUrl;
+                const editor = this;
                 return new Promise((resolve, reject) => __awaiter(this, void 0, void 0, function* () {
                     if (url) {
                         try {
@@ -259,7 +262,7 @@ var BrickyEditor;
                             resolve(blocks);
                         }
                         catch (error) {
-                            this.onError(BrickyEditor.EditorStrings.errorBlocksFileNotFound(url));
+                            editor.onError(BrickyEditor.EditorStrings.errorBlocksFileNotFound(url));
                             reject(error);
                         }
                     }
@@ -327,9 +330,6 @@ var BrickyEditor;
             }
             return container;
         }
-        onError(message, code = 0) {
-            this.options.onError({ message: message, code: code });
-        }
         trigger(event, data) {
             const editor = this;
             const $editor = this.$editor;
@@ -383,6 +383,7 @@ var BrickyEditor;
     EditorStrings.errorBlocksFileNotFound = function (url) { return `Blocks file not found. Requested file: ${url}.`; };
     EditorStrings.errorTemplatesFileNotFound = function (url) { return `Templates file not found. Requested file: ${url}.`; };
     EditorStrings.errorBlockTemplateNotFound = function (templateName) { return `Template "${templateName}" not found.`; };
+    EditorStrings.errorTemplateParsing = function (name) { return `Template parsing error: ${name}.`; };
     EditorStrings.embedFieldLinkTitle = 'Link to embed media';
     EditorStrings.embedFieldLinkPlaceholder = 'Link to instagram, youtube and etc.';
     EditorStrings.imageFieldLinkTitle = 'Image link';
@@ -582,7 +583,11 @@ var BrickyEditor;
                 const $field = fieldsHtml[name];
                 $(elem).replaceWith($field);
             });
-            return trim ? $html.html().breTotalTrim() : $html.html();
+            const html = $html.html();
+            if (!html) {
+                return null;
+            }
+            return trim ? html.breTotalTrim() : html;
         }
     }
     BrickyEditor.Block = Block;
@@ -1251,11 +1256,11 @@ var BrickyEditor;
                             const $groups = $(BrickyEditor.Selectors.selectorTemplateGroup, $data);
                             $groups.each((idx, el) => {
                                 let $group = $(el);
-                                let templates = this.getTemplates($group);
+                                let templates = this.getTemplates($group, onError);
                                 this.templates.push(new BrickyEditor.TemplateGroup($group.attr('title'), templates));
                                 $group.remove();
                             });
-                            let templates = this.getTemplates($data);
+                            let templates = this.getTemplates($data, onError);
                             let defaultGroupName = this.templates.length > 0 ? BrickyEditor.EditorStrings.defaultTemplatesGroupName : '';
                             let group = new BrickyEditor.TemplateGroup(defaultGroupName, templates);
                             this.templates.push(group);
@@ -1268,12 +1273,17 @@ var BrickyEditor;
                     }));
                 });
             }
-            static getTemplates($el) {
+            static getTemplates($el, onError) {
                 let templates = [];
                 const $templates = $(BrickyEditor.Selectors.selectorTemplate, $el);
                 $templates.each((idx, t) => {
                     let template = new BrickyEditor.Template(t);
-                    templates.push(template);
+                    if (template.loaded) {
+                        templates.push(template);
+                    }
+                    else {
+                        onError(BrickyEditor.EditorStrings.errorTemplateParsing(template.name));
+                    }
                 });
                 return templates;
             }
@@ -1297,6 +1307,7 @@ var BrickyEditor;
 (function (BrickyEditor) {
     class Template {
         constructor(el) {
+            this.loaded = true;
             const previewSelector = BrickyEditor.Selectors.selectorTemplatePreview;
             let $template = $(el);
             let data = $template.data();
@@ -1307,7 +1318,12 @@ var BrickyEditor;
             if (!this.$preview.length) {
                 let block = new BrickyEditor.Block(this, true);
                 let blockEl = block.getHtml(true);
-                this.$preview = $(blockEl);
+                if (blockEl === null) {
+                    this.loaded = false;
+                }
+                else {
+                    this.$preview = $(blockEl);
+                }
             }
         }
         getPreview() {

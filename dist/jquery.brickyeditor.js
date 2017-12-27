@@ -249,6 +249,11 @@ var BrickyEditor;
 (function (BrickyEditor) {
     var Editor = (function () {
         function Editor($editor, options) {
+            var _this = this;
+            this.onError = function (message, code) {
+                if (code === void 0) { code = 0; }
+                return _this.options.onError({ message: message, code: code });
+            };
             BrickyEditor.Fields.BaseField.registerCommonFields();
             this.$editor = $editor;
             this.$editor.addClass(BrickyEditor.Selectors.classEditor);
@@ -284,12 +289,13 @@ var BrickyEditor;
         };
         Editor.prototype.initAsync = function () {
             return __awaiter(this, void 0, void 0, function () {
-                var templates, blocks;
+                var editor, templates, blocks;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
+                            editor = this;
                             Editor.UI.toggleToolsLoader(true);
-                            return [4, BrickyEditor.Services.TemplateService.loadTemplatesAsync(this.options.templatesUrl, this.$editor, this.onError)];
+                            return [4, BrickyEditor.Services.TemplateService.loadTemplatesAsync(editor.options.templatesUrl, editor.$editor, editor.onError)];
                         case 1:
                             templates = _a.sent();
                             Editor.UI.toggleToolsLoader(false);
@@ -308,9 +314,10 @@ var BrickyEditor;
         Editor.prototype.tryLoadInitialBlocksAsync = function () {
             return __awaiter(this, void 0, void 0, function () {
                 var _this = this;
-                var url;
+                var url, editor;
                 return __generator(this, function (_a) {
                     url = this.options.blocksUrl;
+                    editor = this;
                     return [2, new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
                             var blocks, error_1;
                             return __generator(this, function (_a) {
@@ -327,7 +334,7 @@ var BrickyEditor;
                                         return [3, 4];
                                     case 3:
                                         error_1 = _a.sent();
-                                        this.onError(BrickyEditor.EditorStrings.errorBlocksFileNotFound(url));
+                                        editor.onError(BrickyEditor.EditorStrings.errorBlocksFileNotFound(url));
                                         reject(error_1);
                                         return [3, 4];
                                     case 4: return [3, 6];
@@ -402,10 +409,6 @@ var BrickyEditor;
             }
             return container;
         };
-        Editor.prototype.onError = function (message, code) {
-            if (code === void 0) { code = 0; }
-            this.options.onError({ message: message, code: code });
-        };
         Editor.prototype.trigger = function (event, data) {
             var editor = this;
             var $editor = this.$editor;
@@ -462,6 +465,7 @@ var BrickyEditor;
         EditorStrings.errorBlocksFileNotFound = function (url) { return "Blocks file not found. Requested file: " + url + "."; };
         EditorStrings.errorTemplatesFileNotFound = function (url) { return "Templates file not found. Requested file: " + url + "."; };
         EditorStrings.errorBlockTemplateNotFound = function (templateName) { return "Template \"" + templateName + "\" not found."; };
+        EditorStrings.errorTemplateParsing = function (name) { return "Template parsing error: " + name + "."; };
         EditorStrings.embedFieldLinkTitle = 'Link to embed media';
         EditorStrings.embedFieldLinkPlaceholder = 'Link to instagram, youtube and etc.';
         EditorStrings.imageFieldLinkTitle = 'Image link';
@@ -672,7 +676,11 @@ var BrickyEditor;
                 var $field = fieldsHtml[name];
                 $(elem).replaceWith($field);
             });
-            return trim ? $html.html().breTotalTrim() : $html.html();
+            var html = $html.html();
+            if (!html) {
+                return null;
+            }
+            return trim ? html.breTotalTrim() : html;
         };
         return Block;
     }());
@@ -1451,11 +1459,11 @@ var BrickyEditor;
                                             $groups = $(BrickyEditor.Selectors.selectorTemplateGroup, $data);
                                             $groups.each(function (idx, el) {
                                                 var $group = $(el);
-                                                var templates = _this.getTemplates($group);
+                                                var templates = _this.getTemplates($group, onError);
                                                 _this.templates.push(new BrickyEditor.TemplateGroup($group.attr('title'), templates));
                                                 $group.remove();
                                             });
-                                            templates_1 = this.getTemplates($data);
+                                            templates_1 = this.getTemplates($data, onError);
                                             defaultGroupName = this.templates.length > 0 ? BrickyEditor.EditorStrings.defaultTemplatesGroupName : '';
                                             group = new BrickyEditor.TemplateGroup(defaultGroupName, templates_1);
                                             this.templates.push(group);
@@ -1473,12 +1481,17 @@ var BrickyEditor;
                     });
                 });
             };
-            TemplateService.getTemplates = function ($el) {
+            TemplateService.getTemplates = function ($el, onError) {
                 var templates = [];
                 var $templates = $(BrickyEditor.Selectors.selectorTemplate, $el);
                 $templates.each(function (idx, t) {
                     var template = new BrickyEditor.Template(t);
-                    templates.push(template);
+                    if (template.loaded) {
+                        templates.push(template);
+                    }
+                    else {
+                        onError(BrickyEditor.EditorStrings.errorTemplateParsing(template.name));
+                    }
                 });
                 return templates;
             };
@@ -1503,6 +1516,7 @@ var BrickyEditor;
 (function (BrickyEditor) {
     var Template = (function () {
         function Template(el) {
+            this.loaded = true;
             var previewSelector = BrickyEditor.Selectors.selectorTemplatePreview;
             var $template = $(el);
             var data = $template.data();
@@ -1513,7 +1527,12 @@ var BrickyEditor;
             if (!this.$preview.length) {
                 var block = new BrickyEditor.Block(this, true);
                 var blockEl = block.getHtml(true);
-                this.$preview = $(blockEl);
+                if (blockEl === null) {
+                    this.loaded = false;
+                }
+                else {
+                    this.$preview = $(blockEl);
+                }
             }
         }
         Template.prototype.getPreview = function () {

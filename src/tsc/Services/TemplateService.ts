@@ -27,13 +27,13 @@ namespace BrickyEditor {
                         const $groups = $(Selectors.selectorTemplateGroup, $data);
                         $groups.each((idx, el) => {
                             let $group = $(el);     
-                            let templates = this.getTemplates($group);
+                            let templates = this.getTemplates($group, onError);
                             this.templates.push(new TemplateGroup($group.attr('title'), templates));
                             $group.remove();
                         })
                                                     
                         // the rest ungroupped templates
-                        let templates = this.getTemplates($data);
+                        let templates = this.getTemplates($data, onError);
                         let defaultGroupName = this.templates.length > 0 ? EditorStrings.defaultTemplatesGroupName : '';
                         let group = new TemplateGroup(defaultGroupName, templates);
                         this.templates.push(group);
@@ -47,13 +47,20 @@ namespace BrickyEditor {
                 });
             }
 
-            private static getTemplates($el: JQuery) : Template[] {
+            private static getTemplates(
+                $el: JQuery,
+                onError: (message: string, code?: number) => any) : Template[] {
                 let templates = [];
                 
                 const $templates = $(Selectors.selectorTemplate, $el);
-                $templates.each((idx, t) => {
+                $templates.each((idx, t) => {                    
                     let template = new Template(t);
-                    templates.push(template);
+                    if(template.loaded) {
+                        templates.push(template);
+                    }
+                    else {
+                        onError(EditorStrings.errorTemplateParsing(template.name))
+                    }
                 });
 
                 return templates;

@@ -10,6 +10,8 @@ namespace BrickyEditor {
         public static UI: UI;        
         public options: EditorOptions;
 
+        private onError = (message: string, code: number = 0) => this.options.onError({ message: message, code: code});
+
         constructor(
             $editor: JQuery,
             options: EditorOptions) {
@@ -61,10 +63,16 @@ namespace BrickyEditor {
         }
 
         public async initAsync() {
+            const editor = this;
+
             /// Load templates
             Editor.UI.toggleToolsLoader(true);
 
-            const templates = await Services.TemplateService.loadTemplatesAsync(this.options.templatesUrl, this.$editor, this.onError);    
+            const templates = await Services.TemplateService.loadTemplatesAsync(
+                editor.options.templatesUrl, 
+                editor.$editor, 
+                editor.onError);
+
             Editor.UI.toggleToolsLoader(false);
             Editor.UI.setTemplates(templates);
 
@@ -80,13 +88,14 @@ namespace BrickyEditor {
         // load initial blocks
         private async tryLoadInitialBlocksAsync(): Promise<Block[]> {
             const url = this.options.blocksUrl;
+            const editor = this;
             return new Promise<Block[]>(async (resolve, reject) => {
                 if(url) {
                     try {
                         const blocks = await $.get(url);
                         resolve(blocks);
                     } catch (error) {    
-                        this.onError(EditorStrings.errorBlocksFileNotFound(url));
+                        editor.onError(EditorStrings.errorBlocksFileNotFound(url));
                         reject(error);
                     }
                 }
@@ -164,10 +173,6 @@ namespace BrickyEditor {
                 }                
             }
             return container;
-        }
-
-        public onError(message: string, code: number = 0) {
-            this.options.onError({ message: message, code: code});
         }
 
         private trigger(event: string, data: any) {

@@ -3,7 +3,8 @@ namespace BrickyEditor {
         static errorBlocksFileNotFound = function(url: string) { return `Blocks file not found. Requested file: ${url}.`; }
         static errorTemplatesFileNotFound = function(url: string) { return `Templates file not found. Requested file: ${url}.`; }
         static errorBlockTemplateNotFound = function(templateName: string) { return `Template "${templateName}" not found.`; }
-        
+        static errorTemplateParsing = function(name: string) { return `Template parsing error: ${name}.`; }
+
         static embedFieldLinkTitle = 'Link to embed media';
         static embedFieldLinkPlaceholder = 'Link to instagram, youtube and etc.';
 
