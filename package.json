@@ -1,10 +1,10 @@
 {
   "name": "brickyeditor",
-  "version": "0.8.2",
+  "version": "0.8.3",
   "author": {
-    "name": "George Yakovlev", 
-    "email" : "yakovlev.ga@gmail.com", 
-    "url" : "https://www.facebook.com/george.yakovlev"
+    "name": "George Yakovlev",
+    "email": "yakovlev.ga@gmail.com",
+    "url": "https://www.facebook.com/george.yakovlev"
   },
   "description": "WYSIWYG block editor jQuery plugin.",
   "license": "MIT",
@@ -55,5 +55,5 @@
     "presets": [
       "es2015"
     ]
-  }  
+  }
 }
