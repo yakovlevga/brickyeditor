@@ -159,7 +159,12 @@ namespace BrickyEditor {
                     $(elem).replaceWith($field);
                 });
                 
-            return trim ? $html.html().breTotalTrim() : $html.html();
+            const html = $html.html();
+            if(!html) {
+                return null;
+            }
+
+            return trim ? html.breTotalTrim() : html;
         }
     }
 }
