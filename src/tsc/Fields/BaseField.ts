@@ -15,6 +15,7 @@ namespace BrickyEditor {
             public data: any;
             private onSelect: (field: BaseField) => void;
             private onUpdate: (property, oldValue, newValue) => void;
+            protected onUpload: (file: any, callback: (url: string) => void) => void;
 
             protected settings: (field: BaseField) => void;
             protected getSettingsEl(): JQuery {
@@ -25,12 +26,14 @@ namespace BrickyEditor {
                 $field: JQuery, 
                 data: any, 
                 onSelect: (field: BaseField) => void, 
-                onUpdate: (property, oldValue, newValue) => void) {
+                onUpdate: (property, oldValue, newValue) => void,
+                onUpload?: (file: any, callback: (url: string) => void) => void) {
 
                 this.$field = $field;
                 this.data = data;
                 this.onSelect = onSelect;
                 this.onUpdate = onUpdate;
+                this.onUpload = onUpload;
                 this.bind();
             }
 
@@ -58,7 +61,8 @@ namespace BrickyEditor {
                 $field: JQuery, 
                 data: any, 
                 onSelect: (field: BaseField) => void, 
-                onUpdate: (property, oldValue, newValue) => void): BaseField {
+                onUpdate: (property, oldValue, newValue) => void,
+                onUpload?: (file: any, callback: (url: string) => void) => void): BaseField {                
 
                 let fieldData = $field.data().breField;
                 if (!fieldData) {
@@ -97,7 +101,7 @@ namespace BrickyEditor {
                     // find field constructor in registered fields
                     if (this._fields.hasOwnProperty(type)) {
                         const field = this._fields[type];
-                        return new field($field, fieldData, onSelect, onUpdate);
+                        return new field($field, fieldData, onSelect, onUpdate, onUpload);
                     }
                     else {
                         throw `${type} field not found`;

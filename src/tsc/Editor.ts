@@ -58,7 +58,8 @@ namespace BrickyEditor {
                     this.trigger(Events.onBlockMove, { block: block, from: from, to: to });
                     this.trigger(Events.onChange, { blocks: this.getData(), html: this.getHtml() });
                 },
-                onUpdate
+                onUpdate,
+                this.options.onUpload
             );
         }
 

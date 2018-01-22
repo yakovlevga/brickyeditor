@@ -14,6 +14,7 @@ namespace BrickyEditor {
             private onDeselectBlock: (block: Block) => any,
             private onMoveBlock: (block: Block, from: number, to: number) => any,
             private onUpdateBlock: (block: Block, property: string, oldValue: any, newValue: any) => any,
+            private onUpload: (file: any, callback: (url: string) => void) => void,
             private usePlaceholder: boolean = false) {
 
             this.togglePlaceholderIfNeed();
@@ -54,7 +55,8 @@ namespace BrickyEditor {
                 block => this.deselectBlock(block),
                 block => this.copyBlock(block),
                 (block, offset) => this.moveBlock(block, offset),
-                this.onUpdateBlock);
+                this.onUpdateBlock,
+                this.onUpload);
 
             this.insertBlock(block, idx);
 

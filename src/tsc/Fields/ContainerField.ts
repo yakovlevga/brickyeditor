@@ -18,6 +18,7 @@ namespace BrickyEditor {
                     (block: Block) => { },
                     (block: Block) => { field.updateBlocks(); },
                     (block: Block) => { field.updateBlocks(); },
+                    field.onUpload,
                     true);
 
                 $field.addClass(Selectors.selectorFieldContainer);

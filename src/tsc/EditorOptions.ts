@@ -26,6 +26,8 @@ namespace BrickyEditor {
         public onBlockDeselect: any;
         /** onBlockUpdate callback */
         public onBlockUpdate: any;
+        
+        public onUpload: (file: any, callback: (url: string) => void) => void;
 
         /** Url to fetch initial blocks, overrides initial blocks property */
         public blocksUrl: string;
@@ -56,6 +58,7 @@ namespace BrickyEditor {
             this.onBlockDeselect = options.onBlockDeselect;
             this.onBlockUpdate = options.onBlockUpdate;
             this.onError = options.onError || this.onError;
+            this.onUpload = options.onUpload || null;
 
             this.blocksUrl = options.blocksUrl || null;
             this.blocks = options.blocks || null;

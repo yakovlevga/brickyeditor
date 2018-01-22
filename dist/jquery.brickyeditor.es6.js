@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 var BrickyEditor;
 (function (BrickyEditor) {
     class BlocksContainer {
-        constructor($element, onAddBlock, onDeleteBlock, onSelectBlock, onDeselectBlock, onMoveBlock, onUpdateBlock, usePlaceholder = false) {
+        constructor($element, onAddBlock, onDeleteBlock, onSelectBlock, onDeselectBlock, onMoveBlock, onUpdateBlock, onUpload, usePlaceholder = false) {
             this.$element = $element;
             this.onAddBlock = onAddBlock;
             this.onDeleteBlock = onDeleteBlock;
@@ -17,6 +17,7 @@ var BrickyEditor;
             this.onDeselectBlock = onDeselectBlock;
             this.onMoveBlock = onMoveBlock;
             this.onUpdateBlock = onUpdateBlock;
+            this.onUpload = onUpload;
             this.usePlaceholder = usePlaceholder;
             this.blocks = [];
             this.isContainer = true;
@@ -40,7 +41,7 @@ var BrickyEditor;
             return html;
         }
         addBlock(template, data, idx, select = true) {
-            let block = new BrickyEditor.Block(template, false, data, block => this.deleteBlock(block), block => this.selectBlock(block), block => this.deselectBlock(block), block => this.copyBlock(block), (block, offset) => this.moveBlock(block, offset), this.onUpdateBlock);
+            let block = new BrickyEditor.Block(template, false, data, block => this.deleteBlock(block), block => this.selectBlock(block), block => this.deselectBlock(block), block => this.copyBlock(block), (block, offset) => this.moveBlock(block, offset), this.onUpdateBlock, this.onUpload);
             this.insertBlock(block, idx);
             if (select) {
                 block.select();
@@ -236,7 +237,7 @@ var BrickyEditor;
             return new BrickyEditor.BlocksContainer(this.$editor, onAdd, onDelete, (block) => { this.trigger(BrickyEditor.Events.onBlockSelect, { block: block }); }, (block) => { this.trigger(BrickyEditor.Events.onBlockDeselect, { block: block }); }, (block, from, to) => {
                 this.trigger(BrickyEditor.Events.onBlockMove, { block: block, from: from, to: to });
                 this.trigger(BrickyEditor.Events.onChange, { blocks: this.getData(), html: this.getHtml() });
-            }, onUpdate);
+            }, onUpdate, this.options.onUpload);
         }
         initAsync() {
             return __awaiter(this, void 0, void 0, function* () {
@@ -365,6 +366,7 @@ var BrickyEditor;
             this.onBlockDeselect = options.onBlockDeselect;
             this.onBlockUpdate = options.onBlockUpdate;
             this.onError = options.onError || this.onError;
+            this.onUpload = options.onUpload || null;
             this.blocksUrl = options.blocksUrl || null;
             this.blocks = options.blocks || null;
             this.compactTools = options.compactTools;
@@ -462,7 +464,7 @@ var BrickyEditor;
 var BrickyEditor;
 (function (BrickyEditor) {
     class Block {
-        constructor(template, preview, data, onDelete, onSelect, onDeselect, onCopy, onMove, onUpdate) {
+        constructor(template, preview, data, onDelete, onSelect, onDeselect, onCopy, onMove, onUpdate, onUpload) {
             this.template = template;
             this.onDelete = onDelete;
             this.onSelect = onSelect;
@@ -470,6 +472,7 @@ var BrickyEditor;
             this.onCopy = onCopy;
             this.onMove = onMove;
             this.onUpdate = onUpdate;
+            this.onUpload = onUpload;
             this.fields = [];
             this.template = template;
             const block = this;
@@ -490,16 +493,16 @@ var BrickyEditor;
                 .addBack(BrickyEditor.Selectors.selectorField);
             $fields.each((idx, elem) => {
                 const onUpdate = (property, oldValue, newValue) => {
-                    if (this.onUpdate) {
-                        this.onUpdate(block, property, oldValue, newValue);
+                    if (block.onUpdate) {
+                        block.onUpdate(block, property, oldValue, newValue);
                     }
                 };
                 const onSelect = (field) => {
                     block.select(field);
                 };
                 let $field = $(elem);
-                let field = BrickyEditor.Fields.BaseField.createField($field, data, onSelect, onUpdate);
-                this.fields.push(field);
+                let field = BrickyEditor.Fields.BaseField.createField($field, data, onSelect, onUpdate, block.onUpload);
+                block.fields.push(field);
             });
         }
         getActions() {
@@ -662,11 +665,12 @@ var BrickyEditor;
     let Fields;
     (function (Fields) {
         class BaseField {
-            constructor($field, data, onSelect, onUpdate) {
+            constructor($field, data, onSelect, onUpdate, onUpload) {
                 this.$field = $field;
                 this.data = data;
                 this.onSelect = onSelect;
                 this.onUpdate = onUpdate;
+                this.onUpload = onUpload;
                 this.bind();
             }
             static get type() {
@@ -691,7 +695,7 @@ var BrickyEditor;
                 }
                 this._fields[this.type] = this;
             }
-            static createField($field, data, onSelect, onUpdate) {
+            static createField($field, data, onSelect, onUpdate, onUpload) {
                 let fieldData = $field.data().breField;
                 if (!fieldData) {
                     throw `There is no any data in field ${$field.html()}`;
@@ -766,7 +770,7 @@ var BrickyEditor;
                 let $field = this.$field;
                 this.container = new BrickyEditor.BlocksContainer($field, (block) => {
                     field.updateBlocks();
-                }, (block) => { field.updateBlocks(); }, (block) => { this.select(); }, (block) => { }, (block) => { field.updateBlocks(); }, (block) => { field.updateBlocks(); }, true);
+                }, (block) => { field.updateBlocks(); }, (block) => { this.select(); }, (block) => { }, (block) => { field.updateBlocks(); }, (block) => { field.updateBlocks(); }, field.onUpload, true);
                 $field.addClass(BrickyEditor.Selectors.selectorFieldContainer);
                 $field
                     .on('click', (ev) => {
@@ -934,8 +938,17 @@ var BrickyEditor;
                         const file = fields.getValue('file');
                         const src = fields.getValue('src');
                         if (file) {
-                            field.setFile(file);
-                            field.setSrc(null);
+                            if (field.onUpload) {
+                                field.onUpload(file, url => {
+                                    debugger;
+                                    field.setSrc(src);
+                                    field.setFile(null);
+                                });
+                            }
+                            else {
+                                field.setFile(file);
+                                field.setSrc(null);
+                            }
                         }
                         else if (src) {
                             field.setSrc(src);

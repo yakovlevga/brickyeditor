@@ -2,6 +2,7 @@ $.extend(BrickyEditor.EditorStrings, {
     errorBlocksFileNotFound: function(url) { return 'Blocks file not found. Requested file: ' + url; },
     errorTemplatesFileNotFound: function(url) { return 'Templates file not found. Requested file:' + url; },
     errorBlockTemplateNotFound: function (templateName) { return 'Template "' + templateName + '" not found.'; },
+    errorTemplateParsing: function(name) { return 'Template parsing error: ' + name; },
 
     embedFieldLinkTitle: 'Link to embed media',
 

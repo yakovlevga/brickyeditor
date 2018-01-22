@@ -16,8 +16,16 @@ namespace BrickyEditor {
                         const file = fields.getValue('file');
                         const src = fields.getValue('src');
                         if (file) {
-                            field.setFile(file);
-                            field.setSrc(null);
+                            if(field.onUpload) {
+                                field.onUpload(file, url => {
+                                    field.setSrc(url);
+                                    field.setFile(null);
+                                });
+                            }
+                            else {
+                                field.setFile(file);
+                                field.setSrc(null);
+                            }
                         }
                         else if (src) {
                             field.setSrc(src);

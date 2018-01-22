@@ -13,7 +13,8 @@ namespace BrickyEditor {
             private onDeselect?: (block: Block) => void,
             private onCopy?: (block: Block) => void,
             private onMove?: (block: Block, offset: number) => void,
-            private onUpdate?: (block: Block, property: string, oldValue: any, newValue: any) => void) {
+            private onUpdate?: (block: Block, property: string, oldValue: any, newValue: any) => void,
+            private onUpload?: (file: any, callback: (url: string) => void) => void) {
 
             this.template = template;
 
@@ -48,16 +49,16 @@ namespace BrickyEditor {
 
             $fields.each((idx, elem) => {
                 const onUpdate = (property: string, oldValue: any, newValue: any) => {
-                    if(this.onUpdate) {
-                        this.onUpdate(block, property, oldValue, newValue);
+                    if(block.onUpdate) {
+                        block.onUpdate(block, property, oldValue, newValue);
                     }
                 };
                 const onSelect = (field: Fields.BaseField) => {
                     block.select(field);
                 };
-                let $field = $(elem);                
-                let field = Fields.BaseField.createField($field, data, onSelect, onUpdate);
-                this.fields.push(field);
+                let $field = $(elem);
+                let field = Fields.BaseField.createField($field, data, onSelect, onUpdate, block.onUpload);
+                block.fields.push(field);
             });
         }
 
