@@ -1,4 +1,3 @@
-/// <reference path="types/jquery.d.ts" />
 /// <reference path="types/common.d.ts" />
 
 namespace BrickyEditor {
@@ -6,43 +5,45 @@ namespace BrickyEditor {
         private isLoaded: boolean;
         private container: BlocksContainer;
 
-        public $editor: JQuery
-        public static UI: UI;        
+        public $editor: HTMLElement;
+        public static UI: UI;
         public options: EditorOptions;
 
-        private onError = (message: string, code: number = 0) => this.options.onError({ message: message, code: code});
+        private onError = (message: string, code: number = 0) => this.options.onError({ message: message, code: code });
 
         constructor(
-            $editor: JQuery,
+            $editor: HTMLElement,
             options: EditorOptions) {
             Fields.BaseField.registerCommonFields();
-            
+
             this.$editor = $editor;
-            this.$editor.addClass(Selectors.classEditor);            
+            this.$editor.classList.add(Selectors.classEditor);
             this.options = new EditorOptions(options);
             this.container = this.createContainer();
 
-            Editor.UI = new UI(this);            
+            Editor.UI = new UI(this);
+
+            this.tryBindFormSubmit();
         }
 
         private createContainer(): BlocksContainer {
             const onAdd = (block: Block, idx: number) => {
-                if(this.isLoaded) {
-                    this.trigger(Events.onBlockAdd, { block: block, idx: idx});
+                if (this.isLoaded) {
+                    this.trigger(Events.onBlockAdd, { block: block, idx: idx });
                     this.trigger(Events.onChange, { blocks: this.getData(), html: this.getHtml() });
                 }
             };
 
             const onDelete = (block: Block, idx: number) => {
-                this.trigger(Events.onBlockDelete, { block: block, idx: idx});
+                this.trigger(Events.onBlockDelete, { block: block, idx: idx });
                 this.trigger(Events.onChange, { blocks: this.getData(), html: this.getHtml() });
             }
 
-            const onUpdate = (block, property, oldValue, newValue) => { 
+            const onUpdate = (block, property, oldValue, newValue) => {
                 this.trigger(Events.onBlockUpdate, {
-                    block : block, 
-                    property: property, 
-                    oldValue: oldValue, 
+                    block: block,
+                    property: property,
+                    oldValue: oldValue,
                     newValue: newValue
                 });
                 this.trigger(Events.onChange, { blocks: this.getData(), html: this.getHtml() });
@@ -70,8 +71,8 @@ namespace BrickyEditor {
             Editor.UI.toggleToolsLoader(true);
 
             const templates = await Services.TemplateService.loadTemplatesAsync(
-                editor.options.templatesUrl, 
-                editor.$editor, 
+                editor.options.templatesUrl,
+                editor.$editor,
                 editor.onError);
 
             Editor.UI.toggleToolsLoader(false);
@@ -80,7 +81,7 @@ namespace BrickyEditor {
             // Load initial blocks
             const blocks = await this.tryLoadInitialBlocksAsync();
             this.loadBlocks(blocks)
-            
+
             // Trigger jQuery event
             this.isLoaded = true;
             this.trigger(Events.onLoad, this);
@@ -91,16 +92,16 @@ namespace BrickyEditor {
             const url = this.options.blocksUrl;
             const editor = this;
             return new Promise<Block[]>(async (resolve, reject) => {
-                if(url) {
+                if (url) {
                     try {
-                        const blocks = await $.get(url);
+                        const blocks = await $ajax.get(url);
                         resolve(blocks);
-                    } catch (error) {    
+                    } catch (error) {
                         editor.onError(EditorStrings.errorBlocksFileNotFound(url));
                         reject(error);
                     }
                 }
-                else if(this.options.blocks) {
+                else if (this.options.blocks) {
                     resolve(this.options.blocks);
                 }
                 else {
@@ -111,28 +112,15 @@ namespace BrickyEditor {
 
         tryBindFormSubmit() {
             const editor = this;
-            const $form = this.options.formSelector ? $(this.options.formSelector) : null;
-            const $input = this.options.inputSelector ? $(this.options.inputSelector) : null;
+            const $form = this.options.formSelector ? $dom.find(this.options.formSelector) : null;
+            const $input = this.options.inputSelector ? $dom.find(this.options.inputSelector) : null;
 
-            if (!$form || !$input || $form.length == 0 || $input.length == 0)
+            if (!$form || !$input || !($input instanceof HTMLInputElement)) {
                 return;
+            }
 
-            $form.on('submit', () => {
-                $input.val(JSON.stringify(editor.getData()));
-                return true;
-            });
-        }
-
-        bindFormSubmit() {
-            const editor = this;
-            const $form = this.options.formSelector ? $(this.options.formSelector) : null;
-            const $input = this.options.inputSelector ? $(this.options.inputSelector) : null;
-
-            if(!$form || !$input || $form.length == 0 || $input.length == 0)
-                return;
-
-            $form.on('submit', () => {
-                $input.val(JSON.stringify(editor.getData()));
+            $dom.on($form, 'submit', () => {
+                ($input as HTMLInputElement).value = JSON.stringify(editor.getData());
                 return true;
             });
         }
@@ -167,22 +155,20 @@ namespace BrickyEditor {
         }
 
         private getContainer(container: BlocksContainer) {
-            if(container.selectedBlock && container.selectedBlock.isContainer()) {
+            if (container.selectedBlock && container.selectedBlock.isContainer()) {
                 const field = container.selectedBlock.selectedField as Fields.ContainerField;
-                if(field) {
+                if (field) {
                     return this.getContainer(field.container);
-                }                
+                }
             }
             return container;
         }
 
         private trigger(event: string, data: any) {
-            const editor = this;
-            const $editor = this.$editor;
-
-            $editor.trigger('bre.' + event, data);
+            const editor = this;            
+            $dom.trigger(this.$editor, 'bre.' + event, data)
             Common.propsEach(editor.options, (key, value) => {
-                if(key.breEqualsInvariant(event) && value) {
+                if (key.breEqualsInvariant(event) && value) {
                     value(data);
                 }
             });

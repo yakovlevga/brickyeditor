@@ -5,59 +5,62 @@ namespace BrickyEditor {
         private selectionRanges: any[];
 
         constructor(
-            private $control: JQuery,
-            private $closeBtn: JQuery,
-            private $form: JQuery,
-            private $btns: JQuery,
-            private $okBtn: JQuery,
-            private $cancelBtn: JQuery) {
+            private $control: HTMLElement,
+            private $closeBtn: HTMLElement,
+            private $form: HTMLElement,
+            private $btns: HTMLElement,
+            private $okBtn: HTMLElement,
+            private $cancelBtn: HTMLElement) {
 
-            var modal = this;
-
-            $closeBtn.on('click', function () {
+            const modal = this;
+            $dom.on($closeBtn, 'click', function () {
                 modal.hideModal();
             });
         }
 
         public hideModal() {
             this.restoreSelection();
-            this.$control.fadeOut();
+            $dom.hide(this.$control);
         }
 
-        public showModal($html?: JQuery, showBtns: boolean = true) {
+        public showModal($html?: HTMLElement, showBtns: boolean = true) {
             this.saveSelection();
-            this.$btns.toggle(showBtns);
+            $dom.toggle(this.$btns, showBtns);
 
             if ($html) {
-                this.$form.append($html);
-                if (!$html.is(':visible')) {
-                    $html.show();
+                this.$form.appendChild($html);
+                if ($dom.isHidden($html)) {
+                    $dom.show($html);
                 }
             }
-
-            this.$control.fadeIn();
+            $dom.show(this.$control);
         }
 
         public promptAsync(fields: Array<Prompt.PromptParameter>): Promise<Prompt.PromptParameterList> {
             const modal = this;
 
             return new Promise<Prompt.PromptParameterList>((resolve, reject) => {
-                //  clear form
-                modal.$form.children().not(this.$btns).remove();
+                //  clear form                
+                for (var i = 0; i < modal.$form.children.length; i++) {
+                    var child = modal.$form.children[i];
+                    if(child != this.$btns) {
+                        modal.$form.removeChild(child);
+                    }
+                }
 
                 // add fields
                 fields.forEach(field => {
-                    this.$btns.before(field.$control);
+                    $dom.before(this.$btns, field.$control);
                 });
 
-                modal.$okBtn.on('click', () => {
+                $dom.on(modal.$okBtn, 'click', () => {
                     fields.forEach(field => field.parseValue());
                     modal.hideModal();
                     const list = new Prompt.PromptParameterList(fields);
                     resolve(list);
                 });
 
-                modal.$cancelBtn.on('click', () => {
+                $dom.on(modal.$cancelBtn, 'click', () => {
                     modal.hideModal();
                     resolve(null);
                 });

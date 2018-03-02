@@ -1,9 +1,9 @@
 namespace BrickyEditor {
     export class BlockUI {
 
-        public $editor: JQuery; // block editor
-        public $tools: JQuery; // block tools        
-        public $block: JQuery; // block tools        
+        public $editor: HTMLElement;    // block editor
+        public $tools: HTMLElement;     // block tools        
+        public $block: HTMLElement;     // block
 
         private onSelect: () => void;
 
@@ -12,7 +12,7 @@ namespace BrickyEditor {
         }
 
         constructor(            
-            $block: JQuery,
+            $block: HTMLElement,
             preview: boolean,
             actions: BlockUIAction[],
             onSelect?: () => void) {
@@ -27,29 +27,41 @@ namespace BrickyEditor {
         }
 
         public toggleSelection(isOn: boolean) {
-            this.$editor.toggleClass("bre-selected", isOn);
+            this.$editor.classList.toggle("bre-selected", isOn);
         }
 
         /**
          * Generate block editor wrapper with block tools.
          */
         private buildEditorUI(actions: BlockUIAction[]) {
-            this.$tools = $('<div class="bre-block-tools bre-btn-deck"></div>');
+            this.$tools = $dom.el('<div class="bre-block-tools bre-btn-deck"></div>');
             actions.forEach(action => {
                 var $btn = this.buildButton(action);
-                this.$tools.append($btn);
+                this.$tools.appendChild($btn);
             });
             UI.initBtnDeck(this.$tools);
 
-            this.$editor = $('<div class="bre-block-wrapper"></div>');
-            this.$editor.append(this.$tools);
-            this.$editor.append(this.$block);
+            this.$editor = $dom.el('<div class="bre-block-wrapper"></div>');
+            this.$editor.appendChild(this.$tools);
+            this.$editor.appendChild(this.$block);
 
-            this.$editor.hover(
-                () => { this.$editor.addClass('bre-active'); },
-                () => { this.$editor.removeClass('bre-active'); });
+            $dom.on(this.$editor, 'mouseover', () => {
+                this.$editor.classList.add('bre-active');
+            });
 
-            this.$block.on('click', () => this.onSelect());
+            $dom.on(this.$editor, 'mouseout', () => {
+                this.$editor.classList.remove('bre-active');
+            });
+
+            $dom.on(this.$editor, 'click', () => {
+                this.onSelect();
+            });
+
+            // this.$editor.hover(
+            //     () => { this.$editor.classList.add('bre-active'); },
+            //     () => { this.$editor.classList.remove('bre-active'); });
+
+            // this.$block.on('click', () => this.onSelect());
         }
 
         /**
@@ -57,14 +69,14 @@ namespace BrickyEditor {
          *
          * @param action Button action
          */
-        private buildButton(action: BlockUIAction): JQuery {
-            let $el = $(`<button type="button" class="bre-btn"><i class="fa fa-${action.icon}"></i></button>`);
+        private buildButton(action: BlockUIAction): HTMLElement {
+            let $el = $dom.el(`<button type="button" class="bre-btn"><i class="fa fa-${action.icon}"></i></button>`);
             if (action.action) {
-                $el.on('click', (ev) => {
+                $el.onclick = function (ev) {
                     action.action()
                     ev.stopPropagation();
                     return false;
-                });
+                }
             }
             return $el;
         }

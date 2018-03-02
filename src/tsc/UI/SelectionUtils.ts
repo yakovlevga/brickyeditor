@@ -1,19 +1,19 @@
 namespace BrickyEditor {
     export class SelectionUtils {
 
-        public static bindTextSelection($el: JQuery, handler: (rect: ClientRect) => any) {
-            if (!$el.is('[contenteditable]')) {
+        public static bindTextSelection($el: HTMLElement, handler: (rect: ClientRect) => any) {
+            if (!$dom.matches($el, '[contenteditable]')) {
                 return;
             }
 
-            $el.on('mouseup', () => {
+            $dom.on($el, 'mouseup', () => {
                 setTimeout(() => {
                     let rect = this.getSelectionRect();
                     handler(rect);
                 }, 0);
             });
 
-            $el.on('keyup', (ev) => {
+            $dom.on($el, 'keyup', (ev) => {
                 let rect = this.getSelectionRect();
                 handler(rect);
             });

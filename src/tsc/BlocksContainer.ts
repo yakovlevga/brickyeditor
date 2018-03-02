@@ -4,10 +4,10 @@ namespace BrickyEditor {
         public blocks: Array<Block> = [];
         public selectedBlock: Block;
         public isContainer: boolean = true;
-        public $placeholder: JQuery;
+        public $placeholder: HTMLElement;
 
         constructor(
-            private $element: JQuery,
+            private $element: HTMLElement,
             private onAddBlock: (block: Block, idx: number) => any,
             private onDeleteBlock: (block: Block, idx: number) => any,
             private onSelectBlock: (block: Block) => any,
@@ -34,10 +34,12 @@ namespace BrickyEditor {
                 blocksHtml.push(block.getHtml(true));
             });
 
-            var blocksHtmlJoined = blocksHtml.join('\n');
-            let $el = this.$element.clone(false, false).html(blocksHtmlJoined).wrap('<div></div>');
-            const html = $('<div></div>').append($el).html();
-            return html;
+            let $el = $dom.clone(this.$element);
+            $el.innerHTML =  blocksHtml.join('\n');
+            return $el.outerHTML;
+
+            // const html = $('<div></div>').appendChild($el).html();
+            // return html;
         }
 
         public addBlock(
@@ -74,10 +76,10 @@ namespace BrickyEditor {
 
             this.blocks.splice(idx, 0, block);
             if (idx == 0) {  // todo: move to block ui
-                this.$element.append(block.ui.$editor);
+                this.$element.appendChild(block.ui.$editor);
             }
             else { // todo: move to block ui
-                this.blocks[idx - 1].ui.$editor.after(block.ui.$editor);
+                $dom.after(this.blocks[idx - 1].ui.$editor, block.ui.$editor);
             }
 
             this.onAddBlock(block, idx);
@@ -116,10 +118,10 @@ namespace BrickyEditor {
 
             var $anchorBlock = this.blocks[new_idx].ui.$editor;
             if (offset > 0) {
-                $anchorBlock.after(block.ui.$editor);
+                $dom.after($anchorBlock, block.ui.$editor);
             }
             else if (offset < 0) {
-                $anchorBlock.before(block.ui.$editor);
+                $dom.before($anchorBlock, block.ui.$editor);
             }
 
             this.blocks.splice(idx, 1);
@@ -160,8 +162,8 @@ namespace BrickyEditor {
 
             if(this.blocks.length === 0) {
                 if(!this.$placeholder) {
-                    this.$placeholder = $('<i data-bre-placeholder="true">Click here to select this container...</i>');
-                    this.$element.append(this.$placeholder);
+                    this.$placeholder = $dom.el('<i data-bre-placeholder="true">Click here to select this container...</i>');
+                    this.$element.appendChild(this.$placeholder);
                 }
             }
             else if (this.$placeholder) {

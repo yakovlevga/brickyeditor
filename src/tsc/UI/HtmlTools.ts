@@ -1,6 +1,6 @@
 namespace BrickyEditor {
     export class HtmlTools {
-        private $control: JQuery;
+        private $control: HTMLElement;
 
         constructor(private editor: Editor) {
             if (editor.options.htmlToolsButtons) {
@@ -20,21 +20,22 @@ namespace BrickyEditor {
         ];
 
         private setControl() {
-            let $panel = $('<div class="bre-html-tools-panel"></div>');
+            let $panel = $dom.el('<div class="bre-html-tools-panel"></div>');
             this.buttons.forEach(b => {
                 let $btn = this.getButtonElement(b.icon, b.command, b.range, b.aValueArgument);
-                $panel.append($btn);
+                $panel.appendChild($btn);
             });
 
-            this.$control = $('<div class="bre-html-tools bre-btn-group"></div>');
-            this.$control.append($panel).hide();
-            this.editor.$editor.append(this.$control);
+            this.$control = $dom.el('<div class="bre-html-tools bre-btn-group"></div>');
+            this.$control.appendChild($panel);
+            $dom.hide(this.$control);
+            this.editor.$editor.appendChild(this.$control);
         }
 
-        private getButtonElement(icon: string, command: string, rangeCommand: boolean = true, aValueArgument: string = null): JQuery {
-            let $btn = $(`<button type="button" class="bre-btn"><i class="fa fa-${icon}"></i></button>`);
+        private getButtonElement(icon: string, command: string, rangeCommand: boolean = true, aValueArgument: string = null): HTMLElement {
+            let $btn = $dom.el(`<button type="button" class="bre-btn"><i class="fa fa-${icon}"></i></button>`);
 
-            $btn.on('click', async () => {
+            $btn.onclick = async () => {
                 let selection = window.getSelection();
                 let selectionRange = selection.rangeCount > 0 ? selection.getRangeAt(0) : null;
 
@@ -71,23 +72,21 @@ namespace BrickyEditor {
                 }
 
                 return false;
-            });
+            }
 
             return $btn;
         }
 
         //** Firefox execCommand hack */
         private wrapSelectionToContainer(selection: Selection) {
-            let $wrapper = $('<div class="bre-temp-container" contenteditable="true"></div>');
-            let $container = $(selection.anchorNode.parentElement);
-            $wrapper.html($container.html());
-            $container
-                .empty()
-                .append($wrapper)
-                .removeAttr("contenteditable");
+            let $container = selection.anchorNode.parentElement;
+            const $wrapper = $dom.el(`<div class="bre-temp-container" contenteditable="true">${$container.innerHTML}</div>`);            
+            $container.innerHTML = '';
+            $container.removeAttribute(Selectors.attrContentEditable)
+            $container.appendChild($wrapper);
 
             const range = document.createRange();
-            range.selectNodeContents($wrapper[0]);
+            range.selectNodeContents($wrapper);
             selection.removeAllRanges();
             selection.addRange(range);
         }
@@ -95,11 +94,14 @@ namespace BrickyEditor {
         public show(rect: ClientRect) {
             // check if some text is seleted
             if (rect && rect.width > 1) {
-                var editorOffset = this.editor.$editor.offset();
-                var editorWidth = this.editor.$editor.width();
-                var top = rect.top - editorOffset.top + $(window).scrollTop() + rect.height;
-                var controlWidth = this.$control.width();
-                var left = rect.left - editorOffset.left + rect.width / 2 - controlWidth / 2;
+                const $editor = this.editor.$editor;
+                const offset = $dom.offset($editor);
+
+                var editorWidth = $editor.clientWidth;
+                var top = rect.top - offset.top + $dom.windowScrollTop() + rect.height;
+
+                var controlWidth = this.$control.clientWidth;
+                var left = rect.left - offset.left + rect.width / 2 - controlWidth / 2;
                 if (left < 0) {
                     left = 0;
                 }
@@ -107,11 +109,12 @@ namespace BrickyEditor {
                     left = editorWidth - controlWidth;
                 }
 
-                this.$control.css({ top: top + 'px', left: left + 'px' });
-                this.$control.show();
+                this.$control.style.top = `${top}px`;
+                this.$control.style.left = `${left}px`;
+                $dom.show(this.$control);
             }
             else {
-                this.$control.hide();
+                $dom.hide(this.$control);
             }
         }
 
@@ -119,8 +122,11 @@ namespace BrickyEditor {
             var link: HtmlLinkParams;
 
             if (selection && selection.anchorNode && selection.anchorNode.parentNode.nodeName.breEqualsInvariant('a')) {
-                var a = $(selection.anchorNode.parentNode);
-                link = new HtmlLinkParams(a.attr('href'),a.attr('title'), a.attr('target'));
+                var $a = selection.anchorNode.parentNode as HTMLElement;
+                link = new HtmlLinkParams(
+                    $a.getAttribute('href'),
+                    $a.getAttribute('title'),
+                    $a.getAttribute('target'));
             }
             else {
                 link = new HtmlLinkParams();

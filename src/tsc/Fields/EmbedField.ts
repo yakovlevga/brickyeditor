@@ -2,9 +2,9 @@ namespace BrickyEditor {
     export namespace Fields {
         export class EmbedField extends BaseField {
 
-            getSettingsEl(): JQuery {
-                let $el = $('<div style="position: absolute;width: 100%; height: 100px;;text-align: center;font-weight: bold;vertical-align: middle;background: #333;opacity: 0.2;">Change embed element link</div>');
-                this.$field.before($el);
+            getSettingsEl(): HTMLElement {
+                let $el = $dom.el('<div style="position: absolute;width: 100%; height: 100px;;text-align: center;font-weight: bold;vertical-align: middle;background: #333;opacity: 0.2;">Change embed element link</div>');
+                $dom.before(this.$field, $el);
                 return $el;
             }
 
@@ -18,7 +18,7 @@ namespace BrickyEditor {
                 let field = this;
                 let $field = this.$field;
                 
-                $field.on('click', async () => {
+                $dom.on($field, 'click', async () => {
                     this.showEmbedLoaderAsync(field);
                 });
 
@@ -50,26 +50,24 @@ namespace BrickyEditor {
                 const json = await Services.EmbedService.getEmbedAsync(field.data.url);
                 
                 field.setEmbed(json, fireUpdate);
-                const $embed = $(json.html);
-
-                const $script = $embed.filter('script');
-                if ($script.length > 0) {
+                const $embed = $dom.el(json.html);
+                const $script = $dom.first($embed, 'script') as HTMLScriptElement;
+                if ($script) {
                     $script.remove();
-                    var scriptSrc = $script.attr('src');
+                    var scriptSrc = $script.src;
                     if (scriptSrc.breStartsWith('//')) {
                         scriptSrc = "https:" + scriptSrc;
-                        $.getScript(scriptSrc)
-                            .done(script => {
+                        $ajax.getScript(scriptSrc)
+                            .then(() => {
                                 Services.EmbedService.processEmbed(json.provider_name);
-                            })
-                            .fail(function (err) { });
+                            });
                     }
                 }
 
-                field.$field.empty();
-                field.$field.removeAttr('class');
-                field.$field.removeAttr('style');
-                field.$field.append($embed);
+                field.$field.innerHTML = '';
+                field.$field.removeAttribute('class');
+                field.$field.removeAttribute('style');
+                field.$field.appendChild($embed);
                 field.select();
             }
 

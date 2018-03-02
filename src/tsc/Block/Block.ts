@@ -16,13 +16,8 @@ namespace BrickyEditor {
             private onUpdate?: (block: Block, property: string, oldValue: any, newValue: any) => void,
             private onUpload?: (file: any, callback: (url: string) => void) => void) {
 
-            this.template = template;
-
-            const block = this;
-            const $block = template.$html.clone();
-
-            block.bindFields($block, data);
-
+            const $block = $dom.el(template.$html.innerHTML);
+            this.bindFields($block, data);
             const actions = this.getActions();
 
             // Build block UI
@@ -41,23 +36,21 @@ namespace BrickyEditor {
          *
          * @param data Array of block fields data
          */
-        private bindFields($block: JQuery, data?: Array<Fields.BaseField>) {
+        private bindFields($block: HTMLElement, data?: Array<Fields.BaseField>) {
             const block = this;
-            const $fields = $block
-                .find(Selectors.selectorField)
-                .addBack(Selectors.selectorField);
-
-            $fields.each((idx, elem) => {
+            const $fields = $dom.select($block, Selectors.selectorField, true);
+            $fields.forEach($elem => {
                 const onUpdate = (property: string, oldValue: any, newValue: any) => {
                     if(block.onUpdate) {
                         block.onUpdate(block, property, oldValue, newValue);
                     }
                 };
+
                 const onSelect = (field: Fields.BaseField) => {
                     block.select(field);
                 };
-                let $field = $(elem);
-                let field = Fields.BaseField.createField($field, data, onSelect, onUpdate, block.onUpload);
+                
+                let field = Fields.BaseField.createField($elem, data, onSelect, onUpdate, block.onUpload);
                 block.fields.push(field);
             });
         }
@@ -115,11 +108,12 @@ namespace BrickyEditor {
 
         public scrollTo() {
             // todo: move to block ui
-            var top = this.ui.$editor.offset().top - 100;
+            var top = $dom.offset(this.ui.$editor).top - 100; // todo: move this magic number away
             top = top > 0 ? top : 0;
-            $('html, body').animate({
-                scrollTop: top
-            }, 'fast');
+            // todo: remove jQuery
+            // $('html, body').animate({
+            //     scrollTop: top
+            // }, 'fast');
         }
 
         public getData(ignoreHtml?: Boolean): any {
@@ -137,30 +131,22 @@ namespace BrickyEditor {
         }
 
         public getHtml(trim: Boolean): string {
-            let $html = this.template.$html.clone(false, false)
-                .wrap('<div></div>')
-                .parent();
-
+            const $html = $dom.el(this.template.$html.innerHTML);
             let fieldsHtml = {};
             this.fields.forEach(field => {
                 const name = field.name || field.data.name;
                 fieldsHtml[name] = field.getEl();
             });    
 
-            $html
-                .find(Selectors.selectorField)
-                .addBack(Selectors.selectorField)
-                .each((idx, elem) => {
-                    let fieldData = $(elem).data().breField;
-                    if(typeof fieldData === 'string') {
-                        fieldData = JSON.parse(fieldData.replace(/'/g, '"'));
-                    }
+            $dom.select($html, Selectors.selectorField, true)
+                .forEach($elem => {
+                    let fieldData = $dom.data<any>($elem, 'breField');
                     const name = fieldData.name;
-                    const $field = fieldsHtml[name];
-                    $(elem).replaceWith($field);
+                    const $field = fieldsHtml[name];                    
+                    $dom.replaceWith($elem, $field);
                 });
                 
-            const html = $html.html();
+            const html = $html.outerHTML;
             if(!html) {
                 return null;
             }

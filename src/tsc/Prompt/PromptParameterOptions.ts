@@ -16,7 +16,7 @@ namespace BrickyEditor {
                 var options = this.options.map(opt => {
                     return `<option value="${opt.value}" ${opt.selected ? "selected" : ""}>${opt.title ? opt.title : opt.value}</option>`;
                 });
-                return $(`<select type="text" id="${this.key}" class="brickyeditor-input" placeholder="${this.placeholder}">${options}</select>`);
+                return $dom.el(`<select type="text" id="${this.key}" class="brickyeditor-input" placeholder="${this.placeholder}">${options}</select>`);
             }
         }
     }

@@ -6,8 +6,8 @@ namespace BrickyEditor {
             public placeholder: string;
             public value: any;
 
-            protected _$control: JQuery;
-            protected $input: JQuery;
+            protected _$control: HTMLElement;
+            protected $input: HTMLInputElement;
 
             constructor(key: string, title: string, value: any, placeholder?: string) {
                 this.key = key;
@@ -18,33 +18,39 @@ namespace BrickyEditor {
 
             public parseValue() {
                 if(this.$input) {
-                    this.value = this.$input.val();
+                    this.value = this.$input.value;
                 }
                 this.$control = null
                 delete this._$control;
             }
 
-            public get $control(): JQuery {
+            public get $control(): HTMLElement {
                 if (!this._$control) {
-                    this._$control =
-                        $(`<div class=${this.key ? "bre-prompt-field" : "bre-prompt-subtitle"}>
+                    this._$control = $dom.el(
+                        `<div class=${this.key ? "bre-prompt-field" : "bre-prompt-subtitle"}>
                             <label class="bre-label" for="${this.key}">${this.title ? this.title : 'Select file...'}</label>
                         </div>`);
-                    this.$input = this.key ? this.getEditor() : null;
+
+                    this.$input = this.key ? this.getEditor() as HTMLInputElement : null;
                     if(this.$input != null) {
-                        this._$control.append(this.$input);
+                        this._$control.appendChild(this.$input);
                     }
                 }
 
                 return this._$control;
             }
 
-            protected getEditor() {
-                var value = this.value || '';
-                return $(`<input type="text" id="${this.key}" class="bre-input" placeholder="${this.placeholder}" value="${this.value ? this.value : ''}">`);
+            protected getEditor() : HTMLElement {
+                var $input = document.createElement('input');
+                $input.id = this.key;
+                $input.className = 'bre-input' 
+                $input.setAttribute('type', 'text');
+                $input.setAttribute('placeholder', this.placeholder);
+                $input.value = this.value || '';
+                return $input;
             }
 
-            public set $control(value: JQuery) {
+            public set $control(value: HTMLElement) {
                 this._$control = value;
             }
         }

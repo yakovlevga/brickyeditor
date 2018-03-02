@@ -6,7 +6,7 @@ namespace BrickyEditor {
 
             static async loadTemplatesAsync(
                 url: string, 
-                $editor: JQuery, 
+                $editor: HTMLElement, 
                 onError: (message: string, code?: number) => any): Promise<TemplateGroup[]> {
                 
                 this.templates = [];
@@ -15,20 +15,22 @@ namespace BrickyEditor {
                 return new Promise<TemplateGroup[]>(async (resolve, reject) => {
                     
                     try {
-                        const data = await $.get(url);
+                        const data = await $ajax.get(url);
 
                         // set custom templates style
-                        const $style = $(data).filter('style');
-                        if ($style && $style.length > 0) {
-                            $editor.prepend($style);
+                        const $data = $dom.el(`<div>${data}</div>`);
+
+                        const $style = $dom.select($data, 'style', false);
+                        if ($style.length > 0) {
+                            $dom.before($editor, $style);
+                            //$editor.prepend($style);
                         }
 
-                        let $data = $(`<div>${data}</div>`);
-                        const $groups = $(Selectors.selectorTemplateGroup, $data);
-                        $groups.each((idx, el) => {
-                            let $group = $(el);     
+                        const $groups = $dom.select($data, Selectors.selectorTemplateGroup);
+                        $groups.forEach($group => {
+                            const title = $group.getAttribute('title');                            
                             let templates = this.getTemplates($group, onError);
-                            this.templates.push(new TemplateGroup($group.attr('title'), templates));
+                            this.templates.push(new TemplateGroup(title, templates));
                             $group.remove();
                         })
                                                     
@@ -48,13 +50,13 @@ namespace BrickyEditor {
             }
 
             private static getTemplates(
-                $el: JQuery,
+                $el: HTMLElement,
                 onError: (message: string, code?: number) => any) : Template[] {
                 let templates = [];
                 
-                const $templates = $(Selectors.selectorTemplate, $el);
-                $templates.each((idx, t) => {                    
-                    let template = new Template(t);
+                const $templates = $dom.select($el, Selectors.selectorTemplate);
+                $templates.forEach($template => {
+                    let template = new Template($template);
                     if(template.loaded) {
                         templates.push(template);
                     }

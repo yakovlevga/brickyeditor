@@ -1,11 +1,11 @@
 namespace BrickyEditor {
     export class UI {
         // Templates
-        private $tools: JQuery;
-        private $toolsBtn: JQuery;
-        private $toolsTemplates: JQuery;
-        private $toolsHideBtn: JQuery;
-        private $toolsLoader: JQuery;
+        private $tools: HTMLElement;
+        private $toolsBtn: HTMLElement;
+        private $toolsTemplates: HTMLElement;
+        private $toolsHideBtn: HTMLElement;
+        private $toolsLoader: HTMLElement;
 
         // Modal
         public modal: Modal;
@@ -35,54 +35,58 @@ namespace BrickyEditor {
         }
 
         private setTools() {
-            this.$tools = $('<div class="bre bre-tools" data-bricky-tools></div>');
+            this.$tools = $dom.el('<div class="bre bre-tools" data-bricky-tools></div>');
 
-            this.$toolsTemplates = $('<div class="bre-tools-templates"></div>');
-            this.$toolsLoader = $('<div class="bre-tools-loader"><b>Loading...</b></div>');
-            this.$toolsHideBtn = $('<button type="button" class="bre-tools-toggle"><div>►</div></button>');
+            this.$toolsTemplates = $dom.el('<div class="bre-tools-templates"></div>');
+            this.$toolsLoader = $dom.el('<div class="bre-tools-loader"><b>Loading...</b></div>');
+            this.$toolsHideBtn = $dom.el('<button type="button" class="bre-tools-toggle"><div>►</div></button>');
 
-            this.$tools.append([this.$toolsHideBtn, this.$toolsLoader, this.$toolsTemplates]);
+            this.$tools.appendChild(this.$toolsHideBtn);
+            this.$tools.appendChild(this.$toolsLoader);
+            this.$tools.appendChild(this.$toolsTemplates);
+            this.$toolsHideBtn.onclick = ev => this.toggleTools();
 
-            this.$toolsHideBtn.on('click', () => this.toggleTools());
-
-            this.editor.$editor.append(this.$tools);
+            this.editor.$editor.appendChild(this.$tools);
 
             if (this.isCompactTools) {
-                this.$tools.addClass("bre-tools-templates-compact");
+                $dom.addClass(this.$tools, 'bre-tools-templates-compact');
                 this.toggleTools();
             }
         }
 
         private toggleTools() {
-            this.$tools.toggleClass('bre-tools-collapsed', !this.$toolsHideBtn.hasClass("bre-tools-toggle-collapsed"));
-            this.$toolsHideBtn.toggleClass("bre-tools-toggle-collapsed");
+            $dom.toggleClass(
+                this.$tools, 
+                'bre-tools-collapsed', 
+                !$dom.hasClass(this.$toolsHideBtn, 'bre-tools-toggle-collapsed'));
+            $dom.toggleClass(this.$toolsHideBtn, 'bre-tools-toggle-collapsed');
         }
 
         private setModal() {
-            let $modal = $('<div class="bre bre-modal"><div class="bre-modal-placeholder"></div></div>');
-            let $modalCloseBtn = $(`<div class="bre-modal-close"><a href="#">${EditorStrings.buttonClose} ✖</a></div>`);
-            let $modalContent = $('<div class="bre-modal-content"></div>');
-            let $modalForm = $('<form></form>');
-            let $modalBtns = $('<div class="bre-btns"></div>');
-            let $modalOk = $(`<button type="button" class="bre-btn bre-btn-primary">${EditorStrings.buttonOk}</button>`);
-            let $modalCancel = $(`<button type="button" class="bre-btn">${EditorStrings.buttonCancel}</button>`);
+            let $modal = $dom.el('<div class="bre bre-modal"><div class="bre-modal-placeholder"></div></div>');
+            let $modalCloseBtn = $dom.el(`<div class="bre-modal-close"><a href="#">${EditorStrings.buttonClose} ✖</a></div>`);
+            let $modalContent = $dom.el('<div class="bre-modal-content"></div>');
+            let $modalForm = $dom.el('<form></form>');
+            let $modalBtns = $dom.el('<div class="bre-btns"></div>');
+            let $modalOk = $dom.el(`<button type="button" class="bre-btn bre-btn-primary">${EditorStrings.buttonOk}</button>`);
+            let $modalCancel = $dom.el(`<button type="button" class="bre-btn">${EditorStrings.buttonCancel}</button>`);
 
-            $modalBtns.append($modalOk);
-            $modalBtns.append($modalCancel);
-            $modalForm.append($modalBtns);
-            $modalContent.append($modalForm);
+            $modalBtns.appendChild($modalOk);
+            $modalBtns.appendChild($modalCancel);
+            $modalForm.appendChild($modalBtns);
+            $modalContent.appendChild($modalForm);
 
-            let $placeholder = $('.bre-modal-placeholder', $modal);
-            $placeholder.append($modalCloseBtn);
-            $placeholder.append($modalContent);
+            let $placeholder = $dom.first($modal, '.bre-modal-placeholder');
+            $placeholder.appendChild($modalCloseBtn);
+            $placeholder.appendChild($modalContent);
 
             this.modal = new Modal($modal, $modalCloseBtn, $modalForm, $modalBtns, $modalOk, $modalCancel);
 
-            this.editor.$editor.append($modal);
+            this.editor.$editor.appendChild($modal);
         }
 
-        public toggleToolsLoader(toggle) {
-            this.$toolsLoader.toggle(toggle);
+        public toggleToolsLoader(toggle: boolean) {
+            $dom.toggle(this.$toolsLoader, toggle);
         }
 
         public setTemplates(templateGroups: TemplateGroup[]) {
@@ -91,62 +95,75 @@ namespace BrickyEditor {
                 if(group.templates.length === 0)
                     return;
 
-                let $header = $(`<div class='${Selectors.classTemplateGroup}'>${group.name}</div>`);
-                this.$toolsTemplates.append($header);
-                let $group = $('<div></div>');
+                let $header = $dom.el(`<div class='${Selectors.classTemplateGroup}'>${group.name}</div>`);
+                this.$toolsTemplates.appendChild($header);
+                let $group = $dom.el('<div></div>');
                 group.templates.forEach(template => {
                     let $preview = template.getPreview();
-                    $preview.attr('title', template.name);
-                    $preview.on('click', (ev) => {
+                    $preview.setAttribute('title', template.name);
+                    $preview.onclick = (ev) => {
                         editor.addBlock(template);
                         ev.stopPropagation();
                         return false;
-                    });
-                    $group.append($preview);
+                    };
+                    $group.appendChild($preview);
                 })
 
-                $header.on('click', () => {
-                    $group.toggle();
+                $dom.on($header, 'click', () => {
+                    $dom.toggle($group);
                 });
-                this.$toolsTemplates.append($group);
+                this.$toolsTemplates.appendChild($group);
             });;
         }
 
-        public static initBtnDeck($btnsDeck: JQuery) {
-            var $btns = $('.bre-btn', $btnsDeck);
-            var $firstBtn = $btns.eq(0);
-
-            $firstBtn.on('click', (ev) => {
+        public static initBtnDeck($btnsDeck: HTMLElement) {
+            var $btns = $dom.select($btnsDeck, '.bre-btn');
+            var $firstBtn = $btns[0];
+            $dom.on($firstBtn, 'click', (ev) => {
                 UI.toggleBtnDeck($btnsDeck);
                 ev.stopPropagation();
                 return false;
             });
         }
 
-        public static toggleBtnDeck($btnsDeck: JQuery, isOn?: Boolean) {
-            var $btns = $('.bre-btn', $btnsDeck);
+        public static toggleBtnDeck($btnsDeck: HTMLElement, isOn?: Boolean) {
+            var $btns = $dom.select($btnsDeck, '.bre-btn');
             if (!$btns || $btns.length == 0)
                 return;
 
-            var $firstBtn = $btns.eq(0);
+            var $firstBtn = $btns[0];
             var size = 32;
             var gap = size / 6;
 
-            isOn = isOn || $btnsDeck.data().isOn || false;
+            isOn = isOn || <any>$btnsDeck.dataset['isOn'] || false;
 
             if (isOn) {
-                $btnsDeck.css({ 'height': 0, 'width': 0 });
-                $btns.not(':first').css({ 'opacity': 0, 'top': 0, 'left': 0 });
+                $btnsDeck.style.height = '0';
+                $btnsDeck.style.width = '0';
+                $btns.forEach(($btn, idx) => {
+                    if(idx === 0) return;
+                    $btn.style.opacity = '0';
+                    $btn.style.top = '0';
+                    $btn.style.left = '0';
+                });
             }
             else {
-                $btns.not(':first').each((idx, btn) => {
-                    $(btn).css({ 'opacity': 1, 'left': (idx + 1) * (size + gap) });
+                $btns.forEach(($btn, idx) => {
+                    if(idx === 0) return;
+                    $btn.style.opacity = '1';
+                    $btn.style.left = `${(idx + 1) * (size + gap)}px`;
                 });
-                $btnsDeck.css({ 'height': size, 'width': (size + gap) * $btns.length - gap });
+
+                // $btns.not(':first').each((idx, btn) => {
+                    
+                //     $(btn).css({ 'opacity': 1, 'left': (idx + 1) * (size + gap) });
+                // });
+                $btnsDeck.style.height = `${size}px`;
+                $btnsDeck.style.width = `${(size + gap) * $btns.length - gap}px`;
             }
 
-            $firstBtn.toggleClass('bre-btn-active', !isOn)
-            $btnsDeck.data('isOn', !isOn);
+            $dom.toggleClass($firstBtn, 'bre-btn-active', !isOn);
+            $btnsDeck.dataset['isOn'] = String(!isOn);
         }
     }
 }

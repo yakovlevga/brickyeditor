@@ -3,15 +3,15 @@ namespace BrickyEditor {
         export class ContainerField extends BaseField {
 
             public container: BlocksContainer;
-            private $placeholder: JQuery;
+            private $placeholder: HTMLElement;
 
             bind() {
                 let field = this;
                 let $field = this.$field;
 
                 this.container = new BlocksContainer($field,
-                    (block: Block) => { 
-                        field.updateBlocks(); 
+                    (block: Block) => {
+                        field.updateBlocks();
                     },
                     (block: Block) => { field.updateBlocks(); },
                     (block: Block) => { this.select(); },
@@ -21,13 +21,12 @@ namespace BrickyEditor {
                     field.onUpload,
                     true);
 
-                $field.addClass(Selectors.selectorFieldContainer);
-                $field
-                    .on('click', (ev) => {                        
-                        field.select();
-                        ev.stopPropagation();
-                        return false;
-                    });
+                $dom.addClass($field, Selectors.selectorFieldContainer);
+                $dom.on($field, 'click', (ev) => {
+                    field.select();
+                    ev.stopPropagation();
+                    return false;
+                });
             }
 
             updateBlocks() {
@@ -37,12 +36,12 @@ namespace BrickyEditor {
 
             public deselect() {
                 this.container.blocks.forEach(b => b.deselect());
-                this.$field.removeClass(Selectors.selectorFieldSelected);
+                this.$field.classList.remove(Selectors.selectorFieldSelected);
             }
 
-            public getEl(): JQuery {
-                let html = this.container.getHtml();
-                return $(html);
+            public getEl(): HTMLElement {
+                const html = this.container.getHtml();
+                return $dom.el(html);
             }
         }
     }

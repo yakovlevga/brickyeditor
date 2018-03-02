@@ -10,7 +10,7 @@ namespace BrickyEditor {
                 return name;
             }
 
-            public $field: JQuery;
+            public $field: HTMLElement;
             public name: string;
             public data: any;
             private onSelect: (field: BaseField) => void;
@@ -18,12 +18,12 @@ namespace BrickyEditor {
             protected onUpload: (file: any, callback: (url: string) => void) => void;
 
             protected settings: (field: BaseField) => void;
-            protected getSettingsEl(): JQuery {
+            protected getSettingsEl(): HTMLElement {
                 return null;
             }
 
             constructor(
-                $field: JQuery, 
+                $field: HTMLElement, 
                 data: any, 
                 onSelect: (field: BaseField) => void, 
                 onUpdate: (property, oldValue, newValue) => void,
@@ -58,24 +58,15 @@ namespace BrickyEditor {
             }
 
             public static createField(
-                $field: JQuery, 
+                $field: HTMLElement, 
                 data: any, 
                 onSelect: (field: BaseField) => void, 
                 onUpdate: (property, oldValue, newValue) => void,
                 onUpload?: (file: any, callback: (url: string) => void) => void): BaseField {                
 
-                let fieldData = $field.data().breField;
-                if (!fieldData) {
-                    throw `There is no any data in field ${$field.html()}`;
-                }
-
-                // sometimes we 'accedently' put our data into single quotes, so let's try to correct it!
-                if (typeof fieldData === 'string') {
-                    fieldData = JSON.parse(fieldData.replace(/'/g, '"'));
-                }
-
-                if (!fieldData.name) {
-                    throw `There is no name in data of field ${$field.html()}`;
+                let fieldData = $dom.data<any>($field, 'breField');
+                if (!fieldData || !fieldData.name) {
+                    throw `There is no data or data doesn't contains 'name' in field ${$field.innerHTML}`;
                 }
 
                 // if data passed
@@ -92,7 +83,7 @@ namespace BrickyEditor {
 
                     // if there is some additional data, pass it to data object
                     if (addFieldData) {
-                        fieldData = $.extend(fieldData, addFieldData);
+                        fieldData = Common.extend(fieldData, addFieldData);
                     }
                 }
 
@@ -115,17 +106,17 @@ namespace BrickyEditor {
             protected bind() { }
 
             protected select() {
-                this.$field.addClass(Selectors.selectorFieldSelected);
+                this.$field.classList.add(Selectors.selectorFieldSelected);
                 this.onSelect(this);
             }
 
             public deselect() {
-                this.$field.removeClass(Selectors.selectorFieldSelected);
+                this.$field.classList.remove(Selectors.selectorFieldSelected);
             }
 
-            public getEl() : JQuery {
-                let $el = this.$field.clone(false);
-                $el.removeAttr(Selectors.attrField);
+            public getEl() : HTMLElement {
+                let $el = this.$field.cloneNode(true) as HTMLElement;
+                $el.attributes.removeNamedItem(Selectors.attrField);
                 return $el;
             }
 

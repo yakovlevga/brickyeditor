@@ -9,9 +9,8 @@ namespace BrickyEditor {
             public static getEmbedAsync(embedUrl: string): Promise<any> {
                 const url = `https://noembed.com/embed?url=${embedUrl}`;
                 return new Promise<any>(async (resolve, reject) => {
-                    const params = { url: url, type: "get", dataType: "jsonp" };
                     try {
-                        const data = await $.ajax(params);
+                        const data = await $ajax.jsonp(url);
                         resolve(data);
                     }
                     catch (err) {

@@ -2,15 +2,14 @@ namespace BrickyEditor {
     export namespace Fields {
         export class ImageField extends BaseField {
 
-            private $link: JQuery;
+            private $link: HTMLLinkElement;
 
             bind() {
                 let field = this;
-                let $field = this.$field;
                 let data = this.data;
 
                 this.setSrc(this.data.src, false);
-                $field.on('click', async () => {
+                $dom.on(this.$field, 'click', async () => {
                     const fields = await Editor.UI.modal.promptAsync(field.getPromptParams());
                     if (fields != null) {
                         const file = fields.getValue('file');
@@ -58,27 +57,27 @@ namespace BrickyEditor {
             setSrc(src: string, fireUpdate: boolean = true) {
                 if (src) {
                     if (this.isImg) {
-                        this.$field.attr('src', src);
+                        this.$field.setAttribute('src', src);
                     }
                     else {
-                        this.$field.css('background-image', `url(${src}`);
+                        this.$field.style.backgroundImage = `url(${src}`;
                     }
                 }
                 this.updateProperty('src', src, fireUpdate);
             }
 
             setAlt(alt) {
-                this.$field.attr(this.isImg ? 'alt' : 'title', alt);
+                this.$field.setAttribute(this.isImg ? 'alt' : 'title', alt);
                 this.updateProperty('alt', alt);
             }
 
             setFile(file) {
                 if (file) {
                     if (this.isImg) {
-                        this.$field.attr('src', file.fileContent);
+                        this.$field.setAttribute('src', file.fileContent);
                     }
                     else {
-                        this.$field.css('background-image', `url(${file.fileContent})`);
+                        this.$field.style.backgroundImage = `url(${file.fileContent})`;
                     }
                 }
                 this.updateProperty('file', file);
@@ -88,19 +87,21 @@ namespace BrickyEditor {
 
                 if (url && url.href) {
                     if (!this.$link) {
-                        this.$link = $(`<a href='${url.href}' title='${url.title}' target='${url.target}'></a>`);
-                        this.$link.on('click', ev => {
+                        this.$link = $dom.el(`<a href='${url.href}' title='${url.title}' target='${url.target}'></a>`) as HTMLLinkElement;
+                        $dom.on(this.$link, 'click', ev => {
                             ev.stopPropagation();
                             return false;
                         });
-                        this.$field.wrap(this.$link);
+
+                        $dom.wrap(this.$field, this.$link);
+                        //this.$field.wrap(this.$link);
                     }
                     else {
-                        this.$link.attr(url.href);
+                        this.$link.href = url.href;
                     }
                 }
                 else if (this.$link) {
-                    this.$field.unwrap();
+                    $dom.unwrap(this.$field);
                     this.$link = null;
                     delete this.$link;
                 }
@@ -110,15 +111,15 @@ namespace BrickyEditor {
 
             _isImg: Boolean;
             private get isImg(): Boolean {
-                return this._isImg = this._isImg || this.$field.prop('tagName').toLowerCase() === 'img';
+                return this._isImg = this._isImg || this.$field.tagName.toLowerCase() === 'img';
             }
 
-            public getEl(): JQuery {
+            public getEl(): HTMLElement {
                 let $el = super.getEl();
                 const {link} = this.data;
                 if(link && link.href){
-                    const $link = $(`<a href='${link.href}' title='${link.title}' target='${link.target}'></a>`);
-                    $link.append($el);
+                    const $link = $dom.el(`<a href='${link.href}' title='${link.title}' target='${link.target}'></a>`);
+                    $link.appendChild($el);
                     return $link;
                 }
                 return $el;
