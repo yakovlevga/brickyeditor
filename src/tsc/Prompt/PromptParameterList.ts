@@ -1,5 +1,6 @@
-namespace BrickyEditor {
-    export namespace Prompt {
+import { PromptParameter } from './Prompt'
+// export namespace BrickyEditor {
+//     export namespace Prompt {
         export class PromptParameterList {
             params: Array<PromptParameter>;
 
@@ -14,5 +15,5 @@ namespace BrickyEditor {
                 return param ? param.value : null
             }
         }
-    }
-}
+//     }
+// }

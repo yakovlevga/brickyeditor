@@ -1,5 +1,9 @@
-namespace BrickyEditor {
-    export namespace Fields {
+import { $dom } from "../Common/DOMHelpers";
+import { Selectors } from "../UI/Selectors";
+import { Block } from "../Block/Block";
+import { BlocksContainer } from "../BlocksContainer";
+import { BaseField } from "./BaseField";
+
         export class ContainerField extends BaseField {
 
             public container: BlocksContainer;
@@ -44,5 +48,3 @@ namespace BrickyEditor {
                 return $dom.el(html);
             }
         }
-    }
-}

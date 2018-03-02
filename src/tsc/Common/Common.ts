@@ -1,21 +1,23 @@
-// String extensions
-interface String {
-    breTotalTrim(): string;
-    breEqualsInvariant(other: String): boolean;
-    breStartsWith(part: String): boolean;
-    breContains(part: String): boolean;
-}
+declare global {
+    // String extensions
+    interface String {
+        breTotalTrim(): string;
+        breEqualsInvariant(other: String): boolean;
+        breStartsWith(part: String): boolean;
+        breContains(part: String): boolean;
+    }
 
-// Array extensions
-interface Array<T> {
-    find(predicate: (search: T) => boolean): T;
-}
+    // Array extensions
+    interface Array<T> {
+        find(predicate: (search: T) => boolean): T;
+    }
 
-interface HtmlToolsButton {
-    icon: string;
-    command: string;
-    range: boolean;
-    aValueArgument: string;
+    interface HtmlToolsButton {
+        icon: string;
+        command: string;
+        range: boolean;
+        aValueArgument: string;
+    }
 }
 
 String.prototype.breContains = function (part: String): boolean {
@@ -58,62 +60,60 @@ if (!Array.prototype.find) {
     };
 }
 
-namespace BrickyEditor {
-    export class Common {
+export class Common {
 
-        // Extend
-        // from http://youmightnotneedjquery.com/
-        static extend(out: any, ...extensions: any[]) {
-            out = out || {};
+    // Extend
+    // from http://youmightnotneedjquery.com/
+    static extend(out: any, ...extensions: any[]) {
+        out = out || {};
 
-            for (var i = 1; i < extensions.length; i++) {
-                if (!extensions[i])
-                    continue;
+        for (var i = 1; i < extensions.length; i++) {
+            if (!extensions[i])
+                continue;
 
-                for (var key in extensions[i]) {
-                    if (extensions[i].hasOwnProperty(key))
-                        out[key] = extensions[i][key];
-                }
-            }
-
-            return out;
-        };
-
-        // Selection
-        static getSelectedText() {
-            let text = "";
-            let doc = document as any;
-            if (window.getSelection) {
-                text = window.getSelection().toString();
-            } else if (doc.selection && doc.selection.type != "Control") {
-                text = doc.selection.createRange().text;
-            }
-            return text;
-        }
-
-        // Objects
-        static propsEach(obj: any, func: (key: string, value) => any) {
-            for (var key in obj) {
-                if (obj.hasOwnProperty(key)) {
-                    var value = obj[key];
-                    func(key, value);
-                }
+            for (var key in extensions[i]) {
+                if (extensions[i].hasOwnProperty(key))
+                    out[key] = extensions[i][key];
             }
         }
 
-        static propsFilterKeys(obj: any, filter: (key: string, value) => Boolean, payload?) {
-            let result = [];
-            Common.propsEach(obj, (key, value) => {
-                if (filter(key, value)) {
-                    result.push(key);
-                }
-            });
+        return out;
+    };
 
-            if (payload) {
-                result.push(payload);
-            }
-
-            return result;
+    // Selection
+    static getSelectedText() {
+        let text = "";
+        let doc = document as any;
+        if (window.getSelection) {
+            text = window.getSelection().toString();
+        } else if (doc.selection && doc.selection.type != "Control") {
+            text = doc.selection.createRange().text;
         }
+        return text;
+    }
+
+    // Objects
+    static propsEach(obj: any, func: (key: string, value) => any) {
+        for (var key in obj) {
+            if (obj.hasOwnProperty(key)) {
+                var value = obj[key];
+                func(key, value);
+            }
+        }
+    }
+
+    static propsFilterKeys(obj: any, filter: (key: string, value) => Boolean, payload?) {
+        let result = [];
+        Common.propsEach(obj, (key, value) => {
+            if (filter(key, value)) {
+                result.push(key);
+            }
+        });
+
+        if (payload) {
+            result.push(payload);
+        }
+
+        return result;
     }
 }

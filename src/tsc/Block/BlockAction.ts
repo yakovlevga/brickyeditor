@@ -1,4 +1,4 @@
-namespace BrickyEditor {
+export namespace BrickyEditor {
     export class BlockAction {
 
         constructor(

@@ -1,13 +1,19 @@
-namespace BrickyEditor {
+import { $dom } from "../Common/DOMHelpers";
+import { Selectors } from "../UI/Selectors";
+import { Template } from "../Templates/Template";
+import { BlockUIAction } from "./BlockUIAction";
+import { BaseField, ContainerField } from "../Fields/Fields";
+import { BlockUI } from "./BlockUI";
+
     export class Block {
-        public fields: Array<Fields.BaseField> = [];
+        public fields: Array<BaseField> = [];
         public ui: BlockUI;
-        public selectedField: Fields.BaseField;
+        public selectedField: BaseField;
 
         constructor(
             public template: Template,
             preview: boolean,
-            data?: Array<Fields.BaseField>,
+            data?: Array<BaseField>,
             private onDelete?: (block: Block) => void,
             private onSelect?: (block: Block) => void,
             private onDeselect?: (block: Block) => void,
@@ -28,7 +34,7 @@ namespace BrickyEditor {
             if(!this.selectedField)
                 return false;
 
-            return this.selectedField instanceof Fields.ContainerField;
+            return this.selectedField instanceof ContainerField;
         }
 
         /**
@@ -36,7 +42,7 @@ namespace BrickyEditor {
          *
          * @param data Array of block fields data
          */
-        private bindFields($block: HTMLElement, data?: Array<Fields.BaseField>) {
+        private bindFields($block: HTMLElement, data?: Array<BaseField>) {
             const block = this;
             const $fields = $dom.select($block, Selectors.selectorField, true);
             $fields.forEach($elem => {
@@ -46,11 +52,11 @@ namespace BrickyEditor {
                     }
                 };
 
-                const onSelect = (field: Fields.BaseField) => {
+                const onSelect = (field: BaseField) => {
                     block.select(field);
                 };
                 
-                let field = Fields.BaseField.createField($elem, data, onSelect, onUpdate, block.onUpload);
+                let field = BaseField.createField($elem, data, onSelect, onUpdate, block.onUpload);
                 block.fields.push(field);
             });
         }
@@ -80,7 +86,7 @@ namespace BrickyEditor {
             this.onCopy(this);
         }
 
-        public select(field?: Fields.BaseField) {
+        public select(field?: BaseField) {
             if(field === this.selectedField)
                 return;
                 
@@ -110,10 +116,6 @@ namespace BrickyEditor {
             // todo: move to block ui
             var top = $dom.offset(this.ui.$editor).top - 100; // todo: move this magic number away
             top = top > 0 ? top : 0;
-            // todo: remove jQuery
-            // $('html, body').animate({
-            //     scrollTop: top
-            // }, 'fast');
         }
 
         public getData(ignoreHtml?: Boolean): any {
@@ -154,4 +156,3 @@ namespace BrickyEditor {
             return trim ? html.breTotalTrim() : html;
         }
     }
-}

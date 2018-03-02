@@ -14,9 +14,10 @@ global.$ = jQuery;
 
 describe('Block tests', () => {
     describe('a number', () => {
+        const bre2 =req
         const bre = rewire('../dist/brickyeditor.js').__get__('BrickyEditor');
 
-        bre.Fields.BaseField.registerCommonFields();
+        bre.Fields.BaseField.registerCommonFields();        
 
         const templateEl = $(
             '<div class="bre-template" data-name="Display Heading 1">' +

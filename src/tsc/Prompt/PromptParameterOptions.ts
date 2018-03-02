@@ -1,23 +1,24 @@
-namespace BrickyEditor {
-    export namespace Prompt {
-        export class PromptParameterOptions extends PromptParameter {
-            public options: Array<PromptParameterOption>;
+import { $dom } from "../Common/DOMHelpers";
+import { 
+    PromptParameter, 
+    PromptParameterOption } from "./Prompt";
 
-            constructor(key: string, title: string, options: Array<Array<any>>, value?: any, placeholder?: string) {
-                super(key, title, value, placeholder);
+export class PromptParameterOptions extends PromptParameter {
+    public options: Array<PromptParameterOption>;
 
-                this.options = [];
-                options.forEach(kv => {
-                    this.options.push(new PromptParameterOption(kv[0], kv[1], kv[1] == value));
-                });
-            }
+    constructor(key: string, title: string, options: Array<Array<any>>, value?: any, placeholder?: string) {
+        super(key, title, value, placeholder);
 
-            protected getEditor() {
-                var options = this.options.map(opt => {
-                    return `<option value="${opt.value}" ${opt.selected ? "selected" : ""}>${opt.title ? opt.title : opt.value}</option>`;
-                });
-                return $dom.el(`<select type="text" id="${this.key}" class="brickyeditor-input" placeholder="${this.placeholder}">${options}</select>`);
-            }
-        }
+        this.options = [];
+        options.forEach(kv => {
+            this.options.push(new PromptParameterOption(kv[0], kv[1], kv[1] == value));
+        });
+    }
+
+    protected getEditor() {
+        var options = this.options.map(opt => {
+            return `<option value="${opt.value}" ${opt.selected ? "selected" : ""}>${opt.title ? opt.title : opt.value}</option>`;
+        });
+        return $dom.el(`<select type="text" id="${this.key}" class="brickyeditor-input" placeholder="${this.placeholder}">${options}</select>`);
     }
 }
