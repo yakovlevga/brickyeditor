@@ -1,5 +1,5 @@
-import { PromptParameter, PromptParameterOption, PromptParameterImageResult, PromptParameterImageResultFile } from "./Prompt";
-import { $dom } from "../Common/DOMHelpers";
+import { PromptParameter, PromptParameterOption, PromptParameterImageResult, PromptParameterImageResultFile } from "src/Prompt";
+import { $dom } from "src/Common/DOMHelpers";
 
 export class PromptParameterImage extends PromptParameter {
     public options: Array<PromptParameterOption>;

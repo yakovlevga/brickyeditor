@@ -1,6 +1,6 @@
 // /// <reference path="types/jquery.d.ts" />
 
-// import { Editor } from "./Editor";
+// import { Editor } from "src/Editor";
 
 // (function ($) {
 //     $.fn.brickyeditor = function (options) {

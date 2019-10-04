@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "module": "amd",
+    "outFile": "brickyeditor.js",
+    "removeComments": true,
+    "declaration": true,
+    "baseUrl": ".",
+    "paths": {
+      "src/*": ["src/tsc/*"]
+    },
+    "plugins": [
+      {
+        "name": "typescript-tslint-plugin"
+      }
+    ]
+  },
+  "typeRoots": ["types"]
+}

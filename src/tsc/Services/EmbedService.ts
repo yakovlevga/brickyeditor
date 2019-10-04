@@ -1,4 +1,4 @@
-import { $ajax } from "../Common/AJAXHelper";
+import { $ajax } from "src/Common/AJAXHelper";
 
 export class EmbedService {
     static Instagram: string = 'Instagram';

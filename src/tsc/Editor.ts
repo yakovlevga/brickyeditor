@@ -1,29 +1,24 @@
-/// <reference path="types/common.d.ts" />
-
-import { $dom } from "./Common/DOMHelpers";
-import { $ajax } from "./Common/AJAXHelper";
-import { BlocksContainer } from "./BlocksContainer";
-import { EditorStrings } from "./EditorStrings";
-import { TemplateService } from "./Services/Services";
-import { Template } from "./Templates/Template";
-import { Events } from "./Events";
-import { Block } from "./Block/Block";
-import { BaseField, ContainerField } from "./Fields/Fields";
-import { Selectors } from "./UI/Selectors";
-import { UI } from "./UI/UI";
-import { Common } from "./Common/Common";
-import { EditorOptions } from "./EditorOptions";
+import { Block } from "src/Block/Block";
+import { BlocksContainer } from "src/BlocksContainer";
+import { $ajax } from "src/Common/AJAXHelper";
+import { Common } from "src/Common/Common";
+import { $dom } from "src/Common/DOMHelpers";
+import { EditorOptions } from "src/EditorOptions";
+import { EditorStrings } from "src/EditorStrings";
+import { Events } from "src/Events";
+import { BaseField, ContainerField } from "src/Fields/Fields";
+import { TemplateService } from "src/Services/Services";
+import { Template } from "src/Templates/Template";
+import { Selectors } from "src/UI/Selectors";
+import { UI } from "src/UI/UI";
 
 export class Editor {
-  private isLoaded: boolean;
-  private container: BlocksContainer;
+  public static UI: UI;
 
   public $editor: HTMLElement;
-  public static UI: UI;
   public options: EditorOptions;
-
-  private onError = (message: string, code: number = 0) =>
-    this.options.onError({ message: message, code: code });
+  private isLoaded: boolean;
+  private container: BlocksContainer;
 
   constructor($editor: HTMLElement, options: EditorOptions) {
     BaseField.registerCommonFields();
@@ -36,60 +31,6 @@ export class Editor {
     Editor.UI = new UI(this);
 
     this.tryBindFormSubmit();
-  }
-
-  private createContainer(): BlocksContainer {
-    const onAdd = (block: Block, idx: number) => {
-      if (this.isLoaded) {
-        this.trigger(Events.onBlockAdd, { block: block, idx: idx });
-        this.trigger(Events.onChange, {
-          blocks: this.getData(),
-          html: this.getHtml()
-        });
-      }
-    };
-
-    const onDelete = (block: Block, idx: number) => {
-      this.trigger(Events.onBlockDelete, { block: block, idx: idx });
-      this.trigger(Events.onChange, {
-        blocks: this.getData(),
-        html: this.getHtml()
-      });
-    };
-
-    const onUpdate = (block, property, oldValue, newValue) => {
-      this.trigger(Events.onBlockUpdate, {
-        block: block,
-        property: property,
-        oldValue: oldValue,
-        newValue: newValue
-      });
-      this.trigger(Events.onChange, {
-        blocks: this.getData(),
-        html: this.getHtml()
-      });
-    };
-
-    return new BlocksContainer(
-      this.$editor,
-      onAdd,
-      onDelete,
-      (block: Block) => {
-        this.trigger(Events.onBlockSelect, { block: block });
-      },
-      (block: Block) => {
-        this.trigger(Events.onBlockDeselect, { block: block });
-      },
-      (block: Block, from: number, to: number) => {
-        this.trigger(Events.onBlockMove, { block: block, from: from, to: to });
-        this.trigger(Events.onChange, {
-          blocks: this.getData(),
-          html: this.getHtml()
-        });
-      },
-      onUpdate,
-      this.options.onUpload
-    );
   }
 
   public async initAsync() {
@@ -116,28 +57,7 @@ export class Editor {
     this.trigger(Events.onLoad, this);
   }
 
-  // load initial blocks
-  private async tryLoadInitialBlocksAsync(): Promise<Block[]> {
-    const url = this.options.blocksUrl;
-    const editor = this;
-    return new Promise<Block[]>(async (resolve, reject) => {
-      if (url) {
-        try {
-          const blocks = await $ajax.get(url);
-          resolve(blocks);
-        } catch (error) {
-          editor.onError(EditorStrings.errorBlocksFileNotFound(url));
-          reject(error);
-        }
-      } else if (this.options.blocks) {
-        resolve(this.options.blocks);
-      } else {
-        resolve(null);
-      }
-    });
-  }
-
-  tryBindFormSubmit() {
+  public tryBindFormSubmit() {
     const editor = this;
     const $form = this.options.formSelector
       ? $dom.find(this.options.formSelector)
@@ -165,10 +85,10 @@ export class Editor {
   }
 
   /// BLOCKS
-  public loadBlocks(blocks: Array<any>) {
+  public loadBlocks(blocks: any[]) {
     if (blocks && blocks.length) {
       blocks.forEach(block => {
-        let template = TemplateService.getTemplate(block.template);
+        const template = TemplateService.getTemplate(block.template);
         if (template) {
           this.container.addBlock(template, block.fields, null, false);
         } else {
@@ -184,6 +104,84 @@ export class Editor {
   public addBlock(template: Template) {
     const container = this.getContainer(this.container);
     container.addBlock(template, null, null, true);
+  }
+
+  private onError = (message: string, code: number = 0) =>
+    this.options.onError({ message, code });
+
+  private createContainer(): BlocksContainer {
+    const onAdd = (block: Block, idx: number) => {
+      if (this.isLoaded) {
+        this.trigger(Events.onBlockAdd, { block, idx });
+        this.trigger(Events.onChange, {
+          blocks: this.getData(),
+          html: this.getHtml()
+        });
+      }
+    };
+
+    const onDelete = (block: Block, idx: number) => {
+      this.trigger(Events.onBlockDelete, { block, idx });
+      this.trigger(Events.onChange, {
+        blocks: this.getData(),
+        html: this.getHtml()
+      });
+    };
+
+    const onUpdate = (block, property, oldValue, newValue) => {
+      this.trigger(Events.onBlockUpdate, {
+        block,
+        property,
+        oldValue,
+        newValue
+      });
+      this.trigger(Events.onChange, {
+        blocks: this.getData(),
+        html: this.getHtml()
+      });
+    };
+
+    return new BlocksContainer(
+      this.$editor,
+      onAdd,
+      onDelete,
+      (block: Block) => {
+        this.trigger(Events.onBlockSelect, { block });
+      },
+      (block: Block) => {
+        this.trigger(Events.onBlockDeselect, { block });
+      },
+      (block: Block, from: number, to: number) => {
+        this.trigger(Events.onBlockMove, { block, from, to });
+        this.trigger(Events.onChange, {
+          blocks: this.getData(),
+          html: this.getHtml()
+        });
+      },
+      onUpdate,
+      this.options.onUpload
+    );
+  }
+
+  // load initial blocks
+  private async tryLoadInitialBlocksAsync(): Promise<Block[]> {
+    const url = this.options.blocksUrl;
+    const editor = this;
+    return new Promise<Block[]>(async (resolve, reject) => {
+      if (url) {
+        try {
+          const blocks = await $ajax.get(url);
+          resolve(blocks);
+        } catch (error) {
+          editor.onError(EditorStrings.errorBlocksFileNotFound(url));
+          reject(error);
+        }
+      } else if (this.options.blocks) {
+        resolve(this.options.blocks);
+      } else {
+        resolve(null);
+      }
+    });
   }
 
   private getContainer(container: BlocksContainer) {

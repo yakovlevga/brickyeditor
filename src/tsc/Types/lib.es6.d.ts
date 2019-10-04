@@ -47,7 +47,7 @@ declare function parseInt(s: string, radix?: number): number;
 declare function parseFloat(string: string): number;
 
 /**
-  * Returns a Boolean value that indicates whether a value is the reserved value NaN (not a number).
+  * Returns a boolean value that indicates whether a value is the reserved value NaN (not a number).
   * @param number A numeric value.
   */
 declare function isNaN(number: number): boolean;
@@ -423,9 +423,9 @@ interface String {
 }
 
 interface StringConstructor {
-    new(value?: any): String;
+    new(value?: any): string;
     (value?: any): string;
-    readonly prototype: String;
+    readonly prototype: string;
     fromCharCode(...codes: number[]): string;
 }
 
@@ -434,18 +434,18 @@ interface StringConstructor {
   */
 declare const String: StringConstructor;
 
-interface Boolean {
+interface boolean {
     /** Returns the primitive value of the specified object. */
     valueOf(): boolean;
 }
 
 interface BooleanConstructor {
-    new(value?: any): Boolean;
+    new(value?: any): boolean;
     (value?: any): boolean;
-    readonly prototype: Boolean;
+    readonly prototype: boolean;
 }
 
-declare const Boolean: BooleanConstructor;
+declare const boolean: BooleanConstructor;
 
 interface Number {
     /**
@@ -824,7 +824,7 @@ interface RegExp {
     exec(string: string): RegExpExecArray | null;
 
     /**
-      * Returns a Boolean value that indicates whether or not a pattern exists in a searched string.
+      * Returns a boolean value that indicates whether or not a pattern exists in a searched string.
       * @param string String on which to perform the search.
       */
     test(string: string): boolean;
@@ -832,13 +832,13 @@ interface RegExp {
     /** Returns a copy of the text of the regular expression pattern. Read-only. The regExp argument is a Regular expression object. It can be a variable name or a literal. */
     readonly source: string;
 
-    /** Returns a Boolean value indicating the state of the global flag (g) used with a regular expression. Default is false. Read-only. */
+    /** Returns a boolean value indicating the state of the global flag (g) used with a regular expression. Default is false. Read-only. */
     readonly global: boolean;
 
-    /** Returns a Boolean value indicating the state of the ignoreCase flag (i) used with a regular expression. Default is false. Read-only. */
+    /** Returns a boolean value indicating the state of the ignoreCase flag (i) used with a regular expression. Default is false. Read-only. */
     readonly ignoreCase: boolean;
 
-    /** Returns a Boolean value indicating the state of the multiline flag (m) used with a regular expression. Default is false. Read-only. */
+    /** Returns a boolean value indicating the state of the multiline flag (m) used with a regular expression. Default is false. Read-only. */
     readonly multiline: boolean;
 
     lastIndex: number;
@@ -4314,7 +4314,7 @@ interface NumberConstructor {
     isInteger(number: number): boolean;
 
     /**
-     * Returns a Boolean value that indicates whether a value is the reserved value NaN (not a
+     * Returns a boolean value that indicates whether a value is the reserved value NaN (not a
      * number). Unlike the global isNaN(), Number.isNaN() doesn't forcefully convert the parameter
      * to a number. Only values of the type number, that are also NaN, result in true.
      * @param number A numeric value.
@@ -4488,13 +4488,13 @@ interface RegExp {
     readonly flags: string;
 
     /**
-     * Returns a Boolean value indicating the state of the sticky flag (y) used with a regular
+     * Returns a boolean value indicating the state of the sticky flag (y) used with a regular
      * expression. Default is false. Read-only.
      */
     readonly sticky: boolean;
 
     /**
-     * Returns a Boolean value indicating the state of the Unicode flag (u) used with a regular
+     * Returns a boolean value indicating the state of the Unicode flag (u) used with a regular
      * expression. Default is false. Read-only.
      */
     readonly unicode: boolean;
@@ -5514,7 +5514,7 @@ interface SymbolConstructor {
     readonly hasInstance: symbol;
 
     /**
-     * A Boolean value that if true indicates that an object should flatten to its array elements
+     * A boolean value that if true indicates that an object should flatten to its array elements
      * by Array.prototype.concat.
      */
     readonly isConcatSpreadable: symbol;
@@ -9058,22 +9058,22 @@ interface Document extends Node, GlobalEventHandlers, NodeSelector, DocumentEven
      */
     open(url?: string, name?: string, features?: string, replace?: boolean): Document;
     /**
-     * Returns a Boolean value that indicates whether a specified command can be successfully executed using execCommand, given the current state of the document.
+     * Returns a boolean value that indicates whether a specified command can be successfully executed using execCommand, given the current state of the document.
      * @param commandId Specifies a command identifier.
      */
     queryCommandEnabled(commandId: string): boolean;
     /**
-     * Returns a Boolean value that indicates whether the specified command is in the indeterminate state.
+     * Returns a boolean value that indicates whether the specified command is in the indeterminate state.
      * @param commandId String that specifies a command identifier.
      */
     queryCommandIndeterm(commandId: string): boolean;
     /**
-     * Returns a Boolean value that indicates the current state of the command.
+     * Returns a boolean value that indicates the current state of the command.
      * @param commandId String that specifies a command identifier.
      */
     queryCommandState(commandId: string): boolean;
     /**
-     * Returns a Boolean value that indicates whether the current command is supported on the current range.
+     * Returns a boolean value that indicates whether the current command is supported on the current range.
      * @param commandId Specifies a command identifier.
      */
     queryCommandSupported(commandId: string): boolean;
@@ -11186,7 +11186,7 @@ interface HTMLInputElement extends HTMLElement {
      */
     min: string;
     /**
-     * Sets or retrieves the Boolean value indicating whether multiple items can be selected from a list.
+     * Sets or retrieves the boolean value indicating whether multiple items can be selected from a list.
      */
     multiple: boolean;
     /**
@@ -12173,7 +12173,7 @@ interface HTMLSelectElement extends HTMLElement {
      */
     length: number;
     /**
-     * Sets or retrieves the Boolean value indicating whether multiple items can be selected from a list.
+     * Sets or retrieves the boolean value indicating whether multiple items can be selected from a list.
      */
     multiple: boolean;
     /**
@@ -20067,7 +20067,7 @@ interface URLSearchParams {
      */
     getAll(name: string): string[];
     /**
-     * Returns a Boolean indicating if such a search parameter exists.
+     * Returns a boolean indicating if such a search parameter exists.
      */
     has(name: string): boolean;
     /**

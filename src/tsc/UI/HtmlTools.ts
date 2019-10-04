@@ -1,7 +1,7 @@
-import { $dom } from "../Common/DOMHelpers";
+import { $dom } from "src/Common/DOMHelpers";
 import { Editor } from "../Editor";
 import { HtmlLinkParams } from "../HtmlLinkParams";
-import { Selectors } from "./Selectors";
+import { Selectors } from "src/Selectors";
 import { PromptParameter } from "../Prompt/Prompt";
 
 export class HtmlTools {

@@ -11,7 +11,7 @@ export default {
   plugins: [
     typescript({
       target: "es5"
-    }),
-    uglify()
+    })
+    // uglify()
   ]
 };

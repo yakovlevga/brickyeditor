@@ -1,4 +1,4 @@
-import { $dom } from "../Common/DOMHelpers";
+import { $dom } from "src/Common/DOMHelpers";
 
 export class SelectionUtils {
     public static bindTextSelection($el: HTMLElement, handler: (rect: ClientRect) => any) {

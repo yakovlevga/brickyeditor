@@ -1,7 +1,7 @@
-import { $dom } from "../Common/DOMHelpers";
+import { $dom } from "src/Common/DOMHelpers";
 import { 
     PromptParameter, 
-    PromptParameterOption } from "./Prompt";
+    PromptParameterOption } from "src/Prompt";
 
 export class PromptParameterOptions extends PromptParameter {
     public options: Array<PromptParameterOption>;

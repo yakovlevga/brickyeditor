@@ -1,6 +1,6 @@
-import { BaseField } from "./BaseField";
+import { BaseField } from "src/BaseField";
 import { Editor } from "../Editor";
-import { $dom } from "../Common/DOMHelpers";
+import { $dom } from "src/Common/DOMHelpers";
 import { PromptParameter, PromptParameterImage } from "../Prompt/Prompt";
 import { HtmlLinkParams } from "../HtmlLinkParams";
 import { EditorStrings } from "../EditorStrings";
@@ -114,8 +114,8 @@ export class ImageField extends BaseField {
         this.updateProperty('link', url);
     }
 
-    _isImg: Boolean;
-    private get isImg(): Boolean {
+    _isImg: boolean;
+    private get isImg(): boolean {
         return this._isImg = this._isImg || this.$field.tagName.toLowerCase() === 'img';
     }
 

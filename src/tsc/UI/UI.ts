@@ -1,10 +1,10 @@
-import { $dom } from "../Common/DOMHelpers";
-import { Selectors } from "./Selectors";
+import { $dom } from "src/Common/DOMHelpers";
+import { Selectors } from "src/Selectors";
 import { TemplateGroup } from "../Templates/TemplateGroup";
 import { EditorStrings } from "../EditorStrings";
-import { HtmlTools } from "./HtmlTools";
+import { HtmlTools } from "src/HtmlTools";
 import { Editor } from "../Editor";
-import { Modal } from "./Modal";
+import { Modal } from "src/Modal";
 
 export class UI {
     // Templates
@@ -133,7 +133,7 @@ export class UI {
         });
     }
 
-    public static toggleBtnDeck($btnsDeck: HTMLElement, isOn?: Boolean) {
+    public static toggleBtnDeck($btnsDeck: HTMLElement, isOn?: boolean) {
         var $btns = $dom.select($btnsDeck, '.bre-btn');
         if (!$btns || $btns.length == 0)
             return;

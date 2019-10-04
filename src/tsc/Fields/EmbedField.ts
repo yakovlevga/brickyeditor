@@ -1,8 +1,8 @@
-import { $dom } from "../Common/DOMHelpers";
-import { BaseField } from "./BaseField";
+import { $dom } from "src/Common/DOMHelpers";
+import { BaseField } from "src/BaseField";
 import { Editor } from "../Editor";
 import { EditorStrings } from "../EditorStrings";
-import { $ajax } from "../Common/AJAXHelper";
+import { $ajax } from "src/Common/AJAXHelper";
 import { PromptParameter } from "../Prompt/Prompt";
 import { EmbedService } from "../Services/Services";
 

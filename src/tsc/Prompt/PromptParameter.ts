@@ -1,4 +1,4 @@
-import { $dom } from "../Common/DOMHelpers";
+import { $dom } from "src/Common/DOMHelpers";
 
 export class PromptParameter {
     public key: string;

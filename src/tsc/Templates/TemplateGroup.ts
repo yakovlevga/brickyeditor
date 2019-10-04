@@ -1,4 +1,4 @@
-import { Template } from "./Template";
+import { Template } from "src/Template";
 
     export class TemplateGroup {
         constructor(
