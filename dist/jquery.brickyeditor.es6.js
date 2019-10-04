@@ -1,4 +1,3 @@
-
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
@@ -371,10 +370,13 @@ define("Fields/BaseField", ["require", "exports", "Common/DOMHelpers", "Fields/F
             return null;
         }
         static registerCommonFields() {
-            Fields_1.HtmlField.registerField();
-            Fields_1.ImageField.registerField();
-            Fields_1.EmbedField.registerField();
-            Fields_1.ContainerField.registerField();
+            if (!this.commonFieldsRegistered) {
+                Fields_1.HtmlField.registerField();
+                Fields_1.ImageField.registerField();
+                Fields_1.EmbedField.registerField();
+                Fields_1.ContainerField.registerField();
+            }
+            this.commonFieldsRegistered = true;
         }
         ;
         static registerField() {
@@ -403,6 +405,9 @@ define("Fields/BaseField", ["require", "exports", "Common/DOMHelpers", "Fields/F
             }
             let type = fieldData.type;
             if (type != null) {
+                if (!BaseField.commonFieldsRegistered) {
+                    BaseField.registerCommonFields();
+                }
                 if (this._fields.hasOwnProperty(type)) {
                     const field = this._fields[type];
                     return new field($field, fieldData, onSelect, onUpdate, onUpload);
@@ -439,6 +444,7 @@ define("Fields/BaseField", ["require", "exports", "Common/DOMHelpers", "Fields/F
         }
     }
     BaseField._fields = {};
+    BaseField.commonFieldsRegistered = false;
     exports.BaseField = BaseField;
 });
 define("Fields/ContainerField", ["require", "exports", "Common/DOMHelpers", "UI/Selectors", "BlocksContainer", "Fields/BaseField"], function (require, exports, DOMHelpers_3, Selectors_3, BlocksContainer_1, BaseField_1) {
@@ -582,7 +588,7 @@ define("EditorStrings", ["require", "exports"], function (require, exports) {
     EditorStrings.defaultTemplatesGroupName = 'Other templates';
     exports.EditorStrings = EditorStrings;
 });
-define("Services/EmbedService", ["require", "exports"], function (require, exports) {
+define("Services/EmbedService", ["require", "exports", "Common/AJAXHelper"], function (require, exports, AJAXHelper_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     class EmbedService {
@@ -592,7 +598,7 @@ define("Services/EmbedService", ["require", "exports"], function (require, expor
             const url = `https://noembed.com/embed?url=${embedUrl}`;
             return new Promise((resolve, reject) => __awaiter(this, void 0, void 0, function* () {
                 try {
-                    const data = yield $ajax.jsonp(url);
+                    const data = yield AJAXHelper_1.$ajax.jsonp(url);
                     resolve(data);
                 }
                 catch (err) {
@@ -626,7 +632,7 @@ define("Templates/TemplateGroup", ["require", "exports"], function (require, exp
     }
     exports.TemplateGroup = TemplateGroup;
 });
-define("Services/TemplateService", ["require", "exports", "EditorStrings", "Templates/Template", "Common/DOMHelpers", "Common/AJAXHelper", "UI/Selectors", "Templates/TemplateGroup"], function (require, exports, EditorStrings_1, Template_1, DOMHelpers_4, AJAXHelper_1, Selectors_4, TemplateGroup_1) {
+define("Services/TemplateService", ["require", "exports", "EditorStrings", "Templates/Template", "Common/DOMHelpers", "Common/AJAXHelper", "UI/Selectors", "Templates/TemplateGroup"], function (require, exports, EditorStrings_1, Template_1, DOMHelpers_4, AJAXHelper_2, Selectors_4, TemplateGroup_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     class TemplateService {
@@ -636,7 +642,7 @@ define("Services/TemplateService", ["require", "exports", "EditorStrings", "Temp
                 const templates = this.templates;
                 return new Promise((resolve, reject) => __awaiter(this, void 0, void 0, function* () {
                     try {
-                        const data = yield AJAXHelper_1.$ajax.get(url);
+                        const data = yield AJAXHelper_2.$ajax.get(url);
                         const $data = DOMHelpers_4.$dom.el(`<div>${data}</div>`);
                         const $style = DOMHelpers_4.$dom.select($data, 'style', false);
                         if ($style.length > 0) {
@@ -1279,7 +1285,7 @@ define("EditorOptions", ["require", "exports"], function (require, exports) {
     }
     exports.EditorOptions = EditorOptions;
 });
-define("Editor", ["require", "exports", "Common/DOMHelpers", "Common/AJAXHelper", "BlocksContainer", "EditorStrings", "Services/Services", "Events", "Fields/Fields", "UI/Selectors", "UI/UI", "Common/Common", "EditorOptions"], function (require, exports, DOMHelpers_11, AJAXHelper_2, BlocksContainer_2, EditorStrings_4, Services_1, Events_1, Fields_2, Selectors_7, UI_1, Common_2, EditorOptions_1) {
+define("Editor", ["require", "exports", "Common/DOMHelpers", "Common/AJAXHelper", "BlocksContainer", "EditorStrings", "Services/Services", "Events", "Fields/Fields", "UI/Selectors", "UI/UI", "Common/Common", "EditorOptions"], function (require, exports, DOMHelpers_11, AJAXHelper_3, BlocksContainer_2, EditorStrings_4, Services_1, Events_1, Fields_2, Selectors_7, UI_1, Common_2, EditorOptions_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     class Editor {
@@ -1297,12 +1303,18 @@ define("Editor", ["require", "exports", "Common/DOMHelpers", "Common/AJAXHelper"
             const onAdd = (block, idx) => {
                 if (this.isLoaded) {
                     this.trigger(Events_1.Events.onBlockAdd, { block: block, idx: idx });
-                    this.trigger(Events_1.Events.onChange, { blocks: this.getData(), html: this.getHtml() });
+                    this.trigger(Events_1.Events.onChange, {
+                        blocks: this.getData(),
+                        html: this.getHtml()
+                    });
                 }
             };
             const onDelete = (block, idx) => {
                 this.trigger(Events_1.Events.onBlockDelete, { block: block, idx: idx });
-                this.trigger(Events_1.Events.onChange, { blocks: this.getData(), html: this.getHtml() });
+                this.trigger(Events_1.Events.onChange, {
+                    blocks: this.getData(),
+                    html: this.getHtml()
+                });
             };
             const onUpdate = (block, property, oldValue, newValue) => {
                 this.trigger(Events_1.Events.onBlockUpdate, {
@@ -1311,11 +1323,21 @@ define("Editor", ["require", "exports", "Common/DOMHelpers", "Common/AJAXHelper"
                     oldValue: oldValue,
                     newValue: newValue
                 });
-                this.trigger(Events_1.Events.onChange, { blocks: this.getData(), html: this.getHtml() });
+                this.trigger(Events_1.Events.onChange, {
+                    blocks: this.getData(),
+                    html: this.getHtml()
+                });
             };
-            return new BlocksContainer_2.BlocksContainer(this.$editor, onAdd, onDelete, (block) => { this.trigger(Events_1.Events.onBlockSelect, { block: block }); }, (block) => { this.trigger(Events_1.Events.onBlockDeselect, { block: block }); }, (block, from, to) => {
+            return new BlocksContainer_2.BlocksContainer(this.$editor, onAdd, onDelete, (block) => {
+                this.trigger(Events_1.Events.onBlockSelect, { block: block });
+            }, (block) => {
+                this.trigger(Events_1.Events.onBlockDeselect, { block: block });
+            }, (block, from, to) => {
                 this.trigger(Events_1.Events.onBlockMove, { block: block, from: from, to: to });
-                this.trigger(Events_1.Events.onChange, { blocks: this.getData(), html: this.getHtml() });
+                this.trigger(Events_1.Events.onChange, {
+                    blocks: this.getData(),
+                    html: this.getHtml()
+                });
             }, onUpdate, this.options.onUpload);
         }
         initAsync() {
@@ -1338,7 +1360,7 @@ define("Editor", ["require", "exports", "Common/DOMHelpers", "Common/AJAXHelper"
                 return new Promise((resolve, reject) => __awaiter(this, void 0, void 0, function* () {
                     if (url) {
                         try {
-                            const blocks = yield AJAXHelper_2.$ajax.get(url);
+                            const blocks = yield AJAXHelper_3.$ajax.get(url);
                             resolve(blocks);
                         }
                         catch (error) {
@@ -1357,12 +1379,16 @@ define("Editor", ["require", "exports", "Common/DOMHelpers", "Common/AJAXHelper"
         }
         tryBindFormSubmit() {
             const editor = this;
-            const $form = this.options.formSelector ? DOMHelpers_11.$dom.find(this.options.formSelector) : null;
-            const $input = this.options.inputSelector ? DOMHelpers_11.$dom.find(this.options.inputSelector) : null;
+            const $form = this.options.formSelector
+                ? DOMHelpers_11.$dom.find(this.options.formSelector)
+                : null;
+            const $input = this.options.inputSelector
+                ? DOMHelpers_11.$dom.find(this.options.inputSelector)
+                : null;
             if (!$form || !$input || !($input instanceof HTMLInputElement)) {
                 return;
             }
-            DOMHelpers_11.$dom.on($form, 'submit', () => {
+            DOMHelpers_11.$dom.on($form, "submit", () => {
                 $input.value = JSON.stringify(editor.getData());
                 return true;
             });
@@ -1402,7 +1428,7 @@ define("Editor", ["require", "exports", "Common/DOMHelpers", "Common/AJAXHelper"
         }
         trigger(event, data) {
             const editor = this;
-            DOMHelpers_11.$dom.trigger(this.$editor, 'bre.' + event, data);
+            DOMHelpers_11.$dom.trigger(this.$editor, "bre." + event, data);
             Common_2.Common.propsEach(editor.options, (key, value) => {
                 if (key.breEqualsInvariant(event) && value) {
                     value(data);
@@ -1412,7 +1438,7 @@ define("Editor", ["require", "exports", "Common/DOMHelpers", "Common/AJAXHelper"
     }
     exports.Editor = Editor;
 });
-define("Fields/EmbedField", ["require", "exports", "Common/DOMHelpers", "Fields/BaseField", "Editor", "EditorStrings", "Common/AJAXHelper", "Prompt/Prompt", "Services/Services"], function (require, exports, DOMHelpers_12, BaseField_2, Editor_2, EditorStrings_5, AJAXHelper_3, Prompt_5, Services_2) {
+define("Fields/EmbedField", ["require", "exports", "Common/DOMHelpers", "Fields/BaseField", "Editor", "EditorStrings", "Common/AJAXHelper", "Prompt/Prompt", "Services/Services"], function (require, exports, DOMHelpers_12, BaseField_2, Editor_2, EditorStrings_5, AJAXHelper_4, Prompt_5, Services_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     class EmbedField extends BaseField_2.BaseField {
@@ -1465,7 +1491,7 @@ define("Fields/EmbedField", ["require", "exports", "Common/DOMHelpers", "Fields/
                     var scriptSrc = $script.src;
                     if (scriptSrc.breStartsWith('//')) {
                         scriptSrc = "https:" + scriptSrc;
-                        AJAXHelper_3.$ajax.getScript(scriptSrc)
+                        AJAXHelper_4.$ajax.getScript(scriptSrc)
                             .then(() => {
                             Services_2.EmbedService.processEmbed(json.provider_name);
                         });
@@ -1487,32 +1513,65 @@ define("Fields/EmbedField", ["require", "exports", "Common/DOMHelpers", "Fields/
     }
     exports.EmbedField = EmbedField;
 });
-define("Fields/HtmlField", ["require", "exports", "Common/DOMHelpers", "UI/Selectors", "Fields/BaseField", "Editor"], function (require, exports, DOMHelpers_13, Selectors_8, BaseField_3, Editor_3) {
+define("UI/SelectionUtils", ["require", "exports", "Common/DOMHelpers"], function (require, exports, DOMHelpers_13) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    class SelectionUtils {
+        static bindTextSelection($el, handler) {
+            if (!DOMHelpers_13.$dom.matches($el, '[contenteditable]')) {
+                return;
+            }
+            DOMHelpers_13.$dom.on($el, 'mouseup', () => {
+                setTimeout(() => {
+                    let rect = this.getSelectionRect();
+                    handler(rect);
+                }, 0);
+            });
+            DOMHelpers_13.$dom.on($el, 'keyup', (ev) => {
+                let rect = this.getSelectionRect();
+                handler(rect);
+            });
+        }
+        static getSelectionRect() {
+            let selection = window.getSelection();
+            let range = selection.getRangeAt(0);
+            if (range) {
+                let rect = range.getBoundingClientRect();
+                if (rect) {
+                    return rect;
+                }
+            }
+            return null;
+        }
+    }
+    exports.SelectionUtils = SelectionUtils;
+});
+define("Fields/HtmlField", ["require", "exports", "Common/DOMHelpers", "UI/Selectors", "Fields/BaseField", "Editor", "UI/SelectionUtils"], function (require, exports, DOMHelpers_14, Selectors_8, BaseField_3, Editor_3, SelectionUtils_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     class HtmlField extends BaseField_3.BaseField {
         bind() {
             let field = this;
             let $field = this.$field;
-            if (!DOMHelpers_13.$dom.matches($field, Selectors_8.Selectors.selectorContentEditable)) {
+            if (!DOMHelpers_14.$dom.matches($field, Selectors_8.Selectors.selectorContentEditable)) {
                 $field.setAttribute(Selectors_8.Selectors.attrContentEditable, 'true');
             }
             var html = this.data.html || this.$field.innerHTML;
             this.setHtml(html, false);
             $field.innerHTML = this.data.html;
-            SelectionUtils.bindTextSelection($field, (rect) => {
+            SelectionUtils_1.SelectionUtils.bindTextSelection($field, (rect) => {
                 Editor_3.Editor.UI.htmlTools.show(rect);
             });
-            DOMHelpers_13.$dom.ons($field, 'blur keyup paste input', ev => {
+            DOMHelpers_14.$dom.ons($field, 'blur keyup paste input', ev => {
                 this.setHtml($field.innerHTML);
             });
-            DOMHelpers_13.$dom.on($field, 'paste', e => {
+            DOMHelpers_14.$dom.on($field, 'paste', e => {
                 e.preventDefault();
                 let ev = e.originalEvent;
                 let text = ev.clipboardData.getData('text/plain');
                 document.execCommand("insertHTML", false, text);
             });
-            DOMHelpers_13.$dom.on($field, 'click', ev => {
+            DOMHelpers_14.$dom.on($field, 'click', ev => {
                 field.select();
                 ev.stopPropagation();
                 return false;
@@ -1533,7 +1592,7 @@ define("Fields/HtmlField", ["require", "exports", "Common/DOMHelpers", "UI/Selec
     }
     exports.HtmlField = HtmlField;
 });
-define("Fields/ImageField", ["require", "exports", "Fields/BaseField", "Editor", "Common/DOMHelpers", "Prompt/Prompt", "HtmlLinkParams", "EditorStrings"], function (require, exports, BaseField_4, Editor_4, DOMHelpers_14, Prompt_6, HtmlLinkParams_2, EditorStrings_6) {
+define("Fields/ImageField", ["require", "exports", "Fields/BaseField", "Editor", "Common/DOMHelpers", "Prompt/Prompt", "HtmlLinkParams", "EditorStrings"], function (require, exports, BaseField_4, Editor_4, DOMHelpers_15, Prompt_6, HtmlLinkParams_2, EditorStrings_6) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     class ImageField extends BaseField_4.BaseField {
@@ -1541,7 +1600,7 @@ define("Fields/ImageField", ["require", "exports", "Fields/BaseField", "Editor",
             let field = this;
             let data = this.data;
             this.setSrc(this.data.src, false);
-            DOMHelpers_14.$dom.on(this.$field, 'click', () => __awaiter(this, void 0, void 0, function* () {
+            DOMHelpers_15.$dom.on(this.$field, 'click', () => __awaiter(this, void 0, void 0, function* () {
                 const fields = yield Editor_4.Editor.UI.modal.promptAsync(field.getPromptParams());
                 if (fields != null) {
                     const file = fields.getValue('file');
@@ -1610,19 +1669,19 @@ define("Fields/ImageField", ["require", "exports", "Fields/BaseField", "Editor",
         setLink(url) {
             if (url && url.href) {
                 if (!this.$link) {
-                    this.$link = DOMHelpers_14.$dom.el(`<a href='${url.href}' title='${url.title}' target='${url.target}'></a>`);
-                    DOMHelpers_14.$dom.on(this.$link, 'click', ev => {
+                    this.$link = DOMHelpers_15.$dom.el(`<a href='${url.href}' title='${url.title}' target='${url.target}'></a>`);
+                    DOMHelpers_15.$dom.on(this.$link, 'click', ev => {
                         ev.stopPropagation();
                         return false;
                     });
-                    DOMHelpers_14.$dom.wrap(this.$field, this.$link);
+                    DOMHelpers_15.$dom.wrap(this.$field, this.$link);
                 }
                 else {
                     this.$link.href = url.href;
                 }
             }
             else if (this.$link) {
-                DOMHelpers_14.$dom.unwrap(this.$field);
+                DOMHelpers_15.$dom.unwrap(this.$field);
                 this.$link = null;
                 delete this.$link;
             }
@@ -1635,7 +1694,7 @@ define("Fields/ImageField", ["require", "exports", "Fields/BaseField", "Editor",
             let $el = super.getEl();
             const { link } = this.data;
             if (link && link.href) {
-                const $link = DOMHelpers_14.$dom.el(`<a href='${link.href}' title='${link.title}' target='${link.target}'></a>`);
+                const $link = DOMHelpers_15.$dom.el(`<a href='${link.href}' title='${link.title}' target='${link.target}'></a>`);
                 $link.appendChild($el);
                 return $link;
             }
@@ -1656,7 +1715,7 @@ define("Fields/Fields", ["require", "exports", "Fields/BaseField", "Fields/Conta
     __export(HtmlField_1);
     __export(ImageField_1);
 });
-define("Block/BlockUI", ["require", "exports", "Common/DOMHelpers", "UI/UI"], function (require, exports, DOMHelpers_15, UI_2) {
+define("Block/BlockUI", ["require", "exports", "Common/DOMHelpers", "UI/UI"], function (require, exports, DOMHelpers_16, UI_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     class BlockUI {
@@ -1674,27 +1733,27 @@ define("Block/BlockUI", ["require", "exports", "Common/DOMHelpers", "UI/UI"], fu
             this.$editor.classList.toggle("bre-selected", isOn);
         }
         buildEditorUI(actions) {
-            this.$tools = DOMHelpers_15.$dom.el('<div class="bre-block-tools bre-btn-deck"></div>');
+            this.$tools = DOMHelpers_16.$dom.el('<div class="bre-block-tools bre-btn-deck"></div>');
             actions.forEach(action => {
                 var $btn = this.buildButton(action);
                 this.$tools.appendChild($btn);
             });
             UI_2.UI.initBtnDeck(this.$tools);
-            this.$editor = DOMHelpers_15.$dom.el('<div class="bre-block-wrapper"></div>');
+            this.$editor = DOMHelpers_16.$dom.el('<div class="bre-block-wrapper"></div>');
             this.$editor.appendChild(this.$tools);
             this.$editor.appendChild(this.$block);
-            DOMHelpers_15.$dom.on(this.$editor, 'mouseover', () => {
+            DOMHelpers_16.$dom.on(this.$editor, 'mouseover', () => {
                 this.$editor.classList.add('bre-active');
             });
-            DOMHelpers_15.$dom.on(this.$editor, 'mouseout', () => {
+            DOMHelpers_16.$dom.on(this.$editor, 'mouseout', () => {
                 this.$editor.classList.remove('bre-active');
             });
-            DOMHelpers_15.$dom.on(this.$editor, 'click', () => {
+            DOMHelpers_16.$dom.on(this.$editor, 'click', () => {
                 this.onSelect();
             });
         }
         buildButton(action) {
-            let $el = DOMHelpers_15.$dom.el(`<button type="button" class="bre-btn"><i class="fa fa-${action.icon}"></i></button>`);
+            let $el = DOMHelpers_16.$dom.el(`<button type="button" class="bre-btn"><i class="fa fa-${action.icon}"></i></button>`);
             if (action.action) {
                 $el.onclick = function (ev) {
                     action.action();
@@ -1707,7 +1766,7 @@ define("Block/BlockUI", ["require", "exports", "Common/DOMHelpers", "UI/UI"], fu
     }
     exports.BlockUI = BlockUI;
 });
-define("Block/Block", ["require", "exports", "Common/DOMHelpers", "UI/Selectors", "Block/BlockUIAction", "Fields/Fields", "Block/BlockUI"], function (require, exports, DOMHelpers_16, Selectors_9, BlockUIAction_1, Fields_3, BlockUI_1) {
+define("Block/Block", ["require", "exports", "Common/DOMHelpers", "UI/Selectors", "Block/BlockUIAction", "Fields/Fields", "Block/BlockUI"], function (require, exports, DOMHelpers_17, Selectors_9, BlockUIAction_1, Fields_3, BlockUI_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     class Block {
@@ -1721,7 +1780,7 @@ define("Block/Block", ["require", "exports", "Common/DOMHelpers", "UI/Selectors"
             this.onUpdate = onUpdate;
             this.onUpload = onUpload;
             this.fields = [];
-            const $block = DOMHelpers_16.$dom.el(template.$html.innerHTML);
+            const $block = DOMHelpers_17.$dom.el(template.$html.innerHTML);
             this.bindFields($block, data);
             const actions = this.getActions();
             this.ui = new BlockUI_1.BlockUI($block, preview, actions, () => this.select());
@@ -1733,7 +1792,7 @@ define("Block/Block", ["require", "exports", "Common/DOMHelpers", "UI/Selectors"
         }
         bindFields($block, data) {
             const block = this;
-            const $fields = DOMHelpers_16.$dom.select($block, Selectors_9.Selectors.selectorField, true);
+            const $fields = DOMHelpers_17.$dom.select($block, Selectors_9.Selectors.selectorField, true);
             $fields.forEach($elem => {
                 const onUpdate = (property, oldValue, newValue) => {
                     if (block.onUpdate) {
@@ -1790,7 +1849,7 @@ define("Block/Block", ["require", "exports", "Common/DOMHelpers", "UI/Selectors"
             this.onDeselect(this);
         }
         scrollTo() {
-            var top = DOMHelpers_16.$dom.offset(this.ui.$editor).top - 100;
+            var top = DOMHelpers_17.$dom.offset(this.ui.$editor).top - 100;
             top = top > 0 ? top : 0;
         }
         getData(ignoreHtml) {
@@ -1805,18 +1864,18 @@ define("Block/Block", ["require", "exports", "Common/DOMHelpers", "UI/Selectors"
             return data;
         }
         getHtml(trim) {
-            const $html = DOMHelpers_16.$dom.el(this.template.$html.innerHTML);
+            const $html = DOMHelpers_17.$dom.el(this.template.$html.innerHTML);
             let fieldsHtml = {};
             this.fields.forEach(field => {
                 const name = field.name || field.data.name;
                 fieldsHtml[name] = field.getEl();
             });
-            DOMHelpers_16.$dom.select($html, Selectors_9.Selectors.selectorField, true)
+            DOMHelpers_17.$dom.select($html, Selectors_9.Selectors.selectorField, true)
                 .forEach($elem => {
-                let fieldData = DOMHelpers_16.$dom.data($elem, 'breField');
+                let fieldData = DOMHelpers_17.$dom.data($elem, 'breField');
                 const name = fieldData.name;
                 const $field = fieldsHtml[name];
-                DOMHelpers_16.$dom.replaceWith($elem, $field);
+                DOMHelpers_17.$dom.replaceWith($elem, $field);
             });
             const html = $html.outerHTML;
             if (!html) {
@@ -1827,7 +1886,7 @@ define("Block/Block", ["require", "exports", "Common/DOMHelpers", "UI/Selectors"
     }
     exports.Block = Block;
 });
-define("BlocksContainer", ["require", "exports", "Block/Block", "Common/DOMHelpers"], function (require, exports, Block_2, DOMHelpers_17) {
+define("BlocksContainer", ["require", "exports", "Block/Block", "Common/DOMHelpers"], function (require, exports, Block_2, DOMHelpers_18) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     class BlocksContainer {
@@ -1857,7 +1916,7 @@ define("BlocksContainer", ["require", "exports", "Block/Block", "Common/DOMHelpe
             this.blocks.forEach(block => {
                 blocksHtml.push(block.getHtml(true));
             });
-            let $el = DOMHelpers_17.$dom.clone(this.$element);
+            let $el = DOMHelpers_18.$dom.clone(this.$element);
             $el.innerHTML = blocksHtml.join('\n');
             return $el.outerHTML;
         }
@@ -1879,7 +1938,7 @@ define("BlocksContainer", ["require", "exports", "Block/Block", "Common/DOMHelpe
                 this.$element.appendChild(block.ui.$editor);
             }
             else {
-                DOMHelpers_17.$dom.after(this.blocks[idx - 1].ui.$editor, block.ui.$editor);
+                DOMHelpers_18.$dom.after(this.blocks[idx - 1].ui.$editor, block.ui.$editor);
             }
             this.onAddBlock(block, idx);
             block.select(null);
@@ -1908,10 +1967,10 @@ define("BlocksContainer", ["require", "exports", "Block/Block", "Common/DOMHelpe
                 return;
             var $anchorBlock = this.blocks[new_idx].ui.$editor;
             if (offset > 0) {
-                DOMHelpers_17.$dom.after($anchorBlock, block.ui.$editor);
+                DOMHelpers_18.$dom.after($anchorBlock, block.ui.$editor);
             }
             else if (offset < 0) {
-                DOMHelpers_17.$dom.before($anchorBlock, block.ui.$editor);
+                DOMHelpers_18.$dom.before($anchorBlock, block.ui.$editor);
             }
             this.blocks.splice(idx, 1);
             this.blocks.splice(new_idx, 0, block);
@@ -1941,7 +2000,7 @@ define("BlocksContainer", ["require", "exports", "Block/Block", "Common/DOMHelpe
             }
             if (this.blocks.length === 0) {
                 if (!this.$placeholder) {
-                    this.$placeholder = DOMHelpers_17.$dom.el('<i data-bre-placeholder="true">Click here to select this container...</i>');
+                    this.$placeholder = DOMHelpers_18.$dom.el('<i data-bre-placeholder="true">Click here to select this container...</i>');
                     this.$element.appendChild(this.$placeholder);
                 }
             }
@@ -1953,24 +2012,21 @@ define("BlocksContainer", ["require", "exports", "Block/Block", "Common/DOMHelpe
     }
     exports.BlocksContainer = BlocksContainer;
 });
-(function ($) {
-    $.fn.brickyeditor = function (options) {
-        let editor = new BrickyEditor.Editor($(this)[0], options);
-        editor.initAsync();
-        return editor;
-    };
-}(jQuery));
-var BrickyEditor;
-(function (BrickyEditor) {
-    class BlockAction {
-        constructor(icon, action, title) {
-            this.icon = icon;
-            this.action = action;
-            this.title = title;
+define("Block/BlockAction", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var BrickyEditor;
+    (function (BrickyEditor) {
+        class BlockAction {
+            constructor(icon, action, title) {
+                this.icon = icon;
+                this.action = action;
+                this.title = title;
+            }
         }
-    }
-    BrickyEditor.BlockAction = BlockAction;
-})(BrickyEditor || (BrickyEditor = {}));
+        BrickyEditor.BlockAction = BlockAction;
+    })(BrickyEditor = exports.BrickyEditor || (exports.BrickyEditor = {}));
+});
 define("UI/SelectionHelper", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -1992,37 +2048,4 @@ define("UI/SelectionHelper", ["require", "exports"], function (require, exports)
         }
     }
     exports.SelectionHelper = SelectionHelper;
-});
-define("UI/SelectionUtils", ["require", "exports", "Common/DOMHelpers"], function (require, exports, DOMHelpers_18) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    class SelectionUtils {
-        static bindTextSelection($el, handler) {
-            if (!DOMHelpers_18.$dom.matches($el, '[contenteditable]')) {
-                return;
-            }
-            DOMHelpers_18.$dom.on($el, 'mouseup', () => {
-                setTimeout(() => {
-                    let rect = this.getSelectionRect();
-                    handler(rect);
-                }, 0);
-            });
-            DOMHelpers_18.$dom.on($el, 'keyup', (ev) => {
-                let rect = this.getSelectionRect();
-                handler(rect);
-            });
-        }
-        static getSelectionRect() {
-            let selection = window.getSelection();
-            let range = selection.getRangeAt(0);
-            if (range) {
-                let rect = range.getBoundingClientRect();
-                if (rect) {
-                    return rect;
-                }
-            }
-            return null;
-        }
-    }
-    exports.SelectionUtils = SelectionUtils;
 });

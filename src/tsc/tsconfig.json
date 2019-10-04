@@ -1,10 +1,10 @@
 {
-    "compilerOptions": {
-        "target": "es5",
-        "module": "amd",
-        "outFile": "jquery.brickyeditor.js",
-        "removeComments": true,
-        "declaration": true
-    },
-    "typeRoots": ["types"]    
+  "compilerOptions": {
+    "target": "es5",
+    "module": "amd",
+    "outFile": "brickyeditor.js",
+    "removeComments": true,
+    "declaration": true
+  },
+  "typeRoots": ["types"]
 }

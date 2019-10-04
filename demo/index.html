@@ -11,18 +11,31 @@
   <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js"></script>
-  <script src="js/jquery.brickyeditor.js"></script>
+  <script src="js/brickyeditor.js"></script>
   <script src="js/locales/jquery.brickyeditor.ru.js"></script>
   <script>
     $(function () {
-      $("#editor").brickyeditor({
+      const options = {
         ignoreHtml: true,
         blocksUrl: 'data.json',
         templatesUrl: 'templates.html',
         onChange: function(data) {
           console.log(data.html);
         }
-      });
+      };
+
+      debugger;
+      const editor = new BrickyEditor.Editor($("#editor")[0], options);       
+      editor.initAsync();
+
+      // $("#editor").brickyeditor({
+      //   ignoreHtml: true,
+      //   blocksUrl: 'data.json',
+      //   templatesUrl: 'templates.html',
+      //   onChange: function(data) {
+      //     console.log(data.html);
+      //   }
+      // });
     });
   </script>
 </head>
