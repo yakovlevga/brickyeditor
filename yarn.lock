@@ -1055,7 +1055,7 @@ browser-sync-ui@^2.26.4:
     socket.io-client "^2.0.4"
     stream-throttle "^0.1.3"
 
-browser-sync@^2.26.7:
+browser-sync@^2.18.13, browser-sync@^2.26.7:
   version "2.26.7"
   resolved "https://registry.yarnpkg.com/browser-sync/-/browser-sync-2.26.7.tgz#120287716eb405651a76cc74fe851c31350557f9"
   integrity sha512-lY3emme0OyvA2ujEMpRmyRy9LY6gHLuTr2/ABxhIm3lADOiRXzP4dgekvnDrQqZ/Ec2Fz19lEjm6kglSG5766w==
@@ -4929,6 +4929,13 @@ rimraf@~2.6.2:
   integrity sha512-mwqeW5XsA2qAejG46gYdENaxXjx9onRNCfn7L0duuP4hCuTIi/QO7PDK07KJfp1d+izWPrzEJDcSqBa0OZQriA==
   dependencies:
     glob "^7.1.3"
+
+rollup-plugin-browsersync@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/rollup-plugin-browsersync/-/rollup-plugin-browsersync-1.0.0.tgz#efab872039ea50fcb9bd001efc8eb729ae35d3b8"
+  integrity sha512-0oiy2Wq4GKzBqMF/e6iB5ZnhfQL/2aNRVIkqtx0Hkf+EJ056BgiKHCuI8+sQiCIi9Ql6GktxQKYOXMUF9qhtjQ==
+  dependencies:
+    browser-sync "^2.18.13"
 
 rollup-plugin-tslint@^0.2.2:
   version "0.2.2"

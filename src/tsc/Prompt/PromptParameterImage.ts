@@ -1,13 +1,13 @@
+import { $dom } from "src/common/DOMHelpers";
 import {
   PromptParameter,
-  PromptParameterOption,
   PromptParameterImageResult,
   PromptParameterImageResultFile,
+  PromptParameterOption,
 } from "src/Prompt/Prompt";
-import { $dom } from "src/common/DOMHelpers";
 
 export class PromptParameterImage extends PromptParameter {
-  public options: Array<PromptParameterOption>;
+  public options: PromptParameterOption[];
   private _value: PromptParameterImageResult;
 
   constructor(
@@ -32,10 +32,10 @@ export class PromptParameterImage extends PromptParameter {
   }
 
   protected getEditor() {
-    var field = this;
-    var img =
+    const field = this;
+    const img =
       this.value && this.value.fileContent ? this.value.fileContent : "";
-    var $editor = $dom.el(`
+    const $editor = $dom.el(`
                 <div class='bre-image-input'>
                     <label for="${this.key}">
                         ${this.placeholder}
@@ -45,21 +45,21 @@ export class PromptParameterImage extends PromptParameter {
                 </div>
                 <small class='bre-image-input-filename'></small>`);
 
-    var $file = $editor.querySelector<HTMLInputElement>("input");
-    var $filePreview = $editor.querySelector<HTMLImageElement>("img");
-    var $fileName = $editor.querySelector<HTMLElement>(
+    const $file = $editor.querySelector<HTMLInputElement>("input");
+    const $filePreview = $editor.querySelector<HTMLImageElement>("img");
+    const $fileName = $editor.querySelector<HTMLElement>(
       ".bre-image-input-filename"
     );
 
-    var value = this.value as PromptParameterImageResult;
+    const value = this.value as PromptParameterImageResult;
     field.updatePreview($filePreview, $fileName, this.value);
 
     $file.onchange = () => {
       if ($file.files && $file.files[0]) {
-        var reader = new FileReader();
+        const reader = new FileReader();
 
-        reader.onload = function(ev) {
-          let target: any = ev.target;
+        reader.onload = ev => {
+          const target: any = ev.target;
           field._value = new PromptParameterImageResult();
           field._value.fileContent = target.result;
           field._value.fileInfo = new PromptParameterImageResultFile(
@@ -81,7 +81,9 @@ export class PromptParameterImage extends PromptParameter {
     $fileName: HTMLElement,
     value: PromptParameterImageResult
   ) {
-    if (!value) return;
+    if (!value) {
+      return;
+    }
 
     $filePreview.src = value.fileContent;
     $filePreview.classList.add("bre-loaded");

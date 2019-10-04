@@ -1,4 +1,5 @@
 import typescript from "rollup-plugin-typescript";
+import browsersync from "rollup-plugin-browsersync";
 import { uglify } from "rollup-plugin-uglify";
 
 export default {
@@ -6,12 +7,18 @@ export default {
   output: {
     format: "iife",
     file: "demo/js/brickyeditor.js",
-    name: "BrickyEditor"
+    name: "BrickyEditor",
   },
   plugins: [
     typescript({
-      target: "es5"
-    })
-    // uglify()
-  ]
+      target: "es5",
+    }),
+    // uglify(),
+    browsersync({
+      https: true,
+      server: {
+        baseDir: "./demo",
+      },
+    }),
+  ],
 };

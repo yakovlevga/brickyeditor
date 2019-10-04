@@ -14,7 +14,7 @@ export class Modal {
     private $cancelBtn: HTMLElement
   ) {
     const modal = this;
-    $dom.on($closeBtn, "click", function() {
+    $dom.on($closeBtn, "click", () => {
       modal.hideModal();
     });
   }
@@ -42,9 +42,10 @@ export class Modal {
 
     return new Promise<PromptParameterList>((resolve, reject) => {
       //  clear form
+      // tslint:disable-next-line:prefer-for-of
       for (let i = 0; i < modal.$form.children.length; i++) {
         const child = modal.$form.children[i];
-        if (child != this.$btns) {
+        if (child !== this.$btns) {
           modal.$form.removeChild(child);
         }
       }
@@ -79,7 +80,7 @@ export class Modal {
   }
 
   public restoreSelection() {
-    if (!this.selectionRanges || this.selectionRanges.length == 0) {
+    if (!this.selectionRanges || this.selectionRanges.length === 0) {
       return;
     }
 

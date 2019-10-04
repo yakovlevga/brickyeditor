@@ -23,7 +23,7 @@ export class UI {
   // Set is mobile if there is not enough of space for tools
   // or if it's not forced by compactTools in passed settings.
   private get isCompactTools(): boolean {
-    var compactTools = this.editor.options.compactTools;
+    const compactTools = this.editor.options.compactTools;
     if (compactTools == null) {
       return window.innerWidth < this.editor.options.compactToolsWidth;
     } else {
@@ -36,7 +36,7 @@ export class UI {
 
     this.setTools();
     this.setModal();
-
+    this.editor.UI = this;
     this.htmlTools = new HtmlTools(this.editor);
   }
 
