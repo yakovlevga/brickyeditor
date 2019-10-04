@@ -1,5 +1,5 @@
-import { $dom } from "src/Common/DOMHelpers";
-import { PromptParameter, PromptParameterList } from "../Prompt/Prompt";
+import { $dom } from "src/common/DOMHelpers";
+import { PromptParameter, PromptParameterList } from "src/Prompt/Prompt";
 
 export class Modal {
   public closeFunction: any;
@@ -37,9 +37,7 @@ export class Modal {
     $dom.show(this.$control);
   }
 
-  public promptAsync(
-    fields: PromptParameter[]
-  ): Promise<PromptParameterList> {
+  public promptAsync(fields: PromptParameter[]): Promise<PromptParameterList> {
     const modal = this;
 
     return new Promise<PromptParameterList>((resolve, reject) => {
@@ -81,7 +79,9 @@ export class Modal {
   }
 
   public restoreSelection() {
-    if (!this.selectionRanges || this.selectionRanges.length == 0) { return; }
+    if (!this.selectionRanges || this.selectionRanges.length == 0) {
+      return;
+    }
 
     const selection = window.getSelection();
     selection.removeAllRanges();

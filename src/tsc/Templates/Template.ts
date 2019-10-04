@@ -1,6 +1,6 @@
-import { $dom } from "src/Common/DOMHelpers";
-import { Selectors } from "src/UI/Selectors";
-import { Block } from "../Block/Block";
+import { $dom } from "src/common/DOMHelpers";
+import { Selectors } from "src/ui/Selectors";
+import { Block } from "src/block/Block";
 
 export class Template {
   public name: string;

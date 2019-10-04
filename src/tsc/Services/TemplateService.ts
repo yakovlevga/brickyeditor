@@ -1,9 +1,10 @@
-import { $ajax } from "src/Common/AJAXHelper";
-import { $dom } from "src/Common/DOMHelpers";
-import { Selectors } from "src/UI/Selectors";
-import { EditorStrings } from "../EditorStrings";
-import { Template } from "../Templates/Template";
-import { TemplateGroup } from "../Templates/TemplateGroup";
+import { $ajax } from "src/common/AJAXHelper";
+import { $dom } from "src/common/DOMHelpers";
+import { Selectors } from "src/ui/Selectors";
+import { EditorStrings } from "src/EditorStrings";
+import { Template } from "src/templates/Template";
+import { TemplateGroup } from "src/templates/TemplateGroup";
+import { str } from "src/common/Common";
 
 export class TemplateService {
   public static templates: TemplateGroup[];
@@ -59,7 +60,7 @@ export class TemplateService {
       const group = this.templates[gi];
       for (let ti = 0; ti < group.templates.length; ti++) {
         const template = group.templates[ti];
-        if (template.name.breEqualsInvariant(templateName)) {
+        if (str.equalsInvariant(template.name, templateName)) {
           return template;
         }
       }

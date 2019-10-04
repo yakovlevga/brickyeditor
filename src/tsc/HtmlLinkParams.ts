@@ -2,11 +2,10 @@ import { EditorStrings } from "src/EditorStrings";
 import {
   PromptParameter,
   PromptParameterList,
-  PromptParameterOptions
+  PromptParameterOptions,
 } from "src/Prompt/Prompt";
 
 export class HtmlLinkParams {
-
   public static getLinkFromParams(fields: PromptParameterList): HtmlLinkParams {
     const href = fields.getValue("href");
     const title = fields.getValue("title");
@@ -41,10 +40,10 @@ export class HtmlLinkParams {
           [EditorStrings.htmlEditorLinkTargetBlank, "_blank"],
           [EditorStrings.htmlEditorLinkTargetSelf, "_self"],
           [EditorStrings.htmlEditorLinkTargetParent, "_parent"],
-          [EditorStrings.htmlEditorLinkTargetTop, "_top"]
+          [EditorStrings.htmlEditorLinkTargetTop, "_top"],
         ],
         this.target
-      )
+      ),
     ];
   }
 }

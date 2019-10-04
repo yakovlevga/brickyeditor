@@ -1,8 +1,5 @@
-import { Template } from "src/Template";
+import { Template } from "src/templates/Template";
 
-    export class TemplateGroup {
-        constructor(
-            public name: string, 
-            public templates: Template[]) {
-        }
-    }
+export class TemplateGroup {
+  constructor(public name: string, public templates: Template[]) {}
+}

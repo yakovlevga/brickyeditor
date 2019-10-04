@@ -1,16 +1,16 @@
-import { Block } from "src/Block/Block";
+import { Block } from "src/block/Block";
 import { BlocksContainer } from "src/BlocksContainer";
-import { $ajax } from "src/Common/AJAXHelper";
-import { Common, str } from "src/Common/Common";
-import { $dom } from "src/Common/DOMHelpers";
+import { $ajax } from "src/common/AJAXHelper";
+import { Common, str } from "src/common/Common";
+import { $dom } from "src/common/DOMHelpers";
 import { EditorOptions } from "src/EditorOptions";
 import { EditorStrings } from "src/EditorStrings";
 import { Events } from "src/Events";
-import { BaseField, ContainerField } from "src/Fields/Fields";
+import { BaseField, ContainerField } from "src/fields/Fields";
 import { TemplateService } from "src/Services/Services";
-import { Template } from "src/Templates/Template";
-import { Selectors } from "src/UI/Selectors";
-import { UI } from "src/UI/UI";
+import { Template } from "src/templates/Template";
+import { Selectors } from "src/ui/Selectors";
+import { UI } from "src/ui/UI";
 
 export class Editor {
   public static UI: UI;
@@ -115,7 +115,7 @@ export class Editor {
         this.trigger(Events.onBlockAdd, { block, idx });
         this.trigger(Events.onChange, {
           blocks: this.getData(),
-          html: this.getHtml()
+          html: this.getHtml(),
         });
       }
     };
@@ -124,7 +124,7 @@ export class Editor {
       this.trigger(Events.onBlockDelete, { block, idx });
       this.trigger(Events.onChange, {
         blocks: this.getData(),
-        html: this.getHtml()
+        html: this.getHtml(),
       });
     };
 
@@ -133,11 +133,11 @@ export class Editor {
         block,
         property,
         oldValue,
-        newValue
+        newValue,
       });
       this.trigger(Events.onChange, {
         blocks: this.getData(),
-        html: this.getHtml()
+        html: this.getHtml(),
       });
     };
 
@@ -155,7 +155,7 @@ export class Editor {
         this.trigger(Events.onBlockMove, { block, from, to });
         this.trigger(Events.onChange, {
           blocks: this.getData(),
-          html: this.getHtml()
+          html: this.getHtml(),
         });
       },
       onUpdate,

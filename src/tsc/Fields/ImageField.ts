@@ -1,132 +1,151 @@
-import { BaseField } from "src/BaseField";
-import { Editor } from "../Editor";
-import { $dom } from "src/Common/DOMHelpers";
-import { PromptParameter, PromptParameterImage } from "../Prompt/Prompt";
-import { HtmlLinkParams } from "../HtmlLinkParams";
-import { EditorStrings } from "../EditorStrings";
+import { BaseField } from "src/fields/BaseField";
+import { Editor } from "src/Editor";
+import { $dom } from "src/common/DOMHelpers";
+import { PromptParameter, PromptParameterImage } from "src/Prompt/Prompt";
+import { HtmlLinkParams } from "src/HtmlLinkParams";
+import { EditorStrings } from "src/EditorStrings";
 
 export class ImageField extends BaseField {
+  private $link: HTMLLinkElement;
 
-    private $link: HTMLLinkElement;
+  bind() {
+    let field = this;
+    let data = this.data;
 
-    bind() {
-        let field = this;
-        let data = this.data;
-
-        this.setSrc(this.data.src, false);
-        $dom.on(this.$field, 'click', async () => {
-            const fields = await Editor.UI.modal.promptAsync(field.getPromptParams());
-            if (fields != null) {
-                const file = fields.getValue('file');
-                const src = fields.getValue('src');
-                if (file) {
-                    if (field.onUpload) {
-                        field.onUpload(file, url => {
-                            field.setSrc(url);
-                            field.setFile(null);
-                        });
-                    }
-                    else {
-                        field.setFile(file);
-                        field.setSrc(null);
-                    }
-                }
-                else if (src) {
-                    field.setSrc(src);
-                    field.setFile(null);
-                }
-
-                const alt = fields.getValue('alt');
-                field.setAlt(alt);
-
-                const link = HtmlLinkParams.getLinkFromParams(fields);
-                this.setLink(link);
-            }
-            field.select();
-        });
-    }
-
-    private getPromptParams(): Array<PromptParameter> {
-        var params = [
-            new PromptParameter('src', EditorStrings.imageFieldLinkTitle, this.data.url, EditorStrings.imageFieldLinkPlaceholder),
-            new PromptParameterImage('file', EditorStrings.imageFieldUploadTitle, this.data.file, EditorStrings.imageFieldUploadButton),
-            new PromptParameter('alt', EditorStrings.imageFieldAltTitle, this.data.alt, EditorStrings.imageFieldAltPlaceholder),
-            new PromptParameter(null, EditorStrings.imageFieldUrlSubtitle, null, null),
-        ];
-
-        const link: HtmlLinkParams = this.data.link ? this.data.link : new HtmlLinkParams();
-        const linkParams = link.getLinkPromptParams();
-        return params.concat(linkParams);
-    }
-
-    setSrc(src: string, fireUpdate: boolean = true) {
-        if (src) {
-            if (this.isImg) {
-                this.$field.setAttribute('src', src);
-            }
-            else {
-                this.$field.style.backgroundImage = `url(${src}`;
-            }
-        }
-        this.updateProperty('src', src, fireUpdate);
-    }
-
-    setAlt(alt) {
-        this.$field.setAttribute(this.isImg ? 'alt' : 'title', alt);
-        this.updateProperty('alt', alt);
-    }
-
-    setFile(file) {
+    this.setSrc(this.data.src, false);
+    $dom.on(this.$field, "click", async () => {
+      const fields = await Editor.UI.modal.promptAsync(field.getPromptParams());
+      if (fields != null) {
+        const file = fields.getValue("file");
+        const src = fields.getValue("src");
         if (file) {
-            if (this.isImg) {
-                this.$field.setAttribute('src', file.fileContent);
-            }
-            else {
-                this.$field.style.backgroundImage = `url(${file.fileContent})`;
-            }
-        }
-        this.updateProperty('file', file);
-    }
-
-    setLink(url: HtmlLinkParams) {
-
-        if (url && url.href) {
-            if (!this.$link) {
-                this.$link = $dom.el(`<a href='${url.href}' title='${url.title}' target='${url.target}'></a>`) as HTMLLinkElement;
-                $dom.on(this.$link, 'click', ev => {
-                    ev.stopPropagation();
-                    return false;
-                });
-
-                $dom.wrap(this.$field, this.$link);
-                //this.$field.wrap(this.$link);
-            }
-            else {
-                this.$link.href = url.href;
-            }
-        }
-        else if (this.$link) {
-            $dom.unwrap(this.$field);
-            this.$link = null;
-            delete this.$link;
+          if (field.onUpload) {
+            field.onUpload(file, url => {
+              field.setSrc(url);
+              field.setFile(null);
+            });
+          } else {
+            field.setFile(file);
+            field.setSrc(null);
+          }
+        } else if (src) {
+          field.setSrc(src);
+          field.setFile(null);
         }
 
-        this.updateProperty('link', url);
+        const alt = fields.getValue("alt");
+        field.setAlt(alt);
+
+        const link = HtmlLinkParams.getLinkFromParams(fields);
+        this.setLink(link);
+      }
+      field.select();
+    });
+  }
+
+  private getPromptParams(): PromptParameter[] {
+    var params = [
+      new PromptParameter(
+        "src",
+        EditorStrings.imageFieldLinkTitle,
+        this.data.url,
+        EditorStrings.imageFieldLinkPlaceholder
+      ),
+      new PromptParameterImage(
+        "file",
+        EditorStrings.imageFieldUploadTitle,
+        this.data.file,
+        EditorStrings.imageFieldUploadButton
+      ),
+      new PromptParameter(
+        "alt",
+        EditorStrings.imageFieldAltTitle,
+        this.data.alt,
+        EditorStrings.imageFieldAltPlaceholder
+      ),
+      new PromptParameter(
+        null,
+        EditorStrings.imageFieldUrlSubtitle,
+        null,
+        null
+      ),
+    ];
+
+    const link: HtmlLinkParams = this.data.link
+      ? this.data.link
+      : new HtmlLinkParams();
+    const linkParams = link.getLinkPromptParams();
+    return params.concat(linkParams);
+  }
+
+  setSrc(src: string, fireUpdate: boolean = true) {
+    if (src) {
+      if (this.isImg) {
+        this.$field.setAttribute("src", src);
+      } else {
+        this.$field.style.backgroundImage = `url(${src}`;
+      }
+    }
+    this.updateProperty("src", src, fireUpdate);
+  }
+
+  setAlt(alt) {
+    this.$field.setAttribute(this.isImg ? "alt" : "title", alt);
+    this.updateProperty("alt", alt);
+  }
+
+  setFile(file) {
+    if (file) {
+      if (this.isImg) {
+        this.$field.setAttribute("src", file.fileContent);
+      } else {
+        this.$field.style.backgroundImage = `url(${file.fileContent})`;
+      }
+    }
+    this.updateProperty("file", file);
+  }
+
+  setLink(url: HtmlLinkParams) {
+    if (url && url.href) {
+      if (!this.$link) {
+        this.$link = $dom.el(
+          `<a href='${url.href}' title='${url.title}' target='${url.target}'></a>`
+        ) as HTMLLinkElement;
+        $dom.on(this.$link, "click", ev => {
+          ev.stopPropagation();
+          return false;
+        });
+
+        $dom.wrap(this.$field, this.$link);
+        //this.$field.wrap(this.$link);
+      } else {
+        this.$link.href = url.href;
+      }
+    } else if (this.$link) {
+      $dom.unwrap(this.$field);
+      this.$link = null;
+      delete this.$link;
     }
 
-    _isImg: boolean;
-    private get isImg(): boolean {
-        return this._isImg = this._isImg || this.$field.tagName.toLowerCase() === 'img';
-    }
+    this.updateProperty("link", url);
+  }
 
-    public getEl(): HTMLElement {
-        let $el = super.getEl();
-        const { link } = this.data;
-        if (link && link.href) {
-            const $link = $dom.el(`<a href='${link.href}' title='${link.title}' target='${link.target}'></a>`);
-            $link.appendChild($el);
-            return $link;
-        }
-        return $el;
+  _isImg: boolean;
+  private get isImg(): boolean {
+    return (this._isImg =
+      this._isImg || this.$field.tagName.toLowerCase() === "img");
+  }
+
+  public getEl(): HTMLElement {
+    let $el = super.getEl();
+    const { link } = this.data;
+    if (link && link.href) {
+      const $link = $dom.el(
+        `<a href='${link.href}' title='${link.title}' target='${link.target}'></a>`
+      );
+      $link.appendChild($el);
+      return $link;
     }
+    return $el;
+  }
 }

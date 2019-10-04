@@ -1,4 +1,4 @@
-import { Block } from "src/Block/Block";
+import { Block } from "src/block/Block";
 
 export class EditorOptions {
   /** Url to predifined templates */

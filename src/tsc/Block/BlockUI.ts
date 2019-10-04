@@ -1,6 +1,6 @@
-import { BlockUIAction } from "src/Block/BlockUIAction";
-import { $dom } from "src/Common/DOMHelpers";
-import { UI } from "src/UI/UI";
+import { BlockUIAction } from "src/block/BlockUIAction";
+import { $dom } from "src/common/DOMHelpers";
+import { UI } from "src/ui/UI";
 
 export class BlockUI {
   public $editor: HTMLElement; // block editor

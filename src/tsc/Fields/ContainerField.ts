@@ -1,8 +1,8 @@
-import { Block } from "src/Block/Block";
+import { Block } from "src/block/Block";
 import { BlocksContainer } from "src/BlocksContainer";
-import { $dom } from "src/Common/DOMHelpers";
-import { BaseField } from "src/Fields/BaseField";
-import { Selectors } from "src/UI/Selectors";
+import { $dom } from "src/common/DOMHelpers";
+import { BaseField } from "src/fields/BaseField";
+import { Selectors } from "src/ui/Selectors";
 
 export class ContainerField extends BaseField {
   public container: BlocksContainer;

@@ -1,7 +1,7 @@
-import { Block } from "src/Block/Block";
-import { $dom } from "src/Common/DOMHelpers";
-import { BaseField } from "src/Fields/Fields";
-import { Template } from "src/Templates/Template";
+import { Block } from "src/block/Block";
+import { $dom } from "src/common/DOMHelpers";
+import { BaseField } from "src/fields/Fields";
+import { Template } from "src/templates/Template";
 
 export class BlocksContainer {
   public blocks: Block[] = [];

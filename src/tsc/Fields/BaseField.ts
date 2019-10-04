@@ -1,12 +1,12 @@
-import { Common } from "src/Common/Common";
-import { $dom } from "src/Common/DOMHelpers";
+import { Common } from "src/common/Common";
+import { $dom } from "src/common/DOMHelpers";
 import {
   ContainerField,
   EmbedField,
   HtmlField,
-  ImageField
-} from "src/Fields/Fields";
-import { Selectors } from "src/UI/Selectors";
+  ImageField,
+} from "src/fields/Fields";
+import { Selectors } from "src/ui/Selectors";
 
 export abstract class BaseField {
   public static get type(): string {

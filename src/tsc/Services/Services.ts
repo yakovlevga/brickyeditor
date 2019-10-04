@@ -1,2 +1,2 @@
-export * from './EmbedService'
-export * from './TemplateService'
+export * from "src/services/EmbedService";
+export * from "src/services/TemplateService";

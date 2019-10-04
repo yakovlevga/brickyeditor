@@ -1,8 +1,8 @@
-import { BaseField } from "src/BaseField";
-import { $dom } from "src/Common/DOMHelpers";
-import { SelectionUtils } from "src/UI/SelectionUtils";
-import { Selectors } from "src/UI/Selectors";
-import { Editor } from "../Editor";
+import { BaseField } from "src/fields/BaseField";
+import { $dom } from "src/common/DOMHelpers";
+import { SelectionUtils } from "src/ui/SelectionUtils";
+import { Selectors } from "src/ui/Selectors";
+import { Editor } from "src/Editor";
 
 export class HtmlField extends BaseField {
   public bind() {

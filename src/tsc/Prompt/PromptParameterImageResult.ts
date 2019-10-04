@@ -1,20 +1,20 @@
 export class PromptParameterImageResult {
-    public fileContent: string;
-    public fileInfo: PromptParameterImageResultFile;
+  public fileContent: string;
+  public fileInfo: PromptParameterImageResultFile;
 }
 
 export class PromptParameterImageResultFile {
-    public lastModified: number;
-    public lastModifiedDate: any;
-    public name: string;
-    public size: number;
-    public type: string;
+  public lastModified: number;
+  public lastModifiedDate: any;
+  public name: string;
+  public size: number;
+  public type: string;
 
-    constructor(file: File) {
-        this.name = file.name;
-        this.size = file.size;
-        this.type = file.type;
-        this.lastModified = (file as any).lastModified;
-        this.lastModifiedDate = file.lastModifiedDate;
-    }
+  constructor(file: File) {
+    this.name = file.name;
+    this.size = file.size;
+    this.type = file.type;
+    this.lastModified = (file as any).lastModified;
+    this.lastModifiedDate = file.lastModifiedDate;
+  }
 }

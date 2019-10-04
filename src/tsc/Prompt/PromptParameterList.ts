@@ -1,4 +1,4 @@
-import { PromptParameter } from "./Prompt";
+import { PromptParameter } from "src/prompt/Prompt";
 
 export class PromptParameterList {
   public params: PromptParameter[];

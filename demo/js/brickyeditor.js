@@ -1,1 +1,2071 @@
-var BrickyEditor=function(t){"use strict";var n=function(t,e){return(n=Object.setPrototypeOf||{__proto__:[]}instanceof Array&&function(t,e){t.__proto__=e}||function(t,e){for(var o in e)e.hasOwnProperty(o)&&(t[o]=e[o])})(t,e)};function e(t,e){function o(){this.constructor=t}n(t,e),t.prototype=null===e?Object.create(e):(o.prototype=e.prototype,new o)}function f(r,l,s,a){return new(s=s||Promise)(function(t,e){function o(t){try{i(a.next(t))}catch(t){e(t)}}function n(t){try{i(a.throw(t))}catch(t){e(t)}}function i(e){e.done?t(e.value):new s(function(t){t(e.value)}).then(o,n)}i((a=a.apply(r,l||[])).next())})}function m(o,n){var i,r,l,t,s={label:0,sent:function(){if(1&l[0])throw l[1];return l[1]},trys:[],ops:[]};return t={next:e(0),throw:e(1),return:e(2)},"function"==typeof Symbol&&(t[Symbol.iterator]=function(){return this}),t;function e(e){return function(t){return function(e){if(i)throw new TypeError("Generator is already executing.");for(;s;)try{if(i=1,r&&(l=2&e[0]?r.return:e[0]?r.throw||((l=r.return)&&l.call(r),0):r.next)&&!(l=l.call(r,e[1])).done)return l;switch(r=0,l&&(e=[2&e[0],l.value]),e[0]){case 0:case 1:l=e;break;case 4:return s.label++,{value:e[1],done:!1};case 5:s.label++,r=e[1],e=[0];continue;case 7:e=s.ops.pop(),s.trys.pop();continue;default:if(!(l=0<(l=s.trys).length&&l[l.length-1])&&(6===e[0]||2===e[0])){s=0;continue}if(3===e[0]&&(!l||e[1]>l[0]&&e[1]<l[3])){s.label=e[1];break}if(6===e[0]&&s.label<l[1]){s.label=l[1],l=e;break}if(l&&s.label<l[2]){s.label=l[2],s.ops.push(e);break}l[2]&&s.ops.pop(),s.trys.pop();continue}e=n.call(o,s)}catch(t){e=[6,t],r=0}finally{i=l=0}if(5&e[0])throw e[1];return{value:e[0]?e[1]:void 0,done:!0}}([e,t])}}}var g=(r.el=function(t){var e=document.createElement("div");e.innerHTML=t;var o=e.firstElementChild;return e.innerHTML=null,o},r.ons=function(e,t,o){var n=this;t.split(" ").forEach(function(t){n.on(e,t,o)})},r.on=function(t,e,o){return t.attachEvent?t.attachEvent("on"+e,o):t.addEventListener(e,o,!1)},r.offset=function(t){var e=t.getBoundingClientRect(),o=document.body;return{top:e.top+o.scrollTop,left:e.left+o.scrollLeft}},r.wrap=function(t,e){t.parentElement.insertBefore(e,t),e.appendChild(t)},r.unwrap=function(t){if(t.parentElement){var e=t.parentElement.parentElement;e?e.replaceChild(t,t.parentElement):t.parentElement.innerHTML=t.innerHTML}},r.hide=function(t){t.style.display="none"},r.show=function(t){t.style.display="block"},r.isHidden=function(t){return"none"===window.getComputedStyle(t).display},r.toggle=function(t,e){(e?e.valueOf():this.isHidden(t))?this.show(t):this.hide(t)},r.before=function(e,t){var o=this;t instanceof HTMLElement?e.parentNode.insertBefore(t,e):t.forEach(function(t){return o.before(e,t)})},r.after=function(t,e){t.nextSibling?t.parentNode.insertBefore(e,t):t.parentNode.appendChild(e)},r.hasClass=function(t,e){t.classList?t.classList.contains(e):new RegExp("(^| )"+e+"( |$)","gi").test(t.className)},r.addClass=function(t,e){this.hasClass(t,e)||(t.classList?t.classList.add(e):t.className+=" "+e)},r.removeClass=function(t,e){t.classList?t.classList.remove(e):t.className=t.className.replace(new RegExp("(^|\\b)"+e.split(" ").join("|")+"(\\b|$)","gi")," ")},r.toggleClass=function(t,e,o){if(o)o.valueOf()?this.addClass(t,e):this.removeClass(t,e);else if(t.classList)t.classList.toggle(e);else{for(var n=t.className.split(" "),i=-1,r=n.length;r--;)n[r]===e&&(i=r);0<=i?n.splice(i,1):n.push(e),t.className=n.join(" ")}},r.windowScrollTop=function(){return void 0!==window.pageYOffset?window.pageYOffset:(document.documentElement||document.body.parentNode||document.body).scrollTop},r.replaceWith=function(t,e){var o=t.parentElement;o&&o.replaceChild(e,t)},r.select=function(t,e,o){void 0===o&&(o=!1);var n=t.querySelectorAll(e),i=Array.prototype.slice.call(n);return o&&o.valueOf()&&r.matches(t,e)&&i.push(t),i},r.find=function(t){return document.querySelector(t)},r.first=function(t,e){return t.querySelector(e)},r.clone=function(t){return t.cloneNode(!0)},r.trigger=function(t,e,o){if(window.CustomEvent)var n=new CustomEvent(e,{detail:o});else(n=document.createEvent("CustomEvent")).initCustomEvent(e,!0,!0,o);t.dispatchEvent(n)},r.matches=function(t,e){return(t.matches||t.matchesSelector||t.msMatchesSelector||t.mozMatchesSelector||t.webkitMatchesSelector||t.oMatchesSelector).call(t,e)},r.data=function(t,e){var o=t.dataset[e],n=null;try{n=JSON.parse(o)}catch(t){if(t instanceof SyntaxError){o=o.replace(/'/g,'"');try{n=JSON.parse(o)}catch(t){}}}return n},r);function r(){}var v=(o.get=function(n){return new Promise(function(t,o){var e=new XMLHttpRequest;e.open("GET",n,!0),e.onreadystatechange=function(){if(4===this.readyState)if(200<=this.status&&this.status<400){var e=null;try{e=JSON.parse(this.responseText)}catch(t){e=this.responseText}try{t(e)}catch(t){o(t)}}else o()},e.send(),e=null})},o.getScript=function(r){return new Promise(function(t,e){function o(){i||this.readyState&&"loaded"!=this.readyState&&"complete"!=this.readyState?e():(i=!0,t())}var n=document.createElement("script"),i=!1;n.onload=o,n.onreadystatechange=o,n.src=r,document.getElementsByTagName("head")[0].appendChild(n)})},o.jsonp=function(l){return new Promise(function(o,t){var n="_"+Math.round(1e4*Math.random()),i="jsonp_callback_"+n;window[i]=function(t){delete window[i];var e=document.getElementById(n);e.parentNode.removeChild(e),o(t)};var e=l+"&callback="+i,r=document.createElement("script");r.src=e,r.id=n,r.addEventListener("error",t),(document.getElementsByTagName("head")[0]||document.body||document.documentElement).appendChild(r)})},o);function o(){}var b=(i.attr=function(t){return"["+t+"]"},i.attrContentEditable="contenteditable",i.selectorContentEditable="contenteditable",i.selectorField="["+(i.attrField="data-bre-field")+"]",i.classEditor="bre-editor",i.selectorTemplate="."+(i.classTemplate="bre-template"),i.selectorTemplateGroup="."+(i.classTemplateGroup="bre-template-group"),i.selectorTemplatePreview=".bre-template-preview",i.classMobile="brickyeditor-tools-mobile",i.htmlToolsCommand="data-bre-doc-command",i.htmlToolsCommandRange="data-bre-doc-command-range",i.selectorFieldSelected="bre-field-selected",i.selectorFieldContainer="bre-field-container",i.selectorHtmlToolsCommand=i.attr(i.htmlToolsCommand),i.selectorHtmlToolsCommandRange=i.attr(i.htmlToolsCommandRange),i);function i(){}var l=function(t,e,o){this.icon=t,this.action=e,this.title=o};String.prototype.breContains=function(t){return 0<=this.indexOf(t)},String.prototype.breStartsWith=function(t){return 0==this.indexOf(t)},String.prototype.breTotalTrim=function(){return this?this.replace(/\s\s+/g," ").trim():""},String.prototype.breEqualsInvariant=function(t){return this.toLowerCase()===t.toLowerCase()},Array.prototype.find||(Array.prototype.find=function(t){if(null==this)throw new TypeError("Array.prototype.find called on null or undefined");if("function"!=typeof t)throw new TypeError("predicate must be a function");for(var e,o=Object(this),n=o.length>>>0,i=arguments[1],r=0;r<n;r++)if(e=o[r],t.call(i,e,r,o))return e});var d=(s.extend=function(t){for(var e=[],o=1;o<arguments.length;o++)e[o-1]=arguments[o];t=t||{};for(var n=1;n<e.length;n++)if(e[n])for(var i in e[n])e[n].hasOwnProperty(i)&&(t[i]=e[n][i]);return t},s.getSelectedText=function(){var t="",e=document;return window.getSelection?t=window.getSelection().toString():e.selection&&"Control"!=e.selection.type&&(t=e.selection.createRange().text),t},s.propsEach=function(t,e){for(var o in t)t.hasOwnProperty(o)&&e(o,t[o])},s.propsFilterKeys=function(t,o,e){var n=[];return s.propsEach(t,function(t,e){o(t,e)&&n.push(t)}),e&&n.push(e),n},s);function s(){}var a=(Object.defineProperty(u,"type",{get:function(){var t=this.name;return t=(t=t.replace("Field","")).substring(0,1).toLowerCase()+t.substring(1)},enumerable:!0,configurable:!0}),u.prototype.getSettingsEl=function(){return null},u.registerCommonFields=function(){this.commonFieldsRegistered||(J.registerField(),Q.registerField(),V.registerField(),h.registerField()),this.commonFieldsRegistered=!0},u.registerField=function(){this._fields.hasOwnProperty(this.type)&&delete this._fields[this.type],this._fields[this.type]=this},u.createField=function(t,e,o,n,i){var r=g.data(t,"breField");if(!r||!r.name)throw"There is no data or data doesn't contains 'name' in field "+t.innerHTML;if(e){for(var l={},s=0;s<e.length;s++)if((a=e[s]).name.toLowerCase()===r.name.toLowerCase()){l=a;break}l&&(r=d.extend(r,l))}var a,c=r.type;if(null==c)throw"Field type not defined in data-bre-field attribute";if(u.commonFieldsRegistered||u.registerCommonFields(),this._fields.hasOwnProperty(c))return new(a=this._fields[c])(t,r,o,n,i);throw c+" field not found"},u.prototype.bind=function(){},u.prototype.select=function(){this.$field.classList.add(b.selectorFieldSelected),this.onSelect(this)},u.prototype.deselect=function(){this.$field.classList.remove(b.selectorFieldSelected)},u.prototype.getEl=function(){var t=this.$field.cloneNode(!0);return t.attributes.removeNamedItem(b.attrField),t},u.prototype.updateProperty=function(t,e,o){void 0===o&&(o=!0);var n=this.data[t];n!==e&&(this.data[t]=e,o&&this.onUpdate(t,n,e))},u._fields={},u.commonFieldsRegistered=!1,u);function u(t,e,o,n,i){this.$field=t,this.data=e,this.onSelect=o,this.onUpdate=n,this.onUpload=i,this.bind()}var c,h=(e(p,c=a),p.prototype.bind=function(){var e=this,o=this,t=this.$field;this.container=new dt(t,function(t){o.updateBlocks()},function(t){o.updateBlocks()},function(t){e.select()},function(t){},function(t){o.updateBlocks()},function(t){o.updateBlocks()},o.onUpload,!0),g.addClass(t,b.selectorFieldContainer),g.on(t,"click",function(t){return o.select(),t.stopPropagation(),!1})},p.prototype.updateBlocks=function(){this.updateProperty("blocks",this.container.getData(!0),!0),this.updateProperty("html",this.container.getHtml(),!0)},p.prototype.deselect=function(){this.container.blocks.forEach(function(t){return t.deselect()}),this.$field.classList.remove(b.selectorFieldSelected)},p.prototype.getEl=function(){var t=this.container.getHtml();return g.el(t)},p);function p(){return null!==c&&c.apply(this,arguments)||this}var y=(k.errorBlocksFileNotFound=function(t){return"Blocks file not found. Requested file: "+t+"."},k.errorTemplatesFileNotFound=function(t){return"Templates file not found. Requested file: "+t+"."},k.errorBlockTemplateNotFound=function(t){return'Template "'+t+'" not found.'},k.errorTemplateParsing=function(t){return"Template parsing error: "+t+"."},k.embedFieldLinkTitle="Link to embed media",k.embedFieldLinkPlaceholder="Link to instagram, youtube and etc.",k.imageFieldLinkTitle="Image link",k.imageFieldLinkPlaceholder="http://url-to-image.png",k.imageFieldUploadTitle="or Upload a file",k.imageFieldUploadButton="Select file",k.imageFieldAltTitle="Alt",k.imageFieldAltPlaceholder="Image 'alt' attribute value",k.imageFieldUrlSubtitle="Link to open on image click",k.htmlEditorLinkUrlTitle="Url",k.htmlEditorLinkUrlPlaceholder="http://put-your-link.here",k.htmlEditorLinkTitleTitle="Title",k.htmlEditorLinkTitlePlaceholder="Title attribute for link",k.htmlEditorLinkTargetTitle="Target",k.htmlEditorLinkTargetBlank="Blank",k.htmlEditorLinkTargetSelf="Self",k.htmlEditorLinkTargetParent="Parent",k.htmlEditorLinkTargetTop="Top",k.buttonClose="close",k.buttonOk="Ok",k.buttonCancel="Cancel",k.defaultTemplatesGroupName="Other templates",k);function k(){}var w=($.prototype.parseValue=function(){this.$input&&(this.value=this.$input.value),this.$control=null,delete this._$control},Object.defineProperty($.prototype,"$control",{get:function(){return this._$control||(this._$control=g.el("<div class="+(this.key?"bre-prompt-field":"bre-prompt-subtitle")+'>\n                            <label class="bre-label" for="'+this.key+'">'+(this.title?this.title:"Select file...")+"</label>\n                        </div>"),this.$input=this.key?this.getEditor():null,null!=this.$input&&this._$control.appendChild(this.$input)),this._$control},set:function(t){this._$control=t},enumerable:!0,configurable:!0}),$.prototype.getEditor=function(){var t=document.createElement("input");return t.id=this.key,t.className="bre-input",t.setAttribute("type","text"),t.setAttribute("placeholder",this.placeholder),t.value=this.value||"",t},$);function $(t,e,o,n){this.key=t,this.title=e,this.placeholder=n||"",this.value=o}var T,E=(e(C,T=w),C.prototype.parseValue=function(){this.value=this._value,this.$control=null,delete this._$control,this._value=null,delete this._value},C.prototype.getEditor=function(){var o=this,t=this.value&&this.value.fileContent?this.value.fileContent:"",e=g.el("\n                <div class='bre-image-input'>\n                    <label for=\""+this.key+'">\n                        '+this.placeholder+'\n                    </label>                        \n                    <img src="'+t+'"/>                    \n                    <input type="file" id="'+this.key+'" class="bre-input" placeholder="'+this.placeholder+"\">\n                </div>\n                <small class='bre-image-input-filename'></small>"),n=e.querySelector("input"),i=e.querySelector("img"),r=e.querySelector(".bre-image-input-filename");return this.value,o.updatePreview(i,r,this.value),n.onchange=function(){if(n.files&&n.files[0]){var t=new FileReader;t.onload=function(t){var e=t.target;o._value=new B,o._value.fileContent=e.result,o._value.fileInfo=new L(n.files[0]),o.updatePreview(i,r,o._value)},t.readAsDataURL(n.files[0])}},e},C.prototype.updatePreview=function(t,e,o){o&&(t.src=o.fileContent,t.classList.add("bre-loaded"),e.innerText=o.fileInfo.name)},C);function C(t,e,o,n){var i=T.call(this,t,e,o,n)||this;return o&&(i._value=o),i}var B=function(){},L=function(t){this.name=t.name,this.size=t.size,this.type=t.type,this.lastModified=t.lastModified,this.lastModifiedDate=t.lastModifiedDate},S=(P.prototype.getValue=function(e){var t=this.params.find(function(t){return t.key===e});return t?t.value:null},P);function P(t){this.params=t}var F,A=function(t,e,o){void 0===o&&(o=!1),this.title=t,this.value=e,this.selected=o},U=(e(M,F=w),M.prototype.getEditor=function(){var t=this.options.map(function(t){return'<option value="'+t.value+'" '+(t.selected?"selected":"")+">"+(t.title?t.title:t.value)+"</option>"});return g.el('<select type="text" id="'+this.key+'" class="brickyeditor-input" placeholder="'+this.placeholder+'">'+t+"</select>")},M);function M(t,e,o,n,i){var r=F.call(this,t,e,n,i)||this;return r.options=[],o.forEach(function(t){r.options.push(new A(t[0],t[1],t[1]==n))}),r}var H=(N.getEmbedAsync=function(t){var e=this,r="https://noembed.com/embed?url="+t;return new Promise(function(n,i){return f(e,void 0,void 0,function(){var e,o;return m(this,function(t){switch(t.label){case 0:return t.trys.push([0,2,,3]),[4,v.jsonp(r)];case 1:return e=t.sent(),n(e),[3,3];case 2:return o=t.sent(),i(o),[3,3];case 3:return[2]}})})})},N.processEmbed=function(t){switch(t){case N.Instagram:instgrm&&instgrm.Embeds.process()}},N.Instagram="Instagram",N);function N(){}var I=(x.prototype.getPreview=function(){var t=g.el("<div class='"+b.classTemplate+"'></div>");return t.appendChild(this.$preview),t},x);function x(t){if(this.loaded=!0,this.name=t.dataset.name,this.$preview=g.first(t,b.selectorTemplatePreview),this.$preview&&t.removeChild(this.$preview),this.$html=t,!this.$preview){var e=new at(this,!0).getHtml(!0);null===e?this.loaded=!1:this.$preview=g.el(e)}}var D=function(t,e){this.name=t,this.templates=e},O=(_.loadTemplatesAsync=function(u,h,p){return f(this,void 0,Promise,function(){var e=this;return m(this,function(t){return this.templates=[],this.templates,[2,new Promise(function(c,d){return f(e,void 0,void 0,function(){var e,o,n,i,r,l,s,a=this;return m(this,function(t){switch(t.label){case 0:return t.trys.push([0,2,,3]),[4,v.get(u)];case 1:return e=t.sent(),o=g.el("<div>"+e+"</div>"),0<(n=g.select(o,"style",!1)).length&&g.before(h,n),g.select(o,b.selectorTemplateGroup).forEach(function(t){var e=t.getAttribute("title"),o=a.getTemplates(t,p);a.templates.push(new D(e,o)),t.remove()}),i=this.getTemplates(o,p),r=0<this.templates.length?y.defaultTemplatesGroupName:"",l=new D(r,i),this.templates.push(l),c(this.templates),[3,3];case 2:return s=t.sent(),p(y.errorTemplatesFileNotFound(u)),d(s),[3,3];case 3:return[2]}})})})]})})},_.getTemplates=function(t,o){var n=[];return g.select(t,b.selectorTemplate).forEach(function(t){var e=new I(t);e.loaded?n.push(e):o(y.errorTemplateParsing(e.name))}),n},_.getTemplate=function(t){for(var e=0;e<this.templates.length;e++)for(var o=this.templates[e],n=0;n<o.templates.length;n++){var i=o.templates[n];if(i.name.breEqualsInvariant(t))return i}return null},_);function _(){}var R,V=(e(j,R=a),j.prototype.getSettingsEl=function(){var t=g.el('<div style="position: absolute;width: 100%; height: 100px;;text-align: center;font-weight: bold;vertical-align: middle;background: #333;opacity: 0.2;">Change embed element link</div>');return g.before(this.$field,t),t},Object.defineProperty(j.prototype,"settings",{get:function(){var e=this;return function(t){e.showEmbedLoaderAsync(t)}},enumerable:!0,configurable:!0}),j.prototype.bind=function(){var t=this,e=this,o=this.$field;g.on(o,"click",function(){return f(t,void 0,void 0,function(){return m(this,function(t){return this.showEmbedLoaderAsync(e),[2]})})}),e.loadMedia(!1)},j.prototype.showEmbedLoaderAsync=function(n){return f(this,void 0,void 0,function(){var e,o;return m(this,function(t){switch(t.label){case 0:return[4,mt.UI.modal.promptAsync(n.getPromptParams())];case 1:return null==(e=t.sent())?[3,3]:(o=e.getValue("url"))?(n.setUrl(o),[4,n.loadMedia(!0)]):[3,3];case 2:t.sent(),t.label=3;case 3:return[2]}})})},j.prototype.getPromptParams=function(){return[new w("url",y.embedFieldLinkTitle,this.data.url||"http://instagr.am/p/BO9VX2Vj4fF/",y.embedFieldLinkPlaceholder)]},j.prototype.loadMedia=function(l){return f(this,void 0,void 0,function(){var e,o,n,i,r;return m(this,function(t){switch(t.label){case 0:return(e=this).data&&e.data.url?[4,H.getEmbedAsync(e.data.url)]:[2];case 1:return o=t.sent(),e.setEmbed(o,l),n=g.el(o.html),(i=g.first(n,"script"))&&(i.remove(),(r=i.src).breStartsWith("//")&&(r="https:"+r,v.getScript(r).then(function(){H.processEmbed(o.provider_name)}))),e.$field.innerHTML="",e.$field.removeAttribute("class"),e.$field.removeAttribute("style"),e.$field.appendChild(n),e.select(),[2]}})})},j.prototype.setEmbed=function(t,e){void 0===e&&(e=!0),this.updateProperty("embed",t,e)},j.prototype.setUrl=function(t){this.updateProperty("url",t)},j);function j(){return null!==R&&R.apply(this,arguments)||this}var q=(W.bindTextSelection=function(t,o){var n=this;g.matches(t,"[contenteditable]")&&(g.on(t,"mouseup",function(){setTimeout(function(){var t=n.getSelectionRect();o(t)},0)}),g.on(t,"keyup",function(t){var e=n.getSelectionRect();o(e)}))},W.getSelectionRect=function(){var t=window.getSelection().getRangeAt(0);if(t){var e=t.getBoundingClientRect();if(e)return e}return null},W);function W(){}var G,J=(e(z,G=a),z.prototype.bind=function(){var e=this,o=this,n=this.$field;g.matches(n,b.selectorContentEditable)||n.setAttribute(b.attrContentEditable,"true");var t=this.data.html||this.$field.innerHTML;this.setHtml(t,!1),n.innerHTML=this.data.html,q.bindTextSelection(n,function(t){mt.UI.htmlTools.show(t)}),g.ons(n,"blur keyup paste input",function(t){e.setHtml(n.innerHTML)}),g.on(n,"paste",function(t){t.preventDefault();var e=t.originalEvent.clipboardData.getData("text/plain");document.execCommand("insertHTML",!1,e)}),g.on(n,"click",function(t){return o.select(),t.stopPropagation(),!1})},z.prototype.setHtml=function(t,e){void 0===e&&(e=!0),t=t.trim(),this.$field.innerHTML!==t&&(this.$field.innerHTML=t),this.updateProperty("html",t,e)},z.prototype.getEl=function(){var t=G.prototype.getEl.call(this);return t.removeAttribute(b.attrContentEditable),t},z);function z(){return null!==G&&G.apply(this,arguments)||this}var X=(Y.prototype.getLinkPromptParams=function(){return[new w("href",y.htmlEditorLinkUrlTitle,this.href,y.htmlEditorLinkUrlPlaceholder),new w("title",y.htmlEditorLinkTitleTitle,this.title,y.htmlEditorLinkTitlePlaceholder),new U("target",y.htmlEditorLinkTargetTitle,[["",""],[y.htmlEditorLinkTargetBlank,"_blank"],[y.htmlEditorLinkTargetSelf,"_self"],[y.htmlEditorLinkTargetParent,"_parent"],[y.htmlEditorLinkTargetTop,"_top"]],this.target)]},Y.getLinkFromParams=function(t){return new Y(t.getValue("href"),t.getValue("title"),t.getValue("target"))},Y);function Y(t,e,o){void 0===t&&(t=""),void 0===e&&(e=""),void 0===o&&(o=""),this.href=t,this.title=e,this.target=o}var K,Q=(e(Z,K=a),Z.prototype.bind=function(){var t=this,l=this;this.data,this.setSrc(this.data.src,!1),g.on(this.$field,"click",function(){return f(t,void 0,void 0,function(){var e,o,n,i,r;return m(this,function(t){switch(t.label){case 0:return[4,mt.UI.modal.promptAsync(l.getPromptParams())];case 1:return null!=(e=t.sent())&&(o=e.getValue("file"),n=e.getValue("src"),o?l.onUpload?l.onUpload(o,function(t){l.setSrc(t),l.setFile(null)}):(l.setFile(o),l.setSrc(null)):n&&(l.setSrc(n),l.setFile(null)),i=e.getValue("alt"),l.setAlt(i),r=X.getLinkFromParams(e),this.setLink(r)),l.select(),[2]}})})})},Z.prototype.getPromptParams=function(){var t=[new w("src",y.imageFieldLinkTitle,this.data.url,y.imageFieldLinkPlaceholder),new E("file",y.imageFieldUploadTitle,this.data.file,y.imageFieldUploadButton),new w("alt",y.imageFieldAltTitle,this.data.alt,y.imageFieldAltPlaceholder),new w(null,y.imageFieldUrlSubtitle,null,null)],e=(this.data.link?this.data.link:new X).getLinkPromptParams();return t.concat(e)},Z.prototype.setSrc=function(t,e){void 0===e&&(e=!0),t&&(this.isImg?this.$field.setAttribute("src",t):this.$field.style.backgroundImage="url("+t),this.updateProperty("src",t,e)},Z.prototype.setAlt=function(t){this.$field.setAttribute(this.isImg?"alt":"title",t),this.updateProperty("alt",t)},Z.prototype.setFile=function(t){t&&(this.isImg?this.$field.setAttribute("src",t.fileContent):this.$field.style.backgroundImage="url("+t.fileContent+")"),this.updateProperty("file",t)},Z.prototype.setLink=function(t){t&&t.href?this.$link?this.$link.href=t.href:(this.$link=g.el("<a href='"+t.href+"' title='"+t.title+"' target='"+t.target+"'></a>"),g.on(this.$link,"click",function(t){return t.stopPropagation(),!1}),g.wrap(this.$field,this.$link)):this.$link&&(g.unwrap(this.$field),this.$link=null,delete this.$link),this.updateProperty("link",t)},Object.defineProperty(Z.prototype,"isImg",{get:function(){return this._isImg=this._isImg||"img"===this.$field.tagName.toLowerCase()},enumerable:!0,configurable:!0}),Z.prototype.getEl=function(){var t=K.prototype.getEl.call(this),e=this.data.link;if(e&&e.href){var o=g.el("<a href='"+e.href+"' title='"+e.title+"' target='"+e.target+"'></a>");return o.appendChild(t),o}return t},Z);function Z(){return null!==K&&K.apply(this,arguments)||this}var tt=(et.prototype.setControl=function(){var o=this,n=g.el('<div class="bre-html-tools-panel"></div>');this.buttons.forEach(function(t){var e=o.getButtonElement(t.icon,t.command,t.range,t.aValueArgument);n.appendChild(e)}),this.$control=g.el('<div class="bre-html-tools bre-btn-group"></div>'),this.$control.appendChild(n),g.hide(this.$control),this.editor.$editor.appendChild(this.$control)},et.prototype.getButtonElement=function(t,s,a,c){var e=this;void 0===a&&(a=!0),void 0===c&&(c=null);var o=g.el('<button type="button" class="bre-btn"><i class="fa fa-'+t+'"></i></button>');return o.onclick=function(){return f(e,void 0,void 0,function(){var e,o,n,i,r,l;return m(this,function(t){switch(t.label){case 0:return e=window.getSelection(),o=0<e.rangeCount?e.getRangeAt(0):null,a&&!o?[2]:"CreateLink"!=s?[3,2]:(n=this.getLinkPromptParamsInternal(e),[4,mt.UI.modal.promptAsync(n)]);case 1:return i=t.sent(),(r=X.getLinkFromParams(i)).href&&(document.execCommand(s,!1,r.href),r.target&&e.anchorNode.parentElement.setAttribute("target",r.target),r.title&&e.anchorNode.parentElement.setAttribute("title",r.title)),[3,3];case 2:"string"==typeof c&&(l=c.replace("%%SELECTION%%",e.toString()));try{document.execCommand(s,!1,l)}catch(t){this.wrapSelectionToContainer(e),document.execCommand(s,!1,l)}t.label=3;case 3:return[2,!1]}})})},o},et.prototype.wrapSelectionToContainer=function(t){var e=t.anchorNode.parentElement,o=g.el('<div class="bre-temp-container" contenteditable="true">'+e.innerHTML+"</div>");e.innerHTML="",e.removeAttribute(b.attrContentEditable),e.appendChild(o);var n=document.createRange();n.selectNodeContents(o),t.removeAllRanges(),t.addRange(n)},et.prototype.show=function(t){if(t&&1<t.width){var e=this.editor.$editor,o=g.offset(e),n=e.clientWidth,i=t.top-o.top+g.windowScrollTop()+t.height,r=this.$control.clientWidth,l=t.left-o.left+t.width/2-r/2;l<0?l=0:n<l+r&&(l=n-r),this.$control.style.top=i+"px",this.$control.style.left=l+"px",g.show(this.$control)}else g.hide(this.$control)},et.prototype.getLinkPromptParamsInternal=function(t){var e;if(t&&t.anchorNode&&t.anchorNode.parentNode.nodeName.breEqualsInvariant("a")){var o=t.anchorNode.parentNode;e=new X(o.getAttribute("href"),o.getAttribute("title"),o.getAttribute("target"))}else e=new X;return e.getLinkPromptParams()},et);function et(t){this.editor=t,this.buttons=[{icon:"bold",command:"Bold",range:!0,aValueArgument:null},{icon:"italic",command:"Italic",range:!0,aValueArgument:null},{icon:"link",command:"CreateLink",range:!0,aValueArgument:null},{icon:"list-ul",command:"insertUnorderedList",range:!0,aValueArgument:null},{icon:"list-ol",command:"insertOrderedList",range:!0,aValueArgument:null},{icon:"undo",command:"Undo",range:!1,aValueArgument:null},{icon:"repeat",command:"Redo",range:!1,aValueArgument:null}],t.options.htmlToolsButtons&&(this.buttons=t.options.htmlToolsButtons),this.setControl()}var ot=(nt.prototype.hideModal=function(){this.restoreSelection(),g.hide(this.$control)},nt.prototype.showModal=function(t,e){void 0===e&&(e=!0),this.saveSelection(),g.toggle(this.$btns,e),t&&(this.$form.appendChild(t),g.isHidden(t)&&g.show(t)),g.show(this.$control)},nt.prototype.promptAsync=function(i){var r=this,l=this;return new Promise(function(e,t){for(var o=0;o<l.$form.children.length;o++){var n=l.$form.children[o];n!=r.$btns&&l.$form.removeChild(n)}i.forEach(function(t){g.before(r.$btns,t.$control)}),g.on(l.$okBtn,"click",function(){i.forEach(function(t){return t.parseValue()}),l.hideModal();var t=new S(i);e(t)}),g.on(l.$cancelBtn,"click",function(){l.hideModal(),e(null)}),l.showModal()})},nt.prototype.saveSelection=function(){var t=window.getSelection();this.selectionRanges=[];for(var e=0;e<t.rangeCount;e++)this.selectionRanges.push(t.getRangeAt(e))},nt.prototype.restoreSelection=function(){if(this.selectionRanges&&0!=this.selectionRanges.length){var e=window.getSelection();e.removeAllRanges(),this.selectionRanges.forEach(function(t){return e.addRange(t)})}},nt);function nt(t,e,o,n,i,r){this.$control=t,this.$closeBtn=e,this.$form=o,this.$btns=n,this.$okBtn=i,this.$cancelBtn=r;var l=this;g.on(e,"click",function(){l.hideModal()})}var it=(Object.defineProperty(rt.prototype,"isCompactTools",{get:function(){var t=this.editor.options.compactTools;return null==t?window.innerWidth<this.editor.options.compactToolsWidth:t.valueOf()},enumerable:!0,configurable:!0}),rt.prototype.setTools=function(){var e=this;this.$tools=g.el('<div class="bre bre-tools" data-bricky-tools></div>'),this.$toolsTemplates=g.el('<div class="bre-tools-templates"></div>'),this.$toolsLoader=g.el('<div class="bre-tools-loader"><b>Loading...</b></div>'),this.$toolsHideBtn=g.el('<button type="button" class="bre-tools-toggle"><div>►</div></button>'),this.$tools.appendChild(this.$toolsHideBtn),this.$tools.appendChild(this.$toolsLoader),this.$tools.appendChild(this.$toolsTemplates),this.$toolsHideBtn.onclick=function(t){return e.toggleTools()},this.editor.$editor.appendChild(this.$tools),this.isCompactTools&&(g.addClass(this.$tools,"bre-tools-templates-compact"),this.toggleTools())},rt.prototype.toggleTools=function(){g.toggleClass(this.$tools,"bre-tools-collapsed",!g.hasClass(this.$toolsHideBtn,"bre-tools-toggle-collapsed")),g.toggleClass(this.$toolsHideBtn,"bre-tools-toggle-collapsed")},rt.prototype.setModal=function(){var t=g.el('<div class="bre bre-modal"><div class="bre-modal-placeholder"></div></div>'),e=g.el('<div class="bre-modal-close"><a href="#">'+y.buttonClose+" ✖</a></div>"),o=g.el('<div class="bre-modal-content"></div>'),n=g.el("<form></form>"),i=g.el('<div class="bre-btns"></div>'),r=g.el('<button type="button" class="bre-btn bre-btn-primary">'+y.buttonOk+"</button>"),l=g.el('<button type="button" class="bre-btn">'+y.buttonCancel+"</button>");i.appendChild(r),i.appendChild(l),n.appendChild(i),o.appendChild(n);var s=g.first(t,".bre-modal-placeholder");s.appendChild(e),s.appendChild(o),this.modal=new ot(t,e,n,i,r,l),this.editor.$editor.appendChild(t)},rt.prototype.toggleToolsLoader=function(t){g.toggle(this.$toolsLoader,t)},rt.prototype.setTemplates=function(t){var n=this,i=this.editor;t.forEach(function(t){if(0!==t.templates.length){var e=g.el("<div class='"+b.classTemplateGroup+"'>"+t.name+"</div>");n.$toolsTemplates.appendChild(e);var o=g.el("<div></div>");t.templates.forEach(function(e){var t=e.getPreview();t.setAttribute("title",e.name),t.onclick=function(t){return i.addBlock(e),t.stopPropagation(),!1},o.appendChild(t)}),g.on(e,"click",function(){g.toggle(o)}),n.$toolsTemplates.appendChild(o)}})},rt.initBtnDeck=function(e){var t=g.select(e,".bre-btn")[0];g.on(t,"click",function(t){return rt.toggleBtnDeck(e),t.stopPropagation(),!1})},rt.toggleBtnDeck=function(t,e){var o=g.select(t,".bre-btn");if(o&&0!=o.length){var n=o[0];(e=e||t.dataset.isOn||!1)?(t.style.height="0",t.style.width="0",o.forEach(function(t,e){0!==e&&(t.style.opacity="0",t.style.top="0",t.style.left="0")})):(o.forEach(function(t,e){0!==e&&(t.style.opacity="1",t.style.left=(e+1)*(32+32/6)+"px")}),t.style.height="32px",t.style.width=(32+32/6)*o.length-32/6+"px"),g.toggleClass(n,"bre-btn-active",!e),t.dataset.isOn=String(!e)}},rt);function rt(t){this.editor=t,this.editor=t,this.setTools(),this.setModal(),this.htmlTools=new tt(this.editor)}var lt=(st.prototype.delete=function(){this.$editor.remove()},st.prototype.toggleSelection=function(t){this.$editor.classList.toggle("bre-selected",t)},st.prototype.buildEditorUI=function(t){var o=this;this.$tools=g.el('<div class="bre-block-tools bre-btn-deck"></div>'),t.forEach(function(t){var e=o.buildButton(t);o.$tools.appendChild(e)}),it.initBtnDeck(this.$tools),this.$editor=g.el('<div class="bre-block-wrapper"></div>'),this.$editor.appendChild(this.$tools),this.$editor.appendChild(this.$block),g.on(this.$editor,"mouseover",function(){o.$editor.classList.add("bre-active")}),g.on(this.$editor,"mouseout",function(){o.$editor.classList.remove("bre-active")}),g.on(this.$editor,"click",function(){o.onSelect()})},st.prototype.buildButton=function(e){var t=g.el('<button type="button" class="bre-btn"><i class="fa fa-'+e.icon+'"></i></button>');return e.action&&(t.onclick=function(t){return e.action(),t.stopPropagation(),!1}),t},st);function st(t,e,o,n){this.$block=t,this.onSelect=n,e||this.buildEditorUI(o)}var at=(ct.prototype.isContainer=function(){return!!this.selectedField&&this.selectedField instanceof h},ct.prototype.bindFields=function(t,o){var n=this;g.select(t,b.selectorField,!0).forEach(function(t){var e=a.createField(t,o,function(t){n.select(t)},function(t,e,o){n.onUpdate&&n.onUpdate(n,t,e,o)},n.onUpload);n.fields.push(e)})},ct.prototype.getActions=function(){var t=this;return[new l("ellipsis-h"),new l("trash-o",function(){return t.delete()}),new l("copy",function(){return t.clone()}),new l("angle-up",function(){return t.move(-1)}),new l("angle-down",function(){return t.move(1)})]},ct.prototype.delete=function(){this.ui.delete(),this.onDelete(this)},ct.prototype.move=function(t){this.onMove(this,t)},ct.prototype.clone=function(){this.onCopy(this)},ct.prototype.select=function(t){t!==this.selectedField&&(null===t&&(t=this.fields[0]),this.selectedField&&this.selectedField.deselect(),this.selectedField=t,this.ui.toggleSelection(!0),this.onSelect(this))},ct.prototype.deselect=function(){this.selectedField=null,this.fields.forEach(function(t){t.deselect()}),this.ui.toggleSelection(!1),this.onDeselect(this)},ct.prototype.scrollTo=function(){var t=g.offset(this.ui.$editor).top-100;t=0<t?t:0},ct.prototype.getData=function(t){var e=[];this.fields.forEach(function(t){e.push(t.data)});var o={template:this.template.name,fields:e};return t||(o.html=this.getHtml(!0)),o},ct.prototype.getHtml=function(t){var e=g.el(this.template.$html.innerHTML),n={};this.fields.forEach(function(t){var e=t.name||t.data.name;n[e]=t.getEl()}),g.select(e,b.selectorField,!0).forEach(function(t){var e=g.data(t,"breField").name,o=n[e];g.replaceWith(t,o)});var o=e.outerHTML;return o?t?o.breTotalTrim():o:null},ct);function ct(t,e,o,n,i,r,l,s,a,c){var d=this;this.template=t,this.onDelete=n,this.onSelect=i,this.onDeselect=r,this.onCopy=l,this.onMove=s,this.onUpdate=a,this.onUpload=c,this.fields=[];var u=g.el(t.$html.innerHTML);this.bindFields(u,o);var h=this.getActions();this.ui=new lt(u,e,h,function(){return d.select()})}var dt=(ut.prototype.getData=function(e){var o=[];return this.blocks.forEach(function(t){o.push(t.getData(e))}),o},ut.prototype.getHtml=function(){var e=[];this.blocks.forEach(function(t){e.push(t.getHtml(!0))});var t=g.clone(this.$element);return t.innerHTML=e.join("\n"),t.outerHTML},ut.prototype.addBlock=function(t,e,o,n){var i=this;void 0===n&&(n=!0);var r=new at(t,!1,e,function(t){return i.deleteBlock(t)},function(t){return i.selectBlock(t)},function(t){return i.deselectBlock(t)},function(t){return i.copyBlock(t)},function(t,e){return i.moveBlock(t,e)},this.onUpdateBlock,this.onUpload);this.insertBlock(r,o),n&&(r.select(),r.scrollTo())},ut.prototype.insertBlock=function(t,e){e=e||this.blocks.length,this.selectedBlock&&(e=this.blocks.indexOf(this.selectedBlock)+1),this.blocks.splice(e,0,t),0==e?this.$element.appendChild(t.ui.$editor):g.after(this.blocks[e-1].ui.$editor,t.ui.$editor),this.onAddBlock(t,e),t.select(null),this.togglePlaceholderIfNeed()},ut.prototype.deleteBlock=function(t){var e=this.blocks.indexOf(t);this.blocks.splice(e,1),t=null,e<this.blocks.length?this.blocks[e].select():0<this.blocks.length?this.blocks[e-1].select():this.selectedBlock=null,this.onDeleteBlock(t,e),this.togglePlaceholderIfNeed()},ut.prototype.moveBlock=function(t,e){var o=this.blocks.indexOf(t),n=o+e;if(!(n>=this.blocks.length||n<0)){var i=this.blocks[n].ui.$editor;0<e?g.after(i,t.ui.$editor):e<0&&g.before(i,t.ui.$editor),this.blocks.splice(o,1),this.blocks.splice(n,0,t),this.onMoveBlock(t,o,n),t.scrollTo()}},ut.prototype.copyBlock=function(t){var e=this.blocks.indexOf(t)+1;this.addBlock(t.template,t.getData().fields,e,!0)},ut.prototype.selectBlock=function(t){this.selectedBlock!==t&&(this.selectedBlock&&this.selectedBlock.deselect(),this.selectedBlock=t,this.onSelectBlock(t))},ut.prototype.deselectBlock=function(t){this.selectedBlock=null,this.onDeselectBlock(t)},ut.prototype.togglePlaceholderIfNeed=function(){this.usePlaceholder&&(0===this.blocks.length?this.$placeholder||(this.$placeholder=g.el('<i data-bre-placeholder="true">Click here to select this container...</i>'),this.$element.appendChild(this.$placeholder)):this.$placeholder&&(this.$placeholder.remove(),this.$placeholder=null))},ut);function ut(t,e,o,n,i,r,l,s,a){void 0===a&&(a=!1),this.$element=t,this.onAddBlock=e,this.onDeleteBlock=o,this.onSelectBlock=n,this.onDeselectBlock=i,this.onMoveBlock=r,this.onUpdateBlock=l,this.onUpload=s,this.usePlaceholder=a,this.blocks=[],this.isContainer=!0,this.togglePlaceholderIfNeed()}var ht=(pt.onLoad="onLoad",pt.onChange="onChange",pt.onBlockAdd="onBlockAdd",pt.onBlockDelete="onBlockDelete",pt.onBlockMove="onBlockMove",pt.onBlockSelect="onBlockSelect",pt.onBlockDeselect="onBlockDeselect",pt.onBlockUpdate="onBlockUpdate",pt);function pt(){}var ft=function(t){this.templatesUrl="templates/bootstrap4.html",this.onError=function(t){console.log(t.message)},this.compactTools=null,this.compactToolsWidth=768,this.ignoreHtml=null,this.htmlToolsButtons=null,this.templatesUrl=t.templatesUrl||this.templatesUrl,this.onLoad=t.onLoad||t.onload,this.onChange=t.onChange,this.onBlockAdd=t.onBlockAdd,this.onBlockDelete=t.onBlockDelete,this.onBlockMove=t.onBlockMove,this.onBlockSelect=t.onBlockSelect,this.onBlockDeselect=t.onBlockDeselect,this.onBlockUpdate=t.onBlockUpdate,this.onError=t.onError||this.onError,this.onUpload=t.onUpload||null,this.blocksUrl=t.blocksUrl||null,this.blocks=t.blocks||null,this.compactTools=t.compactTools,this.ignoreHtml=t.ignoreHtml||!1,this.htmlToolsButtons=t.htmlToolsButtons||null,this.formSelector=t.formSelector||null,this.inputSelector=t.inputSelector||null},mt=(gt.prototype.createContainer=function(){var i=this;return new dt(this.$editor,function(t,e){i.isLoaded&&(i.trigger(ht.onBlockAdd,{block:t,idx:e}),i.trigger(ht.onChange,{blocks:i.getData(),html:i.getHtml()}))},function(t,e){i.trigger(ht.onBlockDelete,{block:t,idx:e}),i.trigger(ht.onChange,{blocks:i.getData(),html:i.getHtml()})},function(t){i.trigger(ht.onBlockSelect,{block:t})},function(t){i.trigger(ht.onBlockDeselect,{block:t})},function(t,e,o){i.trigger(ht.onBlockMove,{block:t,from:e,to:o}),i.trigger(ht.onChange,{blocks:i.getData(),html:i.getHtml()})},function(t,e,o,n){i.trigger(ht.onBlockUpdate,{block:t,property:e,oldValue:o,newValue:n}),i.trigger(ht.onChange,{blocks:i.getData(),html:i.getHtml()})},this.options.onUpload)},gt.prototype.initAsync=function(){return f(this,void 0,void 0,function(){var e,o,n;return m(this,function(t){switch(t.label){case 0:return e=this,gt.UI.toggleToolsLoader(!0),[4,O.loadTemplatesAsync(e.options.templatesUrl,e.$editor,e.onError)];case 1:return o=t.sent(),gt.UI.toggleToolsLoader(!1),gt.UI.setTemplates(o),[4,this.tryLoadInitialBlocksAsync()];case 2:return n=t.sent(),this.loadBlocks(n),this.isLoaded=!0,this.trigger(ht.onLoad,this),[2]}})})},gt.prototype.tryLoadInitialBlocksAsync=function(){return f(this,void 0,Promise,function(){var r,l,e=this;return m(this,function(t){return r=this.options.blocksUrl,l=this,[2,new Promise(function(n,i){return f(e,void 0,void 0,function(){var e,o;return m(this,function(t){switch(t.label){case 0:if(!r)return[3,5];t.label=1;case 1:return t.trys.push([1,3,,4]),[4,v.get(r)];case 2:return e=t.sent(),n(e),[3,4];case 3:return o=t.sent(),l.onError(y.errorBlocksFileNotFound(r)),i(o),[3,4];case 4:return[3,6];case 5:this.options.blocks?n(this.options.blocks):n(null),t.label=6;case 6:return[2]}})})})]})})},gt.prototype.tryBindFormSubmit=function(){var t=this,e=this.options.formSelector?g.find(this.options.formSelector):null,o=this.options.inputSelector?g.find(this.options.inputSelector):null;e&&o&&o instanceof HTMLInputElement&&g.on(e,"submit",function(){return o.value=JSON.stringify(t.getData()),!0})},gt.prototype.getData=function(){return this.container.getData(this.options.ignoreHtml)},gt.prototype.getHtml=function(){return this.container.getHtml()},gt.prototype.loadBlocks=function(t){var n=this;t&&t.length&&t.forEach(function(t){var e=O.getTemplate(t.template);if(e)n.container.addBlock(e,t.fields,null,!1);else{var o=y.errorBlockTemplateNotFound(t.template);n.onError(o)}})},gt.prototype.addBlock=function(t){this.getContainer(this.container).addBlock(t,null,null,!0)},gt.prototype.getContainer=function(t){if(t.selectedBlock&&t.selectedBlock.isContainer()){var e=t.selectedBlock.selectedField;if(e)return this.getContainer(e.container)}return t},gt.prototype.trigger=function(o,n){g.trigger(this.$editor,"bre."+o,n),d.propsEach(this.options,function(t,e){t.breEqualsInvariant(o)&&e&&e(n)})},gt);function gt(t,e){var o=this;this.onError=function(t,e){return void 0===e&&(e=0),o.options.onError({message:t,code:e})},a.registerCommonFields(),this.$editor=t,this.$editor.classList.add(b.classEditor),this.options=new ft(e),this.container=this.createContainer(),gt.UI=new it(this),this.tryBindFormSubmit()}return t.Editor=mt,t}({});
+var BrickyEditor = (function (exports, Selectors$1, HtmlTools, Modal, BaseField$1, Prompt) {
+    'use strict';
+
+    /*! *****************************************************************************
+    Copyright (c) Microsoft Corporation. All rights reserved.
+    Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+    this file except in compliance with the License. You may obtain a copy of the
+    License at http://www.apache.org/licenses/LICENSE-2.0
+
+    THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+    KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+    WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+    MERCHANTABLITY OR NON-INFRINGEMENT.
+
+    See the Apache Version 2.0 License for specific language governing permissions
+    and limitations under the License.
+    ***************************************************************************** */
+    /* global Reflect, Promise */
+
+    var extendStatics = function(d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+
+    function __extends(d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    }
+
+    function __awaiter(thisArg, _arguments, P, generator) {
+        return new (P || (P = Promise))(function (resolve, reject) {
+            function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+            function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+            function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+            step((generator = generator.apply(thisArg, _arguments || [])).next());
+        });
+    }
+
+    function __generator(thisArg, body) {
+        var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+        return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+        function verb(n) { return function (v) { return step([n, v]); }; }
+        function step(op) {
+            if (f) throw new TypeError("Generator is already executing.");
+            while (_) try {
+                if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+                if (y = 0, t) op = [op[0] & 2, t.value];
+                switch (op[0]) {
+                    case 0: case 1: t = op; break;
+                    case 4: _.label++; return { value: op[1], done: false };
+                    case 5: _.label++; y = op[1]; op = [0]; continue;
+                    case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                    default:
+                        if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                        if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                        if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                        if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                        if (t[2]) _.ops.pop();
+                        _.trys.pop(); continue;
+                }
+                op = body.call(thisArg, _);
+            } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+            if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+        }
+    }
+
+    var $dom = (function () {
+        function $dom() {
+        }
+        $dom.el = function (html) {
+            var div = document.createElement('div');
+            div.innerHTML = html;
+            var el = div.firstElementChild;
+            div.innerHTML = null;
+            return el;
+        };
+        $dom.ons = function (el, events, listener) {
+            var _this = this;
+            events.split(' ').forEach(function (ev) {
+                _this.on(el, ev, listener);
+            });
+        };
+        $dom.on = function (el, event, listener) {
+            if (el.attachEvent)
+                return el.attachEvent("on" + event, listener);
+            else {
+                return el.addEventListener(event, listener, false);
+            }
+        };
+        $dom.offset = function (el) {
+            var rect = el.getBoundingClientRect();
+            var $body = document.body;
+            return {
+                top: rect.top + $body.scrollTop,
+                left: rect.left + $body.scrollLeft
+            };
+        };
+        $dom.wrap = function (el, toEl) {
+            el.parentElement.insertBefore(toEl, el);
+            toEl.appendChild(el);
+        };
+        $dom.unwrap = function (el) {
+            if (!el.parentElement)
+                return;
+            var parentsParent = el.parentElement.parentElement;
+            if (parentsParent) {
+                parentsParent.replaceChild(el, el.parentElement);
+            }
+            else {
+                el.parentElement.innerHTML = el.innerHTML;
+            }
+        };
+        $dom.hide = function (el) {
+            el.style.display = 'none';
+        };
+        $dom.show = function (el) {
+            el.style.display = 'block';
+        };
+        $dom.isHidden = function (el) {
+            var style = window.getComputedStyle(el);
+            return (style.display === 'none');
+        };
+        $dom.toggle = function (el, force) {
+            var show = force ? force.valueOf() : this.isHidden(el);
+            if (show)
+                this.show(el);
+            else
+                this.hide(el);
+        };
+        $dom.before = function (el, elToInsert) {
+            var _this = this;
+            if (elToInsert instanceof HTMLElement) {
+                el.parentNode.insertBefore(elToInsert, el);
+            }
+            else {
+                elToInsert.forEach(function ($el) { return _this.before(el, $el); });
+            }
+        };
+        $dom.after = function (el, elToInsert) {
+            if (el.nextSibling)
+                el.parentNode.insertBefore(elToInsert, el);
+            else
+                el.parentNode.appendChild(elToInsert);
+        };
+        $dom.hasClass = function (el, className) {
+            if (el.classList)
+                el.classList.contains(className);
+            else
+                new RegExp('(^| )' + className + '( |$)', 'gi').test(el.className);
+        };
+        $dom.addClass = function (el, className) {
+            if (this.hasClass(el, className))
+                return;
+            if (el.classList)
+                el.classList.add(className);
+            else
+                el.className += ' ' + className;
+        };
+        $dom.removeClass = function (el, className) {
+            if (el.classList)
+                el.classList.remove(className);
+            else
+                el.className = el.className.replace(new RegExp('(^|\\b)' + className.split(' ').join('|') + '(\\b|$)', 'gi'), ' ');
+        };
+        $dom.toggleClass = function (el, className, force) {
+            if (force) {
+                if (force.valueOf())
+                    this.addClass(el, className);
+                else
+                    this.removeClass(el, className);
+                return;
+            }
+            if (el.classList) {
+                el.classList.toggle(className);
+            }
+            else {
+                var classes = el.className.split(' ');
+                var existingIndex = -1;
+                for (var i = classes.length; i--;) {
+                    if (classes[i] === className)
+                        existingIndex = i;
+                }
+                if (existingIndex >= 0)
+                    classes.splice(existingIndex, 1);
+                else
+                    classes.push(className);
+                el.className = classes.join(' ');
+            }
+        };
+        $dom.windowScrollTop = function () {
+            return window.pageYOffset !== undefined ?
+                window.pageYOffset :
+                (document.documentElement || document.body.parentNode || document.body).scrollTop;
+        };
+        $dom.replaceWith = function (from, to) {
+            var parent = from.parentElement;
+            if (parent)
+                parent.replaceChild(to, from);
+        };
+        $dom.select = function (el, selector, addBack) {
+            if (addBack === void 0) { addBack = false; }
+            var elements = el.querySelectorAll(selector);
+            var result = Array.prototype.slice.call(elements);
+            if (addBack && addBack.valueOf() && $dom.matches(el, selector)) {
+                result.push(el);
+            }
+            return result;
+        };
+        $dom.find = function (selector) {
+            return document.querySelector(selector);
+        };
+        $dom.first = function (el, selector) {
+            return el.querySelector(selector);
+        };
+        $dom.clone = function (el) {
+            return el.cloneNode(true);
+        };
+        $dom.trigger = function (el, ev, data) {
+            if (window.CustomEvent) {
+                var event = new CustomEvent(ev, { detail: data });
+            }
+            else {
+                var event = document.createEvent('CustomEvent');
+                event.initCustomEvent(ev, true, true, data);
+            }
+            el.dispatchEvent(event);
+        };
+        $dom.matches = function (el, selector) {
+            var matches = el.matches ||
+                el['matchesSelector'] ||
+                el.msMatchesSelector ||
+                el['mozMatchesSelector'] ||
+                el.webkitMatchesSelector ||
+                el['oMatchesSelector'];
+            return matches.call(el, selector);
+        };
+        $dom.data = function (el, prop) {
+            var json = el.dataset[prop];
+            var data = null;
+            try {
+                data = JSON.parse(json);
+            }
+            catch (e) {
+                if (e instanceof SyntaxError) {
+                    json = json.replace(/'/g, '"');
+                    try {
+                        data = JSON.parse(json);
+                    }
+                    catch (_a) { }
+                }
+            }
+            return data;
+        };
+        return $dom;
+    }());
+
+    var EditorStrings = (function () {
+        function EditorStrings() {
+        }
+        EditorStrings.errorBlocksFileNotFound = function (url) { return "Blocks file not found. Requested file: " + url + "."; };
+        EditorStrings.errorTemplatesFileNotFound = function (url) { return "Templates file not found. Requested file: " + url + "."; };
+        EditorStrings.errorBlockTemplateNotFound = function (templateName) { return "Template \"" + templateName + "\" not found."; };
+        EditorStrings.errorTemplateParsing = function (name) { return "Template parsing error: " + name + "."; };
+        EditorStrings.embedFieldLinkTitle = 'Link to embed media';
+        EditorStrings.embedFieldLinkPlaceholder = 'Link to instagram, youtube and etc.';
+        EditorStrings.imageFieldLinkTitle = 'Image link';
+        EditorStrings.imageFieldLinkPlaceholder = 'http://url-to-image.png';
+        EditorStrings.imageFieldUploadTitle = 'or Upload a file';
+        EditorStrings.imageFieldUploadButton = 'Select file';
+        EditorStrings.imageFieldAltTitle = 'Alt';
+        EditorStrings.imageFieldAltPlaceholder = 'Image \'alt\' attribute value';
+        EditorStrings.imageFieldUrlSubtitle = 'Link to open on image click';
+        EditorStrings.htmlEditorLinkUrlTitle = 'Url';
+        EditorStrings.htmlEditorLinkUrlPlaceholder = 'http://put-your-link.here';
+        EditorStrings.htmlEditorLinkTitleTitle = 'Title';
+        EditorStrings.htmlEditorLinkTitlePlaceholder = 'Title attribute for link';
+        EditorStrings.htmlEditorLinkTargetTitle = 'Target';
+        EditorStrings.htmlEditorLinkTargetBlank = 'Blank';
+        EditorStrings.htmlEditorLinkTargetSelf = 'Self';
+        EditorStrings.htmlEditorLinkTargetParent = 'Parent';
+        EditorStrings.htmlEditorLinkTargetTop = 'Top';
+        EditorStrings.buttonClose = 'close';
+        EditorStrings.buttonOk = 'Ok';
+        EditorStrings.buttonCancel = 'Cancel';
+        EditorStrings.defaultTemplatesGroupName = 'Other templates';
+        return EditorStrings;
+    }());
+
+    var UI = (function () {
+        function UI(editor) {
+            this.editor = editor;
+            this.editor = editor;
+            this.setTools();
+            this.setModal();
+            this.htmlTools = new HtmlTools.HtmlTools(this.editor);
+        }
+        Object.defineProperty(UI.prototype, "isCompactTools", {
+            get: function () {
+                var compactTools = this.editor.options.compactTools;
+                if (compactTools == null) {
+                    return window.innerWidth < this.editor.options.compactToolsWidth;
+                }
+                else {
+                    return compactTools.valueOf();
+                }
+            },
+            enumerable: true,
+            configurable: true
+        });
+        UI.prototype.setTools = function () {
+            var _this = this;
+            this.$tools = $dom.el('<div class="bre bre-tools" data-bricky-tools></div>');
+            this.$toolsTemplates = $dom.el('<div class="bre-tools-templates"></div>');
+            this.$toolsLoader = $dom.el('<div class="bre-tools-loader"><b>Loading...</b></div>');
+            this.$toolsHideBtn = $dom.el('<button type="button" class="bre-tools-toggle"><div>►</div></button>');
+            this.$tools.appendChild(this.$toolsHideBtn);
+            this.$tools.appendChild(this.$toolsLoader);
+            this.$tools.appendChild(this.$toolsTemplates);
+            this.$toolsHideBtn.onclick = function (ev) { return _this.toggleTools(); };
+            this.editor.$editor.appendChild(this.$tools);
+            if (this.isCompactTools) {
+                $dom.addClass(this.$tools, 'bre-tools-templates-compact');
+                this.toggleTools();
+            }
+        };
+        UI.prototype.toggleTools = function () {
+            $dom.toggleClass(this.$tools, 'bre-tools-collapsed', !$dom.hasClass(this.$toolsHideBtn, 'bre-tools-toggle-collapsed'));
+            $dom.toggleClass(this.$toolsHideBtn, 'bre-tools-toggle-collapsed');
+        };
+        UI.prototype.setModal = function () {
+            var $modal = $dom.el('<div class="bre bre-modal"><div class="bre-modal-placeholder"></div></div>');
+            var $modalCloseBtn = $dom.el("<div class=\"bre-modal-close\"><a href=\"#\">" + EditorStrings.buttonClose + " \u2716</a></div>");
+            var $modalContent = $dom.el('<div class="bre-modal-content"></div>');
+            var $modalForm = $dom.el('<form></form>');
+            var $modalBtns = $dom.el('<div class="bre-btns"></div>');
+            var $modalOk = $dom.el("<button type=\"button\" class=\"bre-btn bre-btn-primary\">" + EditorStrings.buttonOk + "</button>");
+            var $modalCancel = $dom.el("<button type=\"button\" class=\"bre-btn\">" + EditorStrings.buttonCancel + "</button>");
+            $modalBtns.appendChild($modalOk);
+            $modalBtns.appendChild($modalCancel);
+            $modalForm.appendChild($modalBtns);
+            $modalContent.appendChild($modalForm);
+            var $placeholder = $dom.first($modal, '.bre-modal-placeholder');
+            $placeholder.appendChild($modalCloseBtn);
+            $placeholder.appendChild($modalContent);
+            this.modal = new Modal.Modal($modal, $modalCloseBtn, $modalForm, $modalBtns, $modalOk, $modalCancel);
+            this.editor.$editor.appendChild($modal);
+        };
+        UI.prototype.toggleToolsLoader = function (toggle) {
+            $dom.toggle(this.$toolsLoader, toggle);
+        };
+        UI.prototype.setTemplates = function (templateGroups) {
+            var _this = this;
+            var editor = this.editor;
+            templateGroups.forEach(function (group) {
+                if (group.templates.length === 0)
+                    return;
+                var $header = $dom.el("<div class='" + Selectors$1.Selectors.classTemplateGroup + "'>" + group.name + "</div>");
+                _this.$toolsTemplates.appendChild($header);
+                var $group = $dom.el('<div></div>');
+                group.templates.forEach(function (template) {
+                    var $preview = template.getPreview();
+                    $preview.setAttribute('title', template.name);
+                    $preview.onclick = function (ev) {
+                        editor.addBlock(template);
+                        ev.stopPropagation();
+                        return false;
+                    };
+                    $group.appendChild($preview);
+                });
+                $dom.on($header, 'click', function () {
+                    $dom.toggle($group);
+                });
+                _this.$toolsTemplates.appendChild($group);
+            });
+        };
+        UI.initBtnDeck = function ($btnsDeck) {
+            var $btns = $dom.select($btnsDeck, '.bre-btn');
+            var $firstBtn = $btns[0];
+            $dom.on($firstBtn, 'click', function (ev) {
+                UI.toggleBtnDeck($btnsDeck);
+                ev.stopPropagation();
+                return false;
+            });
+        };
+        UI.toggleBtnDeck = function ($btnsDeck, isOn) {
+            var $btns = $dom.select($btnsDeck, '.bre-btn');
+            if (!$btns || $btns.length == 0)
+                return;
+            var $firstBtn = $btns[0];
+            var size = 32;
+            var gap = size / 6;
+            isOn = isOn || $btnsDeck.dataset['isOn'] || false;
+            if (isOn) {
+                $btnsDeck.style.height = '0';
+                $btnsDeck.style.width = '0';
+                $btns.forEach(function ($btn, idx) {
+                    if (idx === 0)
+                        return;
+                    $btn.style.opacity = '0';
+                    $btn.style.top = '0';
+                    $btn.style.left = '0';
+                });
+            }
+            else {
+                $btns.forEach(function ($btn, idx) {
+                    if (idx === 0)
+                        return;
+                    $btn.style.opacity = '1';
+                    $btn.style.left = (idx + 1) * (size + gap) + "px";
+                });
+                $btnsDeck.style.height = size + "px";
+                $btnsDeck.style.width = (size + gap) * $btns.length - gap + "px";
+            }
+            $dom.toggleClass($firstBtn, 'bre-btn-active', !isOn);
+            $btnsDeck.dataset['isOn'] = String(!isOn);
+        };
+        return UI;
+    }());
+
+    var BlockUI = (function () {
+        function BlockUI($block, preview, actions, onSelect) {
+            this.$block = $block;
+            this.onSelect = onSelect;
+            if (!preview) {
+                this.buildEditorUI(actions);
+            }
+        }
+        BlockUI.prototype.delete = function () {
+            this.$editor.remove();
+        };
+        BlockUI.prototype.toggleSelection = function (isOn) {
+            this.$editor.classList.toggle("bre-selected", isOn);
+        };
+        BlockUI.prototype.buildEditorUI = function (actions) {
+            var _this = this;
+            this.$tools = $dom.el('<div class="bre-block-tools bre-btn-deck"></div>');
+            actions.forEach(function (action) {
+                var $btn = _this.buildButton(action);
+                _this.$tools.appendChild($btn);
+            });
+            UI.initBtnDeck(this.$tools);
+            this.$editor = $dom.el('<div class="bre-block-wrapper"></div>');
+            this.$editor.appendChild(this.$tools);
+            this.$editor.appendChild(this.$block);
+            $dom.on(this.$editor, "mouseover", function () {
+                _this.$editor.classList.add("bre-active");
+            });
+            $dom.on(this.$editor, "mouseout", function () {
+                _this.$editor.classList.remove("bre-active");
+            });
+            $dom.on(this.$editor, "click", function () {
+                _this.onSelect();
+            });
+        };
+        BlockUI.prototype.buildButton = function (action) {
+            var $el = $dom.el("<button type=\"button\" class=\"bre-btn\"><i class=\"fa fa-" + action.icon + "\"></i></button>");
+            if (action.action) {
+                $el.onclick = function (ev) {
+                    action.action();
+                    ev.stopPropagation();
+                    return false;
+                };
+            }
+            return $el;
+        };
+        return BlockUI;
+    }());
+
+    var BlockUIAction = (function () {
+        function BlockUIAction(icon, action, title) {
+            this.icon = icon;
+            this.action = action;
+            this.title = title;
+        }
+        return BlockUIAction;
+    }());
+
+    var str = {
+        totalTrim: function (s) {
+            return s !== undefined ? s.replace(/\s\s+/g, " ").trim() : "";
+        },
+        equalsInvariant: function (s1, s2) {
+            return s1.toLowerCase() === s2.toLowerCase();
+        }
+    };
+    var Common = (function () {
+        function Common() {
+        }
+        Common.extend = function (out) {
+            var extensions = [];
+            for (var _i = 1; _i < arguments.length; _i++) {
+                extensions[_i - 1] = arguments[_i];
+            }
+            out = out || {};
+            for (var i = 1; i < extensions.length; i++) {
+                if (!extensions[i]) {
+                    continue;
+                }
+                for (var key in extensions[i]) {
+                    if (extensions[i].hasOwnProperty(key)) {
+                        out[key] = extensions[i][key];
+                    }
+                }
+            }
+            return out;
+        };
+        Common.getSelectedText = function () {
+            var text = "";
+            var doc = document;
+            if (window.getSelection) {
+                text = window.getSelection().toString();
+            }
+            else if (doc.selection && doc.selection.type !== "Control") {
+                text = doc.selection.createRange().text;
+            }
+            return text;
+        };
+        Common.propsEach = function (obj, func) {
+            for (var key in obj) {
+                if (obj.hasOwnProperty(key)) {
+                    var value = obj[key];
+                    func(key, value);
+                }
+            }
+        };
+        Common.propsFilterKeys = function (obj, filter, payload) {
+            var result = [];
+            Common.propsEach(obj, function (key, value) {
+                if (filter(key, value)) {
+                    result.push(key);
+                }
+            });
+            if (payload) {
+                result.push(payload);
+            }
+            return result;
+        };
+        return Common;
+    }());
+
+    var Selectors = (function () {
+        function Selectors() {
+        }
+        Selectors.attr = function (attr) {
+            return "[" + attr + "]";
+        };
+        Selectors.attrContentEditable = 'contenteditable';
+        Selectors.selectorContentEditable = 'contenteditable';
+        Selectors.attrField = 'data-bre-field';
+        Selectors.selectorField = "[" + Selectors.attrField + "]";
+        Selectors.classEditor = 'bre-editor';
+        Selectors.classTemplate = 'bre-template';
+        Selectors.selectorTemplate = "." + Selectors.classTemplate;
+        Selectors.classTemplateGroup = 'bre-template-group';
+        Selectors.selectorTemplateGroup = "." + Selectors.classTemplateGroup;
+        Selectors.selectorTemplatePreview = '.bre-template-preview';
+        Selectors.classMobile = 'brickyeditor-tools-mobile';
+        Selectors.htmlToolsCommand = 'data-bre-doc-command';
+        Selectors.htmlToolsCommandRange = 'data-bre-doc-command-range';
+        Selectors.selectorFieldSelected = 'bre-field-selected';
+        Selectors.selectorFieldContainer = 'bre-field-container';
+        Selectors.selectorHtmlToolsCommand = Selectors.attr(Selectors.htmlToolsCommand);
+        Selectors.selectorHtmlToolsCommandRange = Selectors.attr(Selectors.htmlToolsCommandRange);
+        return Selectors;
+    }());
+
+    var BaseField = (function () {
+        function BaseField($field, data, onSelect, onUpdate, onUpload) {
+            this.$field = $field;
+            this.data = data;
+            this.onSelect = onSelect;
+            this.onUpdate = onUpdate;
+            this.onUpload = onUpload;
+            this.bind();
+        }
+        Object.defineProperty(BaseField, "type", {
+            get: function () {
+                var name = this.name;
+                name = name.replace("Field", "");
+                name = name.substring(0, 1).toLowerCase() + name.substring(1);
+                return name;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        BaseField.registerCommonFields = function () {
+            if (!this.commonFieldsRegistered) {
+                HtmlField.registerField();
+                ImageField.registerField();
+                EmbedField.registerField();
+                ContainerField.registerField();
+            }
+            this.commonFieldsRegistered = true;
+        };
+        BaseField.createField = function ($field, data, onSelect, onUpdate, onUpload) {
+            var fieldData = $dom.data($field, "breField");
+            if (!fieldData || !fieldData.name) {
+                throw new Error("There is no data or data doesn't contains 'name' in field " + $field.innerHTML);
+            }
+            if (data) {
+                var addFieldData = {};
+                for (var idx = 0; idx < data.length; idx++) {
+                    var field = data[idx];
+                    if (field.name.toLowerCase() === fieldData.name.toLowerCase()) {
+                        addFieldData = field;
+                        break;
+                    }
+                }
+                if (addFieldData) {
+                    fieldData = Common.extend(fieldData, addFieldData);
+                }
+            }
+            var type = fieldData.type;
+            if (type != null) {
+                if (!BaseField.commonFieldsRegistered) {
+                    BaseField.registerCommonFields();
+                }
+                if (this._fields.hasOwnProperty(type)) {
+                    var field = this._fields[type];
+                    return new field($field, fieldData, onSelect, onUpdate, onUpload);
+                }
+                else {
+                    throw new Error(type + " field not found");
+                }
+            }
+            else {
+                throw new Error("Field type not defined in data-bre-field attribute");
+            }
+        };
+        BaseField.registerField = function () {
+            if (this._fields.hasOwnProperty(this.type)) {
+                delete this._fields[this.type];
+            }
+            this._fields[this.type] = this;
+        };
+        BaseField.prototype.deselect = function () {
+            this.$field.classList.remove(Selectors.selectorFieldSelected);
+        };
+        BaseField.prototype.getEl = function () {
+            var $el = this.$field.cloneNode(true);
+            $el.attributes.removeNamedItem(Selectors.attrField);
+            return $el;
+        };
+        BaseField.prototype.getSettingsEl = function () {
+            return null;
+        };
+        BaseField.prototype.bind = function () {
+        };
+        BaseField.prototype.select = function () {
+            this.$field.classList.add(Selectors.selectorFieldSelected);
+            this.onSelect(this);
+        };
+        BaseField.prototype.updateProperty = function (prop, value, fireUpdate) {
+            if (fireUpdate === void 0) { fireUpdate = true; }
+            var oldValue = this.data[prop];
+            if (oldValue === value) {
+                return;
+            }
+            this.data[prop] = value;
+            if (fireUpdate) {
+                this.onUpdate(prop, oldValue, value);
+            }
+        };
+        BaseField.commonFieldsRegistered = false;
+        BaseField._fields = {};
+        return BaseField;
+    }());
+
+    var ContainerField = (function (_super) {
+        __extends(ContainerField, _super);
+        function ContainerField() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        ContainerField.prototype.bind = function () {
+            var _this = this;
+            var field = this;
+            var $field = this.$field;
+            this.container = new BlocksContainer($field, function (block) {
+                field.updateBlocks();
+            }, function (block) {
+                field.updateBlocks();
+            }, function (block) {
+                _this.select();
+            }, function (block) {
+            }, function (block) {
+                field.updateBlocks();
+            }, function (block) {
+                field.updateBlocks();
+            }, field.onUpload, true);
+            $dom.addClass($field, Selectors.selectorFieldContainer);
+            $dom.on($field, "click", function (ev) {
+                field.select();
+                ev.stopPropagation();
+                return false;
+            });
+        };
+        ContainerField.prototype.updateBlocks = function () {
+            this.updateProperty("blocks", this.container.getData(true), true);
+            this.updateProperty("html", this.container.getHtml(), true);
+        };
+        ContainerField.prototype.deselect = function () {
+            this.container.blocks.forEach(function (b) { return b.deselect(); });
+            this.$field.classList.remove(Selectors.selectorFieldSelected);
+        };
+        ContainerField.prototype.getEl = function () {
+            var html = this.container.getHtml();
+            return $dom.el(html);
+        };
+        return ContainerField;
+    }(BaseField));
+
+    var $ajax = (function () {
+        function $ajax() {
+        }
+        $ajax.get = function (url) {
+            return new Promise(function (resolve, reject) {
+                var request = new XMLHttpRequest();
+                request.open('GET', url, true);
+                request.onreadystatechange = function () {
+                    if (this.readyState === 4) {
+                        if (this.status >= 200 && this.status < 400) {
+                            var data = null;
+                            try {
+                                data = JSON.parse(this.responseText);
+                            }
+                            catch (_a) {
+                                data = this.responseText;
+                            }
+                            try {
+                                resolve(data);
+                            }
+                            catch (ex) {
+                                reject(ex);
+                            }
+                        }
+                        else {
+                            reject();
+                        }
+                    }
+                };
+                request.send();
+                request = null;
+            });
+        };
+        $ajax.getScript = function (url) {
+            return new Promise(function (resolve, reject) {
+                var script = document.createElement("script");
+                var done = false;
+                var loaded = function () {
+                    if (!done && (!this.readyState ||
+                        this.readyState == "loaded" || this.readyState == "complete")) {
+                        done = true;
+                        resolve();
+                    }
+                    else {
+                        reject();
+                    }
+                };
+                script.onload = loaded;
+                script.onreadystatechange = loaded;
+                script.src = url;
+                var head = document.getElementsByTagName("head")[0];
+                head.appendChild(script);
+            });
+        };
+        $ajax.jsonp = function (url) {
+            return new Promise(function (resolve, reject) {
+                var id = '_' + Math.round(10000 * Math.random());
+                var callbackName = 'jsonp_callback_' + id;
+                window[callbackName] = function (data) {
+                    delete window[callbackName];
+                    var ele = document.getElementById(id);
+                    ele.parentNode.removeChild(ele);
+                    resolve(data);
+                };
+                var src = url + '&callback=' + callbackName;
+                var script = document.createElement('script');
+                script.src = src;
+                script.id = id;
+                script.addEventListener('error', reject);
+                (document.getElementsByTagName('head')[0] || document.body || document.documentElement).appendChild(script);
+            });
+        };
+        return $ajax;
+    }());
+
+    var EditorOptions = (function () {
+        function EditorOptions(options) {
+            this.templatesUrl = "templates/bootstrap4.html";
+            this.compactTools = null;
+            this.compactToolsWidth = 768;
+            this.ignoreHtml = null;
+            this.htmlToolsButtons = null;
+            this.onError = function (data) {
+                console.log(data.message);
+            };
+            this.templatesUrl = options.templatesUrl || this.templatesUrl;
+            this.onLoad = options.onLoad || options.onload;
+            this.onChange = options.onChange;
+            this.onBlockAdd = options.onBlockAdd;
+            this.onBlockDelete = options.onBlockDelete;
+            this.onBlockMove = options.onBlockMove;
+            this.onBlockSelect = options.onBlockSelect;
+            this.onBlockDeselect = options.onBlockDeselect;
+            this.onBlockUpdate = options.onBlockUpdate;
+            this.onError = options.onError || this.onError;
+            this.onUpload = options.onUpload || null;
+            this.blocksUrl = options.blocksUrl || null;
+            this.blocks = options.blocks || null;
+            this.compactTools = options.compactTools;
+            this.ignoreHtml = options.ignoreHtml || false;
+            this.htmlToolsButtons = options.htmlToolsButtons || null;
+            this.formSelector = options.formSelector || null;
+            this.inputSelector = options.inputSelector || null;
+        }
+        return EditorOptions;
+    }());
+
+    var Events = (function () {
+        function Events() {
+        }
+        Events.onLoad = 'onLoad';
+        Events.onChange = 'onChange';
+        Events.onBlockAdd = 'onBlockAdd';
+        Events.onBlockDelete = 'onBlockDelete';
+        Events.onBlockMove = 'onBlockMove';
+        Events.onBlockSelect = 'onBlockSelect';
+        Events.onBlockDeselect = 'onBlockDeselect';
+        Events.onBlockUpdate = 'onBlockUpdate';
+        return Events;
+    }());
+
+    var EmbedService = (function () {
+        function EmbedService() {
+        }
+        EmbedService.getEmbedAsync = function (embedUrl) {
+            var _this = this;
+            var url = "https://noembed.com/embed?url=" + embedUrl;
+            return new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
+                var data, err_1;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            _a.trys.push([0, 2, , 3]);
+                            return [4, $ajax.jsonp(url)];
+                        case 1:
+                            data = _a.sent();
+                            resolve(data);
+                            return [3, 3];
+                        case 2:
+                            err_1 = _a.sent();
+                            reject(err_1);
+                            return [3, 3];
+                        case 3: return [2];
+                    }
+                });
+            }); });
+        };
+        EmbedService.processEmbed = function (provider) {
+            switch (provider) {
+                case EmbedService.Instagram:
+                    if (instgrm) {
+                        instgrm.Embeds.process();
+                    }
+                    break;
+                default:
+                    break;
+            }
+        };
+        EmbedService.Instagram = 'Instagram';
+        return EmbedService;
+    }());
+
+    var Template = (function () {
+        function Template($template) {
+            this.loaded = true;
+            this.name = $template.dataset.name;
+            this.$preview = $dom.first($template, Selectors.selectorTemplatePreview);
+            if (this.$preview) {
+                $template.removeChild(this.$preview);
+            }
+            this.$html = $template;
+            if (!this.$preview) {
+                var block = new Block(this, true);
+                var blockHtml = block.getHtml(true);
+                if (blockHtml === null) {
+                    this.loaded = false;
+                }
+                else {
+                    this.$preview = $dom.el(blockHtml);
+                }
+            }
+        }
+        Template.prototype.getPreview = function () {
+            var $template = $dom.el("<div class='" + Selectors.classTemplate + "'></div>");
+            $template.appendChild(this.$preview);
+            return $template;
+        };
+        return Template;
+    }());
+
+    var TemplateGroup = (function () {
+        function TemplateGroup(name, templates) {
+            this.name = name;
+            this.templates = templates;
+        }
+        return TemplateGroup;
+    }());
+
+    var TemplateService = (function () {
+        function TemplateService() {
+        }
+        TemplateService.loadTemplatesAsync = function (url, $editor, onError) {
+            return __awaiter(this, void 0, Promise, function () {
+                var templates;
+                var _this = this;
+                return __generator(this, function (_a) {
+                    this.templates = [];
+                    templates = this.templates;
+                    return [2, new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
+                            var data, $data, $style, $groups, templates_1, defaultGroupName, group, err_1;
+                            var _this = this;
+                            return __generator(this, function (_a) {
+                                switch (_a.label) {
+                                    case 0:
+                                        _a.trys.push([0, 2, , 3]);
+                                        return [4, $ajax.get(url)];
+                                    case 1:
+                                        data = _a.sent();
+                                        $data = $dom.el("<div>" + data + "</div>");
+                                        $style = $dom.select($data, "style", false);
+                                        if ($style.length > 0) {
+                                            $dom.before($editor, $style);
+                                        }
+                                        $groups = $dom.select($data, Selectors.selectorTemplateGroup);
+                                        $groups.forEach(function ($group) {
+                                            var title = $group.getAttribute("title");
+                                            var templates = _this.getTemplates($group, onError);
+                                            _this.templates.push(new TemplateGroup(title, templates));
+                                            $group.remove();
+                                        });
+                                        templates_1 = this.getTemplates($data, onError);
+                                        defaultGroupName = this.templates.length > 0
+                                            ? EditorStrings.defaultTemplatesGroupName
+                                            : "";
+                                        group = new TemplateGroup(defaultGroupName, templates_1);
+                                        this.templates.push(group);
+                                        resolve(this.templates);
+                                        return [3, 3];
+                                    case 2:
+                                        err_1 = _a.sent();
+                                        onError(EditorStrings.errorTemplatesFileNotFound(url));
+                                        reject(err_1);
+                                        return [3, 3];
+                                    case 3: return [2];
+                                }
+                            });
+                        }); })];
+                });
+            });
+        };
+        TemplateService.getTemplate = function (templateName) {
+            for (var gi = 0; gi < this.templates.length; gi++) {
+                var group = this.templates[gi];
+                for (var ti = 0; ti < group.templates.length; ti++) {
+                    var template = group.templates[ti];
+                    if (template.name.breEqualsInvariant(templateName)) {
+                        return template;
+                    }
+                }
+            }
+            return null;
+        };
+        TemplateService.getTemplates = function ($el, onError) {
+            var templates = [];
+            var $templates = $dom.select($el, Selectors.selectorTemplate);
+            $templates.forEach(function ($template) {
+                var template = new Template($template);
+                if (template.loaded) {
+                    templates.push(template);
+                }
+                else {
+                    onError(EditorStrings.errorTemplateParsing(template.name));
+                }
+            });
+            return templates;
+        };
+        return TemplateService;
+    }());
+
+    var Editor = (function () {
+        function Editor($editor, options) {
+            var _this = this;
+            this.onError = function (message, code) {
+                if (code === void 0) { code = 0; }
+                return _this.options.onError({ message: message, code: code });
+            };
+            BaseField.registerCommonFields();
+            this.$editor = $editor;
+            this.$editor.classList.add(Selectors.classEditor);
+            this.options = new EditorOptions(options);
+            this.container = this.createContainer();
+            Editor.UI = new UI(this);
+            this.tryBindFormSubmit();
+        }
+        Editor.prototype.initAsync = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                var editor, templates, blocks;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            editor = this;
+                            Editor.UI.toggleToolsLoader(true);
+                            return [4, TemplateService.loadTemplatesAsync(editor.options.templatesUrl, editor.$editor, editor.onError)];
+                        case 1:
+                            templates = _a.sent();
+                            Editor.UI.toggleToolsLoader(false);
+                            Editor.UI.setTemplates(templates);
+                            return [4, this.tryLoadInitialBlocksAsync()];
+                        case 2:
+                            blocks = _a.sent();
+                            this.loadBlocks(blocks);
+                            this.isLoaded = true;
+                            this.trigger(Events.onLoad, this);
+                            return [2];
+                    }
+                });
+            });
+        };
+        Editor.prototype.tryBindFormSubmit = function () {
+            var editor = this;
+            var $form = this.options.formSelector
+                ? $dom.find(this.options.formSelector)
+                : null;
+            var $input = this.options.inputSelector
+                ? $dom.find(this.options.inputSelector)
+                : null;
+            if (!$form || !$input || !($input instanceof HTMLInputElement)) {
+                return;
+            }
+            $dom.on($form, "submit", function () {
+                $input.value = JSON.stringify(editor.getData());
+                return true;
+            });
+        };
+        Editor.prototype.getData = function () {
+            return this.container.getData(this.options.ignoreHtml);
+        };
+        Editor.prototype.getHtml = function () {
+            return this.container.getHtml();
+        };
+        Editor.prototype.loadBlocks = function (blocks) {
+            var _this = this;
+            if (blocks && blocks.length) {
+                blocks.forEach(function (block) {
+                    var template = TemplateService.getTemplate(block.template);
+                    if (template) {
+                        _this.container.addBlock(template, block.fields, null, false);
+                    }
+                    else {
+                        var message = EditorStrings.errorBlockTemplateNotFound(block.template);
+                        _this.onError(message);
+                    }
+                });
+            }
+        };
+        Editor.prototype.addBlock = function (template) {
+            var container = this.getContainer(this.container);
+            container.addBlock(template, null, null, true);
+        };
+        Editor.prototype.createContainer = function () {
+            var _this = this;
+            var onAdd = function (block, idx) {
+                if (_this.isLoaded) {
+                    _this.trigger(Events.onBlockAdd, { block: block, idx: idx });
+                    _this.trigger(Events.onChange, {
+                        blocks: _this.getData(),
+                        html: _this.getHtml()
+                    });
+                }
+            };
+            var onDelete = function (block, idx) {
+                _this.trigger(Events.onBlockDelete, { block: block, idx: idx });
+                _this.trigger(Events.onChange, {
+                    blocks: _this.getData(),
+                    html: _this.getHtml()
+                });
+            };
+            var onUpdate = function (block, property, oldValue, newValue) {
+                _this.trigger(Events.onBlockUpdate, {
+                    block: block,
+                    property: property,
+                    oldValue: oldValue,
+                    newValue: newValue
+                });
+                _this.trigger(Events.onChange, {
+                    blocks: _this.getData(),
+                    html: _this.getHtml()
+                });
+            };
+            return new BlocksContainer(this.$editor, onAdd, onDelete, function (block) {
+                _this.trigger(Events.onBlockSelect, { block: block });
+            }, function (block) {
+                _this.trigger(Events.onBlockDeselect, { block: block });
+            }, function (block, from, to) {
+                _this.trigger(Events.onBlockMove, { block: block, from: from, to: to });
+                _this.trigger(Events.onChange, {
+                    blocks: _this.getData(),
+                    html: _this.getHtml()
+                });
+            }, onUpdate, this.options.onUpload);
+        };
+        Editor.prototype.tryLoadInitialBlocksAsync = function () {
+            return __awaiter(this, void 0, Promise, function () {
+                var url, editor;
+                var _this = this;
+                return __generator(this, function (_a) {
+                    url = this.options.blocksUrl;
+                    editor = this;
+                    return [2, new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
+                            var blocks, error_1;
+                            return __generator(this, function (_a) {
+                                switch (_a.label) {
+                                    case 0:
+                                        if (!url) return [3, 5];
+                                        _a.label = 1;
+                                    case 1:
+                                        _a.trys.push([1, 3, , 4]);
+                                        return [4, $ajax.get(url)];
+                                    case 2:
+                                        blocks = _a.sent();
+                                        resolve(blocks);
+                                        return [3, 4];
+                                    case 3:
+                                        error_1 = _a.sent();
+                                        editor.onError(EditorStrings.errorBlocksFileNotFound(url));
+                                        reject(error_1);
+                                        return [3, 4];
+                                    case 4: return [3, 6];
+                                    case 5:
+                                        if (this.options.blocks) {
+                                            resolve(this.options.blocks);
+                                        }
+                                        else {
+                                            resolve(null);
+                                        }
+                                        _a.label = 6;
+                                    case 6: return [2];
+                                }
+                            });
+                        }); })];
+                });
+            });
+        };
+        Editor.prototype.getContainer = function (container) {
+            if (container.selectedBlock && container.selectedBlock.isContainer()) {
+                var field = container.selectedBlock.selectedField;
+                if (field) {
+                    return this.getContainer(field.container);
+                }
+            }
+            return container;
+        };
+        Editor.prototype.trigger = function (event, data) {
+            var editor = this;
+            $dom.trigger(this.$editor, "bre." + event, data);
+            Common.propsEach(editor.options, function (key, value) {
+                if (str.equalsInvariant(key, event) && value) {
+                    value(data);
+                }
+            });
+        };
+        return Editor;
+    }());
+
+    var PromptParameter = (function () {
+        function PromptParameter(key, title, value, placeholder) {
+            this.key = key;
+            this.title = title;
+            this.placeholder = placeholder || "";
+            this.value = value;
+        }
+        PromptParameter.prototype.parseValue = function () {
+            if (this.$input) {
+                this.value = this.$input.value;
+            }
+            this.$control = null;
+            delete this._$control;
+        };
+        Object.defineProperty(PromptParameter.prototype, "$control", {
+            get: function () {
+                if (!this._$control) {
+                    this._$control = $dom.el("<div class=" + (this.key ? "bre-prompt-field" : "bre-prompt-subtitle") + ">\n                            <label class=\"bre-label\" for=\"" + this.key + "\">" + (this.title ? this.title : "Select file...") + "</label>\n                        </div>");
+                    this.$input = this.key ? this.getEditor() : null;
+                    if (this.$input != null) {
+                        this._$control.appendChild(this.$input);
+                    }
+                }
+                return this._$control;
+            },
+            set: function (value) {
+                this._$control = value;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        PromptParameter.prototype.getEditor = function () {
+            var $input = document.createElement("input");
+            $input.id = this.key;
+            $input.className = "bre-input";
+            $input.setAttribute("type", "text");
+            $input.setAttribute("placeholder", this.placeholder);
+            $input.value = this.value || "";
+            return $input;
+        };
+        return PromptParameter;
+    }());
+
+    var PromptParameterImage = (function (_super) {
+        __extends(PromptParameterImage, _super);
+        function PromptParameterImage(key, title, value, placeholder) {
+            var _this = _super.call(this, key, title, value, placeholder) || this;
+            if (value) {
+                _this._value = value;
+            }
+            return _this;
+        }
+        PromptParameterImage.prototype.parseValue = function () {
+            this.value = this._value;
+            this.$control = null;
+            delete this._$control;
+            this._value = null;
+            delete this._value;
+        };
+        PromptParameterImage.prototype.getEditor = function () {
+            var field = this;
+            var img = this.value && this.value.fileContent ? this.value.fileContent : "";
+            var $editor = $dom.el("\n                <div class='bre-image-input'>\n                    <label for=\"" + this.key + "\">\n                        " + this.placeholder + "\n                    </label>                        \n                    <img src=\"" + img + "\"/>                    \n                    <input type=\"file\" id=\"" + this.key + "\" class=\"bre-input\" placeholder=\"" + this.placeholder + "\">\n                </div>\n                <small class='bre-image-input-filename'></small>");
+            var $file = $editor.querySelector('input');
+            var $filePreview = $editor.querySelector('img');
+            var $fileName = $editor.querySelector('.bre-image-input-filename');
+            var value = this.value;
+            field.updatePreview($filePreview, $fileName, this.value);
+            $file.onchange = function () {
+                if ($file.files && $file.files[0]) {
+                    var reader = new FileReader();
+                    reader.onload = function (ev) {
+                        var target = ev.target;
+                        field._value = new Prompt.PromptParameterImageResult();
+                        field._value.fileContent = target.result;
+                        field._value.fileInfo = new Prompt.PromptParameterImageResultFile($file.files[0]);
+                        field.updatePreview($filePreview, $fileName, field._value);
+                    };
+                    reader.readAsDataURL($file.files[0]);
+                }
+            };
+            return $editor;
+        };
+        PromptParameterImage.prototype.updatePreview = function ($filePreview, $fileName, value) {
+            if (!value)
+                return;
+            $filePreview.src = value.fileContent;
+            $filePreview.classList.add('bre-loaded');
+            $fileName.innerText = value.fileInfo.name;
+        };
+        return PromptParameterImage;
+    }(Prompt.PromptParameter));
+
+    var PromptParameterOptions = (function (_super) {
+        __extends(PromptParameterOptions, _super);
+        function PromptParameterOptions(key, title, options, value, placeholder) {
+            var _this = _super.call(this, key, title, value, placeholder) || this;
+            _this.options = [];
+            options.forEach(function (kv) {
+                _this.options.push(new Prompt.PromptParameterOption(kv[0], kv[1], kv[1] == value));
+            });
+            return _this;
+        }
+        PromptParameterOptions.prototype.getEditor = function () {
+            var options = this.options.map(function (opt) {
+                return "<option value=\"" + opt.value + "\" " + (opt.selected ? "selected" : "") + ">" + (opt.title ? opt.title : opt.value) + "</option>";
+            });
+            return $dom.el("<select type=\"text\" id=\"" + this.key + "\" class=\"brickyeditor-input\" placeholder=\"" + this.placeholder + "\">" + options + "</select>");
+        };
+        return PromptParameterOptions;
+    }(Prompt.PromptParameter));
+
+    var EmbedField = (function (_super) {
+        __extends(EmbedField, _super);
+        function EmbedField() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        EmbedField.prototype.getSettingsEl = function () {
+            var $el = $dom.el('<div style="position: absolute;width: 100%; height: 100px;;text-align: center;font-weight: bold;vertical-align: middle;background: #333;opacity: 0.2;">Change embed element link</div>');
+            $dom.before(this.$field, $el);
+            return $el;
+        };
+        Object.defineProperty(EmbedField.prototype, "settings", {
+            get: function () {
+                var _this = this;
+                return function (field) {
+                    _this.showEmbedLoaderAsync(field);
+                };
+            },
+            enumerable: true,
+            configurable: true
+        });
+        EmbedField.prototype.bind = function () {
+            var _this = this;
+            var field = this;
+            var $field = this.$field;
+            $dom.on($field, 'click', function () { return __awaiter(_this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    this.showEmbedLoaderAsync(field);
+                    return [2];
+                });
+            }); });
+            field.loadMedia(false);
+        };
+        EmbedField.prototype.showEmbedLoaderAsync = function (field) {
+            return __awaiter(this, void 0, void 0, function () {
+                var fields, url;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4, Editor.UI.modal.promptAsync(field.getPromptParams())];
+                        case 1:
+                            fields = _a.sent();
+                            if (!(fields != null)) return [3, 3];
+                            url = fields.getValue('url');
+                            if (!url) return [3, 3];
+                            field.setUrl(url);
+                            return [4, field.loadMedia(true)];
+                        case 2:
+                            _a.sent();
+                            _a.label = 3;
+                        case 3: return [2];
+                    }
+                });
+            });
+        };
+        EmbedField.prototype.getPromptParams = function () {
+            return [
+                new PromptParameter('url', EditorStrings.embedFieldLinkTitle, this.data.url || 'http://instagr.am/p/BO9VX2Vj4fF/', EditorStrings.embedFieldLinkPlaceholder)
+            ];
+        };
+        EmbedField.prototype.loadMedia = function (fireUpdate) {
+            return __awaiter(this, void 0, void 0, function () {
+                var field, json, $embed, $script, scriptSrc;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            field = this;
+                            if (!field.data || !field.data.url)
+                                return [2];
+                            return [4, EmbedService.getEmbedAsync(field.data.url)];
+                        case 1:
+                            json = _a.sent();
+                            field.setEmbed(json, fireUpdate);
+                            $embed = $dom.el(json.html);
+                            $script = $dom.first($embed, 'script');
+                            if ($script) {
+                                $script.remove();
+                                scriptSrc = $script.src;
+                                if (scriptSrc.breStartsWith('//')) {
+                                    scriptSrc = "https:" + scriptSrc;
+                                    $ajax.getScript(scriptSrc)
+                                        .then(function () {
+                                        EmbedService.processEmbed(json.provider_name);
+                                    });
+                                }
+                            }
+                            field.$field.innerHTML = '';
+                            field.$field.removeAttribute('class');
+                            field.$field.removeAttribute('style');
+                            field.$field.appendChild($embed);
+                            field.select();
+                            return [2];
+                    }
+                });
+            });
+        };
+        EmbedField.prototype.setEmbed = function (value, fireUpdate) {
+            if (fireUpdate === void 0) { fireUpdate = true; }
+            this.updateProperty('embed', value, fireUpdate);
+        };
+        EmbedField.prototype.setUrl = function (value) {
+            this.updateProperty('url', value);
+        };
+        return EmbedField;
+    }(BaseField$1.BaseField));
+
+    var SelectionUtils = (function () {
+        function SelectionUtils() {
+        }
+        SelectionUtils.bindTextSelection = function ($el, handler) {
+            var _this = this;
+            if (!$dom.matches($el, '[contenteditable]')) {
+                return;
+            }
+            $dom.on($el, 'mouseup', function () {
+                setTimeout(function () {
+                    var rect = _this.getSelectionRect();
+                    handler(rect);
+                }, 0);
+            });
+            $dom.on($el, 'keyup', function (ev) {
+                var rect = _this.getSelectionRect();
+                handler(rect);
+            });
+        };
+        SelectionUtils.getSelectionRect = function () {
+            var selection = window.getSelection();
+            var range = selection.getRangeAt(0);
+            if (range) {
+                var rect = range.getBoundingClientRect();
+                if (rect) {
+                    return rect;
+                }
+            }
+            return null;
+        };
+        return SelectionUtils;
+    }());
+
+    var HtmlField = (function (_super) {
+        __extends(HtmlField, _super);
+        function HtmlField() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        HtmlField.prototype.bind = function () {
+            var _this = this;
+            var field = this;
+            var $field = this.$field;
+            if (!$dom.matches($field, Selectors.selectorContentEditable)) {
+                $field.setAttribute(Selectors.attrContentEditable, "true");
+            }
+            var html = this.data.html || this.$field.innerHTML;
+            this.setHtml(html, false);
+            $field.innerHTML = this.data.html;
+            SelectionUtils.bindTextSelection($field, function (rect) {
+                Editor.UI.htmlTools.show(rect);
+            });
+            $dom.ons($field, "blur keyup paste input", function (ev) {
+                _this.setHtml($field.innerHTML);
+            });
+            $dom.on($field, "paste", function (e) {
+                e.preventDefault();
+                var ev = e.originalEvent;
+                var text = ev.clipboardData.getData("text/plain");
+                document.execCommand("insertHTML", false, text);
+            });
+            $dom.on($field, "click", function (ev) {
+                field.select();
+                ev.stopPropagation();
+                return false;
+            });
+        };
+        HtmlField.prototype.setHtml = function (value, fireUpdate) {
+            if (fireUpdate === void 0) { fireUpdate = true; }
+            value = value.trim();
+            if (this.$field.innerHTML !== value) {
+                this.$field.innerHTML = value;
+            }
+            this.updateProperty("html", value, fireUpdate);
+        };
+        HtmlField.prototype.getEl = function () {
+            var $el = _super.prototype.getEl.call(this);
+            $el.removeAttribute(Selectors.attrContentEditable);
+            return $el;
+        };
+        return HtmlField;
+    }(BaseField$1.BaseField));
+
+    var HtmlLinkParams = (function () {
+        function HtmlLinkParams(href, title, target) {
+            if (href === void 0) { href = ""; }
+            if (title === void 0) { title = ""; }
+            if (target === void 0) { target = ""; }
+            this.href = href;
+            this.title = title;
+            this.target = target;
+        }
+        HtmlLinkParams.getLinkFromParams = function (fields) {
+            var href = fields.getValue("href");
+            var title = fields.getValue("title");
+            var target = fields.getValue("target");
+            return new HtmlLinkParams(href, title, target);
+        };
+        HtmlLinkParams.prototype.getLinkPromptParams = function () {
+            return [
+                new PromptParameter("href", EditorStrings.htmlEditorLinkUrlTitle, this.href, EditorStrings.htmlEditorLinkUrlPlaceholder),
+                new PromptParameter("title", EditorStrings.htmlEditorLinkTitleTitle, this.title, EditorStrings.htmlEditorLinkTitlePlaceholder),
+                new PromptParameterOptions("target", EditorStrings.htmlEditorLinkTargetTitle, [
+                    ["", ""],
+                    [EditorStrings.htmlEditorLinkTargetBlank, "_blank"],
+                    [EditorStrings.htmlEditorLinkTargetSelf, "_self"],
+                    [EditorStrings.htmlEditorLinkTargetParent, "_parent"],
+                    [EditorStrings.htmlEditorLinkTargetTop, "_top"]
+                ], this.target)
+            ];
+        };
+        return HtmlLinkParams;
+    }());
+
+    var ImageField = (function (_super) {
+        __extends(ImageField, _super);
+        function ImageField() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        ImageField.prototype.bind = function () {
+            var _this = this;
+            var field = this;
+            var data = this.data;
+            this.setSrc(this.data.src, false);
+            $dom.on(this.$field, 'click', function () { return __awaiter(_this, void 0, void 0, function () {
+                var fields, file, src, alt, link;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4, Editor.UI.modal.promptAsync(field.getPromptParams())];
+                        case 1:
+                            fields = _a.sent();
+                            if (fields != null) {
+                                file = fields.getValue('file');
+                                src = fields.getValue('src');
+                                if (file) {
+                                    if (field.onUpload) {
+                                        field.onUpload(file, function (url) {
+                                            field.setSrc(url);
+                                            field.setFile(null);
+                                        });
+                                    }
+                                    else {
+                                        field.setFile(file);
+                                        field.setSrc(null);
+                                    }
+                                }
+                                else if (src) {
+                                    field.setSrc(src);
+                                    field.setFile(null);
+                                }
+                                alt = fields.getValue('alt');
+                                field.setAlt(alt);
+                                link = HtmlLinkParams.getLinkFromParams(fields);
+                                this.setLink(link);
+                            }
+                            field.select();
+                            return [2];
+                    }
+                });
+            }); });
+        };
+        ImageField.prototype.getPromptParams = function () {
+            var params = [
+                new PromptParameter('src', EditorStrings.imageFieldLinkTitle, this.data.url, EditorStrings.imageFieldLinkPlaceholder),
+                new PromptParameterImage('file', EditorStrings.imageFieldUploadTitle, this.data.file, EditorStrings.imageFieldUploadButton),
+                new PromptParameter('alt', EditorStrings.imageFieldAltTitle, this.data.alt, EditorStrings.imageFieldAltPlaceholder),
+                new PromptParameter(null, EditorStrings.imageFieldUrlSubtitle, null, null),
+            ];
+            var link = this.data.link ? this.data.link : new HtmlLinkParams();
+            var linkParams = link.getLinkPromptParams();
+            return params.concat(linkParams);
+        };
+        ImageField.prototype.setSrc = function (src, fireUpdate) {
+            if (fireUpdate === void 0) { fireUpdate = true; }
+            if (src) {
+                if (this.isImg) {
+                    this.$field.setAttribute('src', src);
+                }
+                else {
+                    this.$field.style.backgroundImage = "url(" + src;
+                }
+            }
+            this.updateProperty('src', src, fireUpdate);
+        };
+        ImageField.prototype.setAlt = function (alt) {
+            this.$field.setAttribute(this.isImg ? 'alt' : 'title', alt);
+            this.updateProperty('alt', alt);
+        };
+        ImageField.prototype.setFile = function (file) {
+            if (file) {
+                if (this.isImg) {
+                    this.$field.setAttribute('src', file.fileContent);
+                }
+                else {
+                    this.$field.style.backgroundImage = "url(" + file.fileContent + ")";
+                }
+            }
+            this.updateProperty('file', file);
+        };
+        ImageField.prototype.setLink = function (url) {
+            if (url && url.href) {
+                if (!this.$link) {
+                    this.$link = $dom.el("<a href='" + url.href + "' title='" + url.title + "' target='" + url.target + "'></a>");
+                    $dom.on(this.$link, 'click', function (ev) {
+                        ev.stopPropagation();
+                        return false;
+                    });
+                    $dom.wrap(this.$field, this.$link);
+                }
+                else {
+                    this.$link.href = url.href;
+                }
+            }
+            else if (this.$link) {
+                $dom.unwrap(this.$field);
+                this.$link = null;
+                delete this.$link;
+            }
+            this.updateProperty('link', url);
+        };
+        Object.defineProperty(ImageField.prototype, "isImg", {
+            get: function () {
+                return this._isImg = this._isImg || this.$field.tagName.toLowerCase() === 'img';
+            },
+            enumerable: true,
+            configurable: true
+        });
+        ImageField.prototype.getEl = function () {
+            var $el = _super.prototype.getEl.call(this);
+            var link = this.data.link;
+            if (link && link.href) {
+                var $link = $dom.el("<a href='" + link.href + "' title='" + link.title + "' target='" + link.target + "'></a>");
+                $link.appendChild($el);
+                return $link;
+            }
+            return $el;
+        };
+        return ImageField;
+    }(BaseField$1.BaseField));
+
+    var Block = (function () {
+        function Block(template, preview, data, onDelete, onSelect, onDeselect, onCopy, onMove, onUpdate, onUpload) {
+            var _this = this;
+            this.template = template;
+            this.onDelete = onDelete;
+            this.onSelect = onSelect;
+            this.onDeselect = onDeselect;
+            this.onCopy = onCopy;
+            this.onMove = onMove;
+            this.onUpdate = onUpdate;
+            this.onUpload = onUpload;
+            this.fields = [];
+            var $block = $dom.el(template.$html.innerHTML);
+            this.bindFields($block, data);
+            var actions = this.getActions();
+            this.ui = new BlockUI($block, preview, actions, function () { return _this.select(); });
+        }
+        Block.prototype.isContainer = function () {
+            if (!this.selectedField) {
+                return false;
+            }
+            return this.selectedField instanceof ContainerField;
+        };
+        Block.prototype.delete = function () {
+            this.ui.delete();
+            this.onDelete(this);
+        };
+        Block.prototype.move = function (offset) {
+            this.onMove(this, offset);
+        };
+        Block.prototype.clone = function () {
+            this.onCopy(this);
+        };
+        Block.prototype.select = function (field) {
+            if (field === this.selectedField) {
+                return;
+            }
+            if (field === null) {
+                field = this.fields[0];
+            }
+            if (this.selectedField) {
+                this.selectedField.deselect();
+            }
+            this.selectedField = field;
+            this.ui.toggleSelection(true);
+            this.onSelect(this);
+        };
+        Block.prototype.deselect = function () {
+            this.selectedField = null;
+            this.fields.forEach(function (f) {
+                f.deselect();
+            });
+            this.ui.toggleSelection(false);
+            this.onDeselect(this);
+        };
+        Block.prototype.scrollTo = function () {
+            var top = $dom.offset(this.ui.$editor).top - 100;
+            top = top > 0 ? top : 0;
+        };
+        Block.prototype.getData = function (ignoreHtml) {
+            var fieldsData = [];
+            this.fields.forEach(function (field) {
+                fieldsData.push(field.data);
+            });
+            var data = {
+                template: this.template.name,
+                fields: fieldsData,
+            };
+            if (!ignoreHtml) {
+                data.html = this.getHtml(true);
+            }
+            return data;
+        };
+        Block.prototype.getHtml = function (trim) {
+            var $html = $dom.el(this.template.$html.innerHTML);
+            var fieldsHtml = {};
+            this.fields.forEach(function (field) {
+                var name = field.name || field.data.name;
+                fieldsHtml[name] = field.getEl();
+            });
+            $dom.select($html, Selectors.selectorField, true).forEach(function ($elem) {
+                var fieldData = $dom.data($elem, "breField");
+                var name = fieldData.name;
+                var $field = fieldsHtml[name];
+                $dom.replaceWith($elem, $field);
+            });
+            var html = $html.outerHTML;
+            if (!html) {
+                return null;
+            }
+            return trim ? str.totalTrim(html) : html;
+        };
+        Block.prototype.bindFields = function ($block, data) {
+            var block = this;
+            var $fields = $dom.select($block, Selectors.selectorField, true);
+            $fields.forEach(function ($elem) {
+                var onUpdate = function (property, oldValue, newValue) {
+                    if (block.onUpdate) {
+                        block.onUpdate(block, property, oldValue, newValue);
+                    }
+                };
+                var onSelect = block.select;
+                var field = BaseField.createField($elem, data, onSelect, onUpdate, block.onUpload);
+                block.fields.push(field);
+            });
+        };
+        Block.prototype.getActions = function () {
+            var block = this;
+            var actions = [
+                new BlockUIAction("ellipsis-h"),
+                new BlockUIAction("trash-o", function () { return block.delete(); }),
+                new BlockUIAction("copy", function () { return block.clone(); }),
+                new BlockUIAction("angle-up", function () { return block.move(-1); }),
+                new BlockUIAction("angle-down", function () { return block.move(1); }),
+            ];
+            return actions;
+        };
+        return Block;
+    }());
+
+    var BlocksContainer = (function () {
+        function BlocksContainer($element, onAddBlock, onDeleteBlock, onSelectBlock, onDeselectBlock, onMoveBlock, onUpdateBlock, onUpload, usePlaceholder) {
+            if (usePlaceholder === void 0) { usePlaceholder = false; }
+            this.$element = $element;
+            this.onAddBlock = onAddBlock;
+            this.onDeleteBlock = onDeleteBlock;
+            this.onSelectBlock = onSelectBlock;
+            this.onDeselectBlock = onDeselectBlock;
+            this.onMoveBlock = onMoveBlock;
+            this.onUpdateBlock = onUpdateBlock;
+            this.onUpload = onUpload;
+            this.usePlaceholder = usePlaceholder;
+            this.blocks = [];
+            this.isContainer = true;
+            this.togglePlaceholderIfNeed();
+        }
+        BlocksContainer.prototype.getData = function (ignoreHtml) {
+            var blocksData = [];
+            this.blocks.forEach(function (block) {
+                blocksData.push(block.getData(ignoreHtml));
+            });
+            return blocksData;
+        };
+        BlocksContainer.prototype.getHtml = function () {
+            var blocksHtml = [];
+            this.blocks.forEach(function (block) {
+                blocksHtml.push(block.getHtml(true));
+            });
+            var $el = $dom.clone(this.$element);
+            $el.innerHTML = blocksHtml.join("\n");
+            return $el.outerHTML;
+        };
+        BlocksContainer.prototype.addBlock = function (template, data, idx, select) {
+            var _this = this;
+            if (select === void 0) { select = true; }
+            var block = new Block(template, false, data, function (block) { return _this.deleteBlock(block); }, function (block) { return _this.selectBlock(block); }, function (block) { return _this.deselectBlock(block); }, function (block) { return _this.copyBlock(block); }, function (block, offset) { return _this.moveBlock(block, offset); }, this.onUpdateBlock, this.onUpload);
+            this.insertBlock(block, idx);
+            if (select) {
+                block.select();
+                block.scrollTo();
+            }
+        };
+        BlocksContainer.prototype.insertBlock = function (block, idx) {
+            idx = idx || this.blocks.length;
+            if (this.selectedBlock) {
+                idx = this.blocks.indexOf(this.selectedBlock) + 1;
+            }
+            this.blocks.splice(idx, 0, block);
+            if (idx == 0) {
+                this.$element.appendChild(block.ui.$editor);
+            }
+            else {
+                $dom.after(this.blocks[idx - 1].ui.$editor, block.ui.$editor);
+            }
+            this.onAddBlock(block, idx);
+            block.select(null);
+            this.togglePlaceholderIfNeed();
+        };
+        BlocksContainer.prototype.deleteBlock = function (block) {
+            var idx = this.blocks.indexOf(block);
+            this.blocks.splice(idx, 1);
+            block = null;
+            if (idx < this.blocks.length) {
+                this.blocks[idx].select();
+            }
+            else if (this.blocks.length > 0) {
+                this.blocks[idx - 1].select();
+            }
+            else {
+                this.selectedBlock = null;
+            }
+            this.onDeleteBlock(block, idx);
+            this.togglePlaceholderIfNeed();
+        };
+        BlocksContainer.prototype.moveBlock = function (block, offset) {
+            var idx = this.blocks.indexOf(block);
+            var new_idx = idx + offset;
+            if (new_idx >= this.blocks.length || new_idx < 0) {
+                return;
+            }
+            var $anchorBlock = this.blocks[new_idx].ui.$editor;
+            if (offset > 0) {
+                $dom.after($anchorBlock, block.ui.$editor);
+            }
+            else if (offset < 0) {
+                $dom.before($anchorBlock, block.ui.$editor);
+            }
+            this.blocks.splice(idx, 1);
+            this.blocks.splice(new_idx, 0, block);
+            this.onMoveBlock(block, idx, new_idx);
+            block.scrollTo();
+        };
+        BlocksContainer.prototype.copyBlock = function (block) {
+            var idx = this.blocks.indexOf(block) + 1;
+            var copy = this.addBlock(block.template, block.getData().fields, idx, true);
+        };
+        BlocksContainer.prototype.selectBlock = function (block) {
+            if (this.selectedBlock === block) {
+                return;
+            }
+            if (this.selectedBlock) {
+                this.selectedBlock.deselect();
+            }
+            this.selectedBlock = block;
+            this.onSelectBlock(block);
+        };
+        BlocksContainer.prototype.deselectBlock = function (block) {
+            this.selectedBlock = null;
+            this.onDeselectBlock(block);
+        };
+        BlocksContainer.prototype.togglePlaceholderIfNeed = function () {
+            if (!this.usePlaceholder) {
+                return;
+            }
+            if (this.blocks.length === 0) {
+                if (!this.$placeholder) {
+                    this.$placeholder = $dom.el('<i data-bre-placeholder="true">Click here to select this container...</i>');
+                    this.$element.appendChild(this.$placeholder);
+                }
+            }
+            else if (this.$placeholder) {
+                this.$placeholder.remove();
+                this.$placeholder = null;
+            }
+        };
+        return BlocksContainer;
+    }());
+
+    var Editor$1 = (function () {
+        function Editor($editor, options) {
+            var _this = this;
+            this.onError = function (message, code) {
+                if (code === void 0) { code = 0; }
+                return _this.options.onError({ message: message, code: code });
+            };
+            BaseField.registerCommonFields();
+            this.$editor = $editor;
+            this.$editor.classList.add(Selectors.classEditor);
+            this.options = new EditorOptions(options);
+            this.container = this.createContainer();
+            Editor.UI = new UI(this);
+            this.tryBindFormSubmit();
+        }
+        Editor.prototype.initAsync = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                var editor, templates, blocks;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            editor = this;
+                            Editor.UI.toggleToolsLoader(true);
+                            return [4, TemplateService.loadTemplatesAsync(editor.options.templatesUrl, editor.$editor, editor.onError)];
+                        case 1:
+                            templates = _a.sent();
+                            Editor.UI.toggleToolsLoader(false);
+                            Editor.UI.setTemplates(templates);
+                            return [4, this.tryLoadInitialBlocksAsync()];
+                        case 2:
+                            blocks = _a.sent();
+                            this.loadBlocks(blocks);
+                            this.isLoaded = true;
+                            this.trigger(Events.onLoad, this);
+                            return [2];
+                    }
+                });
+            });
+        };
+        Editor.prototype.tryBindFormSubmit = function () {
+            var editor = this;
+            var $form = this.options.formSelector
+                ? $dom.find(this.options.formSelector)
+                : null;
+            var $input = this.options.inputSelector
+                ? $dom.find(this.options.inputSelector)
+                : null;
+            if (!$form || !$input || !($input instanceof HTMLInputElement)) {
+                return;
+            }
+            $dom.on($form, "submit", function () {
+                $input.value = JSON.stringify(editor.getData());
+                return true;
+            });
+        };
+        Editor.prototype.getData = function () {
+            return this.container.getData(this.options.ignoreHtml);
+        };
+        Editor.prototype.getHtml = function () {
+            return this.container.getHtml();
+        };
+        Editor.prototype.loadBlocks = function (blocks) {
+            var _this = this;
+            if (blocks && blocks.length) {
+                blocks.forEach(function (block) {
+                    var template = TemplateService.getTemplate(block.template);
+                    if (template) {
+                        _this.container.addBlock(template, block.fields, null, false);
+                    }
+                    else {
+                        var message = EditorStrings.errorBlockTemplateNotFound(block.template);
+                        _this.onError(message);
+                    }
+                });
+            }
+        };
+        Editor.prototype.addBlock = function (template) {
+            var container = this.getContainer(this.container);
+            container.addBlock(template, null, null, true);
+        };
+        Editor.prototype.createContainer = function () {
+            var _this = this;
+            var onAdd = function (block, idx) {
+                if (_this.isLoaded) {
+                    _this.trigger(Events.onBlockAdd, { block: block, idx: idx });
+                    _this.trigger(Events.onChange, {
+                        blocks: _this.getData(),
+                        html: _this.getHtml()
+                    });
+                }
+            };
+            var onDelete = function (block, idx) {
+                _this.trigger(Events.onBlockDelete, { block: block, idx: idx });
+                _this.trigger(Events.onChange, {
+                    blocks: _this.getData(),
+                    html: _this.getHtml()
+                });
+            };
+            var onUpdate = function (block, property, oldValue, newValue) {
+                _this.trigger(Events.onBlockUpdate, {
+                    block: block,
+                    property: property,
+                    oldValue: oldValue,
+                    newValue: newValue
+                });
+                _this.trigger(Events.onChange, {
+                    blocks: _this.getData(),
+                    html: _this.getHtml()
+                });
+            };
+            return new BlocksContainer(this.$editor, onAdd, onDelete, function (block) {
+                _this.trigger(Events.onBlockSelect, { block: block });
+            }, function (block) {
+                _this.trigger(Events.onBlockDeselect, { block: block });
+            }, function (block, from, to) {
+                _this.trigger(Events.onBlockMove, { block: block, from: from, to: to });
+                _this.trigger(Events.onChange, {
+                    blocks: _this.getData(),
+                    html: _this.getHtml()
+                });
+            }, onUpdate, this.options.onUpload);
+        };
+        Editor.prototype.tryLoadInitialBlocksAsync = function () {
+            return __awaiter(this, void 0, Promise, function () {
+                var url, editor;
+                var _this = this;
+                return __generator(this, function (_a) {
+                    url = this.options.blocksUrl;
+                    editor = this;
+                    return [2, new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
+                            var blocks, error_1;
+                            return __generator(this, function (_a) {
+                                switch (_a.label) {
+                                    case 0:
+                                        if (!url) return [3, 5];
+                                        _a.label = 1;
+                                    case 1:
+                                        _a.trys.push([1, 3, , 4]);
+                                        return [4, $ajax.get(url)];
+                                    case 2:
+                                        blocks = _a.sent();
+                                        resolve(blocks);
+                                        return [3, 4];
+                                    case 3:
+                                        error_1 = _a.sent();
+                                        editor.onError(EditorStrings.errorBlocksFileNotFound(url));
+                                        reject(error_1);
+                                        return [3, 4];
+                                    case 4: return [3, 6];
+                                    case 5:
+                                        if (this.options.blocks) {
+                                            resolve(this.options.blocks);
+                                        }
+                                        else {
+                                            resolve(null);
+                                        }
+                                        _a.label = 6;
+                                    case 6: return [2];
+                                }
+                            });
+                        }); })];
+                });
+            });
+        };
+        Editor.prototype.getContainer = function (container) {
+            if (container.selectedBlock && container.selectedBlock.isContainer()) {
+                var field = container.selectedBlock.selectedField;
+                if (field) {
+                    return this.getContainer(field.container);
+                }
+            }
+            return container;
+        };
+        Editor.prototype.trigger = function (event, data) {
+            var editor = this;
+            $dom.trigger(this.$editor, "bre." + event, data);
+            Common.propsEach(editor.options, function (key, value) {
+                if (str.equalsInvariant(key, event) && value) {
+                    value(data);
+                }
+            });
+        };
+        return Editor;
+    }());
+
+    exports.Editor = Editor$1;
+
+    return exports;
+
+}({}, Selectors$1, HtmlTools, Modal, BaseField$1, Prompt));
