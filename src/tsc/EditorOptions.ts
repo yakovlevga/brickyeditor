@@ -36,7 +36,7 @@ export class EditorOptions {
   /** Ignore blocks html field, if you need only json */
   public ignoreHtml?: boolean = null;
   /** Custom Html editor buttons */
-  public htmlToolsButtons?: IHtmlToolsButton[] = null;
+  public htmlToolsButtons?: bre.IHtmlToolsButton[] = null;
   /** Form selector to bind form submit event */
   public formSelector: string;
   /** Input selector to put json to on form submit */

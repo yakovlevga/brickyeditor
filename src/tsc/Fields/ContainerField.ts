@@ -1,8 +1,8 @@
-import { BaseField } from "src/BaseField";
+import { Block } from "src/Block/Block";
+import { BlocksContainer } from "src/BlocksContainer";
 import { $dom } from "src/Common/DOMHelpers";
+import { BaseField } from "src/Fields/BaseField";
 import { Selectors } from "src/UI/Selectors";
-import { Block } from "../Block/Block";
-import { BlocksContainer } from "../BlocksContainer";
 
 export class ContainerField extends BaseField {
   public container: BlocksContainer;
@@ -23,7 +23,9 @@ export class ContainerField extends BaseField {
       (block: Block) => {
         this.select();
       },
-      (block: Block) => {},
+      (block: Block) => {
+        //
+      },
       (block: Block) => {
         field.updateBlocks();
       },

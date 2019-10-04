@@ -1,7 +1,7 @@
 import { Block } from "src/Block/Block";
 import { BlocksContainer } from "src/BlocksContainer";
 import { $ajax } from "src/Common/AJAXHelper";
-import { Common } from "src/Common/Common";
+import { Common, str } from "src/Common/Common";
 import { $dom } from "src/Common/DOMHelpers";
 import { EditorOptions } from "src/EditorOptions";
 import { EditorStrings } from "src/EditorStrings";
@@ -198,7 +198,7 @@ export class Editor {
     const editor = this;
     $dom.trigger(this.$editor, "bre." + event, data);
     Common.propsEach(editor.options, (key, value) => {
-      if (key.breEqualsInvariant(event) && value) {
+      if (str.equalsInvariant(key, event) && value) {
         value(data);
       }
     });

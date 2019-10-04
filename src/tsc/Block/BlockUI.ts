@@ -76,7 +76,7 @@ export class BlockUI {
       `<button type="button" class="bre-btn"><i class="fa fa-${action.icon}"></i></button>`
     );
     if (action.action) {
-      $el.onclick = function(ev) {
+      $el.onclick = ev => {
         action.action();
         ev.stopPropagation();
         return false;

@@ -1,6 +1,11 @@
 import { Common } from "src/Common/Common";
 import { $dom } from "src/Common/DOMHelpers";
-import { ContainerField, EmbedField, HtmlField, ImageField } from "src/Fields";
+import {
+  ContainerField,
+  EmbedField,
+  HtmlField,
+  ImageField
+} from "src/Fields/Fields";
 import { Selectors } from "src/UI/Selectors";
 
 export abstract class BaseField {
@@ -127,7 +132,9 @@ export abstract class BaseField {
     return null;
   }
 
-  protected bind() {}
+  protected bind() {
+    // should be ovverided from child
+  }
 
   protected select() {
     this.$field.classList.add(Selectors.selectorFieldSelected);

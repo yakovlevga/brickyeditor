@@ -1,5 +1,6 @@
 import { BlockUI } from "src/Block/BlockUI";
 import { BlockUIAction } from "src/Block/BlockUIAction";
+import { str } from "src/Common/Common";
 import { $dom } from "src/Common/DOMHelpers";
 import { BaseField, ContainerField } from "src/Fields/Fields";
 import { Template } from "src/Templates/Template";
@@ -89,13 +90,17 @@ export class Block {
     top = top > 0 ? top : 0;
   }
 
-  public getData(ignoreHtml?: boolean): any {
+  public getData(ignoreHtml?: boolean): bre.IBlockData {
     const fieldsData = [];
     this.fields.forEach(field => {
       fieldsData.push(field.data);
     });
 
-    const data = { template: this.template.name, fields: fieldsData };
+    const data: bre.IBlockData = {
+      template: this.template.name,
+      fields: fieldsData,
+    };
+
     if (!ignoreHtml) {
       data.html = this.getHtml(true);
     }
@@ -123,7 +128,7 @@ export class Block {
       return null;
     }
 
-    return trim ? html.breTotalTrim() : html;
+    return trim ? str.totalTrim(html) : html;
   }
 
   /**
@@ -161,7 +166,7 @@ export class Block {
       new BlockUIAction("trash-o", () => block.delete()),
       new BlockUIAction("copy", () => block.clone()),
       new BlockUIAction("angle-up", () => block.move(-1)),
-      new BlockUIAction("angle-down", () => block.move(1))
+      new BlockUIAction("angle-down", () => block.move(1)),
     ];
     return actions;
   }

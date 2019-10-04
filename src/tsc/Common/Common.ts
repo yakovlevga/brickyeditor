@@ -1,65 +1,9 @@
-declare global {
-  // String extensions
-  interface String {
-    breTotalTrim(): string;
-    breEqualsInvariant(other: string): boolean;
-    breStartsWith(part: string): boolean;
-    breContains(part: string): boolean;
-  }
-
-  // Array extensions
-  interface Array<T> {
-    find(predicate: (search: T) => boolean): T;
-  }
-
-  interface IHtmlToolsButton {
-    icon: string;
-    command: string;
-    range: boolean;
-    aValueArgument: string;
-  }
-}
-
-String.prototype.breContains = function(part: string): boolean {
-  return this.indexOf(part) >= 0;
+export const str = {
+  totalTrim: (s: string) =>
+    s !== undefined ? s.replace(/\s\s+/g, " ").trim() : "",
+  equalsInvariant: (s1: string, s2: string) =>
+    s1.toLowerCase() === s2.toLowerCase()
 };
-
-String.prototype.breStartsWith = function(part: string): boolean {
-  return this.indexOf(part) === 0;
-};
-
-String.prototype.breTotalTrim = function(): string {
-  return this ? this.replace(/\s\s+/g, " ").trim() : "";
-};
-
-String.prototype.breEqualsInvariant = function(other: string): boolean {
-  return this.toLowerCase() === other.toLowerCase();
-};
-
-// Array extensions
-if (!Array.prototype.find) {
-  Array.prototype.find = function(predicate) {
-    if (this == null) {
-      throw new TypeError("Array.prototype.find called on null or undefined");
-    }
-    if (typeof predicate !== "function") {
-      throw new TypeError("predicate must be a function");
-    }
-    const list = Object(this);
-    // tslint:disable-next-line:no-bitwise
-    const length = list.length >>> 0;
-    const thisArg = arguments[1];
-    let value;
-
-    for (let i = 0; i < length; i++) {
-      value = list[i];
-      if (predicate.call(thisArg, value, i, list)) {
-        return value;
-      }
-    }
-    return undefined;
-  };
-}
 
 export class Common {
   // Extend

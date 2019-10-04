@@ -1,10 +1,7 @@
-export namespace BrickyEditor {
-    export class BlockAction {
-
-        constructor(
-            public icon?: string,
-            public action?: (block) => any,
-            public title?: string) {
-        }
-    }
+export class BlockAction {
+  constructor(
+    public icon?: string,
+    public action?: (block) => any,
+    public title?: string
+  ) {}
 }

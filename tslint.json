@@ -8,6 +8,7 @@
     "enum-member-name": [true, "caps-case"],
     "enum-name": [true, "caps-case"],
     "no-default-export": true,
-    "interface-over-type-literal": false
+    "interface-over-type-literal": false,
+    "variable-name": false
   }
 }

@@ -1,19 +1,16 @@
-import { PromptParameter } from './Prompt'
-// export namespace BrickyEditor {
-//     export namespace Prompt {
-        export class PromptParameterList {
-            params: Array<PromptParameter>;
+import { PromptParameter } from "./Prompt";
 
-            constructor(params: Array<PromptParameter>) {
-                this.params = params;
-            }
+export class PromptParameterList {
+  public params: PromptParameter[];
 
-            getValue(key: string): any {
-                let param = this.params.find(p => {
-                    return p.key === key;
-                });
-                return param ? param.value : null
-            }
-        }
-//     }
-// }
+  constructor(params: PromptParameter[]) {
+    this.params = params;
+  }
+
+  public getValue(key: string): any {
+    const param = this.params.find(p => {
+      return p.key === key;
+    });
+    return param ? param.value : null;
+  }
+}
