@@ -554,10 +554,9 @@ var BrickyEditor = (function (exports) {
             if (!fieldData || !fieldData.name) {
                 throw new Error("There is no data or data doesn't contains 'name' in field " + $field.innerHTML);
             }
-            if (data) {
+            if (data !== undefined) {
                 var addFieldData = {};
-                for (var idx = 0; idx < data.length; idx++) {
-                    var field = data[idx];
+                for (var field in data) {
                     if (field.name.toLowerCase() === fieldData.name.toLowerCase()) {
                         addFieldData = field;
                         break;
@@ -1236,13 +1235,14 @@ var BrickyEditor = (function (exports) {
     var dataSave = "data-save";
     var dataCancel = "data-cancel";
     var getElement = function (params) {
-        var fields = params
-            .map(function (p) {
+        var fields = Object.keys(params)
+            .map(function (key) {
+            var p = params[key];
             var val = p.value || "";
-            return "\n          <div>\n            <label>\n                " + p.title + "<br />\n                <input type='text' name='" + p.key + "' placeholder='" + p.placeholder + "' value='" + val + "'/>\n            </label>\n          </div>";
+            return "\n          <div>\n            <label>\n                " + p.title + "<br />\n                <input type='text' name='" + key + "' placeholder='" + p.placeholder + "' value='" + val + "'/>\n            </label>\n          </div>";
         })
             .join("");
-        var template = "\n      <div style=\"position: absolute; top: 0; right: 0; bottom: 0; left: 0; background-color: #fff;\">\n        <h3>modal</h3>\n        " + fields + "\n        <button type=\"button\" " + dataSave + "=\"true\">Save</button>\n        <button type=\"button\" " + dataCancel + "=\"true\">Cancel</button>\n      </div>";
+        var template = "\n      <div style=\"position: absolute; top: 0; right: 0; bottom: 0; left: 0; z-index: 10000; background-color: #eee;\">\n        <h3>modal</h3>\n        " + fields + "\n        <button type=\"button\" " + dataSave + "=\"true\">Save</button>\n        <button type=\"button\" " + dataCancel + "=\"true\">Cancel</button>\n      </div>";
         var div = document.createElement("div");
         div.innerHTML = template;
         var el = div.children[0];
@@ -1250,17 +1250,20 @@ var BrickyEditor = (function (exports) {
         return el;
     };
     var prompt = function (params) {
-        return new Promise(function (resolve, reject) {
+        return new Promise(function (resolve) {
             var el = getElement(params);
             var closeModal = function () {
                 document.body.removeChild(el);
-                reject();
+                resolve(null);
             };
             var onSave = function () {
                 var result = {};
-                params.forEach(function (p) {
-                    var paramEl = el.querySelector("[name=" + p.key + "]");
-                    result[p.key] = paramEl.value;
+                Object.keys(params).map(function (key) {
+                    var paramEl = el.querySelector("[name=" + key + "]");
+                    var value = paramEl.value && paramEl.value.length > 0 ? paramEl.value : undefined;
+                    if (value) {
+                        result[key] = value;
+                    }
                 });
                 resolve(result);
                 closeModal();
@@ -1271,30 +1274,29 @@ var BrickyEditor = (function (exports) {
             cancel.onclick = closeModal;
         });
     };
-    //# sourceMappingURL=modal.js.map
 
     var getPromptParams = function (_a) {
-        var url = _a.url, file = _a.file, alt = _a.alt;
-        return [
-            {
+        var src = _a.src, file = _a.file, alt = _a.alt;
+        return ({
+            src: {
                 key: "src",
-                value: url,
+                value: src,
                 title: locales.prompt.image.link.title,
                 placeholder: locales.prompt.image.link.placeholder,
             },
-            {
+            file: {
                 key: "file",
                 value: file,
                 title: locales.prompt.image.upload.title,
                 placeholder: locales.prompt.image.upload.placeholder,
             },
-            {
+            alt: {
                 key: "alt",
                 value: alt,
                 title: locales.prompt.image.alt.title,
                 placeholder: locales.prompt.image.alt.placeholder,
             },
-        ];
+        });
     };
     var ImageField = (function (_super) {
         __extends(ImageField, _super);
@@ -1311,18 +1313,38 @@ var BrickyEditor = (function (exports) {
         });
         ImageField.prototype.bind = function () {
             var _this = this;
+            var field = this;
             var data = this.data;
             this.setSrc(this.data.src, false);
             $dom.on(this.$field, "click", function () { return __awaiter(_this, void 0, void 0, function () {
-                var params, result;
+                var params, updated, file, src, alt;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
                             params = getPromptParams(this.data);
                             return [4, prompt(params)];
                         case 1:
-                            result = _a.sent();
-                            debugger;
+                            updated = _a.sent();
+                            if (updated !== null) {
+                                file = updated.file, src = updated.src, alt = updated.alt;
+                                if (file !== undefined) {
+                                    if (field.onUpload) {
+                                        field.onUpload(file, function (url) {
+                                            field.setSrc(url);
+                                            field.setFile(null);
+                                        });
+                                    }
+                                    else {
+                                        field.setFile(file);
+                                        field.setSrc(null);
+                                    }
+                                }
+                                else if (src) {
+                                    field.setSrc(src);
+                                    field.setFile(null);
+                                }
+                                field.setAlt(alt);
+                            }
                             return [2];
                     }
                 });
@@ -1388,6 +1410,7 @@ var BrickyEditor = (function (exports) {
         };
         return ImageField;
     }(BaseField));
+    //# sourceMappingURL=ImageField.js.map
 
     //# sourceMappingURL=Fields.js.map
 

@@ -1,10 +1,10 @@
 import { $ajax } from "src/common/AJAXHelper";
+import { str } from "src/common/Common";
 import { $dom } from "src/common/DOMHelpers";
-import { Selectors } from "src/ui/Selectors";
 import { EditorStrings } from "src/EditorStrings";
 import { Template } from "src/templates/Template";
 import { TemplateGroup } from "src/templates/TemplateGroup";
-import { str } from "src/common/Common";
+import { Selectors } from "src/ui/Selectors";
 
 export class TemplateService {
   public static templates: TemplateGroup[];

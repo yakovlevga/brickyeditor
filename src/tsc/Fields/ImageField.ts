@@ -6,57 +6,46 @@ import { locales } from "src/locales";
 import { prompt } from "src/modal";
 import { PromptParameter, PromptParameterImage } from "src/prompt/Prompt";
 
-const getPromptParams: (props: {
-  url: string;
+type ImageFieldData = {
+  src: string;
   alt: string;
   file: any;
-}) => bre.prompt.PromptParameter[] = ({ url, file, alt }) => [
-  {
+  link: Pick<HTMLLinkElement, "href" | "title" | "target">;
+};
+
+type ImagePromptParams = {
+  src: bre.prompt.PromptParameter;
+  alt: bre.prompt.PromptParameter;
+  file: bre.prompt.PromptParameter;
+};
+
+const getPromptParams: (props: ImageFieldData) => ImagePromptParams = ({
+  src,
+  file,
+  alt,
+}) => ({
+  src: {
     key: "src",
-    value: url,
+    value: src,
     title: locales.prompt.image.link.title,
     placeholder: locales.prompt.image.link.placeholder,
   },
-  {
+  file: {
     key: "file",
     value: file,
     title: locales.prompt.image.upload.title,
     placeholder: locales.prompt.image.upload.placeholder,
   },
-  {
+  alt: {
     key: "alt",
     value: alt,
     title: locales.prompt.image.alt.title,
     placeholder: locales.prompt.image.alt.placeholder,
   },
-];
+  // TODO: link params
+});
 
-// new PromptParameter(
-//   "src",
-//   EditorStrings.imageFieldLinkTitle,
-//   this.data.url,
-//   EditorStrings.imageFieldLinkPlaceholder
-// ),
-// new PromptParameterImage(
-//   "file",
-//   EditorStrings.imageFieldUploadTitle,
-//   this.data.file,
-//   EditorStrings.imageFieldUploadButton
-// ),
-// new PromptParameter(
-//   "alt",
-//   EditorStrings.imageFieldAltTitle,
-//   this.data.alt,
-//   EditorStrings.imageFieldAltPlaceholder
-// ),
-// new PromptParameter(
-//   null,
-//   EditorStrings.imageFieldUrlSubtitle,
-//   null,
-//   null
-// ),
-
-export class ImageField extends BaseField {
+export class ImageField extends BaseField<ImageFieldData> {
   private get isImg(): boolean {
     return (this._isImg =
       this._isImg || this.$field.tagName.toLowerCase() === "img");
@@ -72,8 +61,33 @@ export class ImageField extends BaseField {
     this.setSrc(this.data.src, false);
     $dom.on(this.$field, "click", async () => {
       const params = getPromptParams(this.data);
-      const result = await prompt(params);
-      debugger;
+      const updated = await prompt<ImagePromptParams>(params);
+
+      if (updated !== null) {
+        const { file, src, alt } = updated;
+
+        if (file !== undefined) {
+          // todo: add some common handler for image uploading?
+          if (field.onUpload) {
+            field.onUpload(file, url => {
+              field.setSrc(url);
+              field.setFile(null);
+            });
+          } else {
+            field.setFile(file);
+            field.setSrc(null);
+          }
+        } else if (src) {
+          field.setSrc(src);
+          field.setFile(null);
+        }
+
+        field.setAlt(alt);
+
+        // const link = HtmlLinkParams.getLinkFromParams(fields);
+        // this.setLink(link);
+      }
+
       // const fields = await Editor.UI.modal.promptAsync(field.getPromptParams());
       // if (fields != null) {
       //   const file = fields.getValue("file");

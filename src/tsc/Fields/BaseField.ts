@@ -8,7 +8,7 @@ import {
 } from "src/fields/Fields";
 import { Selectors } from "src/ui/Selectors";
 
-export abstract class BaseField {
+export abstract class BaseField<TData extends bre.Data> {
   public static get type(): string {
     let name = (this as any).name;
     name = name.replace("Field", "");
@@ -34,9 +34,9 @@ export abstract class BaseField {
     this.commonFieldsRegistered = true;
   }
 
-  public static createField(
+  public static createField<TData extends bre.Data>(
     $field: HTMLElement,
-    data: any,
+    data: TData,
     onSelect: (field: BaseField) => void,
     onUpdate: (property, oldValue, newValue) => void,
     onUpload?: (file: any, callback: (url: string) => void) => void
@@ -49,10 +49,12 @@ export abstract class BaseField {
     }
 
     // if data passed
-    if (data) {
+    if (data !== undefined) {
       let addFieldData = {};
-      for (let idx = 0; idx < data.length; idx++) {
-        const field = data[idx];
+      // Object.keys(data).forEach(fieldName => {
+      //   data[fieldName].
+      // })
+      for (const field in data) {
         if (field.name.toLowerCase() === fieldData.name.toLowerCase()) {
           // get current field data
           addFieldData = field;
@@ -97,7 +99,7 @@ export abstract class BaseField {
 
   public $field: HTMLElement;
   public name: string;
-  public data: any;
+  public data: TData;
   protected onUpload: (file: any, callback: (url: string) => void) => void;
 
   protected settings: (field: BaseField) => void;

@@ -16,12 +16,24 @@ declare namespace bre {
     html?: string;
   }
 
+  // type DataField = {
+  //   name: string;
+  //   value: any;
+  // };
+
+  type Data = {
+    [TKey: string]: any;
+  };
+
   namespace prompt {
     type PromptParameter = {
-      key: string;
       value: string;
       title: string;
       placeholder?: string;
+    };
+
+    type PromptParameters = {
+      [TKey: string]: PromptParameter;
     };
 
     type PromptParameterWithControl = PromptParameter & {

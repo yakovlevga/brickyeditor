@@ -1,22 +1,23 @@
 const dataSave = "data-save";
 const dataCancel = "data-cancel";
 
-const getElement = (params: bre.prompt.PromptParameter[]) => {
-  const fields = params
-    .map(p => {
+const getElement = (params: { [TKey: string]: bre.prompt.PromptParameter }) => {
+  const fields = Object.keys(params)
+    .map(key => {
+      const p = params[key];
       const val = p.value || "";
       return `
           <div>
             <label>
                 ${p.title}<br />
-                <input type='text' name='${p.key}' placeholder='${p.placeholder}' value='${val}'/>
+                <input type='text' name='${key}' placeholder='${p.placeholder}' value='${val}'/>
             </label>
           </div>`;
     })
     .join("");
 
   const template = `
-      <div style="position: absolute; top: 0; right: 0; bottom: 0; left: 0; background-color: #fff;">
+      <div style="position: absolute; top: 0; right: 0; bottom: 0; left: 0; z-index: 10000; background-color: #eee;">
         <h3>modal</h3>
         ${fields}
         <button type="button" ${dataSave}="true">Save</button>
@@ -35,22 +36,38 @@ type ModalResult = {
   [TKey: string]: string;
 };
 
-export const prompt: (
-  params: bre.prompt.PromptParameter[]
-) => Promise<ModalResult> = params =>
-  new Promise<ModalResult>((resolve, reject) => {
+export const prompt = <TParams extends bre.prompt.PromptParameters>(
+  params: TParams
+): Promise<
+  {
+    [TKey in keyof TParams]?: string;
+  }
+> =>
+  new Promise<
+    {
+      [TKey in keyof TParams]?: any;
+    }
+  >(resolve => {
     const el = getElement(params);
 
     const closeModal = () => {
       document.body.removeChild(el);
-      reject();
+      resolve(null);
     };
 
     const onSave = () => {
-      const result: ModalResult = {};
-      params.forEach(p => {
-        const paramEl: HTMLInputElement = el.querySelector(`[name=${p.key}]`);
-        result[p.key] = paramEl.value;
+      // tslint:disable-next-line:prefer-const
+      let result: {
+        [TKey in keyof TParams]?: string;
+      } = {};
+
+      Object.keys(params).map((key: keyof TParams) => {
+        const paramEl: HTMLInputElement = el.querySelector(`[name=${key}]`);
+        const value =
+          paramEl.value && paramEl.value.length > 0 ? paramEl.value : undefined;
+        if (value) {
+          result[key] = value;
+        }
       });
       resolve(result);
       closeModal();
