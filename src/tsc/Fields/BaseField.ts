@@ -37,10 +37,10 @@ export abstract class BaseField<TData extends bre.Data> {
   public static createField<TData extends bre.Data>(
     $field: HTMLElement,
     data: TData,
-    onSelect: (field: BaseField) => void,
+    onSelect: (field: BaseField<TData>) => void,
     onUpdate: (property, oldValue, newValue) => void,
     onUpload?: (file: any, callback: (url: string) => void) => void
-  ): BaseField {
+  ): BaseField<TData> {
     let fieldData = $dom.data<any>($field, "breField");
     if (!fieldData || !fieldData.name) {
       throw new Error(
@@ -102,14 +102,14 @@ export abstract class BaseField<TData extends bre.Data> {
   public data: TData;
   protected onUpload: (file: any, callback: (url: string) => void) => void;
 
-  protected settings: (field: BaseField) => void;
-  private onSelect: (field: BaseField) => void;
+  protected settings: (field: BaseField<TData>) => void;
+  private onSelect: (field: BaseField<TData>) => void;
   private onUpdate: (property, oldValue, newValue) => void;
 
   constructor(
     $field: HTMLElement,
     data: any,
-    onSelect: (field: BaseField) => void,
+    onSelect: (field: BaseField<TData>) => void,
     onUpdate: (property, oldValue, newValue) => void,
     onUpload?: (file: any, callback: (url: string) => void) => void
   ) {
@@ -144,7 +144,7 @@ export abstract class BaseField<TData extends bre.Data> {
   }
 
   protected updateProperty(
-    prop: string,
+    prop: keyof TData,
     value: any,
     fireUpdate: boolean = true
   ) {

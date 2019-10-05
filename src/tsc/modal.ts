@@ -2,33 +2,35 @@ const dataSave = "data-save";
 const dataCancel = "data-cancel";
 
 const getElement = (params: { [TKey: string]: bre.prompt.PromptParameter }) => {
-  const fields = Object.keys(params)
-    .map(key => {
-      const p = params[key];
-      const val = p.value || "";
-      return `
+  const fields = Object.keys(params).map(key => {
+    const p = params[key];
+    const val = p.value || "";
+    return `
           <div>
             <label>
                 ${p.title}<br />
                 <input type='text' name='${key}' placeholder='${p.placeholder}' value='${val}'/>
             </label>
           </div>`;
-    })
-    .join("");
+  });
 
-  const template = `
-      <div style="position: absolute; top: 0; right: 0; bottom: 0; left: 0; z-index: 10000; background-color: #eee;">
-        <h3>modal</h3>
-        ${fields}
-        <button type="button" ${dataSave}="true">Save</button>
-        <button type="button" ${dataCancel}="true">Cancel</button>
-      </div>`;
+  const template = `<div>
+    <div class="bre-modal" style="display: block;">
+      <div class="bre-modal-placeholder">
+        <form>
+          <h3>modal</h3>
+          ${fields.join("")}
+          <button type="button" ${dataSave}="true">Save</button>
+          <button type="button" ${dataCancel}="true">Cancel</button>
+        </form>
+      </div>
+    </div>
+  </div>`;
 
   const div = document.createElement("div");
   div.innerHTML = template;
   const el = div.children[0];
   document.body.appendChild(el);
-
   return el;
 };
 

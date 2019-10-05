@@ -1235,14 +1235,12 @@ var BrickyEditor = (function (exports) {
     var dataSave = "data-save";
     var dataCancel = "data-cancel";
     var getElement = function (params) {
-        var fields = Object.keys(params)
-            .map(function (key) {
+        var fields = Object.keys(params).map(function (key) {
             var p = params[key];
             var val = p.value || "";
             return "\n          <div>\n            <label>\n                " + p.title + "<br />\n                <input type='text' name='" + key + "' placeholder='" + p.placeholder + "' value='" + val + "'/>\n            </label>\n          </div>";
-        })
-            .join("");
-        var template = "\n      <div style=\"position: absolute; top: 0; right: 0; bottom: 0; left: 0; z-index: 10000; background-color: #eee;\">\n        <h3>modal</h3>\n        " + fields + "\n        <button type=\"button\" " + dataSave + "=\"true\">Save</button>\n        <button type=\"button\" " + dataCancel + "=\"true\">Cancel</button>\n      </div>";
+        });
+        var template = "<div>\n    <div class=\"bre-modal\" style=\"display: block;\">\n      <div class=\"bre-modal-placeholder\">\n        <form>\n          <h3>modal</h3>\n          " + fields.join("") + "\n          <button type=\"button\" " + dataSave + "=\"true\">Save</button>\n          <button type=\"button\" " + dataCancel + "=\"true\">Cancel</button>\n        </form>\n      </div>\n    </div>\n  </div>";
         var div = document.createElement("div");
         div.innerHTML = template;
         var el = div.children[0];
@@ -1274,24 +1272,22 @@ var BrickyEditor = (function (exports) {
             cancel.onclick = closeModal;
         });
     };
+    //# sourceMappingURL=modal.js.map
 
     var getPromptParams = function (_a) {
         var src = _a.src, file = _a.file, alt = _a.alt;
         return ({
             src: {
-                key: "src",
                 value: src,
                 title: locales.prompt.image.link.title,
                 placeholder: locales.prompt.image.link.placeholder,
             },
             file: {
-                key: "file",
                 value: file,
                 title: locales.prompt.image.upload.title,
                 placeholder: locales.prompt.image.upload.placeholder,
             },
             alt: {
-                key: "alt",
                 value: alt,
                 title: locales.prompt.image.alt.title,
                 placeholder: locales.prompt.image.alt.placeholder,
@@ -1316,7 +1312,7 @@ var BrickyEditor = (function (exports) {
             var field = this;
             var data = this.data;
             this.setSrc(this.data.src, false);
-            $dom.on(this.$field, "click", function () { return __awaiter(_this, void 0, void 0, function () {
+            this.$field.addEventListener("click", function () { return __awaiter(_this, void 0, void 0, function () {
                 var params, updated, file, src, alt;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
@@ -1410,7 +1406,6 @@ var BrickyEditor = (function (exports) {
         };
         return ImageField;
     }(BaseField));
-    //# sourceMappingURL=ImageField.js.map
 
     //# sourceMappingURL=Fields.js.map
 

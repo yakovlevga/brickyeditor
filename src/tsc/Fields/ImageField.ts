@@ -1,5 +1,4 @@
 import { $dom } from "src/common/DOMHelpers";
-import { Editor } from "src/Editor";
 import { BaseField } from "src/fields/BaseField";
 import { HtmlLinkParams } from "src/HtmlLinkParams";
 import { locales } from "src/locales";
@@ -25,19 +24,16 @@ const getPromptParams: (props: ImageFieldData) => ImagePromptParams = ({
   alt,
 }) => ({
   src: {
-    key: "src",
     value: src,
     title: locales.prompt.image.link.title,
     placeholder: locales.prompt.image.link.placeholder,
   },
   file: {
-    key: "file",
     value: file,
     title: locales.prompt.image.upload.title,
     placeholder: locales.prompt.image.upload.placeholder,
   },
   alt: {
-    key: "alt",
     value: alt,
     title: locales.prompt.image.alt.title,
     placeholder: locales.prompt.image.alt.placeholder,
@@ -59,7 +55,7 @@ export class ImageField extends BaseField<ImageFieldData> {
     const data = this.data;
 
     this.setSrc(this.data.src, false);
-    $dom.on(this.$field, "click", async () => {
+    this.$field.addEventListener("click", async () => {
       const params = getPromptParams(this.data);
       const updated = await prompt<ImagePromptParams>(params);
 
@@ -179,12 +175,4 @@ export class ImageField extends BaseField<ImageFieldData> {
     }
     return $el;
   }
-
-  // private getPromptParams(): PromptParameter[] {
-  //   const link: HtmlLinkParams = this.data.link
-  //     ? this.data.link
-  //     : new HtmlLinkParams();
-  //   const linkParams = link.getLinkPromptParams();
-  //   return params.concat(linkParams);
-  // }
 }
