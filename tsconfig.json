@@ -6,6 +6,10 @@
     "removeComments": true,
     "declaration": true,
     "baseUrl": ".",
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
     "paths": {
       "src/*": ["src/tsc/*"]
     },

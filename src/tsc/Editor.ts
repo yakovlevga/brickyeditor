@@ -1,31 +1,31 @@
-import { Block } from "src/block/Block";
 import { BlocksContainer } from "src/BlocksContainer";
 import { $ajax } from "src/common/AJAXHelper";
 import { Common, str } from "src/common/Common";
 import { $dom } from "src/common/DOMHelpers";
-import { EditorOptions } from "src/EditorOptions";
+import { defaultOptions } from "src/defaults";
 import { EditorStrings } from "src/EditorStrings";
-import { Events } from "src/Events";
 import { BaseField, ContainerField } from "src/fields/Fields";
 import { TemplateService } from "src/Services/Services";
 import { Template } from "src/templates/Template";
+import { bre } from "src/Types/bre";
 import { Selectors } from "src/ui/Selectors";
 import { UI } from "src/ui/UI";
+import { Block } from "tsc/block/Block";
 
 export class Editor {
   public static UI: UI;
 
   public $editor: HTMLElement;
-  public options: EditorOptions;
+  public options: bre.Options;
   private isLoaded: boolean;
   private container: BlocksContainer;
 
-  constructor($editor: HTMLElement, options: EditorOptions) {
+  constructor($editor: HTMLElement, options: bre.Options) {
     BaseField.registerCommonFields();
 
     this.$editor = $editor;
     this.$editor.classList.add(Selectors.classEditor);
-    this.options = new EditorOptions(options);
+    this.options = { ...options, ...defaultOptions };
     this.container = this.createContainer();
 
     Editor.UI = new UI(this);
@@ -54,7 +54,7 @@ export class Editor {
 
     // Trigger jQuery event
     this.isLoaded = true;
-    this.trigger(Events.onLoad, this);
+    this.trigger("onLoad", this);
   }
 
   public tryBindFormSubmit() {
@@ -112,8 +112,8 @@ export class Editor {
   private createContainer(): BlocksContainer {
     const onAdd = (block: Block, idx: number) => {
       if (this.isLoaded) {
-        this.trigger(Events.onBlockAdd, { block, idx });
-        this.trigger(Events.onChange, {
+        this.trigger("onBlockAdd", { block, idx });
+        this.trigger("onChange", {
           blocks: this.getData(),
           html: this.getHtml(),
         });
@@ -128,14 +128,19 @@ export class Editor {
       });
     };
 
-    const onUpdate = (block, property, oldValue, newValue) => {
-      this.trigger(Events.onBlockUpdate, {
+    const onUpdate = (
+      block: Block,
+      property: string,
+      oldValue: any,
+      newValue: any
+    ) => {
+      this.trigger("onBlockUpdate", {
         block,
         property,
         oldValue,
         newValue,
       });
-      this.trigger(Events.onChange, {
+      this.trigger("onChange", {
         blocks: this.getData(),
         html: this.getHtml(),
       });
@@ -146,14 +151,14 @@ export class Editor {
       onAdd,
       onDelete,
       (block: Block) => {
-        this.trigger(Events.onBlockSelect, { block });
+        this.trigger("onBlockSelect", { block });
       },
       (block: Block) => {
-        this.trigger(Events.onBlockDeselect, { block });
+        this.trigger("onBlockDeselect", { block });
       },
       (block: Block, from: number, to: number) => {
-        this.trigger(Events.onBlockMove, { block, from, to });
-        this.trigger(Events.onChange, {
+        this.trigger("onBlockMove", { block, from, to });
+        this.trigger("onChange", {
           blocks: this.getData(),
           html: this.getHtml(),
         });
@@ -164,11 +169,11 @@ export class Editor {
   }
 
   // load initial blocks
-  private async tryLoadInitialBlocksAsync(): Promise<Block[]> {
+  private async tryLoadInitialBlocksAsync(): Promise<Block[] | null> {
     const url = this.options.blocksUrl;
     const editor = this;
-    return new Promise<Block[]>(async (resolve, reject) => {
-      if (url) {
+    return new Promise<Block[] | null>(async (resolve, reject) => {
+      if (url !== undefined) {
         try {
           const blocks = await $ajax.get(url);
           resolve(blocks);
@@ -176,7 +181,7 @@ export class Editor {
           editor.onError(EditorStrings.errorBlocksFileNotFound(url));
           reject(error);
         }
-      } else if (this.options.blocks) {
+      } else if (this.options.blocks !== undefined) {
         resolve(this.options.blocks);
       } else {
         resolve(null);
@@ -194,7 +199,7 @@ export class Editor {
     return container;
   }
 
-  private trigger(event: string, data: any) {
+  private trigger(event: bre.Event, data: any) {
     const editor = this;
     $dom.trigger(this.$editor, "bre." + event, data);
     Common.propsEach(editor.options, (key, value) => {

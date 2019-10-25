@@ -91,7 +91,7 @@ export class Block {
   }
 
   public getData(ignoreHtml?: boolean): bre.IBlockData {
-    const fieldsData = [];
+    const fieldsData: bre.Data[] = [];
     this.fields.forEach(field => {
       fieldsData.push(field.data);
     });

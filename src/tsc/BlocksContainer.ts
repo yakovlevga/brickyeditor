@@ -84,7 +84,7 @@ export class BlocksContainer {
     }
 
     this.blocks.splice(idx, 0, block);
-    if (idx == 0) {
+    if (idx === 0) {
       // todo: move to block ui
       this.$element.appendChild(block.ui.$editor);
     } else {

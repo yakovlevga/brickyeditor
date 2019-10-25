@@ -1,57 +1,103 @@
-export class OBSOLETE_PromptParameter {
-  public key: string;
-  public title: string;
-  public placeholder: string;
-  public value: any;
+import { helpers } from "./helpers";
 
-  protected _$control: HTMLElement;
-  protected $input: HTMLInputElement;
+type FieldEditor = (props: {
+  key: string;
+  p: bre.prompt.PromptParameter;
+  data: { [TKey: string]: any };
+}) => HTMLElement;
 
-  constructor(key: string, title: string, value: any, placeholder?: string) {
-    this.key = key;
-    this.title = title;
-    this.placeholder = placeholder || "";
-    this.value = value;
-  }
+const textFieldEditor: FieldEditor = ({ key, p, data }) => {
+  const html = `<input type='text' name='${key}' placeholder='${
+    p.placeholder
+  }' value='${p.value || ""}' />`;
+  const input = helpers.createElement<HTMLInputElement>(html);
+  input.onchange = () => {
+    data[key] = input.value;
+  };
+  return input;
+};
 
-  public parseValue() {
-    if (this.$input) {
-      this.value = this.$input.value;
+const fileFieldEditor: FieldEditor = ({ key, p, data }) => {
+  let file: File = data[key];
+
+  const filePreview = helpers.createElement<HTMLImageElement>(
+    `<img src="${p.value}"/>`
+  );
+  const fileInput = helpers.createElement<HTMLInputElement>(
+    `<input type="file" id="bre-modal-modal-${key}" class="bre-input" placeholder="${p.placeholder}">`
+  );
+  const fileName = helpers.createElement(
+    `<span class='bre-image-input-filename'></span>`
+  );
+
+  const updatePreview = () => {
+    if (file === undefined) {
+      fileName.innerText = "";
+      filePreview.src = null;
+    } else {
+      fileName.innerText = file.name;
+      const reader = new FileReader();
+      reader.onload = ev => {
+        filePreview.src = ev.target.result.toString();
+      };
+      reader.readAsDataURL(file);
     }
-    this.$control = null;
-    delete this._$control;
+  };
+
+  fileInput.onchange = () => {
+    file = fileInput.files && fileInput.files[0];
+    updatePreview();
+    data[key] = file;
+  };
+
+  updatePreview();
+
+  const editor = helpers.createElement(`<div class='bre-image-input'>
+    <label for="bre-modal-modal-${key}">
+      ${p.placeholder}
+    </label>
+  </div>`);
+
+  editor.append(filePreview, fileInput, fileName);
+  return editor;
+};
+
+const parameterEditors: {
+  [TKey in bre.prompt.PromptParameterType]: FieldEditor;
+} = {
+  text: textFieldEditor,
+  file: fileFieldEditor,
+};
+
+export const prompt = <TParams extends bre.prompt.PromptParameters>(
+  params: TParams
+): Promise<
+  {
+    [TKey in keyof TParams]?: string;
   }
-
-  public get $control(): HTMLElement {
-    if (!this._$control) {
-      this._$control = $dom.el(
-        `<div class=${this.key ? "bre-prompt-field" : "bre-prompt-subtitle"}>
-                              <label class="bre-label" for="${this.key}">${
-          this.title ? this.title : "Select file..."
-        }</label>
-                          </div>`
-      );
-
-      this.$input = this.key ? (this.getEditor() as HTMLInputElement) : null;
-      if (this.$input != null) {
-        this._$control.appendChild(this.$input);
-      }
+> =>
+  new Promise<
+    {
+      [TKey in keyof TParams]?: any;
     }
+  >(resolve => {
+    const result: {
+      [TKey in keyof TParams]?: any;
+    } = {};
 
-    return this._$control;
-  }
+    const editors = Object.keys(params).map(key => {
+      const p = params[key];
+      const editor = parameterEditors[p.type || "text"]({
+        key,
+        p,
+        data: result,
+      });
+      return editor;
+    });
 
-  protected getEditor(): HTMLElement {
-    const $input = document.createElement("input");
-    $input.id = this.key;
-    $input.className = "bre-input";
-    $input.setAttribute("type", "text");
-    $input.setAttribute("placeholder", this.placeholder);
-    $input.value = this.value || "";
-    return $input;
-  }
-
-  public set $control(value: HTMLElement) {
-    this._$control = value;
-  }
-}
+    helpers.showModal({
+      content: editors,
+      onOk: () => resolve(result),
+      onCancel: () => resolve(null),
+    });
+  });

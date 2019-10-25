@@ -8,7 +8,7 @@ import {
 } from "src/fields/Fields";
 import { Selectors } from "src/ui/Selectors";
 
-export abstract class BaseField<TData extends bre.Data> {
+export abstract class BaseField<TData extends bre.Data = bre.Data> {
   public static get type(): string {
     let name = (this as any).name;
     name = name.replace("Field", "");
@@ -34,11 +34,11 @@ export abstract class BaseField<TData extends bre.Data> {
     this.commonFieldsRegistered = true;
   }
 
-  public static createField<TData extends bre.Data>(
+  public static createField<TData extends bre.Data = bre.Data>(
     $field: HTMLElement,
     data: TData,
     onSelect: (field: BaseField<TData>) => void,
-    onUpdate: (property, oldValue, newValue) => void,
+    onUpdate: (property: keyof TData, oldValue: any, newValue: any) => void,
     onUpload?: (file: any, callback: (url: string) => void) => void
   ): BaseField<TData> {
     let fieldData = $dom.data<any>($field, "breField");
@@ -104,13 +104,17 @@ export abstract class BaseField<TData extends bre.Data> {
 
   protected settings: (field: BaseField<TData>) => void;
   private onSelect: (field: BaseField<TData>) => void;
-  private onUpdate: (property, oldValue, newValue) => void;
+  private onUpdate: (
+    property: keyof TData,
+    oldValue: any,
+    newValue: any
+  ) => void;
 
   constructor(
     $field: HTMLElement,
     data: any,
     onSelect: (field: BaseField<TData>) => void,
-    onUpdate: (property, oldValue, newValue) => void,
+    onUpdate: (property: keyof TData, oldValue: any, newValue: any) => void,
     onUpload?: (file: any, callback: (url: string) => void) => void
   ) {
     this.$field = $field;

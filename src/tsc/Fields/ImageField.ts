@@ -2,13 +2,13 @@ import { $dom } from "src/common/DOMHelpers";
 import { BaseField } from "src/fields/BaseField";
 import { HtmlLinkParams } from "src/HtmlLinkParams";
 import { locales } from "src/locales";
-import { prompt } from "src/modal";
+import { prompt } from "src/prompt";
 import { PromptParameter, PromptParameterImage } from "src/prompt/Prompt";
 
 type ImageFieldData = {
   src: string;
   alt: string;
-  file: any;
+  file: File;
   link: Pick<HTMLLinkElement, "href" | "title" | "target">;
 };
 
@@ -29,6 +29,7 @@ const getPromptParams: (props: ImageFieldData) => ImagePromptParams = ({
     placeholder: locales.prompt.image.link.placeholder,
   },
   file: {
+    type: "file",
     value: file,
     title: locales.prompt.image.upload.title,
     placeholder: locales.prompt.image.upload.placeholder,
@@ -122,17 +123,17 @@ export class ImageField extends BaseField<ImageFieldData> {
     this.updateProperty("src", src, fireUpdate);
   }
 
-  public setAlt(alt) {
+  public setAlt(alt: string) {
     this.$field.setAttribute(this.isImg ? "alt" : "title", alt);
     this.updateProperty("alt", alt);
   }
 
-  public setFile(file) {
+  public setFile(file: File) {
     if (file) {
       if (this.isImg) {
-        this.$field.setAttribute("src", file.fileContent);
+        this.$field.setAttribute("src", fileContent);
       } else {
-        this.$field.style.backgroundImage = `url(${file.fileContent})`;
+        this.$field.style.backgroundImage = `url(${fileContent})`;
       }
     }
     this.updateProperty("file", file);
