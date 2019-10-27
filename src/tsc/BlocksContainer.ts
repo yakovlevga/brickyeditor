@@ -1,27 +1,16 @@
 import { Block } from "src/block/Block";
 import { $dom } from "src/common/DOMHelpers";
-import { BaseField } from "src/Fields/Fields";
+import { BaseField } from "src/fields/Fields";
 import { Template } from "src/templates/Template";
-import { bre } from "src/Types/bre";
 
-const getData = (container: bre.core.IBlocksContainer, ignoreHtml?: boolean) =>
-  container.blocks.map(block => block.getData(ignoreHtml));
-
-const getHtml = (container: bre.core.IBlocksContainer) => {
-  const html = container.blocks.map(block => block.getHtml(true)).join("\n");
-  const root: HTMLElement = container.$element.cloneNode(false) as HTMLElement;
-  root.innerHTML = html;
-  return root.outerHTML;
-};
-
-export class BlocksContainer implements bre.core.IBlocksContainer {
-  public $element: HTMLElement;
+export class BlocksContainer {
   public blocks: Block[] = [];
   public selectedBlock: Block;
   public isContainer: boolean = true;
   public $placeholder: HTMLElement;
 
   constructor(
+    private $element: HTMLElement,
     private onAddBlock: (block: Block, idx: number) => any,
     private onDeleteBlock: (block: Block, idx: number) => any,
     private onSelectBlock: (block: Block) => any,
@@ -33,10 +22,32 @@ export class BlocksContainer implements bre.core.IBlocksContainer {
       oldValue: any,
       newValue: any
     ) => any,
-    private onUpload: bre.FileUploadHandler,
+    private onUpload: (file: any, callback: (url: string) => void) => void,
     private usePlaceholder: boolean = false
   ) {
     this.togglePlaceholderIfNeed();
+  }
+
+  public getData(ignoreHtml?: boolean): any {
+    const blocksData = [];
+    this.blocks.forEach(block => {
+      blocksData.push(block.getData(ignoreHtml));
+    });
+    return blocksData;
+  }
+
+  public getHtml(): string {
+    const blocksHtml = [];
+    this.blocks.forEach(block => {
+      blocksHtml.push(block.getHtml(true));
+    });
+
+    const $el = $dom.clone(this.$element);
+    $el.innerHTML = blocksHtml.join("\n");
+    return $el.outerHTML;
+
+    // const html = $('<div></div>').appendChild($el).html();
+    // return html;
   }
 
   public addBlock(
@@ -176,54 +187,3 @@ export class BlocksContainer implements bre.core.IBlocksContainer {
     }
   }
 }
-
-export const blocksContainer = { getData, getHtml };
-
-// type BlocksContainerProps = {
-//   $element: HTMLElement;
-//   $placeholder?: HTMLElement;
-// };
-
-// const insertBlock = (
-//   container: IBlocksContainer,
-//   block: Block,
-//   idx?: number
-// ) => {
-//   const { blocks, selectedBlock } = container;
-
-//   if (idx === undefined) {
-//     idx = container.selectedBlock
-//       ? blocks.indexOf(selectedBlock) + 1
-//       : blocks.length;
-//   }
-
-//   // todo: insert block ()
-//   // todo: select block
-//   return [...blocks].splice(idx, 0, block);
-
-//   // if (idx === 0) {
-//   //   // todo: move to block ui
-//   //   $element.appendChild(block.ui.$editor);
-//   // } else {
-//   //   // todo: move to block ui
-//   //   $dom.after(this.blocks[idx - 1].ui.$editor, block.ui.$editor);
-//   // }
-
-//   // this.onAddBlock(block, idx);
-//   // block.select(null);
-
-//   // this.togglePlaceholderIfNeed();
-// };
-
-// const blocksContainer = ({
-//   $element,
-//   $placeholder,
-// }: BlocksContainerProps): IBlocksContainer => {
-//   const blocks: Block[] = [];
-//   let selectedBlock: Block | null = null;
-
-//   // return {
-//   //   getData,
-//   //   getHtml
-//   // }
-// };

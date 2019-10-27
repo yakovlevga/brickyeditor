@@ -2,7 +2,7 @@ import { BlockUI } from "src/block/BlockUI";
 import { BlockUIAction } from "src/block/BlockUIAction";
 import { str } from "src/common/Common";
 import { $dom } from "src/common/DOMHelpers";
-import { BaseField, ContainerField } from "src/Fields/Fields";
+import { BaseField, ContainerField } from "src/fields/Fields";
 import { Template } from "src/templates/Template";
 import { Selectors } from "src/ui/Selectors";
 

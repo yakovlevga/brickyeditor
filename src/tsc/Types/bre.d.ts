@@ -1,4 +1,4 @@
-import { Block } from "src/block/Block";
+import { Block } from "tsc/block/Block";
 
 declare var instgrm: any;
 
@@ -13,62 +13,38 @@ declare namespace bre {
     | "onBlockDeselect"
     | "onBlockUpdate"
     | "onError";
-
+  
   type Subscriptions = {
     [TKey in Event]: (params: any) => void;
   };
 
-  type FileUploadHandler = (file: any, callback: (url: string) => void) => void;
+  type FileUploadHandler = (file: any, callback: (url: string) => void) => void); 
 
   type Options = Subscriptions & {
-    /** Url to predifined templates */
-    templatesUrl: string;
-
-    onUpload: FileUploadHandler;
-
-    /** Url to fetch initial blocks, overrides initial blocks property */
-    blocksUrl: string;
-    /** Inital block data */
-    blocks: Block[];
-    /** Show blocks selector in compact mode */
-    compactTools?: boolean;
-    /** Max screen width to show tools in compact mode */
-    compactToolsWidth: number;
-    /** Ignore blocks html field, if you need only json */
-    ignoreHtml: boolean;
-    /** Custom Html editor buttons */
-    htmlToolsButtons?: bre.IHtmlToolsButton[];
-    /** Form selector to bind form submit event */
-    formSelector: string;
-    /** Input selector to put json to on form submit */
-    inputSelector: string;
-  };
+      /** Url to predifined templates */
+      templatesUrl: string = "templates/bootstrap4.html",      
+    
+      onUpload: FileUploadHandler,
+    
+      /** Url to fetch initial blocks, overrides initial blocks property */
+      blocksUrl: string,
+      /** Inital block data */
+      blocks: Block[],
+      /** Show blocks selector in compact mode */
+      compactTools?: boolean,
+      /** Max screen width to show tools in compact mode */
+      compactToolsWidth: number,
+      /** Ignore blocks html field, if you need only json */
+      ignoreHtml: boolean,
+      /** Custom Html editor buttons */
+      htmlToolsButtons?: bre.IHtmlToolsButton[],
+      /** Form selector to bind form submit event */
+      formSelector: string,
+      /** Input selector to put json to on form submit */
+      inputSelector: string,    
+    }
 
   namespace ui {}
-
-  namespace core {
-    interface IBlocksContainer {
-      $element: HTMLElement;
-      blocks: Block[];
-      selectedBlock: Block;
-      // data: () => any;
-      // html: () => string;
-      // add: (block: Block) => void;
-    }
-  }
-  //   type BaseField<TValue = any> = {
-  //     $field: HTMLElement;
-  //     name: string;
-  //     value: TValue;
-
-  //     // onUpload: (file: any, callback: (url: string) => void) => void;
-  //     // protected settings: (field: BaseField<TData>) => void;
-  //     onSelect: () => void;
-  //     onUpdate: (oldValue: TValue, newValue: TValue) => void;
-  //   };
-
-  //   type HtmlField = BaseField<string>;
-  // }
 
   interface IHtmlToolsButton {
     icon: string;

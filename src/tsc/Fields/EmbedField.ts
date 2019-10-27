@@ -1,5 +1,5 @@
 import { $dom } from "src/common/DOMHelpers";
-import { BaseField } from "src/Fields/BaseField";
+import { BaseField } from "src/fields/BaseField";
 import { Editor } from "src/Editor";
 import { EditorStrings } from "src/EditorStrings";
 import { $ajax } from "src/common/AJAXHelper";
@@ -8,18 +8,18 @@ import { EmbedService } from "src/Services/Services";
 import { str } from "src/common/Common";
 
 export class EmbedField extends BaseField {
-
-  get settings(): (field: BaseField) => void {
-    return (field: EmbedField) => {
-      this.showEmbedLoaderAsync(field);
-    };
-  }
   getSettingsEl(): HTMLElement {
     let $el = $dom.el(
       '<div style="position: absolute;width: 100%; height: 100px;;text-align: center;font-weight: bold;vertical-align: middle;background: #333;opacity: 0.2;">Change embed element link</div>'
     );
     $dom.before(this.$field, $el);
     return $el;
+  }
+
+  get settings(): (field: BaseField) => void {
+    return (field: EmbedField) => {
+      this.showEmbedLoaderAsync(field);
+    };
   }
 
   bind() {
@@ -31,6 +31,28 @@ export class EmbedField extends BaseField {
     });
 
     field.loadMedia(false);
+  }
+
+  private async showEmbedLoaderAsync(field) {
+    const fields = await Editor.UI.modal.promptAsync(field.getPromptParams());
+    if (fields != null) {
+      const url = fields.getValue("url");
+      if (url) {
+        field.setUrl(url);
+        await field.loadMedia(true);
+      }
+    }
+  }
+
+  private getPromptParams(): Array<PromptParameter> {
+    return [
+      new PromptParameter(
+        "url",
+        EditorStrings.embedFieldLinkTitle,
+        this.data.url || "http://instagr.am/p/BO9VX2Vj4fF/",
+        EditorStrings.embedFieldLinkPlaceholder
+      ),
+    ];
   }
 
   async loadMedia(fireUpdate: boolean) {
@@ -66,27 +88,5 @@ export class EmbedField extends BaseField {
 
   setUrl(value: string) {
     this.updateProperty("url", value);
-  }
-
-  private async showEmbedLoaderAsync(field) {
-    const fields = await Editor.UI.modal.promptAsync(field.getPromptParams());
-    if (fields != null) {
-      const url = fields.getValue("url");
-      if (url) {
-        field.setUrl(url);
-        await field.loadMedia(true);
-      }
-    }
-  }
-
-  private getPromptParams(): Array<PromptParameter> {
-    return [
-      new PromptParameter(
-        "url",
-        EditorStrings.embedFieldLinkTitle,
-        this.data.url || "http://instagr.am/p/BO9VX2Vj4fF/",
-        EditorStrings.embedFieldLinkPlaceholder
-      ),
-    ];
   }
 }

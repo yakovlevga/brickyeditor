@@ -1,6 +1,6 @@
 import { $dom } from "src/common/DOMHelpers";
 import { Editor } from "src/Editor";
-import { BaseField } from "src/Fields/BaseField";
+import { BaseField } from "src/fields/BaseField";
 import { SelectionUtils } from "src/ui/SelectionUtils";
 import { Selectors } from "src/ui/Selectors";
 
