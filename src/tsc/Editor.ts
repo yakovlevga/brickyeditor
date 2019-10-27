@@ -1,10 +1,10 @@
-import { BlocksContainer } from "src/BlocksContainer";
+import { BlocksContainer, blocksContainer } from "src/BlocksContainer";
 import { $ajax } from "src/common/AJAXHelper";
 import { Common, str } from "src/common/Common";
 import { $dom } from "src/common/DOMHelpers";
 import { defaultOptions } from "src/defaults";
 import { EditorStrings } from "src/EditorStrings";
-import { BaseField, ContainerField } from "src/fields/Fields";
+import { BaseField, ContainerField } from "src/Fields/Fields";
 import { TemplateService } from "src/Services/Services";
 import { Template } from "src/templates/Template";
 import { bre } from "src/Types/bre";
@@ -76,13 +76,10 @@ export class Editor {
     });
   }
 
-  public getData(): any {
-    return this.container.getData(this.options.ignoreHtml);
-  }
+  public getData = () =>
+    blocksContainer.getData(this.container, this.options.ignoreHtml);
 
-  public getHtml(): string {
-    return this.container.getHtml();
-  }
+  public getHtml = () => blocksContainer.getHtml(this.container);
 
   /// BLOCKS
   public loadBlocks(blocks: any[]) {

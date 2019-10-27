@@ -6,6 +6,7 @@ import {
   HtmlField,
   ImageField,
 } from "src/fields/Fields";
+import { bre } from "src/Types/bre";
 import { Selectors } from "src/ui/Selectors";
 
 export abstract class BaseField<TData extends bre.Data = bre.Data> {
@@ -139,7 +140,7 @@ export abstract class BaseField<TData extends bre.Data = bre.Data> {
   }
 
   protected bind() {
-    // should be ovverided from child
+    // should be overrided from child
   }
 
   protected select() {

@@ -1,8 +1,9 @@
 import { Block } from "src/block/Block";
-import { BlocksContainer } from "src/BlocksContainer";
+import { BlocksContainer, blocksContainer } from "src/BlocksContainer";
 import { $dom } from "src/common/DOMHelpers";
-import { BaseField } from "src/fields/BaseField";
+import { BaseField } from "src/Fields/BaseField";
 import { Selectors } from "src/ui/Selectors";
+import { helpers } from "src/helpers";
 
 export class ContainerField extends BaseField {
   public container: BlocksContainer;
@@ -45,8 +46,11 @@ export class ContainerField extends BaseField {
   }
 
   public updateBlocks() {
-    this.updateProperty("blocks", this.container.getData(true), true);
-    this.updateProperty("html", this.container.getHtml(), true);
+    const { container } = this;
+    const data = blocksContainer.getData(container, true);
+    const html = blocksContainer.getHtml(container);
+    this.updateProperty("blocks", data, true);
+    this.updateProperty("html", html, true);
   }
 
   public deselect() {
@@ -55,7 +59,7 @@ export class ContainerField extends BaseField {
   }
 
   public getEl(): HTMLElement {
-    const html = this.container.getHtml();
-    return $dom.el(html);
+    const html = blocksContainer.getHtml(this.container);
+    return helpers.createElement(html);
   }
 }

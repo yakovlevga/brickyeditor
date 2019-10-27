@@ -1,5 +1,5 @@
 import { $dom } from "src/common/DOMHelpers";
-import { BaseField } from "src/fields/BaseField";
+import { BaseField } from "src/Fields/BaseField";
 import { HtmlLinkParams } from "src/HtmlLinkParams";
 import { locales } from "src/locales";
 import { prompt } from "src/prompt";
