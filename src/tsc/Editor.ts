@@ -25,7 +25,7 @@ export class Editor {
 
     this.$editor = $editor;
     this.$editor.classList.add(Selectors.classEditor);
-    this.options = { ...options, ...defaultOptions };
+    this.options = { ...defaultOptions, ...options };
     this.container = this.createContainer();
 
     Editor.UI = new UI(this);

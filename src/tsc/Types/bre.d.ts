@@ -18,13 +18,13 @@ declare namespace bre {
     [TKey in Event]: (params: any) => void;
   };
 
-  type OnFileUploadHandler = (file: any, callback: (url: string) => void) => void); 
+  type FileUploadHandler = (file: any, callback: (url: string) => void) => void); 
 
   type Options = Subscriptions & {
       /** Url to predifined templates */
       templatesUrl: string = "templates/bootstrap4.html",      
     
-      onUpload: OnFileUploadHandler,
+      onUpload: FileUploadHandler,
     
       /** Url to fetch initial blocks, overrides initial blocks property */
       blocksUrl: string,
