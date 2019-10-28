@@ -3,27 +3,29 @@ import { BlockUIAction } from "src/block/BlockUIAction";
 import { str } from "src/common/Common";
 import { $dom } from "src/common/DOMHelpers";
 import { BaseField, ContainerField } from "src/fields/Fields";
-import { Template } from "src/templates/Template";
 import { bre } from "src/Types/bre";
 import { Selectors } from "src/ui/Selectors";
 
 export class Block {
-  public template: Template;
+  public name: string;
+  public html: string;
   public fields: BaseField[] = [];
   public ui: BlockUI;
   public selectedField: BaseField;
   public events?: bre.core.block.Events;
 
   constructor(
-    template: Template,
+    name: string,
+    html: string,
     preview: boolean,
     data?: BaseField[],
     events?: bre.core.block.Events
   ) {
-    this.template = template;
+    this.name = name;
+    this.html = html;
     this.events = events;
 
-    const $block = $dom.el(template.$html.innerHTML);
+    const $block = $dom.el(html);
     this.bindFields($block, data);
     const actions = this.getActions();
 
@@ -92,7 +94,7 @@ export class Block {
     });
 
     const data: bre.IBlockData = {
-      template: this.template.name,
+      template: this.name,
       fields: fieldsData,
     };
 
@@ -104,7 +106,7 @@ export class Block {
   }
 
   public getHtml(trim: boolean): string {
-    const $html = $dom.el(this.template.$html.innerHTML);
+    const $html = $dom.el(this.html);
     const fieldsHtml: {
       [TKey: string]: HTMLElement;
     } = {};

@@ -1,6 +1,7 @@
 import { $dom } from "src/common/DOMHelpers";
 import { Editor } from "src/Editor";
 import { EditorStrings } from "src/EditorStrings";
+import { getTemplatePreview } from "src/Templates/Template";
 import { TemplateGroup } from "src/templates/TemplateGroup";
 import { HtmlTools } from "src/ui/HtmlTools";
 import { Modal } from "src/ui/Modal";
@@ -99,7 +100,7 @@ export class UI {
       this.$toolsTemplates.appendChild($header);
       const $group = $dom.el("<div></div>");
       group.templates.forEach(template => {
-        const $preview = template.getPreview();
+        const $preview = getTemplatePreview(template);
         $preview.setAttribute("title", template.name);
         $preview.onclick = ev => {
           editor.addBlock(template);

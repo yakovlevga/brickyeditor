@@ -76,12 +76,13 @@ export class BlocksContainer implements bre.core.IBlocksContainer {
   }
 
   public addBlock(
-    template: Template,
+    name: string,
+    html: string,
     data?: BaseField[],
     idx?: number,
     select: boolean = true
   ) {
-    const block = new Block(template, false, data, {
+    const block = new Block(name, html, false, data, {
       onDelete: this.deleteBlock,
       onSelect: this.selectBlock,
       onDeselect: this.deselectBlock,
@@ -165,12 +166,8 @@ export class BlocksContainer implements bre.core.IBlocksContainer {
 
   private copyBlock(block: Block) {
     const idx = this.blocks.indexOf(block) + 1;
-    const copy = this.addBlock(
-      block.template,
-      block.getData().fields,
-      idx,
-      true
-    );
+    // const copy = this.addBlock(
+    this.addBlock(block.name, block.html, block.getData().fields, idx, true);
   }
 
   private selectBlock(block: Block) {

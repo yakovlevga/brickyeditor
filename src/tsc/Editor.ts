@@ -11,7 +11,6 @@ import { defaultOptions } from "src/defaults";
 import { EditorStrings } from "src/EditorStrings";
 import { BaseField, ContainerField } from "src/fields/Fields";
 import { TemplateService } from "src/Services/Services";
-import { Template } from "src/templates/Template";
 import { bre } from "src/Types/bre";
 import { Selectors } from "src/ui/Selectors";
 import { UI } from "src/ui/UI";
@@ -91,7 +90,13 @@ export class Editor {
       blocks.forEach(block => {
         const template = TemplateService.getTemplate(block.template);
         if (template) {
-          this.container.addBlock(template, block.fields, null, false);
+          this.container.addBlock(
+            template.name,
+            template.$html.innerHTML,
+            block.fields,
+            null,
+            false
+          );
         } else {
           const message = EditorStrings.errorBlockTemplateNotFound(
             block.template
@@ -104,7 +109,13 @@ export class Editor {
 
   public addBlock(template: Template) {
     const container = this.getContainer(this.container);
-    container.addBlock(template, null, null, true);
+    container.addBlock(
+      template.name,
+      template.$html.innerHTML,
+      null,
+      null,
+      true
+    );
   }
 
   private onError = (message: string, code: number = 0) =>

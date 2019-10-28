@@ -2,9 +2,10 @@ import { $ajax } from "src/common/AJAXHelper";
 import { str } from "src/common/Common";
 import { $dom } from "src/common/DOMHelpers";
 import { EditorStrings } from "src/EditorStrings";
-import { Template } from "src/templates/Template";
+import { Template, createTemplate } from "src/templates/Template";
 import { TemplateGroup } from "src/templates/TemplateGroup";
 import { Selectors } from "src/ui/Selectors";
+import { bre } from "src/Types/bre";
 
 export class TemplateService {
   public static templates: TemplateGroup[];
@@ -55,7 +56,7 @@ export class TemplateService {
     });
   }
 
-  public static getTemplate(templateName: string): Template {
+  public static getTemplate(templateName: string): bre.core.ITemplate {
     for (let gi = 0; gi < this.templates.length; gi++) {
       const group = this.templates[gi];
       for (let ti = 0; ti < group.templates.length; ti++) {
@@ -73,11 +74,11 @@ export class TemplateService {
     $el: HTMLElement,
     onError: (message: string, code?: number) => any
   ): Template[] {
-    const templates = [];
+    const templates: bre.core.ITemplate[] = [];
 
     const $templates = $dom.select($el, Selectors.selectorTemplate);
     $templates.forEach($template => {
-      const template = new Template($template);
+      const template = createTemplate($template);
       if (template.loaded) {
         templates.push(template);
       } else {
