@@ -58,6 +58,11 @@ declare namespace bre {
       // add: (block: Block) => void;
     }
 
+    interface ITemplateGroup {
+      name: string;
+      templates: bre.core.ITemplate[];
+    }
+
     interface ITemplate {
       $html: HTMLElement;
       $preview: HTMLElement;

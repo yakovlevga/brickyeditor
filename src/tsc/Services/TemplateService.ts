@@ -2,23 +2,19 @@ import { $ajax } from "src/common/AJAXHelper";
 import { str } from "src/common/Common";
 import { $dom } from "src/common/DOMHelpers";
 import { EditorStrings } from "src/EditorStrings";
-import { Template, createTemplate } from "src/templates/Template";
-import { TemplateGroup } from "src/templates/TemplateGroup";
-import { Selectors } from "src/ui/Selectors";
+import { createTemplate } from "src/templates/Template";
 import { bre } from "src/Types/bre";
+import { Selectors } from "src/ui/Selectors";
 
 export class TemplateService {
-  public static templates: TemplateGroup[];
+  public static templates: bre.core.ITemplateGroup[] = [];
 
   public static async loadTemplatesAsync(
     url: string,
     $editor: HTMLElement,
     onError: (message: string, code?: number) => any
-  ): Promise<TemplateGroup[]> {
-    this.templates = [];
-    const templates = this.templates;
-
-    return new Promise<TemplateGroup[]>(async (resolve, reject) => {
+  ): Promise<bre.core.ITemplateGroup[]> {
+    return new Promise<bre.core.ITemplateGroup[]>(async (resolve, reject) => {
       try {
         const data = await $ajax.get(url);
 
@@ -33,20 +29,23 @@ export class TemplateService {
 
         const $groups = $dom.select($data, Selectors.selectorTemplateGroup);
         $groups.forEach($group => {
-          const title = $group.getAttribute("title");
-          const templates = this.getTemplates($group, onError);
-          this.templates.push(new TemplateGroup(title, templates));
+          const name = $group.getAttribute("title");
+          const groupTemplates = this.getTemplates($group, onError);
+          this.templates.push({ name, templates: groupTemplates });
           $group.remove();
         });
 
         // the rest ungroupped templates
-        const templates = this.getTemplates($data, onError);
+        const ungrouppedTemplates = this.getTemplates($data, onError);
         const defaultGroupName =
           this.templates.length > 0
             ? EditorStrings.defaultTemplatesGroupName
             : "";
-        const group = new TemplateGroup(defaultGroupName, templates);
-        this.templates.push(group);
+
+        this.templates.push({
+          name: defaultGroupName,
+          templates: ungrouppedTemplates,
+        });
 
         resolve(this.templates);
       } catch (err) {
@@ -57,15 +56,25 @@ export class TemplateService {
   }
 
   public static getTemplate(templateName: string): bre.core.ITemplate {
-    for (let gi = 0; gi < this.templates.length; gi++) {
-      const group = this.templates[gi];
-      for (let ti = 0; ti < group.templates.length; ti++) {
-        const template = group.templates[ti];
-        if (str.equalsInvariant(template.name, templateName)) {
-          return template;
-        }
+    this.templates.forEach(group => {
+      const result = group.templates.find(template =>
+        str.equalsInvariant(template.name, templateName)
+      );
+
+      if (result !== undefined) {
+        return result;
       }
-    }
+    });
+
+    // for (let gi = 0; gi < this.templates.length; gi++) {
+    //   const group = this.templates[gi];
+    //   for (let ti = 0; ti < group.templates.length; ti++) {
+    //     const template = group.templates[ti];
+    //     if (str.equalsInvariant(template.name, templateName)) {
+    //       return template;
+    //     }
+    //   }
+    // }
 
     return null;
   }
@@ -73,7 +82,7 @@ export class TemplateService {
   private static getTemplates(
     $el: HTMLElement,
     onError: (message: string, code?: number) => any
-  ): Template[] {
+  ): bre.core.ITemplate[] {
     const templates: bre.core.ITemplate[] = [];
 
     const $templates = $dom.select($el, Selectors.selectorTemplate);
