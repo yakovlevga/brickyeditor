@@ -1,4 +1,8 @@
-import { BlocksContainer } from "src/BlocksContainer";
+import {
+  BlocksContainer,
+  getContainerData,
+  getContainerHtml,
+} from "src/BlocksContainer";
 import { $ajax } from "src/common/AJAXHelper";
 import { Common, str } from "src/common/Common";
 import { $dom } from "src/common/DOMHelpers";
@@ -76,13 +80,10 @@ export class Editor {
     });
   }
 
-  public getData(): any {
-    return this.container.getData(this.options.ignoreHtml);
-  }
+  public getData = () =>
+    getContainerData(this.container, this.options.ignoreHtml);
 
-  public getHtml(): string {
-    return this.container.getHtml();
-  }
+  public getHtml = () => getContainerHtml(this.container);
 
   /// BLOCKS
   public loadBlocks(blocks: any[]) {

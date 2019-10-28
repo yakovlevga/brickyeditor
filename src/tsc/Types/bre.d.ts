@@ -1,4 +1,4 @@
-import { Block } from "tsc/block/Block";
+import { Block } from "src/block/Block";
 
 declare var instgrm: any;
 
@@ -13,38 +13,72 @@ declare namespace bre {
     | "onBlockDeselect"
     | "onBlockUpdate"
     | "onError";
-  
+
   type Subscriptions = {
     [TKey in Event]: (params: any) => void;
   };
 
-  type FileUploadHandler = (file: any, callback: (url: string) => void) => void); 
+  type FileUploadHandler = (file: any, callback: (url: string) => void) => void;
 
   type Options = Subscriptions & {
-      /** Url to predifined templates */
-      templatesUrl: string = "templates/bootstrap4.html",      
-    
-      onUpload: FileUploadHandler,
-    
-      /** Url to fetch initial blocks, overrides initial blocks property */
-      blocksUrl: string,
-      /** Inital block data */
-      blocks: Block[],
-      /** Show blocks selector in compact mode */
-      compactTools?: boolean,
-      /** Max screen width to show tools in compact mode */
-      compactToolsWidth: number,
-      /** Ignore blocks html field, if you need only json */
-      ignoreHtml: boolean,
-      /** Custom Html editor buttons */
-      htmlToolsButtons?: bre.IHtmlToolsButton[],
-      /** Form selector to bind form submit event */
-      formSelector: string,
-      /** Input selector to put json to on form submit */
-      inputSelector: string,    
-    }
+    /** Url to predifined templates */
+    templatesUrl: string;
+
+    onUpload: FileUploadHandler;
+
+    /** Url to fetch initial blocks, overrides initial blocks property */
+    blocksUrl: string;
+    /** Inital block data */
+    blocks: Block[];
+    /** Show blocks selector in compact mode */
+    compactTools?: boolean;
+    /** Max screen width to show tools in compact mode */
+    compactToolsWidth: number;
+    /** Ignore blocks html field, if you need only json */
+    ignoreHtml: boolean;
+    /** Custom Html editor buttons */
+    htmlToolsButtons?: bre.IHtmlToolsButton[];
+    /** Form selector to bind form submit event */
+    formSelector: string;
+    /** Input selector to put json to on form submit */
+    inputSelector: string;
+  };
 
   namespace ui {}
+
+  namespace core {
+    interface IBlocksContainer {
+      $element: HTMLElement;
+      $placeholder: HTMLElement;
+      blocks: Block[];
+      selectedBlock: Block;
+      usePlaceholder: boolean;
+      // data: () => any;
+      // html: () => string;
+      // add: (block: Block) => void;
+    }
+
+    namespace block {
+      type Event = (block: Block) => void;
+      type MoveEvent = (block: Block, offset: number) => void;
+      type UpdateEvent = (
+        block: Block,
+        property: string,
+        oldValue: any,
+        newValue: any
+      ) => void;
+
+      type Events = {
+        onDelete?: Event;
+        onSelect?: Event;
+        onDeselect?: Event;
+        onCopy?: Event;
+        onMove?: MoveEvent;
+        onUpdate?: UpdateEvent;
+        onUpload?: FileUploadHandler;
+      };
+    }
+  }
 
   interface IHtmlToolsButton {
     icon: string;

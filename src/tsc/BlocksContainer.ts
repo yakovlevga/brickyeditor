@@ -1,16 +1,60 @@
 import { Block } from "src/block/Block";
 import { $dom } from "src/common/DOMHelpers";
-import { BaseField } from "src/fields/Fields";
+import { BaseField } from "src/Fields/Fields";
+import { helpers } from "src/helpers";
 import { Template } from "src/templates/Template";
+import { bre } from "src/Types/bre";
 
-export class BlocksContainer {
+export const getContainerData = (
+  container: bre.core.IBlocksContainer,
+  ignoreHtml?: boolean
+) => container.blocks.map(block => block.getData(ignoreHtml));
+
+export const getContainerHtml = (container: bre.core.IBlocksContainer) => {
+  const html = container.blocks.map(block => block.getHtml(true)).join("\n");
+  const root: HTMLElement = container.$element.cloneNode(false) as HTMLElement;
+  root.innerHTML = html;
+  return root.outerHTML;
+};
+
+// TODO: add custom placeholder and localization
+const getDefaultPlaceholder = () =>
+  helpers.createElement(
+    '<i data-bre-placeholder="true">Click here to select this container...</i>'
+  );
+
+const toggleContainerPlaceholderIfNeed = (
+  container: bre.core.IBlocksContainer
+) => {
+  if (container.usePlaceholder !== true) {
+    return;
+  }
+
+  if (container.$placeholder !== undefined) {
+    container.$placeholder.remove();
+    container.$placeholder = undefined;
+    return;
+  }
+
+  if (container.blocks.length === 0) {
+    const $placeholder = getDefaultPlaceholder();
+    container.$placeholder = $placeholder;
+    container.$element.appendChild($placeholder);
+  }
+};
+
+export class BlocksContainer implements bre.core.IBlocksContainer {
+  public $element: HTMLElement;
+  public $placeholder: HTMLElement;
+
+  public usePlaceholder: boolean;
+
   public blocks: Block[] = [];
   public selectedBlock: Block;
   public isContainer: boolean = true;
-  public $placeholder: HTMLElement;
 
   constructor(
-    private $element: HTMLElement,
+    $element: HTMLElement,
     private onAddBlock: (block: Block, idx: number) => any,
     private onDeleteBlock: (block: Block, idx: number) => any,
     private onSelectBlock: (block: Block) => any,
@@ -22,32 +66,13 @@ export class BlocksContainer {
       oldValue: any,
       newValue: any
     ) => any,
-    private onUpload: (file: any, callback: (url: string) => void) => void,
-    private usePlaceholder: boolean = false
+    private onUpload: bre.FileUploadHandler,
+    usePlaceholder: boolean = false
   ) {
-    this.togglePlaceholderIfNeed();
-  }
+    this.$element = $element;
+    this.usePlaceholder = usePlaceholder;
 
-  public getData(ignoreHtml?: boolean): any {
-    const blocksData = [];
-    this.blocks.forEach(block => {
-      blocksData.push(block.getData(ignoreHtml));
-    });
-    return blocksData;
-  }
-
-  public getHtml(): string {
-    const blocksHtml = [];
-    this.blocks.forEach(block => {
-      blocksHtml.push(block.getHtml(true));
-    });
-
-    const $el = $dom.clone(this.$element);
-    $el.innerHTML = blocksHtml.join("\n");
-    return $el.outerHTML;
-
-    // const html = $('<div></div>').appendChild($el).html();
-    // return html;
+    toggleContainerPlaceholderIfNeed(this);
   }
 
   public addBlock(
@@ -56,18 +81,15 @@ export class BlocksContainer {
     idx?: number,
     select: boolean = true
   ) {
-    const block = new Block(
-      template,
-      false,
-      data,
-      block => this.deleteBlock(block),
-      block => this.selectBlock(block),
-      block => this.deselectBlock(block),
-      block => this.copyBlock(block),
-      (block, offset) => this.moveBlock(block, offset),
-      this.onUpdateBlock,
-      this.onUpload
-    );
+    const block = new Block(template, false, data, {
+      onDelete: this.deleteBlock,
+      onSelect: this.selectBlock,
+      onDeselect: this.deselectBlock,
+      onCopy: this.copyBlock,
+      onMove: (b, offset) => this.moveBlock(b, offset),
+      onUpdate: this.onUpdateBlock,
+      onUpload: this.onUpload,
+    });
 
     this.insertBlock(block, idx);
 
@@ -95,7 +117,7 @@ export class BlocksContainer {
     this.onAddBlock(block, idx);
     block.select(null);
 
-    this.togglePlaceholderIfNeed();
+    toggleContainerPlaceholderIfNeed(this);
   }
 
   private deleteBlock(block: Block) {
@@ -114,7 +136,7 @@ export class BlocksContainer {
     // Trigger event
     this.onDeleteBlock(block, idx);
 
-    this.togglePlaceholderIfNeed();
+    toggleContainerPlaceholderIfNeed(this);
   }
 
   private moveBlock(block: Block, offset: number) {
@@ -167,23 +189,5 @@ export class BlocksContainer {
   private deselectBlock(block: Block) {
     this.selectedBlock = null;
     this.onDeselectBlock(block);
-  }
-
-  private togglePlaceholderIfNeed() {
-    if (!this.usePlaceholder) {
-      return;
-    }
-
-    if (this.blocks.length === 0) {
-      if (!this.$placeholder) {
-        this.$placeholder = $dom.el(
-          '<i data-bre-placeholder="true">Click here to select this container...</i>'
-        );
-        this.$element.appendChild(this.$placeholder);
-      }
-    } else if (this.$placeholder) {
-      this.$placeholder.remove();
-      this.$placeholder = null;
-    }
   }
 }

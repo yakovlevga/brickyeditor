@@ -4,30 +4,25 @@ import { str } from "src/common/Common";
 import { $dom } from "src/common/DOMHelpers";
 import { BaseField, ContainerField } from "src/fields/Fields";
 import { Template } from "src/templates/Template";
+import { bre } from "src/Types/bre";
 import { Selectors } from "src/ui/Selectors";
 
 export class Block {
+  public template: Template;
   public fields: BaseField[] = [];
   public ui: BlockUI;
   public selectedField: BaseField;
+  public events: bre.core.block.Events;
 
   constructor(
-    public template: Template,
+    template: Template,
     preview: boolean,
     data?: BaseField[],
-    private onDelete?: (block: Block) => void,
-    private onSelect?: (block: Block) => void,
-    private onDeselect?: (block: Block) => void,
-    private onCopy?: (block: Block) => void,
-    private onMove?: (block: Block, offset: number) => void,
-    private onUpdate?: (
-      block: Block,
-      property: string,
-      oldValue: any,
-      newValue: any
-    ) => void,
-    private onUpload?: (file: any, callback: (url: string) => void) => void
+    events?: bre.core.block.Events
   ) {
+    this.template = template;
+    this.events = events;
+
     const $block = $dom.el(template.$html.innerHTML);
     this.bindFields($block, data);
     const actions = this.getActions();
@@ -46,18 +41,18 @@ export class Block {
 
   public delete() {
     this.ui.delete();
-    this.onDelete(this);
+    this.events.onDelete(this);
   }
 
   public move(offset: number) {
-    this.onMove(this, offset);
+    this.events.onMove(this, offset);
   }
 
   public clone() {
-    this.onCopy(this);
+    this.events.onCopy(this);
   }
 
-  public select(field?: BaseField) {
+  public select(field?: BaseField): void {
     if (field === this.selectedField) {
       return;
     }
@@ -72,7 +67,7 @@ export class Block {
 
     this.selectedField = field;
     this.ui.toggleSelection(true);
-    this.onSelect(this);
+    this.events.onSelect(this);
   }
 
   public deselect() {
@@ -81,7 +76,7 @@ export class Block {
       f.deselect();
     });
     this.ui.toggleSelection(false);
-    this.onDeselect(this);
+    this.events.onDeselect(this);
   }
 
   public scrollTo() {
@@ -110,9 +105,12 @@ export class Block {
 
   public getHtml(trim: boolean): string {
     const $html = $dom.el(this.template.$html.innerHTML);
-    const fieldsHtml = {};
+    const fieldsHtml: {
+      [TKey: string]: HTMLElement;
+    } = {};
+
     this.fields.forEach(field => {
-      const name = field.name || field.data.name;
+      const name: string = field.name || field.data.name;
       fieldsHtml[name] = field.getEl();
     });
 
@@ -141,8 +139,8 @@ export class Block {
     const $fields = $dom.select($block, Selectors.selectorField, true);
     $fields.forEach($elem => {
       const onUpdate = (property: string, oldValue: any, newValue: any) => {
-        if (block.onUpdate) {
-          block.onUpdate(block, property, oldValue, newValue);
+        if (block.events.onUpdate !== undefined) {
+          block.events.onUpdate(block, property, oldValue, newValue);
         }
       };
 
@@ -153,7 +151,7 @@ export class Block {
         data,
         onSelect,
         onUpdate,
-        block.onUpload
+        block.events.onUpload
       );
       block.fields.push(field);
     });
