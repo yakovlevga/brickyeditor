@@ -1,3 +1,4 @@
+import { Block } from "src/block/Block";
 import {
   BlocksContainer,
   getContainerData,
@@ -14,7 +15,6 @@ import { Template } from "src/templates/Template";
 import { bre } from "src/Types/bre";
 import { Selectors } from "src/ui/Selectors";
 import { UI } from "src/ui/UI";
-import { Block } from "tsc/block/Block";
 
 export class Editor {
   public static UI: UI;
@@ -122,8 +122,8 @@ export class Editor {
     };
 
     const onDelete = (block: Block, idx: number) => {
-      this.trigger(Events.onBlockDelete, { block, idx });
-      this.trigger(Events.onChange, {
+      this.trigger("onBlockDelete", { block, idx });
+      this.trigger("onChange", {
         blocks: this.getData(),
         html: this.getHtml(),
       });
@@ -190,13 +190,14 @@ export class Editor {
     });
   }
 
-  private getContainer(container: BlocksContainer) {
+  private getContainer(container: BlocksContainer): BlocksContainer {
     if (container.selectedBlock && container.selectedBlock.isContainer()) {
       const field = container.selectedBlock.selectedField as ContainerField;
       if (field) {
         return this.getContainer(field.container);
       }
     }
+
     return container;
   }
 

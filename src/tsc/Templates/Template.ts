@@ -1,6 +1,16 @@
-import { $dom } from "src/common/DOMHelpers";
-import { Selectors } from "src/ui/Selectors";
 import { Block } from "src/block/Block";
+import { $dom } from "src/common/DOMHelpers";
+import { helpers } from "src/helpers";
+import { bre } from "src/Types/bre";
+import { Selectors } from "src/ui/Selectors";
+
+export const getTemplatePreview = (template: bre.core.ITemplate) => {
+  const $template = helpers.createElement(
+    `<div class='${Selectors.classTemplate}'></div>`
+  );
+  $template.appendChild(template.$preview);
+  return $template;
+};
 
 export class Template {
   public name: string;

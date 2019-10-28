@@ -58,6 +58,13 @@ declare namespace bre {
       // add: (block: Block) => void;
     }
 
+    interface ITemplate {
+      $html: HTMLElement;
+      $preview: HTMLElement;
+      name: string;
+      loaded: boolean;
+    }
+
     namespace block {
       type Event = (block: Block) => void;
       type MoveEvent = (block: Block, offset: number) => void;
