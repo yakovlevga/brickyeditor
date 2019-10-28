@@ -99,8 +99,8 @@ declare namespace bre {
   // };
 
   type Data = {
-    [TKey: string]: any;
     name: string;
+    [TKey: string]: any;
   };
 
   // namespace field {

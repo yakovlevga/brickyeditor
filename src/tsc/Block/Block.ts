@@ -12,7 +12,7 @@ export class Block {
   public fields: BaseField[] = [];
   public ui: BlockUI;
   public selectedField: BaseField;
-  public events: bre.core.block.Events;
+  public events?: bre.core.block.Events;
 
   constructor(
     template: Template,
@@ -151,7 +151,7 @@ export class Block {
         data,
         onSelect,
         onUpdate,
-        block.events.onUpload
+        block.events ? block.events.onUpload : undefined
       );
       block.fields.push(field);
     });
