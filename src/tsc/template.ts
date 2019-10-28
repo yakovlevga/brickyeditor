@@ -1,13 +1,14 @@
+import { Block } from "src/block/Block";
 import { http } from "src/common/AJAXHelper";
 import { str } from "src/common/Common";
 import { $dom } from "src/common/DOMHelpers";
 import { EditorStrings } from "src/EditorStrings";
 import { helpers } from "src/helpers";
-import { createTemplate } from "src/templates/Template";
 import { bre } from "src/Types/bre";
 import { Selectors } from "src/ui/Selectors";
 
-const grouppedTemplates: bre.core.ITemplateGroup[] = [];
+type onErrorHandler = (message: string, code?: number) => any;
+
 let allTemplates: bre.core.ITemplate[] = [];
 
 export const getTemplate = (
@@ -23,8 +24,10 @@ export const getTemplate = (
 export const loadTemplatesAsync = async (
   url: string,
   $editor: HTMLElement,
-  onError: (message: string, code?: number) => any
+  onError: onErrorHandler
 ) => {
+  const grouppedTemplates: bre.core.ITemplateGroup[] = [];
+
   try {
     const data = await http.get(url);
 
@@ -73,10 +76,7 @@ export const loadTemplatesAsync = async (
   }
 };
 
-const parseTemplates = (
-  $el: HTMLElement,
-  onError: (message: string, code?: number) => any
-) => {
+const parseTemplates = ($el: HTMLElement, onError: onErrorHandler) => {
   const templates: bre.core.ITemplate[] = [];
 
   const $templates = $el.querySelectorAll<HTMLElement>(
@@ -84,14 +84,51 @@ const parseTemplates = (
   );
 
   $templates.forEach($template => {
-    const template = createTemplate($template);
-    if (template.loaded) {
+    const template = createTemplate($template, onError);
+    if (template !== null) {
       templates.push(template);
-    } else {
-      // TODO move to createTemplate method and use .map.filter
-      onError(EditorStrings.errorTemplateParsing(template.name));
     }
   });
 
   return templates;
+};
+
+export const getTemplatePreview = (template: bre.core.ITemplate) => {
+  const $template = helpers.createElement(
+    `<div class='${Selectors.classTemplate}'></div>`
+  );
+  $template.appendChild(template.$preview);
+  return $template;
+};
+
+const createTemplate = (
+  $template: HTMLElement,
+  onError: onErrorHandler
+): bre.core.ITemplate | null => {
+  const $html = $template;
+  const name = $template.dataset.name || "";
+
+  let $preview = $template.querySelector<HTMLElement>(
+    Selectors.selectorTemplatePreview
+  );
+
+  if ($preview !== null) {
+    $template.removeChild($preview);
+  } else {
+    const block = new Block(name, $html.innerHTML, true);
+    const blockHtml = block.getHtml(true);
+
+    if (blockHtml === null) {
+      onError(EditorStrings.errorTemplateParsing(name));
+      return null;
+    }
+
+    $preview = helpers.createElement(blockHtml);
+  }
+
+  return {
+    name,
+    $html,
+    $preview,
+  };
 };

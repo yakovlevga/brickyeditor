@@ -67,7 +67,6 @@ declare namespace bre {
       $html: HTMLElement;
       $preview: HTMLElement;
       name: string;
-      loaded: boolean;
     }
 
     namespace block {

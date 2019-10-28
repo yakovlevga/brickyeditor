@@ -1,11 +1,11 @@
 import { $dom } from "src/common/DOMHelpers";
 import { Editor } from "src/Editor";
 import { EditorStrings } from "src/EditorStrings";
-import { getTemplatePreview } from "src/Templates/Template";
 import { bre } from "src/Types/bre";
 import { HtmlTools } from "src/ui/HtmlTools";
 import { Modal } from "src/ui/Modal";
 import { Selectors } from "src/ui/Selectors";
+import { getTemplatePreview } from "src/template";
 
 export class UI {
   public static initBtnDeck($btnsDeck: HTMLElement) {
