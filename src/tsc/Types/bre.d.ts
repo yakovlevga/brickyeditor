@@ -59,7 +59,7 @@ declare namespace bre {
     }
 
     interface ITemplateGroup {
-      name: string;
+      name: string | null;
       templates: bre.core.ITemplate[];
     }
 

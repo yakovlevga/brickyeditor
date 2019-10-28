@@ -1,12 +1,12 @@
-export class $ajax {
-  static get(url: string): Promise<any> {
+export const http = {
+  get(url: string): Promise<any> {
     return new Promise<any>((resolve, reject) => {
-      var request = new XMLHttpRequest();
+      let request: XMLHttpRequest | null = new XMLHttpRequest();
       request.open("GET", url, true);
       request.onreadystatechange = function() {
         if (this.readyState === 4) {
           if (this.status >= 200 && this.status < 400) {
-            var data = null;
+            let data = null;
             try {
               data = JSON.parse(this.responseText);
             } catch {
@@ -26,18 +26,18 @@ export class $ajax {
       request.send();
       request = null;
     });
-  }
+  },
 
-  static getScript(url: string) {
+  getScript(url: string) {
     return new Promise((resolve, reject) => {
-      var script = document.createElement("script");
-      var done = false;
-      var loaded = function() {
+      const script = document.createElement("script");
+      let done = false;
+      const loaded = function() {
         if (
           !done &&
           (!this.readyState ||
-            this.readyState == "loaded" ||
-            this.readyState == "complete")
+            this.readyState === "loaded" ||
+            this.readyState === "complete")
         ) {
           done = true;
           resolve();
@@ -46,28 +46,32 @@ export class $ajax {
         }
       };
       script.onload = loaded;
-      (<any>script).onreadystatechange = loaded;
+      if ((script as any).onreadystatechange !== undefined) {
+        (script as any).onreadystatechange = loaded;
+      }
 
       script.src = url;
-      var head = document.getElementsByTagName("head")[0];
+      const head = document.getElementsByTagName("head")[0];
       head.appendChild(script);
     });
-  }
+  },
 
   // https://stackoverflow.com/a/31556957
-  static jsonp(url: string) {
-    return new Promise(function(resolve, reject) {
-      var id = "_" + Math.round(10000 * Math.random());
-      var callbackName = "jsonp_callback_" + id;
-      window[callbackName] = function(data) {
-        delete window[callbackName];
-        var ele = document.getElementById(id);
-        ele.parentNode.removeChild(ele);
+  jsonp(url: string) {
+    return new Promise((resolve, reject) => {
+      const id = "_" + Math.round(10000 * Math.random());
+      const callbackName = "jsonp_callback_" + id;
+      (window as any)[callbackName] = (data: any) => {
+        delete (window as any)[callbackName];
+        const element = document.getElementById(id);
+        if (element !== null) {
+          element.remove();
+        }
         resolve(data);
       };
 
-      var src = url + "&callback=" + callbackName;
-      var script = document.createElement("script");
+      const src = url + "&callback=" + callbackName;
+      const script = document.createElement("script");
       script.src = src;
       script.id = id;
       script.addEventListener("error", reject);
@@ -77,5 +81,5 @@ export class $ajax {
         document.documentElement
       ).appendChild(script);
     });
-  }
-}
+  },
+};

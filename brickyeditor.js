@@ -46,6 +46,17 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 define("tsc/common/DOMHelpers", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -409,7 +420,7 @@ define("tsc/common/Common", ["require", "exports"], function (require, exports) 
     }());
     exports.Common = Common;
 });
-define("tsc/fields/BaseField", ["require", "exports", "tsc/common/Common", "tsc/common/DOMHelpers", "tsc/fields/Fields", "tsc/ui/Selectors"], function (require, exports, Common_1, DOMHelpers_1, Fields_1, Selectors_1) {
+define("tsc/fields/BaseField", ["require", "exports", "tsc/common/Common", "tsc/common/DOMHelpers", "tsc/Fields/Fields", "tsc/ui/Selectors"], function (require, exports, Common_1, DOMHelpers_1, Fields_1, Selectors_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var BaseField = (function () {
@@ -1500,7 +1511,7 @@ define("tsc/fields/ImageField", ["require", "exports", "tsc/common/DOMHelpers", 
     }(BaseField_4.BaseField));
     exports.ImageField = ImageField;
 });
-define("tsc/fields/Fields", ["require", "exports", "tsc/fields/BaseField", "tsc/fields/ContainerField", "tsc/fields/EmbedField", "tsc/fields/HtmlField", "tsc/fields/ImageField"], function (require, exports, BaseField_5, ContainerField_1, EmbedField_1, HtmlField_1, ImageField_1) {
+define("tsc/Fields/Fields", ["require", "exports", "tsc/fields/BaseField", "tsc/fields/ContainerField", "tsc/fields/EmbedField", "tsc/fields/HtmlField", "tsc/fields/ImageField"], function (require, exports, BaseField_5, ContainerField_1, EmbedField_1, HtmlField_1, ImageField_1) {
     "use strict";
     function __export(m) {
         for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
@@ -1512,13 +1523,37 @@ define("tsc/fields/Fields", ["require", "exports", "tsc/fields/BaseField", "tsc/
     __export(HtmlField_1);
     __export(ImageField_1);
 });
-define("tsc/BlocksContainer", ["require", "exports", "tsc/block/Block", "tsc/common/DOMHelpers"], function (require, exports, Block_1, DOMHelpers_11) {
+define("tsc/BlocksContainer", ["require", "exports", "tsc/block/Block", "tsc/common/DOMHelpers", "tsc/helpers"], function (require, exports, Block_1, DOMHelpers_11, helpers_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    exports.getContainerData = function (container, ignoreHtml) { return container.blocks.map(function (block) { return block.getData(ignoreHtml); }); };
+    exports.getContainerHtml = function (container) {
+        var html = container.blocks.map(function (block) { return block.getHtml(true); }).join("\n");
+        var root = container.$element.cloneNode(false);
+        root.innerHTML = html;
+        return root.outerHTML;
+    };
+    var getDefaultPlaceholder = function () {
+        return helpers_2.helpers.createElement('<i data-bre-placeholder="true">Click here to select this container...</i>');
+    };
+    var toggleContainerPlaceholderIfNeed = function (container) {
+        if (container.usePlaceholder !== true) {
+            return;
+        }
+        if (container.$placeholder !== undefined) {
+            container.$placeholder.remove();
+            container.$placeholder = undefined;
+            return;
+        }
+        if (container.blocks.length === 0) {
+            var $placeholder = getDefaultPlaceholder();
+            container.$placeholder = $placeholder;
+            container.$element.appendChild($placeholder);
+        }
+    };
     var BlocksContainer = (function () {
         function BlocksContainer($element, onAddBlock, onDeleteBlock, onSelectBlock, onDeselectBlock, onMoveBlock, onUpdateBlock, onUpload, usePlaceholder) {
             if (usePlaceholder === void 0) { usePlaceholder = false; }
-            this.$element = $element;
             this.onAddBlock = onAddBlock;
             this.onDeleteBlock = onDeleteBlock;
             this.onSelectBlock = onSelectBlock;
@@ -1526,27 +1561,12 @@ define("tsc/BlocksContainer", ["require", "exports", "tsc/block/Block", "tsc/com
             this.onMoveBlock = onMoveBlock;
             this.onUpdateBlock = onUpdateBlock;
             this.onUpload = onUpload;
-            this.usePlaceholder = usePlaceholder;
             this.blocks = [];
             this.isContainer = true;
-            this.togglePlaceholderIfNeed();
+            this.$element = $element;
+            this.usePlaceholder = usePlaceholder;
+            toggleContainerPlaceholderIfNeed(this);
         }
-        BlocksContainer.prototype.getData = function (ignoreHtml) {
-            var blocksData = [];
-            this.blocks.forEach(function (block) {
-                blocksData.push(block.getData(ignoreHtml));
-            });
-            return blocksData;
-        };
-        BlocksContainer.prototype.getHtml = function () {
-            var blocksHtml = [];
-            this.blocks.forEach(function (block) {
-                blocksHtml.push(block.getHtml(true));
-            });
-            var $el = DOMHelpers_11.$dom.clone(this.$element);
-            $el.innerHTML = blocksHtml.join("\n");
-            return $el.outerHTML;
-        };
         BlocksContainer.prototype.addBlock = function (template, data, idx, select) {
             var _this = this;
             if (select === void 0) { select = true; }
@@ -1563,7 +1583,7 @@ define("tsc/BlocksContainer", ["require", "exports", "tsc/block/Block", "tsc/com
                 idx = this.blocks.indexOf(this.selectedBlock) + 1;
             }
             this.blocks.splice(idx, 0, block);
-            if (idx == 0) {
+            if (idx === 0) {
                 this.$element.appendChild(block.ui.$editor);
             }
             else {
@@ -1571,7 +1591,7 @@ define("tsc/BlocksContainer", ["require", "exports", "tsc/block/Block", "tsc/com
             }
             this.onAddBlock(block, idx);
             block.select(null);
-            this.togglePlaceholderIfNeed();
+            toggleContainerPlaceholderIfNeed(this);
         };
         BlocksContainer.prototype.deleteBlock = function (block) {
             var idx = this.blocks.indexOf(block);
@@ -1587,7 +1607,7 @@ define("tsc/BlocksContainer", ["require", "exports", "tsc/block/Block", "tsc/com
                 this.selectedBlock = null;
             }
             this.onDeleteBlock(block, idx);
-            this.togglePlaceholderIfNeed();
+            toggleContainerPlaceholderIfNeed(this);
         };
         BlocksContainer.prototype.moveBlock = function (block, offset) {
             var idx = this.blocks.indexOf(block);
@@ -1625,85 +1645,33 @@ define("tsc/BlocksContainer", ["require", "exports", "tsc/block/Block", "tsc/com
             this.selectedBlock = null;
             this.onDeselectBlock(block);
         };
-        BlocksContainer.prototype.togglePlaceholderIfNeed = function () {
-            if (!this.usePlaceholder) {
-                return;
-            }
-            if (this.blocks.length === 0) {
-                if (!this.$placeholder) {
-                    this.$placeholder = DOMHelpers_11.$dom.el('<i data-bre-placeholder="true">Click here to select this container...</i>');
-                    this.$element.appendChild(this.$placeholder);
-                }
-            }
-            else if (this.$placeholder) {
-                this.$placeholder.remove();
-                this.$placeholder = null;
-            }
-        };
         return BlocksContainer;
     }());
     exports.BlocksContainer = BlocksContainer;
 });
-define("tsc/EditorOptions", ["require", "exports"], function (require, exports) {
+define("tsc/defaults", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    var EditorOptions = (function () {
-        function EditorOptions(options) {
-            this.templatesUrl = "templates/bootstrap4.html";
-            this.compactTools = null;
-            this.compactToolsWidth = 768;
-            this.ignoreHtml = null;
-            this.htmlToolsButtons = null;
-            this.onError = function (data) {
-                console.log(data.message);
-            };
-            this.templatesUrl = options.templatesUrl || this.templatesUrl;
-            this.onLoad = options.onLoad || options.onload;
-            this.onChange = options.onChange;
-            this.onBlockAdd = options.onBlockAdd;
-            this.onBlockDelete = options.onBlockDelete;
-            this.onBlockMove = options.onBlockMove;
-            this.onBlockSelect = options.onBlockSelect;
-            this.onBlockDeselect = options.onBlockDeselect;
-            this.onBlockUpdate = options.onBlockUpdate;
-            this.onError = options.onError || this.onError;
-            this.onUpload = options.onUpload || null;
-            this.blocksUrl = options.blocksUrl || null;
-            this.blocks = options.blocks || null;
-            this.compactTools = options.compactTools;
-            this.ignoreHtml = options.ignoreHtml || false;
-            this.htmlToolsButtons = options.htmlToolsButtons || null;
-            this.formSelector = options.formSelector || null;
-            this.inputSelector = options.inputSelector || null;
-        }
-        return EditorOptions;
-    }());
-    exports.EditorOptions = EditorOptions;
+    exports.defaultOptions = {
+        templatesUrl: "templates/bootstrap4.html",
+        compactTools: false,
+        compactToolsWidth: 768,
+        ignoreHtml: true,
+        onError: function (data) {
+            console.log(data.message);
+        },
+    };
 });
-define("tsc/Events", ["require", "exports"], function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var Events = (function () {
-        function Events() {
-        }
-        Events.onLoad = "onLoad";
-        Events.onChange = "onChange";
-        Events.onBlockAdd = "onBlockAdd";
-        Events.onBlockDelete = "onBlockDelete";
-        Events.onBlockMove = "onBlockMove";
-        Events.onBlockSelect = "onBlockSelect";
-        Events.onBlockDeselect = "onBlockDeselect";
-        Events.onBlockUpdate = "onBlockUpdate";
-        return Events;
-    }());
-    exports.Events = Events;
-});
-define("tsc/Editor", ["require", "exports", "tsc/BlocksContainer", "tsc/common/AJAXHelper", "tsc/common/Common", "tsc/common/DOMHelpers", "tsc/EditorOptions", "tsc/EditorStrings", "tsc/Events", "tsc/fields/Fields", "tsc/Services/Services", "tsc/ui/Selectors", "tsc/ui/UI"], function (require, exports, BlocksContainer_2, AJAXHelper_4, Common_4, DOMHelpers_12, EditorOptions_1, EditorStrings_4, Events_1, Fields_2, Services_2, Selectors_5, UI_1) {
+define("tsc/Editor", ["require", "exports", "tsc/BlocksContainer", "tsc/common/AJAXHelper", "tsc/common/Common", "tsc/common/DOMHelpers", "tsc/defaults", "tsc/EditorStrings", "tsc/Fields/Fields", "tsc/Services/Services", "tsc/ui/Selectors", "tsc/ui/UI"], function (require, exports, BlocksContainer_2, AJAXHelper_4, Common_4, DOMHelpers_12, defaults_1, EditorStrings_4, Fields_2, Services_2, Selectors_5, UI_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Editor = (function () {
         function Editor($editor, options) {
             var _this = this;
+            this.getData = function () {
+                return BlocksContainer_2.getContainerData(_this.container, _this.options.ignoreHtml);
+            };
+            this.getHtml = function () { return BlocksContainer_2.getContainerHtml(_this.container); };
             this.onError = function (message, code) {
                 if (code === void 0) { code = 0; }
                 return _this.options.onError({ message: message, code: code });
@@ -1711,7 +1679,7 @@ define("tsc/Editor", ["require", "exports", "tsc/BlocksContainer", "tsc/common/A
             Fields_2.BaseField.registerCommonFields();
             this.$editor = $editor;
             this.$editor.classList.add(Selectors_5.Selectors.classEditor);
-            this.options = new EditorOptions_1.EditorOptions(options);
+            this.options = __assign({}, defaults_1.defaultOptions, options);
             this.container = this.createContainer();
             Editor.UI = new UI_1.UI(this);
             this.tryBindFormSubmit();
@@ -1734,7 +1702,7 @@ define("tsc/Editor", ["require", "exports", "tsc/BlocksContainer", "tsc/common/A
                             blocks = _a.sent();
                             this.loadBlocks(blocks);
                             this.isLoaded = true;
-                            this.trigger(Events_1.Events.onLoad, this);
+                            this.trigger("onLoad", this);
                             return [2];
                     }
                 });
@@ -1755,12 +1723,6 @@ define("tsc/Editor", ["require", "exports", "tsc/BlocksContainer", "tsc/common/A
                 $input.value = JSON.stringify(editor.getData());
                 return true;
             });
-        };
-        Editor.prototype.getData = function () {
-            return this.container.getData(this.options.ignoreHtml);
-        };
-        Editor.prototype.getHtml = function () {
-            return this.container.getHtml();
         };
         Editor.prototype.loadBlocks = function (blocks) {
             var _this = this;
@@ -1785,39 +1747,39 @@ define("tsc/Editor", ["require", "exports", "tsc/BlocksContainer", "tsc/common/A
             var _this = this;
             var onAdd = function (block, idx) {
                 if (_this.isLoaded) {
-                    _this.trigger(Events_1.Events.onBlockAdd, { block: block, idx: idx });
-                    _this.trigger(Events_1.Events.onChange, {
+                    _this.trigger("onBlockAdd", { block: block, idx: idx });
+                    _this.trigger("onChange", {
                         blocks: _this.getData(),
                         html: _this.getHtml(),
                     });
                 }
             };
             var onDelete = function (block, idx) {
-                _this.trigger(Events_1.Events.onBlockDelete, { block: block, idx: idx });
-                _this.trigger(Events_1.Events.onChange, {
+                _this.trigger(Events.onBlockDelete, { block: block, idx: idx });
+                _this.trigger(Events.onChange, {
                     blocks: _this.getData(),
                     html: _this.getHtml(),
                 });
             };
             var onUpdate = function (block, property, oldValue, newValue) {
-                _this.trigger(Events_1.Events.onBlockUpdate, {
+                _this.trigger("onBlockUpdate", {
                     block: block,
                     property: property,
                     oldValue: oldValue,
                     newValue: newValue,
                 });
-                _this.trigger(Events_1.Events.onChange, {
+                _this.trigger("onChange", {
                     blocks: _this.getData(),
                     html: _this.getHtml(),
                 });
             };
             return new BlocksContainer_2.BlocksContainer(this.$editor, onAdd, onDelete, function (block) {
-                _this.trigger(Events_1.Events.onBlockSelect, { block: block });
+                _this.trigger("onBlockSelect", { block: block });
             }, function (block) {
-                _this.trigger(Events_1.Events.onBlockDeselect, { block: block });
+                _this.trigger("onBlockDeselect", { block: block });
             }, function (block, from, to) {
-                _this.trigger(Events_1.Events.onBlockMove, { block: block, from: from, to: to });
-                _this.trigger(Events_1.Events.onChange, {
+                _this.trigger("onBlockMove", { block: block, from: from, to: to });
+                _this.trigger("onChange", {
                     blocks: _this.getData(),
                     html: _this.getHtml(),
                 });
@@ -1835,7 +1797,7 @@ define("tsc/Editor", ["require", "exports", "tsc/BlocksContainer", "tsc/common/A
                             return __generator(this, function (_a) {
                                 switch (_a.label) {
                                     case 0:
-                                        if (!url) return [3, 5];
+                                        if (!(url !== undefined)) return [3, 5];
                                         _a.label = 1;
                                     case 1:
                                         _a.trys.push([1, 3, , 4]);
@@ -1851,7 +1813,7 @@ define("tsc/Editor", ["require", "exports", "tsc/BlocksContainer", "tsc/common/A
                                         return [3, 4];
                                     case 4: return [3, 6];
                                     case 5:
-                                        if (this.options.blocks) {
+                                        if (this.options.blocks !== undefined) {
                                             resolve(this.options.blocks);
                                         }
                                         else {
@@ -2293,21 +2255,15 @@ define("tsc/block/BlockUI", ["require", "exports", "tsc/common/DOMHelpers", "tsc
     }());
     exports.BlockUI = BlockUI;
 });
-define("tsc/block/Block", ["require", "exports", "tsc/block/BlockUI", "tsc/block/BlockUIAction", "tsc/common/Common", "tsc/common/DOMHelpers", "tsc/fields/Fields", "tsc/ui/Selectors"], function (require, exports, BlockUI_1, BlockUIAction_1, Common_6, DOMHelpers_17, Fields_3, Selectors_8) {
+define("tsc/block/Block", ["require", "exports", "tsc/block/BlockUI", "tsc/block/BlockUIAction", "tsc/common/Common", "tsc/common/DOMHelpers", "tsc/Fields/Fields", "tsc/ui/Selectors"], function (require, exports, BlockUI_1, BlockUIAction_1, Common_6, DOMHelpers_17, Fields_3, Selectors_8) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Block = (function () {
-        function Block(template, preview, data, onDelete, onSelect, onDeselect, onCopy, onMove, onUpdate, onUpload) {
+        function Block(template, preview, data, events) {
             var _this = this;
-            this.template = template;
-            this.onDelete = onDelete;
-            this.onSelect = onSelect;
-            this.onDeselect = onDeselect;
-            this.onCopy = onCopy;
-            this.onMove = onMove;
-            this.onUpdate = onUpdate;
-            this.onUpload = onUpload;
             this.fields = [];
+            this.template = template;
+            this.events = events;
             var $block = DOMHelpers_17.$dom.el(template.$html.innerHTML);
             this.bindFields($block, data);
             var actions = this.getActions();
@@ -2321,13 +2277,13 @@ define("tsc/block/Block", ["require", "exports", "tsc/block/BlockUI", "tsc/block
         };
         Block.prototype.delete = function () {
             this.ui.delete();
-            this.onDelete(this);
+            this.events.onDelete(this);
         };
         Block.prototype.move = function (offset) {
-            this.onMove(this, offset);
+            this.events.onMove(this, offset);
         };
         Block.prototype.clone = function () {
-            this.onCopy(this);
+            this.events.onCopy(this);
         };
         Block.prototype.select = function (field) {
             if (field === this.selectedField) {
@@ -2341,7 +2297,7 @@ define("tsc/block/Block", ["require", "exports", "tsc/block/BlockUI", "tsc/block
             }
             this.selectedField = field;
             this.ui.toggleSelection(true);
-            this.onSelect(this);
+            this.eventsonSelect(this);
         };
         Block.prototype.deselect = function () {
             this.selectedField = null;
@@ -2349,7 +2305,7 @@ define("tsc/block/Block", ["require", "exports", "tsc/block/BlockUI", "tsc/block
                 f.deselect();
             });
             this.ui.toggleSelection(false);
-            this.onDeselect(this);
+            this.events.onDeselect(this);
         };
         Block.prototype.scrollTo = function () {
             var top = DOMHelpers_17.$dom.offset(this.ui.$editor).top - 100;

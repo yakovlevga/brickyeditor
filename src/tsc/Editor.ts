@@ -4,13 +4,13 @@ import {
   getContainerData,
   getContainerHtml,
 } from "src/BlocksContainer";
-import { $ajax } from "src/common/AJAXHelper";
+import { http } from "src/common/AJAXHelper";
 import { Common, str } from "src/common/Common";
 import { $dom } from "src/common/DOMHelpers";
 import { defaultOptions } from "src/defaults";
 import { EditorStrings } from "src/EditorStrings";
 import { BaseField, ContainerField } from "src/fields/Fields";
-import { TemplateService } from "src/Services/Services";
+import { getTemplate, loadTemplatesAsync } from "src/template";
 import { bre } from "src/Types/bre";
 import { Selectors } from "src/ui/Selectors";
 import { UI } from "src/ui/UI";
@@ -20,7 +20,7 @@ export class Editor {
 
   public $editor: HTMLElement;
   public options: bre.Options;
-  private isLoaded: boolean;
+  private isLoaded: boolean = false;
   private container: BlocksContainer;
 
   constructor($editor: HTMLElement, options: bre.Options) {
@@ -42,7 +42,7 @@ export class Editor {
     /// Load templates
     Editor.UI.toggleToolsLoader(true);
 
-    const templates = await TemplateService.loadTemplatesAsync(
+    const templates = await loadTemplatesAsync(
       editor.options.templatesUrl,
       editor.$editor,
       editor.onError
@@ -88,7 +88,7 @@ export class Editor {
   public loadBlocks(blocks: any[]) {
     if (blocks && blocks.length) {
       blocks.forEach(block => {
-        const template = TemplateService.getTemplate(block.template);
+        const template = getTemplate(block.template);
         if (template) {
           this.container.addBlock(
             template.name,
@@ -107,7 +107,7 @@ export class Editor {
     }
   }
 
-  public addBlock(template: Template) {
+  public addBlock(template: bre.core.ITemplate) {
     const container = this.getContainer(this.container);
     container.addBlock(
       template.name,
@@ -187,7 +187,7 @@ export class Editor {
     return new Promise<Block[] | null>(async (resolve, reject) => {
       if (url !== undefined) {
         try {
-          const blocks = await $ajax.get(url);
+          const blocks = await http.get(url);
           resolve(blocks);
         } catch (error) {
           editor.onError(EditorStrings.errorBlocksFileNotFound(url));

@@ -2,7 +2,7 @@ import { $dom } from "src/common/DOMHelpers";
 import { Editor } from "src/Editor";
 import { EditorStrings } from "src/EditorStrings";
 import { getTemplatePreview } from "src/Templates/Template";
-import { TemplateGroup } from "src/templates/TemplateGroup";
+import { bre } from "src/Types/bre";
 import { HtmlTools } from "src/ui/HtmlTools";
 import { Modal } from "src/ui/Modal";
 import { Selectors } from "src/ui/Selectors";
@@ -87,7 +87,7 @@ export class UI {
     $dom.toggle(this.$toolsLoader, toggle);
   }
 
-  public setTemplates(templateGroups: TemplateGroup[]) {
+  public setTemplates(templateGroups: bre.core.ITemplateGroup[]) {
     const { editor } = this;
     templateGroups.forEach(group => {
       if (group.templates.length === 0) {

@@ -1,15 +1,13 @@
-import { $ajax } from "src/common/AJAXHelper";
+import { http } from "src/common/AJAXHelper";
 
 export class EmbedService {
-  static Instagram: string = "Instagram";
-
-  constructor() {}
+  public static Instagram: string = "Instagram";
 
   public static getEmbedAsync(embedUrl: string): Promise<any> {
     const url = `https://noembed.com/embed?url=${embedUrl}`;
     return new Promise<any>(async (resolve, reject) => {
       try {
-        const data = await $ajax.jsonp(url);
+        const data = await http.jsonp(url);
         resolve(data);
       } catch (err) {
         reject(err);
@@ -29,4 +27,6 @@ export class EmbedService {
         break;
     }
   }
+
+  constructor() {}
 }
