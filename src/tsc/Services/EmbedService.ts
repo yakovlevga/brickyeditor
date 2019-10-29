@@ -1,4 +1,4 @@
-import { http } from "src/common/AJAXHelper";
+import { jsonp } from "src/httpTransport";
 
 export class EmbedService {
   public static Instagram: string = "Instagram";
@@ -7,7 +7,7 @@ export class EmbedService {
     const url = `https://noembed.com/embed?url=${embedUrl}`;
     return new Promise<any>(async (resolve, reject) => {
       try {
-        const data = await http.jsonp(url);
+        const data = await jsonp(url);
         resolve(data);
       } catch (err) {
         reject(err);
@@ -27,6 +27,4 @@ export class EmbedService {
         break;
     }
   }
-
-  constructor() {}
 }

@@ -44,12 +44,10 @@ const toggleContainerPlaceholderIfNeed = (
 
 export class BlocksContainer implements bre.core.IBlocksContainer {
   public $element: HTMLElement;
-  public $placeholder: HTMLElement;
-
+  public $placeholder?: HTMLElement;
   public usePlaceholder: boolean;
-
   public blocks: Block[] = [];
-  public selectedBlock: Block;
+  public selectedBlock?: Block;
   public isContainer: boolean = true;
 
   constructor(
@@ -115,7 +113,7 @@ export class BlocksContainer implements bre.core.IBlocksContainer {
     }
 
     this.onAddBlock(block, idx);
-    block.select(null);
+    block.select(undefined);
 
     toggleContainerPlaceholderIfNeed(this);
   }

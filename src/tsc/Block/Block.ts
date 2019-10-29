@@ -11,7 +11,7 @@ export class Block {
   public html: string;
   public fields: BaseField[] = [];
   public ui: BlockUI;
-  public selectedField: BaseField;
+  public selectedField?: BaseField;
   public events?: bre.core.block.Events;
 
   constructor(

@@ -2,13 +2,11 @@ import { $dom } from "src/common/DOMHelpers";
 import { BaseField } from "src/fields/BaseField";
 import { Editor } from "src/Editor";
 import { EditorStrings } from "src/EditorStrings";
-import { http } from "src/common/AJAXHelper";
 import { PromptParameter } from "src/Prompt/Prompt";
 import { EmbedService } from "src/Services/Services";
 import { str } from "src/common/Common";
 
 export class EmbedField extends BaseField {
-
   get settings(): (field: BaseField) => void {
     return (field: EmbedField) => {
       this.showEmbedLoaderAsync(field);
@@ -64,7 +62,7 @@ export class EmbedField extends BaseField {
     this.updateProperty("embed", value, fireUpdate);
   }
 
-  setUrl(value: string) {
+  public setUrl(value: string) {
     this.updateProperty("url", value);
   }
 
@@ -79,7 +77,7 @@ export class EmbedField extends BaseField {
     }
   }
 
-  private getPromptParams(): Array<PromptParameter> {
+  private getPromptParams(): PromptParameter[] {
     return [
       new PromptParameter(
         "url",

@@ -49,9 +49,9 @@ declare namespace bre {
   namespace core {
     interface IBlocksContainer {
       $element: HTMLElement;
-      $placeholder: HTMLElement;
+      $placeholder?: HTMLElement;
       blocks: Block[];
-      selectedBlock: Block;
+      selectedBlock?: Block;
       usePlaceholder: boolean;
       // data: () => any;
       // html: () => string;

@@ -4,12 +4,12 @@ import {
   getContainerData,
   getContainerHtml,
 } from "src/BlocksContainer";
-import { http } from "src/common/AJAXHelper";
 import { Common, str } from "src/common/Common";
 import { $dom } from "src/common/DOMHelpers";
 import { defaultOptions } from "src/defaults";
 import { EditorStrings } from "src/EditorStrings";
 import { BaseField, ContainerField } from "src/fields/Fields";
+import { getRequest } from "src/httpTransport";
 import { getTemplate, loadTemplatesAsync } from "src/template";
 import { bre } from "src/Types/bre";
 import { Selectors } from "src/ui/Selectors";
@@ -53,7 +53,9 @@ export class Editor {
 
     // Load initial blocks
     const blocks = await this.tryLoadInitialBlocksAsync();
-    this.loadBlocks(blocks);
+    if (blocks !== null) {
+      this.loadBlocks(blocks);
+    }
 
     // Trigger jQuery event
     this.isLoaded = true;
@@ -85,22 +87,20 @@ export class Editor {
   public getHtml = () => getContainerHtml(this.container);
 
   /// BLOCKS
-  public loadBlocks(blocks: any[]) {
+  public loadBlocks(blocks: Block[]) {
     if (blocks && blocks.length) {
       blocks.forEach(block => {
-        const template = getTemplate(block.template);
+        const template = getTemplate(block.name);
         if (template) {
           this.container.addBlock(
             template.name,
             template.$html.innerHTML,
             block.fields,
-            null,
+            undefined,
             false
           );
         } else {
-          const message = EditorStrings.errorBlockTemplateNotFound(
-            block.template
-          );
+          const message = EditorStrings.errorBlockTemplateNotFound(block.name);
           this.onError(message);
         }
       });
@@ -112,8 +112,8 @@ export class Editor {
     container.addBlock(
       template.name,
       template.$html.innerHTML,
-      null,
-      null,
+      undefined,
+      undefined,
       true
     );
   }
@@ -187,7 +187,7 @@ export class Editor {
     return new Promise<Block[] | null>(async (resolve, reject) => {
       if (url !== undefined) {
         try {
-          const blocks = await http.get(url);
+          const blocks = await getRequest(url);
           resolve(blocks);
         } catch (error) {
           editor.onError(EditorStrings.errorBlocksFileNotFound(url));
