@@ -64,7 +64,7 @@ export class $dom {
 
   // IE8+
   // http://youmightnotneedjquery.com/
-  static show(el: HTMLElement) {
+  public static show(el: HTMLElement) {
     el.style.display = "block";
   }
 
@@ -78,8 +78,8 @@ export class $dom {
   // http://youmightnotneedjquery.com/
   static toggle(el: HTMLElement, force?: boolean) {
     const show = force ? force.valueOf() : this.isHidden(el);
-    if (show) this.show(el);
-    else this.hide(el);
+    if (show) { this.show(el); }
+    else { this.hide(el); }
   }
 
   static before(el: HTMLElement, elToInsert: HTMLElement | HTMLElement[]) {
@@ -90,33 +90,34 @@ export class $dom {
     }
   }
 
-  static after(el: HTMLElement, elToInsert: HTMLElement) {
-    if (el.nextSibling) el.parentNode.insertBefore(elToInsert, el);
-    else el.parentNode.appendChild(elToInsert);
+  public static after(el: HTMLElement, elToInsert: HTMLElement) {
+    if (el.nextSibling) { el.parentNode.insertBefore(elToInsert, el); }
+    else { el.parentNode.appendChild(elToInsert); }
   }
 
   // IE8+
   // http://youmightnotneedjquery.com/
   static hasClass(el: HTMLElement, className: string) {
-    if (el.classList) return el.classList.contains(className);
-    else
+    if (el.classList) { return el.classList.contains(className); }
+    else {
       return new RegExp("(^| )" + className + "( |$)", "gi").test(el.className);
+    }
   }
 
   // IE8+
   // http://youmightnotneedjquery.com/
   static addClass(el: HTMLElement, className: string) {
-    if (this.hasClass(el, className)) return;
+    if (this.hasClass(el, className)) { return; }
 
-    if (el.classList) el.classList.add(className);
-    else el.className += " " + className;
+    if (el.classList) { el.classList.add(className); }
+    else { el.className += " " + className; }
   }
 
   // IE8+
   // http://youmightnotneedjquery.com/
   static removeClass(el: HTMLElement, className: string) {
-    if (el.classList) el.classList.remove(className);
-    else
+    if (el.classList) { el.classList.remove(className); }
+    else {
       el.className = el.className.replace(
         new RegExp(
           "(^|\\b)" + className.split(" ").join("|") + "(\\b|$)",
@@ -124,14 +125,15 @@ export class $dom {
         ),
         " "
       );
+    }
   }
 
   // IE8+
   // http://youmightnotneedjquery.com/
   static toggleClass(el: HTMLElement, className: string, force?: boolean) {
     if (force) {
-      if (force.valueOf()) this.addClass(el, className);
-      else this.removeClass(el, className);
+      if (force.valueOf()) { this.addClass(el, className); }
+      else { this.removeClass(el, className); }
       return;
     }
 
@@ -141,11 +143,11 @@ export class $dom {
       var classes = el.className.split(" ");
       var existingIndex = -1;
       for (var i = classes.length; i--; ) {
-        if (classes[i] === className) existingIndex = i;
+        if (classes[i] === className) { existingIndex = i; }
       }
 
-      if (existingIndex >= 0) classes.splice(existingIndex, 1);
-      else classes.push(className);
+      if (existingIndex >= 0) { classes.splice(existingIndex, 1); }
+      else { classes.push(className); }
 
       el.className = classes.join(" ");
     }
@@ -163,16 +165,16 @@ export class $dom {
 
   static replaceWith(from: HTMLElement, to: HTMLElement) {
     const parent = from.parentElement;
-    if (parent) parent.replaceChild(to, from);
+    if (parent) { parent.replaceChild(to, from); }
   }
 
-  static select(
+  public static select(
     el: HTMLElement,
     selector: string,
     addBack: boolean = false
   ): HTMLElement[] {
     const elements = el.querySelectorAll(selector);
-    var result = Array.prototype.slice.call(elements) as Array<HTMLElement>;
+    var result = Array.prototype.slice.call(elements) as HTMLElement[];
 
     if (addBack && addBack.valueOf() && $dom.matches(el, selector)) {
       result.push(el);
@@ -180,22 +182,22 @@ export class $dom {
     return result;
   }
 
-  static find(selector: string): HTMLElement {
+  public static find(selector: string): HTMLElement {
     return document.querySelector(selector);
   }
 
-  static first(el: HTMLElement, selector: string): HTMLElement {
+  public static first(el: HTMLElement, selector: string): HTMLElement {
     return el.querySelector(selector);
   }
 
-  static clone(el: Element): HTMLElement {
+  public static clone(el: Element): HTMLElement {
     return el.cloneNode(true) as HTMLElement;
   }
 
   // IE9+
   // http://youmightnotneedjquery.com/
-  static trigger(el: Element, ev: string, data: any) {
-    if ((<any>window).CustomEvent) {
+  public static trigger(el: Element, ev: string, data: any) {
+    if ((window as any).CustomEvent) {
       var event = new CustomEvent(ev, { detail: data });
     } else {
       var event = document.createEvent("CustomEvent");
@@ -204,21 +206,21 @@ export class $dom {
     el.dispatchEvent(event);
   }
 
-  static matches(el: Element, selector: string) {
+  public static matches(el: Element, selector: string) {
     const matches =
       el.matches ||
-      el["matchesSelector"] ||
+      el.matchesSelector ||
       el.msMatchesSelector ||
-      el["mozMatchesSelector"] ||
+      el.mozMatchesSelector ||
       el.webkitMatchesSelector ||
-      el["oMatchesSelector"];
+      el.oMatchesSelector;
 
     return matches.call(el, selector);
   }
 
-  static data<T>(el: HTMLElement, prop: string): T {
-    var json = el.dataset[prop];
-    var data: T = null;
+  public static data<T>(el: HTMLElement, prop: string): T {
+    let json = el.dataset[prop];
+    let data: T = null;
 
     try {
       data = JSON.parse(json) as T;

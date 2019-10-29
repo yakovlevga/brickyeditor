@@ -144,10 +144,12 @@ var BrickyEditor = (function (exports) {
         };
         $dom.toggle = function (el, force) {
             var show = force ? force.valueOf() : this.isHidden(el);
-            if (show)
+            if (show) {
                 this.show(el);
-            else
+            }
+            else {
                 this.hide(el);
+            }
         };
         $dom.before = function (el, elToInsert) {
             var _this = this;
@@ -159,37 +161,48 @@ var BrickyEditor = (function (exports) {
             }
         };
         $dom.after = function (el, elToInsert) {
-            if (el.nextSibling)
+            if (el.nextSibling) {
                 el.parentNode.insertBefore(elToInsert, el);
-            else
+            }
+            else {
                 el.parentNode.appendChild(elToInsert);
+            }
         };
         $dom.hasClass = function (el, className) {
-            if (el.classList)
+            if (el.classList) {
                 return el.classList.contains(className);
-            else
+            }
+            else {
                 return new RegExp("(^| )" + className + "( |$)", "gi").test(el.className);
+            }
         };
         $dom.addClass = function (el, className) {
-            if (this.hasClass(el, className))
+            if (this.hasClass(el, className)) {
                 return;
-            if (el.classList)
+            }
+            if (el.classList) {
                 el.classList.add(className);
-            else
+            }
+            else {
                 el.className += " " + className;
+            }
         };
         $dom.removeClass = function (el, className) {
-            if (el.classList)
+            if (el.classList) {
                 el.classList.remove(className);
-            else
+            }
+            else {
                 el.className = el.className.replace(new RegExp("(^|\\b)" + className.split(" ").join("|") + "(\\b|$)", "gi"), " ");
+            }
         };
         $dom.toggleClass = function (el, className, force) {
             if (force) {
-                if (force.valueOf())
+                if (force.valueOf()) {
                     this.addClass(el, className);
-                else
+                }
+                else {
                     this.removeClass(el, className);
+                }
                 return;
             }
             if (el.classList) {
@@ -199,13 +212,16 @@ var BrickyEditor = (function (exports) {
                 var classes = el.className.split(" ");
                 var existingIndex = -1;
                 for (var i = classes.length; i--;) {
-                    if (classes[i] === className)
+                    if (classes[i] === className) {
                         existingIndex = i;
+                    }
                 }
-                if (existingIndex >= 0)
+                if (existingIndex >= 0) {
                     classes.splice(existingIndex, 1);
-                else
+                }
+                else {
                     classes.push(className);
+                }
                 el.className = classes.join(" ");
             }
         };
@@ -218,8 +234,9 @@ var BrickyEditor = (function (exports) {
         };
         $dom.replaceWith = function (from, to) {
             var parent = from.parentElement;
-            if (parent)
+            if (parent) {
                 parent.replaceChild(to, from);
+            }
         };
         $dom.select = function (el, selector, addBack) {
             if (addBack === void 0) { addBack = false; }
@@ -251,11 +268,11 @@ var BrickyEditor = (function (exports) {
         };
         $dom.matches = function (el, selector) {
             var matches = el.matches ||
-                el["matchesSelector"] ||
+                el.matchesSelector ||
                 el.msMatchesSelector ||
-                el["mozMatchesSelector"] ||
+                el.mozMatchesSelector ||
                 el.webkitMatchesSelector ||
-                el["oMatchesSelector"];
+                el.oMatchesSelector;
             return matches.call(el, selector);
         };
         $dom.data = function (el, prop) {
@@ -277,7 +294,6 @@ var BrickyEditor = (function (exports) {
         };
         return $dom;
     }());
-    //# sourceMappingURL=DOMHelpers.js.map
 
     var EditorStrings = (function () {
         function EditorStrings() {
@@ -318,7 +334,6 @@ var BrickyEditor = (function (exports) {
         };
         return EditorStrings;
     }());
-    //# sourceMappingURL=EditorStrings.js.map
 
     var str = {
         totalTrim: function (s) {
@@ -386,195 +401,50 @@ var BrickyEditor = (function (exports) {
         };
         return Common;
     }());
-    //# sourceMappingURL=Common.js.map
 
-    var defaultOptions = {
-        templatesUrl: "templates/bootstrap4.html",
-        compactTools: false,
-        compactToolsWidth: 768,
-        ignoreHtml: true,
-        onError: function (data) {
-            console.log(data.message);
-        },
+    var createElement = function (html) {
+        var temp = document.createElement("div");
+        temp.innerHTML = html;
+        var result = temp.children[0];
+        temp.innerHTML = "";
+        return result;
     };
-    //# sourceMappingURL=defaults.js.map
-
-    var Selectors = (function () {
-        function Selectors() {
+    var toggleVisibility = function (el, visible) {
+        if (visible !== undefined) {
+            el.style.display = visible ? "initial" : "none";
+            return;
         }
-        Selectors.attr = function (attr) {
-            return "[" + attr + "]";
+        el.style.display = el.style.display !== "none" ? "none" : "initial";
+    };
+    var modalTemplate = "\n<div>\n  <div class=\"bre-modal\" style=\"display: block;\">\n    <div class=\"bre-modal-placeholder\">\n    </div>\n  </div>\n</div>";
+    var showModal = function (props) {
+        var element = createElement(modalTemplate);
+        var placeholder = element.getElementsByClassName("bre-modal-placeholder")[0];
+        var closeModal = function () {
+            element.remove();
+            element = null;
         };
-        Selectors.attrContentEditable = "contenteditable";
-        Selectors.selectorContentEditable = "contenteditable";
-        Selectors.attrField = "data-bre-field";
-        Selectors.selectorField = "[" + Selectors.attrField + "]";
-        Selectors.classEditor = "bre-editor";
-        Selectors.classTemplate = "bre-template";
-        Selectors.selectorTemplate = "." + Selectors.classTemplate;
-        Selectors.classTemplateGroup = "bre-template-group";
-        Selectors.selectorTemplateGroup = "." + Selectors.classTemplateGroup;
-        Selectors.selectorTemplatePreview = ".bre-template-preview";
-        Selectors.classMobile = "brickyeditor-tools-mobile";
-        Selectors.htmlToolsCommand = "data-bre-doc-command";
-        Selectors.htmlToolsCommandRange = "data-bre-doc-command-range";
-        Selectors.selectorFieldSelected = "bre-field-selected";
-        Selectors.selectorFieldContainer = "bre-field-container";
-        Selectors.selectorHtmlToolsCommand = Selectors.attr(Selectors.htmlToolsCommand);
-        Selectors.selectorHtmlToolsCommandRange = Selectors.attr(Selectors.htmlToolsCommandRange);
-        return Selectors;
-    }());
-    //# sourceMappingURL=Selectors.js.map
-
-    var BaseField = (function () {
-        function BaseField($field, data, onSelect, onUpdate, onUpload) {
-            this.$field = $field;
-            this.data = data;
-            this.onSelect = onSelect;
-            this.onUpdate = onUpdate;
-            this.onUpload = onUpload;
-            this.bind();
-        }
-        Object.defineProperty(BaseField, "type", {
-            get: function () {
-                var name = this.name;
-                name = name.replace("Field", "");
-                name = name.substring(0, 1).toLowerCase() + name.substring(1);
-                return name;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        BaseField.registerCommonFields = function () {
-            if (!this.commonFieldsRegistered) {
-                HtmlField.registerField();
-                ImageField.registerField();
-                EmbedField.registerField();
-                ContainerField.registerField();
-            }
-            this.commonFieldsRegistered = true;
-        };
-        BaseField.createField = function ($field, data, onSelect, onUpdate, onUpload) {
-            var fieldData = $dom.data($field, "breField");
-            if (!fieldData || !fieldData.name) {
-                throw new Error("There is no data or data doesn't contains 'name' in field " + $field.innerHTML);
-            }
-            if (data !== undefined) {
-                var addFieldData = {};
-                for (var field in data) {
-                    if (field.name.toLowerCase() === fieldData.name.toLowerCase()) {
-                        addFieldData = field;
-                        break;
-                    }
-                }
-                if (addFieldData) {
-                    fieldData = Common.extend(fieldData, addFieldData);
-                }
-            }
-            var type = fieldData.type;
-            if (type != null) {
-                if (!BaseField.commonFieldsRegistered) {
-                    BaseField.registerCommonFields();
-                }
-                if (this._fields.hasOwnProperty(type)) {
-                    var field = this._fields[type];
-                    return new field($field, fieldData, onSelect, onUpdate, onUpload);
-                }
-                else {
-                    throw new Error(type + " field not found");
-                }
-            }
-            else {
-                throw new Error("Field type not defined in data-bre-field attribute");
-            }
-        };
-        BaseField.registerField = function () {
-            if (this._fields.hasOwnProperty(this.type)) {
-                delete this._fields[this.type];
-            }
-            this._fields[this.type] = this;
-        };
-        BaseField.prototype.deselect = function () {
-            this.$field.classList.remove(Selectors.selectorFieldSelected);
-        };
-        BaseField.prototype.getEl = function () {
-            var $el = this.$field.cloneNode(true);
-            $el.attributes.removeNamedItem(Selectors.attrField);
-            return $el;
-        };
-        BaseField.prototype.getSettingsEl = function () {
-            return null;
-        };
-        BaseField.prototype.bind = function () {
-        };
-        BaseField.prototype.select = function () {
-            this.$field.classList.add(Selectors.selectorFieldSelected);
-            this.onSelect(this);
-        };
-        BaseField.prototype.updateProperty = function (prop, value, fireUpdate) {
-            if (fireUpdate === void 0) { fireUpdate = true; }
-            var oldValue = this.data[prop];
-            if (oldValue === value) {
-                return;
-            }
-            this.data[prop] = value;
-            if (fireUpdate) {
-                this.onUpdate(prop, oldValue, value);
-            }
-        };
-        BaseField.commonFieldsRegistered = false;
-        BaseField._fields = {};
-        return BaseField;
-    }());
-    //# sourceMappingURL=BaseField.js.map
-
-    var ContainerField = (function (_super) {
-        __extends(ContainerField, _super);
-        function ContainerField() {
-            return _super !== null && _super.apply(this, arguments) || this;
-        }
-        ContainerField.prototype.bind = function () {
-            var _this = this;
-            var field = this;
-            var $field = this.$field;
-            this.container = new BlocksContainer($field, function (block) {
-                field.updateBlocks();
-            }, function (block) {
-                field.updateBlocks();
-            }, function (block) {
-                _this.select();
-            }, function (block) {
-            }, function (block) {
-                field.updateBlocks();
-            }, function (block) {
-                field.updateBlocks();
-            }, field.onUpload, true);
-            $dom.addClass($field, Selectors.selectorFieldContainer);
-            $dom.on($field, "click", function (ev) {
-                field.select();
-                ev.stopPropagation();
-                return false;
+        var content = props.content, onOk = props.onOk, onCancel = props.onCancel;
+        content.forEach(function (el) { return placeholder.appendChild(el); });
+        if (onOk !== undefined) {
+            var buttonOk = createElement("<button type=\"button\">Save</button>");
+            buttonOk.addEventListener("click", function () {
+                onOk();
+                closeModal();
             });
-        };
-        ContainerField.prototype.updateBlocks = function () {
-            var container = this.container;
-            var data = getContainerData(container, true);
-            this.updateProperty("blocks", data, true);
-            var html = getContainerHtml(container);
-            this.updateProperty("html", html, true);
-        };
-        ContainerField.prototype.deselect = function () {
-            this.container.blocks.forEach(function (b) { return b.deselect(); });
-            this.$field.classList.remove(Selectors.selectorFieldSelected);
-        };
-        ContainerField.prototype.getEl = function () {
-            var container = this.container;
-            var html = getContainerHtml(container);
-            return $dom.el(html);
-        };
-        return ContainerField;
-    }(BaseField));
-    //# sourceMappingURL=ContainerField.js.map
+            placeholder.appendChild(buttonOk);
+        }
+        var buttonCancel = createElement("<button type=\"button\">Cancel</button>");
+        buttonCancel.addEventListener("click", function () {
+            if (onCancel) {
+                onCancel();
+            }
+            closeModal();
+        });
+        placeholder.appendChild(buttonCancel);
+        document.body.appendChild(element);
+    };
+    var helpers = { createElement: createElement, showModal: showModal, toggleVisibility: toggleVisibility };
 
     var getRequest = function (url) {
         return new Promise(function (resolve, reject) {
@@ -654,528 +524,32 @@ var BrickyEditor = (function (exports) {
                 document.documentElement).appendChild(script);
         });
     };
-    //# sourceMappingURL=httpTransport.js.map
 
-    var postProcessEmbed = function (provider) {
-        switch (provider) {
-            case "Instagram":
-                var instgrm = window.instgrm;
-                if (instgrm !== undefined) {
-                    instgrm.Embeds.process();
-                }
-                break;
-            default:
-                break;
+    var Selectors = (function () {
+        function Selectors() {
         }
-    };
-    var getEmbedAsync = function (embedUrl) {
-        var url = "https://noembed.com/embed?url=" + embedUrl;
-        return new Promise(function (resolve, reject) { return __awaiter(void 0, void 0, void 0, function () {
-            var data, err_1;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        _a.trys.push([0, 2, , 3]);
-                        return [4, jsonp(url)];
-                    case 1:
-                        data = _a.sent();
-                        resolve(data);
-                        return [3, 3];
-                    case 2:
-                        err_1 = _a.sent();
-                        reject(err_1);
-                        return [3, 3];
-                    case 3: return [2];
-                }
-            });
-        }); });
-    };
-    //# sourceMappingURL=embed.js.map
-
-    var createElement = function (html) {
-        var temp = document.createElement("div");
-        temp.innerHTML = html;
-        var result = temp.children[0];
-        temp.innerHTML = null;
-        return result;
-    };
-    var modalTemplate = "\n<div>\n  <div class=\"bre-modal\" style=\"display: block;\">\n    <div class=\"bre-modal-placeholder\">\n    </div>\n  </div>\n</div>";
-    var showModal = function (props) {
-        var element = createElement(modalTemplate);
-        var placeholder = element.getElementsByClassName("bre-modal-placeholder")[0];
-        var closeModal = function () {
-            element.remove();
-            element = null;
+        Selectors.attr = function (attr) {
+            return "[" + attr + "]";
         };
-        var content = props.content, onOk = props.onOk, onCancel = props.onCancel;
-        content.forEach(function (el) { return placeholder.appendChild(el); });
-        if (onOk !== undefined) {
-            var buttonOk = createElement("<button type=\"button\">Save</button>");
-            buttonOk.addEventListener("click", function () {
-                onOk();
-                closeModal();
-            });
-            placeholder.appendChild(buttonOk);
-        }
-        var buttonCancel = createElement("<button type=\"button\">Cancel</button>");
-        buttonCancel.addEventListener("click", function () {
-            onCancel();
-            closeModal();
-        });
-        placeholder.appendChild(buttonCancel);
-        document.body.appendChild(element);
-    };
-    var helpers = { createElement: createElement, showModal: showModal };
-    //# sourceMappingURL=helpers.js.map
-
-    var locales = {
-        errorBlocksFileNotFound: function (url) {
-            return "Blocks file not found. Requested file: " + url + ".";
-        },
-        errorTemplatesFileNotFound: function (url) {
-            return "Templates file not found. Requested file: " + url + ".";
-        },
-        errorBlockTemplateNotFound: function (templateName) {
-            return "Template \"" + templateName + "\" not found.";
-        },
-        errorTemplateParsing: function (name) {
-            return "Template parsing error: " + name + ".";
-        },
-        embedFieldLinkTitle: "Link to embed media",
-        embedFieldLinkPlaceholder: "Link to instagram, youtube and etc.",
-        prompt: {
-            image: {
-                link: {
-                    title: "Image link",
-                    placeholder: "http://url-to-image.png",
-                },
-                alt: {
-                    title: "Image alt",
-                    placeholder: "Image 'alt' attribute value",
-                },
-                upload: {
-                    title: "or Upload a file",
-                    placeholder: "select file",
-                    button: "Select file",
-                },
-                url: {
-                    subtitle: "Link to open on image click",
-                },
-            },
-            embed: {
-                url: {
-                    title: "URL to media",
-                    placeholder: "Paste link to youtube, instagram, etc.",
-                },
-            },
-        },
-        htmlEditorLinkUrlTitle: "Url",
-        htmlEditorLinkUrlPlaceholder: "http://put-your-link.here",
-        htmlEditorLinkTitleTitle: "Title",
-        htmlEditorLinkTitlePlaceholder: "Title attribute for link",
-        htmlEditorLinkTargetTitle: "Target",
-        htmlEditorLinkTargetBlank: "Blank",
-        htmlEditorLinkTargetSelf: "Self",
-        htmlEditorLinkTargetParent: "Parent",
-        htmlEditorLinkTargetTop: "Top",
-        buttonClose: "close",
-        buttonOk: "Ok",
-        buttonCancel: "Cancel",
-        defaultTemplatesGroupName: "Other templates",
-    };
-    //# sourceMappingURL=locales.js.map
-
-    var textFieldEditor = function (_a) {
-        var key = _a.key, p = _a.p, data = _a.data;
-        var html = "<input type='text' name='" + key + "' placeholder='" + p.placeholder + "' value='" + (p.value || "") + "' />";
-        var input = helpers.createElement(html);
-        input.onchange = function () {
-            data[key] = input.value;
-        };
-        return input;
-    };
-    var fileFieldEditor = function (_a) {
-        var key = _a.key, p = _a.p, data = _a.data;
-        var file = data[key];
-        var filePreview = helpers.createElement("<img src=\"" + p.value + "\"/>");
-        var fileInput = helpers.createElement("<input type=\"file\" id=\"bre-modal-modal-" + key + "\" class=\"bre-input\" placeholder=\"" + p.placeholder + "\">");
-        var fileName = helpers.createElement("<span class='bre-image-input-filename'></span>");
-        var updatePreview = function () {
-            if (file === undefined || file === null) {
-                fileName.innerText = "";
-                filePreview.src = "//:0";
-            }
-            else {
-                fileName.innerText = file.name;
-                var reader = new FileReader();
-                reader.onload = function (ev) {
-                    if (ev.target !== null && ev.target.result !== null) {
-                        filePreview.src = ev.target.result.toString();
-                    }
-                };
-                reader.readAsDataURL(file);
-            }
-        };
-        fileInput.onchange = function () {
-            file = fileInput.files && fileInput.files[0];
-            updatePreview();
-            data[key] = file;
-        };
-        updatePreview();
-        var editor = helpers.createElement("<div class='bre-image-input'>\n    <label for=\"bre-modal-modal-" + key + "\">\n      " + p.placeholder + "\n    </label>\n  </div>");
-        editor.append(filePreview, fileInput, fileName);
-        return editor;
-    };
-    var parameterEditors = {
-        text: textFieldEditor,
-        file: fileFieldEditor,
-    };
-    var promptAsync = function (params) {
-        return new Promise(function (resolve) {
-            var result = {};
-            var editors = Object.keys(params).map(function (key) {
-                var p = params[key];
-                var editor = parameterEditors[p.type || "text"]({
-                    key: key,
-                    p: p,
-                    data: result,
-                });
-                return editor;
-            });
-            helpers.showModal({
-                content: editors,
-                onOk: function () { return resolve(result); },
-                onCancel: function () { return resolve(null); },
-            });
-        });
-    };
-    //# sourceMappingURL=prompt.js.map
-
-    var getPromptParams = function (_a) {
-        var url = _a.url;
-        return ({
-            url: {
-                value: url || "http://instagr.am/p/BO9VX2Vj4fF/",
-                title: locales.prompt.embed.url.title,
-                placeholder: locales.prompt.embed.url.placeholder,
-            },
-        });
-    };
-    var promptEmbedMediaUrl = function (field) { return __awaiter(void 0, void 0, void 0, function () {
-        var params, updated, url;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    params = getPromptParams(field.data);
-                    return [4, promptAsync(params)];
-                case 1:
-                    updated = _a.sent();
-                    if (!(updated !== null)) return [3, 3];
-                    url = updated.url;
-                    if (!(url !== undefined)) return [3, 3];
-                    field.setUrl(url);
-                    return [4, field.loadMedia(true)];
-                case 2:
-                    _a.sent();
-                    _a.label = 3;
-                case 3: return [2];
-            }
-        });
-    }); };
-    var EmbedField = (function (_super) {
-        __extends(EmbedField, _super);
-        function EmbedField() {
-            return _super !== null && _super.apply(this, arguments) || this;
-        }
-        EmbedField.prototype.getSettingsEl = function () {
-            return null;
-        };
-        EmbedField.prototype.bind = function () {
-            var _this = this;
-            var field = this;
-            var $field = this.$field;
-            $dom.on($field, "click", function () { return __awaiter(_this, void 0, void 0, function () {
-                return __generator(this, function (_a) {
-                    promptEmbedMediaUrl(field);
-                    return [2];
-                });
-            }); });
-            field.loadMedia(false);
-        };
-        EmbedField.prototype.loadMedia = function (fireUpdate) {
-            return __awaiter(this, void 0, void 0, function () {
-                var field, json, $embed, $script, scriptSrc;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0:
-                            field = this;
-                            if (!field.data || !field.data.url) {
-                                return [2];
-                            }
-                            return [4, getEmbedAsync(field.data.url)];
-                        case 1:
-                            json = _a.sent();
-                            field.setEmbed(json, fireUpdate);
-                            $embed = $dom.el(json.html);
-                            $script = $dom.first($embed, "script");
-                            if (!$script) return [3, 3];
-                            $script.remove();
-                            scriptSrc = $script.src;
-                            if (!str.startsWith(scriptSrc, "//")) return [3, 3];
-                            scriptSrc = "https:" + scriptSrc;
-                            return [4, loadScript(scriptSrc)];
-                        case 2:
-                            _a.sent();
-                            postProcessEmbed(json.provider_name);
-                            _a.label = 3;
-                        case 3:
-                            field.$field.innerHTML = "";
-                            field.$field.removeAttribute("class");
-                            field.$field.removeAttribute("style");
-                            field.$field.appendChild($embed);
-                            field.select();
-                            return [2];
-                    }
-                });
-            });
-        };
-        EmbedField.prototype.setEmbed = function (value, fireUpdate) {
-            if (fireUpdate === void 0) { fireUpdate = true; }
-            this.updateProperty("embed", value, fireUpdate);
-        };
-        EmbedField.prototype.setUrl = function (value) {
-            this.updateProperty("url", value);
-        };
-        return EmbedField;
-    }(BaseField));
-    //# sourceMappingURL=EmbedField.js.map
-
-    var _ui = null;
-    var setUI = function (ui) { return (_ui = ui); };
-    var getUI = function () { return _ui; };
-    //# sourceMappingURL=shared.js.map
-
-    var SelectionUtils = (function () {
-        function SelectionUtils() {
-        }
-        SelectionUtils.bindTextSelection = function ($el, handler) {
-            var _this = this;
-            if (!$dom.matches($el, "[contenteditable]")) {
-                return;
-            }
-            $dom.on($el, "mouseup", function () {
-                setTimeout(function () {
-                    var rect = _this.getSelectionRect();
-                    handler(rect);
-                }, 0);
-            });
-            $dom.on($el, "keyup", function (ev) {
-                var rect = _this.getSelectionRect();
-                handler(rect);
-            });
-        };
-        SelectionUtils.getSelectionRect = function () {
-            var selection = window.getSelection();
-            var range = selection.getRangeAt(0);
-            if (range) {
-                var rect = range.getBoundingClientRect();
-                if (rect) {
-                    return rect;
-                }
-            }
-            return null;
-        };
-        return SelectionUtils;
+        Selectors.attrContentEditable = "contenteditable";
+        Selectors.selectorContentEditable = "contenteditable";
+        Selectors.attrField = "data-bre-field";
+        Selectors.selectorField = "[" + Selectors.attrField + "]";
+        Selectors.classEditor = "bre-editor";
+        Selectors.classTemplate = "bre-template";
+        Selectors.selectorTemplate = "." + Selectors.classTemplate;
+        Selectors.classTemplateGroup = "bre-template-group";
+        Selectors.selectorTemplateGroup = "." + Selectors.classTemplateGroup;
+        Selectors.selectorTemplatePreview = ".bre-template-preview";
+        Selectors.classMobile = "brickyeditor-tools-mobile";
+        Selectors.htmlToolsCommand = "data-bre-doc-command";
+        Selectors.htmlToolsCommandRange = "data-bre-doc-command-range";
+        Selectors.selectorFieldSelected = "bre-field-selected";
+        Selectors.selectorFieldContainer = "bre-field-container";
+        Selectors.selectorHtmlToolsCommand = Selectors.attr(Selectors.htmlToolsCommand);
+        Selectors.selectorHtmlToolsCommandRange = Selectors.attr(Selectors.htmlToolsCommandRange);
+        return Selectors;
     }());
-    //# sourceMappingURL=SelectionUtils.js.map
-
-    var HtmlField = (function (_super) {
-        __extends(HtmlField, _super);
-        function HtmlField() {
-            return _super !== null && _super.apply(this, arguments) || this;
-        }
-        HtmlField.prototype.bind = function () {
-            var _this = this;
-            var field = this;
-            var $field = this.$field;
-            if (!$dom.matches($field, Selectors.selectorContentEditable)) {
-                $field.setAttribute(Selectors.attrContentEditable, "true");
-            }
-            var html = this.data.html || this.$field.innerHTML;
-            this.setHtml(html, false);
-            $field.innerHTML = this.data.html;
-            SelectionUtils.bindTextSelection($field, function (rect) {
-                var UI = getUI();
-                if (UI !== null) {
-                    UI.htmlTools.show(rect);
-                }
-            });
-            $dom.ons($field, "blur keyup paste input", function (ev) {
-                _this.setHtml($field.innerHTML);
-            });
-            $dom.on($field, "paste", function (e) {
-                e.preventDefault();
-                var ev = e.originalEvent;
-                var text = ev.clipboardData.getData("text/plain");
-                document.execCommand("insertHTML", false, text);
-            });
-            $dom.on($field, "click", function (ev) {
-                field.select();
-                ev.stopPropagation();
-                return false;
-            });
-        };
-        HtmlField.prototype.setHtml = function (value, fireUpdate) {
-            if (fireUpdate === void 0) { fireUpdate = true; }
-            value = value.trim();
-            if (this.$field.innerHTML !== value) {
-                this.$field.innerHTML = value;
-            }
-            this.updateProperty("html", value, fireUpdate);
-        };
-        HtmlField.prototype.getEl = function () {
-            var $el = _super.prototype.getEl.call(this);
-            $el.removeAttribute(Selectors.attrContentEditable);
-            return $el;
-        };
-        return HtmlField;
-    }(BaseField));
-
-    var getPromptParams$1 = function (_a) {
-        var src = _a.src, file = _a.file, alt = _a.alt;
-        return ({
-            src: {
-                value: src,
-                title: locales.prompt.image.link.title,
-                placeholder: locales.prompt.image.link.placeholder,
-            },
-            file: {
-                type: "file",
-                value: file,
-                title: locales.prompt.image.upload.title,
-                placeholder: locales.prompt.image.upload.placeholder,
-            },
-            alt: {
-                value: alt,
-                title: locales.prompt.image.alt.title,
-                placeholder: locales.prompt.image.alt.placeholder,
-            },
-        });
-    };
-    var ImageField = (function (_super) {
-        __extends(ImageField, _super);
-        function ImageField() {
-            return _super !== null && _super.apply(this, arguments) || this;
-        }
-        Object.defineProperty(ImageField.prototype, "isImg", {
-            get: function () {
-                return (this._isImg =
-                    this._isImg || this.$field.tagName.toLowerCase() === "img");
-            },
-            enumerable: true,
-            configurable: true
-        });
-        ImageField.prototype.bind = function () {
-            var _this = this;
-            var field = this;
-            this.setSrc(this.data.src, false);
-            this.$field.addEventListener("click", function () { return __awaiter(_this, void 0, void 0, function () {
-                var params, updated, file, src, alt;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0:
-                            params = getPromptParams$1(this.data);
-                            return [4, promptAsync(params)];
-                        case 1:
-                            updated = _a.sent();
-                            if (updated !== null) {
-                                file = updated.file, src = updated.src, alt = updated.alt;
-                                if (file !== undefined) {
-                                    if (field.onUpload) {
-                                        field.onUpload(file, function (url) {
-                                            field.setSrc(url);
-                                            field.setFile(null);
-                                        });
-                                    }
-                                    else {
-                                        field.setFile(file);
-                                        field.setSrc(null);
-                                    }
-                                }
-                                else if (src) {
-                                    field.setSrc(src);
-                                    field.setFile(null);
-                                }
-                                field.setAlt(alt);
-                            }
-                            return [2];
-                    }
-                });
-            }); });
-        };
-        ImageField.prototype.setSrc = function (src, fireUpdate) {
-            if (fireUpdate === void 0) { fireUpdate = true; }
-            if (src) {
-                if (this.isImg) {
-                    this.$field.setAttribute("src", src);
-                }
-                else {
-                    this.$field.style.backgroundImage = "url(" + src;
-                }
-            }
-            this.updateProperty("src", src, fireUpdate);
-        };
-        ImageField.prototype.setAlt = function (alt) {
-            this.$field.setAttribute(this.isImg ? "alt" : "title", alt || "");
-            this.updateProperty("alt", alt);
-        };
-        ImageField.prototype.setFile = function (file) {
-            if (file !== null) {
-                if (this.isImg) {
-                    this.$field.setAttribute("src", file);
-                }
-                else {
-                    this.$field.style.backgroundImage = "url(" + file + ")";
-                }
-            }
-            this.updateProperty("file", file);
-        };
-        ImageField.prototype.setLink = function (url) {
-            if (url && url.href) {
-                if (!this.$link) {
-                    this.$link = $dom.el("<a href='" + url.href + "' title='" + url.title + "' target='" + url.target + "'></a>");
-                    $dom.on(this.$link, "click", function (ev) {
-                        ev.stopPropagation();
-                        return false;
-                    });
-                    $dom.wrap(this.$field, this.$link);
-                }
-                else {
-                    this.$link.href = url.href;
-                }
-            }
-            else if (this.$link) {
-                $dom.unwrap(this.$field);
-                this.$link = undefined;
-                delete this.$link;
-            }
-            this.updateProperty("link", url);
-        };
-        ImageField.prototype.getEl = function () {
-            var $el = _super.prototype.getEl.call(this);
-            var link = this.data.link;
-            if (link && link.href) {
-                var $link = $dom.el("<a href='" + link.href + "' title='" + link.title + "' target='" + link.target + "'></a>");
-                $link.appendChild($el);
-                return $link;
-            }
-            return $el;
-        };
-        return ImageField;
-    }(BaseField));
-    //# sourceMappingURL=ImageField.js.map
-
-    //# sourceMappingURL=Fields.js.map
 
     var allTemplates = [];
     var getTemplate = function (templateName) {
@@ -1265,195 +639,300 @@ var BrickyEditor = (function (exports) {
             $preview: $preview,
         };
     };
-    //# sourceMappingURL=template.js.map
 
-    var Editor = (function () {
-        function Editor($editor, options) {
-            var _this = this;
-            this.isLoaded = false;
-            this.getData = function () {
-                return getContainerData(_this.container, _this.options.ignoreHtml);
-            };
-            this.getHtml = function () { return getContainerHtml(_this.container); };
-            this.onError = function (message, code) {
-                if (code === void 0) { code = 0; }
-                return _this.options.onError({ message: message, code: code });
-            };
-            BaseField.registerCommonFields();
-            this.$editor = $editor;
-            this.$editor.classList.add(Selectors.classEditor);
-            this.options = __assign(__assign({}, defaultOptions), options);
-            this.container = this.createContainer();
-            Editor.UI = new UI(this);
-            setUI(Editor.UI);
-            this.tryBindFormSubmit();
+    var locales = {
+        errorBlocksFileNotFound: function (url) {
+            return "Blocks file not found. Requested file: " + url + ".";
+        },
+        errorTemplatesFileNotFound: function (url) {
+            return "Templates file not found. Requested file: " + url + ".";
+        },
+        errorBlockTemplateNotFound: function (templateName) {
+            return "Template \"" + templateName + "\" not found.";
+        },
+        errorTemplateParsing: function (name) {
+            return "Template parsing error: " + name + ".";
+        },
+        embedFieldLinkTitle: "Link to embed media",
+        embedFieldLinkPlaceholder: "Link to instagram, youtube and etc.",
+        prompt: {
+            image: {
+                link: {
+                    title: "Image link",
+                    placeholder: "http://url-to-image.png",
+                },
+                alt: {
+                    title: "Image alt",
+                    placeholder: "Image 'alt' attribute value",
+                },
+                upload: {
+                    title: "or Upload a file",
+                    placeholder: "select file",
+                    button: "Select file",
+                },
+                url: {
+                    subtitle: "Link to open on image click",
+                },
+            },
+            embed: {
+                url: {
+                    title: "URL to media",
+                    placeholder: "Paste link to youtube, instagram, etc.",
+                },
+            },
+            link: {
+                href: {
+                    title: "Url",
+                    placeholder: "https://put-your-link.here",
+                },
+                title: {
+                    title: "Title",
+                    placeholder: "Title attribute for link",
+                },
+                target: {
+                    title: "Target",
+                    blank: "Blank",
+                    self: "Self",
+                    parent: "Parent",
+                    top: "Top",
+                },
+            },
+        },
+        htmlEditorLinkUrlTitle: "Url",
+        htmlEditorLinkUrlPlaceholder: "http://put-your-link.here",
+        htmlEditorLinkTitleTitle: "Title",
+        htmlEditorLinkTitlePlaceholder: "Title attribute for link",
+        htmlEditorLinkTargetTitle: "Target",
+        htmlEditorLinkTargetBlank: "Blank",
+        htmlEditorLinkTargetSelf: "Self",
+        htmlEditorLinkTargetParent: "Parent",
+        htmlEditorLinkTargetTop: "Top",
+        buttonClose: "close",
+        buttonOk: "Ok",
+        buttonCancel: "Cancel",
+        defaultTemplatesGroupName: "Other templates",
+    };
+
+    var textFieldEditor = function (_a) {
+        var key = _a.key, p = _a.p, data = _a.data;
+        var html = "<input type='text' name='" + key + "' placeholder='" + p.placeholder + "' value='" + (p.value || "") + "' />";
+        var input = helpers.createElement(html);
+        input.onchange = function () {
+            data[key] = input.value;
+        };
+        return input;
+    };
+    var fileFieldEditor = function (_a) {
+        var key = _a.key, p = _a.p, data = _a.data;
+        var file = data[key];
+        var filePreview = helpers.createElement("<img src=\"" + p.value + "\"/>");
+        var fileInput = helpers.createElement("<input type=\"file\" id=\"bre-modal-modal-" + key + "\" class=\"bre-input\" placeholder=\"" + p.placeholder + "\">");
+        var fileName = helpers.createElement("<span class='bre-image-input-filename'></span>");
+        var updatePreview = function () {
+            if (file === undefined || file === null) {
+                fileName.innerText = "";
+                filePreview.src = "//:0";
+            }
+            else {
+                fileName.innerText = file.name;
+                var reader = new FileReader();
+                reader.onload = function (ev) {
+                    if (ev.target !== null && ev.target.result !== null) {
+                        filePreview.src = ev.target.result.toString();
+                    }
+                };
+                reader.readAsDataURL(file);
+            }
+        };
+        fileInput.onchange = function () {
+            file = fileInput.files && fileInput.files[0];
+            updatePreview();
+            data[key] = file;
+        };
+        updatePreview();
+        var editor = helpers.createElement("<div class='bre-image-input'>\n    <label for=\"bre-modal-modal-" + key + "\">\n      " + p.placeholder + "\n    </label>\n  </div>");
+        editor.append(filePreview, fileInput, fileName);
+        return editor;
+    };
+    var selectFieldEditor = function (_a) {
+        var key = _a.key, p = _a.p, data = _a.data;
+        if (p.options === undefined) {
+            throw new Error("Empty options");
         }
-        Editor.prototype.initAsync = function () {
-            return __awaiter(this, void 0, void 0, function () {
-                var editor, templates, blocks;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0:
-                            editor = this;
-                            Editor.UI.toggleToolsLoader(true);
-                            return [4, loadTemplatesAsync(editor.options.templatesUrl, editor.$editor, editor.onError)];
-                        case 1:
-                            templates = _a.sent();
-                            Editor.UI.toggleToolsLoader(false);
-                            Editor.UI.setTemplates(templates);
-                            return [4, this.tryLoadInitialBlocksAsync()];
-                        case 2:
-                            blocks = _a.sent();
-                            if (blocks !== null) {
-                                this.loadBlocks(blocks);
-                            }
-                            this.isLoaded = true;
-                            this.trigger("onLoad", this);
+        var options = p.options
+            .map(function (o) {
+            return "<option value=\"" + o.title + "\" " + (o.value === p.value ? "selected" : "") + ">" + o.title + "</option>";
+        })
+            .join("\n");
+        var html = "<select name='" + key + "' placeholder='" + p.placeholder + "'>" + options + "</select>";
+        var select = helpers.createElement(html);
+        select.onchange = function () {
+            data[key] = select.value;
+        };
+        return select;
+    };
+    var parameterEditors = {
+        text: textFieldEditor,
+        file: fileFieldEditor,
+        select: selectFieldEditor,
+    };
+    var promptAsync = function (params) {
+        return new Promise(function (resolve) {
+            var result = {};
+            var editors = Object.keys(params).map(function (key) {
+                var p = params[key];
+                var editor = parameterEditors[p.type || "text"]({
+                    key: key,
+                    p: p,
+                    data: result,
+                });
+                return editor;
+            });
+            helpers.showModal({
+                content: editors,
+                onOk: function () { return resolve(result); },
+                onCancel: function () { return resolve(null); },
+            });
+        });
+    };
+
+    var getPromptParams = function (link) { return ({
+        title: {
+            title: locales.prompt.link.title.title,
+            placeholder: locales.prompt.link.title.placeholder,
+            value: link ? link.getAttribute("title") : "",
+        },
+        href: {
+            title: locales.prompt.link.href.title,
+            placeholder: locales.prompt.link.href.placeholder,
+            value: link ? link.getAttribute("href") : "",
+        },
+        target: {
+            type: "select",
+            title: locales.prompt.link.target.title,
+            value: link ? link.getAttribute("target") : "",
+            options: [
+                { title: "", value: "" },
+                { title: locales.prompt.link.target.blank, value: "_blank" },
+                { title: locales.prompt.link.target.parent, value: "_parent" },
+                { title: locales.prompt.link.target.self, value: "_self" },
+                { title: locales.prompt.link.target.top, value: "_top" },
+            ],
+        },
+    }); };
+    var promptLinkParamsAsync = function (selection) { return __awaiter(void 0, void 0, void 0, function () {
+        var currentLink, promptParams;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    if (selection.anchorNode !== null &&
+                        selection.anchorNode.parentNode !== null &&
+                        str.equalsInvariant(selection.anchorNode.parentNode.nodeName, "a")) {
+                        currentLink = selection.anchorNode.parentNode;
+                    }
+                    promptParams = getPromptParams(currentLink);
+                    return [4, promptAsync(promptParams)];
+                case 1: return [2, _a.sent()];
+            }
+        });
+    }); };
+    var renderButtonElement = function (_a) {
+        var icon = _a.icon, command = _a.command, range = _a.range, aValueArgument = _a.aValueArgument;
+        var $btn = helpers.createElement("<button type=\"button\" class=\"bre-btn\"><i class=\"fa fa-" + icon + "\"></i></button>");
+        $btn.onclick = function () { return __awaiter(void 0, void 0, void 0, function () {
+            var selection, selectionRange, link, valueArgument;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        selection = window.getSelection();
+                        if (selection === null) {
                             return [2];
-                    }
-                });
-            });
-        };
-        Editor.prototype.tryBindFormSubmit = function () {
-            var editor = this;
-            var $form = this.options.formSelector
-                ? $dom.find(this.options.formSelector)
-                : null;
-            var $input = this.options.inputSelector
-                ? $dom.find(this.options.inputSelector)
-                : null;
-            if (!$form || !$input || !($input instanceof HTMLInputElement)) {
-                return;
-            }
-            $dom.on($form, "submit", function () {
-                $input.value = JSON.stringify(editor.getData());
-                return true;
-            });
-        };
-        Editor.prototype.loadBlocks = function (blocks) {
-            var _this = this;
-            if (blocks && blocks.length) {
-                blocks.forEach(function (block) {
-                    var template = getTemplate(block.name);
-                    if (template) {
-                        _this.container.addBlock(template.name, template.$html.innerHTML, block.fields, undefined, false);
-                    }
-                    else {
-                        var message = EditorStrings.errorBlockTemplateNotFound(block.name);
-                        _this.onError(message);
-                    }
-                });
-            }
-        };
-        Editor.prototype.addBlock = function (template) {
-            var container = this.getContainer(this.container);
-            container.addBlock(template.name, template.$html.innerHTML, undefined, undefined, true);
-        };
-        Editor.prototype.createContainer = function () {
-            var _this = this;
-            var onAdd = function (block, idx) {
-                if (_this.isLoaded) {
-                    _this.trigger("onBlockAdd", { block: block, idx: idx });
-                    _this.trigger("onChange", {
-                        blocks: _this.getData(),
-                        html: _this.getHtml(),
-                    });
-                }
-            };
-            var onDelete = function (block, idx) {
-                _this.trigger("onBlockDelete", { block: block, idx: idx });
-                _this.trigger("onChange", {
-                    blocks: _this.getData(),
-                    html: _this.getHtml(),
-                });
-            };
-            var onUpdate = function (block, property, oldValue, newValue) {
-                _this.trigger("onBlockUpdate", {
-                    block: block,
-                    property: property,
-                    oldValue: oldValue,
-                    newValue: newValue,
-                });
-                _this.trigger("onChange", {
-                    blocks: _this.getData(),
-                    html: _this.getHtml(),
-                });
-            };
-            return new BlocksContainer(this.$editor, onAdd, onDelete, function (block) {
-                _this.trigger("onBlockSelect", { block: block });
-            }, function (block) {
-                _this.trigger("onBlockDeselect", { block: block });
-            }, function (block, from, to) {
-                _this.trigger("onBlockMove", { block: block, from: from, to: to });
-                _this.trigger("onChange", {
-                    blocks: _this.getData(),
-                    html: _this.getHtml(),
-                });
-            }, onUpdate, this.options.onUpload);
-        };
-        Editor.prototype.tryLoadInitialBlocksAsync = function () {
-            return __awaiter(this, void 0, Promise, function () {
-                var url, editor;
-                var _this = this;
-                return __generator(this, function (_a) {
-                    url = this.options.blocksUrl;
-                    editor = this;
-                    return [2, new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
-                            var blocks, error_1;
-                            return __generator(this, function (_a) {
-                                switch (_a.label) {
-                                    case 0:
-                                        if (!(url !== undefined)) return [3, 5];
-                                        _a.label = 1;
-                                    case 1:
-                                        _a.trys.push([1, 3, , 4]);
-                                        return [4, getRequest(url)];
-                                    case 2:
-                                        blocks = _a.sent();
-                                        resolve(blocks);
-                                        return [3, 4];
-                                    case 3:
-                                        error_1 = _a.sent();
-                                        editor.onError(EditorStrings.errorBlocksFileNotFound(url));
-                                        reject(error_1);
-                                        return [3, 4];
-                                    case 4: return [3, 6];
-                                    case 5:
-                                        if (this.options.blocks !== undefined) {
-                                            resolve(this.options.blocks);
-                                        }
-                                        else {
-                                            resolve(null);
-                                        }
-                                        _a.label = 6;
-                                    case 6: return [2];
+                        }
+                        selectionRange = selection.rangeCount > 0 ? selection.getRangeAt(0) : null;
+                        if (range && !selectionRange) {
+                            return [2];
+                        }
+                        if (!(command === "CreateLink")) return [3, 2];
+                        return [4, promptLinkParamsAsync(selection)];
+                    case 1:
+                        link = _a.sent();
+                        if (link === null) {
+                            return [2];
+                        }
+                        if (link.href) {
+                            document.execCommand(command, false, link.href);
+                            if (selection.anchorNode !== null &&
+                                selection.anchorNode.parentElement !== null) {
+                                if (link.target) {
+                                    selection.anchorNode.parentElement.setAttribute("target", link.target);
                                 }
-                            });
-                        }); })];
-                });
-            });
-        };
-        Editor.prototype.getContainer = function (container) {
-            if (container.selectedBlock && container.selectedBlock.isContainer()) {
-                var field = container.selectedBlock.selectedField;
-                if (field) {
-                    return this.getContainer(field.container);
+                                if (link.title) {
+                                    selection.anchorNode.parentElement.setAttribute("title", link.title);
+                                }
+                            }
+                        }
+                        return [3, 3];
+                    case 2:
+                        valueArgument = void 0;
+                        if (typeof aValueArgument === "string") {
+                            valueArgument = aValueArgument.replace("%%SELECTION%%", selection.toString());
+                        }
+                        try {
+                            document.execCommand(command, false, valueArgument);
+                        }
+                        catch (_b) {
+                            wrapSelectionToContainer(selection);
+                            document.execCommand(command, false, valueArgument);
+                        }
+                        _a.label = 3;
+                    case 3: return [2, false];
                 }
-            }
-            return container;
-        };
-        Editor.prototype.trigger = function (event, data) {
-            var editor = this;
-            $dom.trigger(this.$editor, "bre." + event, data);
-            Common.propsEach(editor.options, function (key, value) {
-                if (str.equalsInvariant(key, event) && value) {
-                    value(data);
-                }
             });
-        };
-        return Editor;
-    }());
-    //# sourceMappingURL=Editor.js.map
+        }); };
+        return $btn;
+    };
+    var renderControl = function (buttons) {
+        var $panel = helpers.createElement('<div class="bre-html-tools-panel"></div>');
+        buttons.map(renderButtonElement).forEach(function ($btn) { return $panel.appendChild($btn); });
+        var $controlRoot = helpers.createElement('<div class="bre-html-tools bre-btn-group"></div>');
+        $controlRoot.appendChild($panel);
+        helpers.toggleVisibility($controlRoot, false);
+        return $controlRoot;
+    };
+    var wrapSelectionToContainer = function (selection) {
+        if (selection.anchorNode === null) {
+            return;
+        }
+        var $container = selection.anchorNode.parentElement;
+        if ($container !== null) {
+            var $wrapper = $dom.el("<div class=\"bre-temp-container\" contenteditable=\"true\">" + $container.innerHTML + "</div>");
+            $container.innerHTML = "";
+            $container.removeAttribute(Selectors.attrContentEditable);
+            $container.appendChild($wrapper);
+            var range = document.createRange();
+            range.selectNodeContents($wrapper);
+            selection.removeAllRanges();
+            selection.addRange(range);
+        }
+    };
+    var control;
+    var initHtmlTools = function (_a) {
+        var htmlToolsButtons = _a.htmlToolsButtons;
+        control = renderControl(htmlToolsButtons);
+        document.body.appendChild(control);
+    };
+    var toggleHtmlTools = function (rect) {
+        if (rect !== null && rect.width > 1) {
+            var top = rect.top + rect.height;
+            var left = rect.left;
+            control.style.top = top + "px";
+            control.style.left = left + "px";
+            helpers.toggleVisibility(control, true);
+        }
+        else {
+            helpers.toggleVisibility(control, false);
+        }
+    };
 
     var PromptParameter = (function () {
         function PromptParameter(key, title, value, placeholder) {
@@ -1497,7 +976,6 @@ var BrickyEditor = (function (exports) {
         };
         return PromptParameter;
     }());
-    //# sourceMappingURL=PromptParameter.js.map
 
     var PromptParameterImage = (function (_super) {
         __extends(PromptParameterImage, _super);
@@ -1549,7 +1027,6 @@ var BrickyEditor = (function (exports) {
         };
         return PromptParameterImage;
     }(PromptParameter));
-    //# sourceMappingURL=PromptParameterImage.js.map
 
     var PromptParameterImageResult = (function () {
         function PromptParameterImageResult() {
@@ -1566,7 +1043,6 @@ var BrickyEditor = (function (exports) {
         }
         return PromptParameterImageResultFile;
     }());
-    //# sourceMappingURL=PromptParameterImageResult.js.map
 
     var PromptParameterList = (function () {
         function PromptParameterList(params) {
@@ -1580,7 +1056,6 @@ var BrickyEditor = (function (exports) {
         };
         return PromptParameterList;
     }());
-    //# sourceMappingURL=PromptParameterList.js.map
 
     var PromptParameterOption = (function () {
         function PromptParameterOption(title, value, selected) {
@@ -1591,9 +1066,6 @@ var BrickyEditor = (function (exports) {
         }
         return PromptParameterOption;
     }());
-    //# sourceMappingURL=PromptParameterOption.js.map
-
-    //# sourceMappingURL=Prompt.js.map
 
     var PromptParameterOptions = (function (_super) {
         __extends(PromptParameterOptions, _super);
@@ -1613,178 +1085,6 @@ var BrickyEditor = (function (exports) {
         };
         return PromptParameterOptions;
     }(PromptParameter));
-    //# sourceMappingURL=PromptParameterOptions.js.map
-
-    //# sourceMappingURL=Prompt.js.map
-
-    var HtmlLinkParams = (function () {
-        function HtmlLinkParams(href, title, target) {
-            if (href === void 0) { href = ""; }
-            if (title === void 0) { title = ""; }
-            if (target === void 0) { target = ""; }
-            this.href = href;
-            this.title = title;
-            this.target = target;
-        }
-        HtmlLinkParams.getLinkFromParams = function (fields) {
-            var href = fields.getValue("href");
-            var title = fields.getValue("title");
-            var target = fields.getValue("target");
-            return new HtmlLinkParams(href, title, target);
-        };
-        HtmlLinkParams.prototype.getLinkPromptParams = function () {
-            return [
-                new PromptParameter("href", EditorStrings.htmlEditorLinkUrlTitle, this.href, EditorStrings.htmlEditorLinkUrlPlaceholder),
-                new PromptParameter("title", EditorStrings.htmlEditorLinkTitleTitle, this.title, EditorStrings.htmlEditorLinkTitlePlaceholder),
-                new PromptParameterOptions("target", EditorStrings.htmlEditorLinkTargetTitle, [
-                    ["", ""],
-                    [EditorStrings.htmlEditorLinkTargetBlank, "_blank"],
-                    [EditorStrings.htmlEditorLinkTargetSelf, "_self"],
-                    [EditorStrings.htmlEditorLinkTargetParent, "_parent"],
-                    [EditorStrings.htmlEditorLinkTargetTop, "_top"],
-                ], this.target),
-            ];
-        };
-        return HtmlLinkParams;
-    }());
-    //# sourceMappingURL=HtmlLinkParams.js.map
-
-    var HtmlTools = (function () {
-        function HtmlTools(editor) {
-            this.editor = editor;
-            this.buttons = [
-                { icon: "bold", command: "Bold", range: true, aValueArgument: null },
-                { icon: "italic", command: "Italic", range: true, aValueArgument: null },
-                { icon: "link", command: "CreateLink", range: true, aValueArgument: null },
-                {
-                    icon: "list-ul",
-                    command: "insertUnorderedList",
-                    range: true,
-                    aValueArgument: null,
-                },
-                {
-                    icon: "list-ol",
-                    command: "insertOrderedList",
-                    range: true,
-                    aValueArgument: null,
-                },
-                { icon: "undo", command: "Undo", range: false, aValueArgument: null },
-                { icon: "repeat", command: "Redo", range: false, aValueArgument: null },
-            ];
-            if (editor.options.htmlToolsButtons) {
-                this.buttons = editor.options.htmlToolsButtons;
-            }
-            this.setControl();
-        }
-        HtmlTools.prototype.setControl = function () {
-            var _this = this;
-            var $panel = $dom.el('<div class="bre-html-tools-panel"></div>');
-            this.buttons.forEach(function (b) {
-                var $btn = _this.getButtonElement(b.icon, b.command, b.range, b.aValueArgument);
-                $panel.appendChild($btn);
-            });
-            this.$control = $dom.el('<div class="bre-html-tools bre-btn-group"></div>');
-            this.$control.appendChild($panel);
-            $dom.hide(this.$control);
-            this.editor.$editor.appendChild(this.$control);
-        };
-        HtmlTools.prototype.getButtonElement = function (icon, command, rangeCommand, aValueArgument) {
-            var _this = this;
-            if (rangeCommand === void 0) { rangeCommand = true; }
-            if (aValueArgument === void 0) { aValueArgument = null; }
-            var $btn = $dom.el("<button type=\"button\" class=\"bre-btn\"><i class=\"fa fa-" + icon + "\"></i></button>");
-            $btn.onclick = function () { return __awaiter(_this, void 0, void 0, function () {
-                var selection, selectionRange, params, fields, link, valueArgument;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0:
-                            selection = window.getSelection();
-                            selectionRange = selection.rangeCount > 0 ? selection.getRangeAt(0) : null;
-                            if (rangeCommand && !selectionRange)
-                                return [2];
-                            if (!(command == "CreateLink")) return [3, 2];
-                            params = this.getLinkPromptParamsInternal(selection);
-                            return [4, Editor.UI.modal.promptAsync(params)];
-                        case 1:
-                            fields = _a.sent();
-                            link = HtmlLinkParams.getLinkFromParams(fields);
-                            if (link.href) {
-                                document.execCommand(command, false, link.href);
-                                if (link.target) {
-                                    selection.anchorNode.parentElement.setAttribute("target", link.target);
-                                }
-                                if (link.title) {
-                                    selection.anchorNode.parentElement.setAttribute("title", link.title);
-                                }
-                            }
-                            return [3, 3];
-                        case 2:
-                            if (typeof aValueArgument === "string") {
-                                valueArgument = aValueArgument.replace("%%SELECTION%%", selection.toString());
-                            }
-                            try {
-                                document.execCommand(command, false, valueArgument);
-                            }
-                            catch (_b) {
-                                this.wrapSelectionToContainer(selection);
-                                document.execCommand(command, false, valueArgument);
-                            }
-                            _a.label = 3;
-                        case 3: return [2, false];
-                    }
-                });
-            }); };
-            return $btn;
-        };
-        HtmlTools.prototype.wrapSelectionToContainer = function (selection) {
-            var $container = selection.anchorNode.parentElement;
-            var $wrapper = $dom.el("<div class=\"bre-temp-container\" contenteditable=\"true\">" + $container.innerHTML + "</div>");
-            $container.innerHTML = "";
-            $container.removeAttribute(Selectors.attrContentEditable);
-            $container.appendChild($wrapper);
-            var range = document.createRange();
-            range.selectNodeContents($wrapper);
-            selection.removeAllRanges();
-            selection.addRange(range);
-        };
-        HtmlTools.prototype.show = function (rect) {
-            if (rect && rect.width > 1) {
-                var $editor = this.editor.$editor;
-                var offset = $dom.offset($editor);
-                var editorWidth = $editor.clientWidth;
-                var top = rect.top - offset.top + $dom.windowScrollTop() + rect.height;
-                var controlWidth = this.$control.clientWidth;
-                var left = rect.left - offset.left + rect.width / 2 - controlWidth / 2;
-                if (left < 0) {
-                    left = 0;
-                }
-                else if (left + controlWidth > editorWidth) {
-                    left = editorWidth - controlWidth;
-                }
-                this.$control.style.top = top + "px";
-                this.$control.style.left = left + "px";
-                $dom.show(this.$control);
-            }
-            else {
-                $dom.hide(this.$control);
-            }
-        };
-        HtmlTools.prototype.getLinkPromptParamsInternal = function (selection) {
-            var link;
-            if (selection &&
-                selection.anchorNode &&
-                str.equalsInvariant(selection.anchorNode.parentNode.nodeName, "a")) {
-                var $a = selection.anchorNode.parentNode;
-                link = new HtmlLinkParams($a.getAttribute("href"), $a.getAttribute("title"), $a.getAttribute("target"));
-            }
-            else {
-                link = new HtmlLinkParams();
-            }
-            return link.getLinkPromptParams();
-        };
-        return HtmlTools;
-    }());
-    //# sourceMappingURL=HtmlTools.js.map
 
     var Modal = (function () {
         function Modal($control, $closeBtn, $form, $btns, $okBtn, $cancelBtn) {
@@ -1858,15 +1158,14 @@ var BrickyEditor = (function (exports) {
         };
         return Modal;
     }());
-    //# sourceMappingURL=Modal.js.map
 
     var UI = (function () {
         function UI(editor) {
             this.editor = editor;
             this.editor = editor;
+            initHtmlTools(editor.options);
             this.setTools();
             this.setModal();
-            this.htmlTools = new HtmlTools(this.editor);
         }
         UI.initBtnDeck = function ($btnsDeck) {
             var $btns = $dom.select($btnsDeck, ".bre-btn");
@@ -1994,7 +1293,6 @@ var BrickyEditor = (function (exports) {
         };
         return UI;
     }());
-    //# sourceMappingURL=UI.js.map
 
     var BlockUI = (function () {
         function BlockUI($block, preview, actions, onSelect) {
@@ -2044,7 +1342,6 @@ var BrickyEditor = (function (exports) {
         };
         return BlockUI;
     }());
-    //# sourceMappingURL=BlockUI.js.map
 
     var BlockUIAction = (function () {
         function BlockUIAction(icon, action, title) {
@@ -2054,7 +1351,499 @@ var BrickyEditor = (function (exports) {
         }
         return BlockUIAction;
     }());
-    //# sourceMappingURL=BlockUIAction.js.map
+
+    var BaseField = (function () {
+        function BaseField($field, data, onSelect, onUpdate, onUpload) {
+            this.$field = $field;
+            this.data = data;
+            this.onSelect = onSelect;
+            this.onUpdate = onUpdate;
+            this.onUpload = onUpload;
+            this.bind();
+        }
+        Object.defineProperty(BaseField, "type", {
+            get: function () {
+                var name = this.name;
+                name = name.replace("Field", "");
+                name = name.substring(0, 1).toLowerCase() + name.substring(1);
+                return name;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        BaseField.registerCommonFields = function () {
+            if (!this.commonFieldsRegistered) {
+                HtmlField.registerField();
+                ImageField.registerField();
+                EmbedField.registerField();
+                ContainerField.registerField();
+            }
+            this.commonFieldsRegistered = true;
+        };
+        BaseField.createField = function ($field, data, onSelect, onUpdate, onUpload) {
+            var fieldData = $dom.data($field, "breField");
+            if (!fieldData || !fieldData.name) {
+                throw new Error("There is no data or data doesn't contains 'name' in field " + $field.innerHTML);
+            }
+            if (data !== undefined) {
+                var addFieldData = {};
+                for (var field in data) {
+                    if (field.name.toLowerCase() === fieldData.name.toLowerCase()) {
+                        addFieldData = field;
+                        break;
+                    }
+                }
+                if (addFieldData) {
+                    fieldData = Common.extend(fieldData, addFieldData);
+                }
+            }
+            var type = fieldData.type;
+            if (type != null) {
+                if (!BaseField.commonFieldsRegistered) {
+                    BaseField.registerCommonFields();
+                }
+                if (this._fields.hasOwnProperty(type)) {
+                    var field = this._fields[type];
+                    return new field($field, fieldData, onSelect, onUpdate, onUpload);
+                }
+                else {
+                    throw new Error(type + " field not found");
+                }
+            }
+            else {
+                throw new Error("Field type not defined in data-bre-field attribute");
+            }
+        };
+        BaseField.registerField = function () {
+            if (this._fields.hasOwnProperty(this.type)) {
+                delete this._fields[this.type];
+            }
+            this._fields[this.type] = this;
+        };
+        BaseField.prototype.deselect = function () {
+            this.$field.classList.remove(Selectors.selectorFieldSelected);
+        };
+        BaseField.prototype.getEl = function () {
+            var $el = this.$field.cloneNode(true);
+            $el.attributes.removeNamedItem(Selectors.attrField);
+            return $el;
+        };
+        BaseField.prototype.getSettingsEl = function () {
+            return null;
+        };
+        BaseField.prototype.bind = function () {
+        };
+        BaseField.prototype.select = function () {
+            this.$field.classList.add(Selectors.selectorFieldSelected);
+            this.onSelect(this);
+        };
+        BaseField.prototype.updateProperty = function (prop, value, fireUpdate) {
+            if (fireUpdate === void 0) { fireUpdate = true; }
+            var oldValue = this.data[prop];
+            if (oldValue === value) {
+                return;
+            }
+            this.data[prop] = value;
+            if (fireUpdate) {
+                this.onUpdate(prop, oldValue, value);
+            }
+        };
+        BaseField.commonFieldsRegistered = false;
+        BaseField._fields = {};
+        return BaseField;
+    }());
+
+    var ContainerField = (function (_super) {
+        __extends(ContainerField, _super);
+        function ContainerField() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        ContainerField.prototype.bind = function () {
+            var _this = this;
+            var field = this;
+            var $field = this.$field;
+            this.container = new BlocksContainer($field, function (block) {
+                field.updateBlocks();
+            }, function (block) {
+                field.updateBlocks();
+            }, function (block) {
+                _this.select();
+            }, function (block) {
+            }, function (block) {
+                field.updateBlocks();
+            }, function (block) {
+                field.updateBlocks();
+            }, field.onUpload, true);
+            $dom.addClass($field, Selectors.selectorFieldContainer);
+            $dom.on($field, "click", function (ev) {
+                field.select();
+                ev.stopPropagation();
+                return false;
+            });
+        };
+        ContainerField.prototype.updateBlocks = function () {
+            var container = this.container;
+            var data = getContainerData(container, true);
+            this.updateProperty("blocks", data, true);
+            var html = getContainerHtml(container);
+            this.updateProperty("html", html, true);
+        };
+        ContainerField.prototype.deselect = function () {
+            this.container.blocks.forEach(function (b) { return b.deselect(); });
+            this.$field.classList.remove(Selectors.selectorFieldSelected);
+        };
+        ContainerField.prototype.getEl = function () {
+            var container = this.container;
+            var html = getContainerHtml(container);
+            return $dom.el(html);
+        };
+        return ContainerField;
+    }(BaseField));
+
+    var postProcessEmbed = function (provider) {
+        switch (provider) {
+            case "Instagram":
+                var instgrm = window.instgrm;
+                if (instgrm !== undefined) {
+                    instgrm.Embeds.process();
+                }
+                break;
+            default:
+                break;
+        }
+    };
+    var getEmbedAsync = function (embedUrl) {
+        var url = "https://noembed.com/embed?url=" + embedUrl;
+        return new Promise(function (resolve, reject) { return __awaiter(void 0, void 0, void 0, function () {
+            var data, err_1;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        _a.trys.push([0, 2, , 3]);
+                        return [4, jsonp(url)];
+                    case 1:
+                        data = _a.sent();
+                        resolve(data);
+                        return [3, 3];
+                    case 2:
+                        err_1 = _a.sent();
+                        reject(err_1);
+                        return [3, 3];
+                    case 3: return [2];
+                }
+            });
+        }); });
+    };
+
+    var getPromptParams$1 = function (_a) {
+        var url = _a.url;
+        return ({
+            url: {
+                value: url || "http://instagr.am/p/BO9VX2Vj4fF/",
+                title: locales.prompt.embed.url.title,
+                placeholder: locales.prompt.embed.url.placeholder,
+            },
+        });
+    };
+    var promptEmbedMediaUrl = function (field) { return __awaiter(void 0, void 0, void 0, function () {
+        var params, updated, url;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    params = getPromptParams$1(field.data);
+                    return [4, promptAsync(params)];
+                case 1:
+                    updated = _a.sent();
+                    if (!(updated !== null)) return [3, 3];
+                    url = updated.url;
+                    if (!(url !== undefined)) return [3, 3];
+                    field.setUrl(url);
+                    return [4, field.loadMedia(true)];
+                case 2:
+                    _a.sent();
+                    _a.label = 3;
+                case 3: return [2];
+            }
+        });
+    }); };
+    var EmbedField = (function (_super) {
+        __extends(EmbedField, _super);
+        function EmbedField() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        EmbedField.prototype.getSettingsEl = function () {
+            return null;
+        };
+        EmbedField.prototype.bind = function () {
+            var _this = this;
+            var field = this;
+            var $field = this.$field;
+            $dom.on($field, "click", function () { return __awaiter(_this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    promptEmbedMediaUrl(field);
+                    return [2];
+                });
+            }); });
+            field.loadMedia(false);
+        };
+        EmbedField.prototype.loadMedia = function (fireUpdate) {
+            return __awaiter(this, void 0, void 0, function () {
+                var field, json, $embed, $script, scriptSrc;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            field = this;
+                            if (!field.data || !field.data.url) {
+                                return [2];
+                            }
+                            return [4, getEmbedAsync(field.data.url)];
+                        case 1:
+                            json = _a.sent();
+                            field.setEmbed(json, fireUpdate);
+                            $embed = $dom.el(json.html);
+                            $script = $dom.first($embed, "script");
+                            if (!$script) return [3, 3];
+                            $script.remove();
+                            scriptSrc = $script.src;
+                            if (!str.startsWith(scriptSrc, "//")) return [3, 3];
+                            scriptSrc = "https:" + scriptSrc;
+                            return [4, loadScript(scriptSrc)];
+                        case 2:
+                            _a.sent();
+                            postProcessEmbed(json.provider_name);
+                            _a.label = 3;
+                        case 3:
+                            field.$field.innerHTML = "";
+                            field.$field.removeAttribute("class");
+                            field.$field.removeAttribute("style");
+                            field.$field.appendChild($embed);
+                            field.select();
+                            return [2];
+                    }
+                });
+            });
+        };
+        EmbedField.prototype.setEmbed = function (value, fireUpdate) {
+            if (fireUpdate === void 0) { fireUpdate = true; }
+            this.updateProperty("embed", value, fireUpdate);
+        };
+        EmbedField.prototype.setUrl = function (value) {
+            this.updateProperty("url", value);
+        };
+        return EmbedField;
+    }(BaseField));
+
+    var SelectionUtils = (function () {
+        function SelectionUtils() {
+        }
+        SelectionUtils.bindTextSelection = function ($el, handler) {
+            var _this = this;
+            if (!$dom.matches($el, "[contenteditable]")) {
+                return;
+            }
+            $dom.on($el, "mouseup", function () {
+                setTimeout(function () {
+                    var rect = _this.getSelectionRect();
+                    handler(rect);
+                }, 0);
+            });
+            $dom.on($el, "keyup", function () {
+                var rect = _this.getSelectionRect();
+                handler(rect);
+            });
+        };
+        SelectionUtils.getSelectionRect = function () {
+            var selection = window.getSelection();
+            if (selection === null) {
+                return null;
+            }
+            var range = selection.getRangeAt(0);
+            return range.getBoundingClientRect();
+        };
+        return SelectionUtils;
+    }());
+
+    var HtmlField = (function (_super) {
+        __extends(HtmlField, _super);
+        function HtmlField() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        HtmlField.prototype.bind = function () {
+            var _this = this;
+            var field = this;
+            var $field = this.$field;
+            if (!$dom.matches($field, Selectors.selectorContentEditable)) {
+                $field.setAttribute(Selectors.attrContentEditable, "true");
+            }
+            var html = this.data.html || this.$field.innerHTML;
+            this.setHtml(html, false);
+            $field.innerHTML = this.data.html;
+            SelectionUtils.bindTextSelection($field, function (rect) {
+                toggleHtmlTools(rect);
+            });
+            $dom.ons($field, "blur keyup paste input", function () {
+                _this.setHtml($field.innerHTML);
+            });
+            $dom.on($field, "paste", function (e) {
+                e.preventDefault();
+                var ev = e.originalEvent;
+                var text = ev.clipboardData.getData("text/plain");
+                document.execCommand("insertHTML", false, text);
+            });
+            $dom.on($field, "click", function (ev) {
+                field.select();
+                ev.stopPropagation();
+                return false;
+            });
+        };
+        HtmlField.prototype.setHtml = function (value, fireUpdate) {
+            if (fireUpdate === void 0) { fireUpdate = true; }
+            value = value.trim();
+            if (this.$field.innerHTML !== value) {
+                this.$field.innerHTML = value;
+            }
+            this.updateProperty("html", value, fireUpdate);
+        };
+        HtmlField.prototype.getEl = function () {
+            var $el = _super.prototype.getEl.call(this);
+            $el.removeAttribute(Selectors.attrContentEditable);
+            return $el;
+        };
+        return HtmlField;
+    }(BaseField));
+
+    var getPromptParams$2 = function (_a) {
+        var src = _a.src, file = _a.file, alt = _a.alt;
+        return ({
+            src: {
+                value: src,
+                title: locales.prompt.image.link.title,
+                placeholder: locales.prompt.image.link.placeholder,
+            },
+            file: {
+                type: "file",
+                value: file,
+                title: locales.prompt.image.upload.title,
+                placeholder: locales.prompt.image.upload.placeholder,
+            },
+            alt: {
+                value: alt,
+                title: locales.prompt.image.alt.title,
+                placeholder: locales.prompt.image.alt.placeholder,
+            },
+        });
+    };
+    var ImageField = (function (_super) {
+        __extends(ImageField, _super);
+        function ImageField() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        Object.defineProperty(ImageField.prototype, "isImg", {
+            get: function () {
+                return (this._isImg =
+                    this._isImg || this.$field.tagName.toLowerCase() === "img");
+            },
+            enumerable: true,
+            configurable: true
+        });
+        ImageField.prototype.bind = function () {
+            var _this = this;
+            var field = this;
+            this.setSrc(this.data.src, false);
+            this.$field.addEventListener("click", function () { return __awaiter(_this, void 0, void 0, function () {
+                var params, updated, file, src, alt;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            params = getPromptParams$2(this.data);
+                            return [4, promptAsync(params)];
+                        case 1:
+                            updated = _a.sent();
+                            if (updated !== null) {
+                                file = updated.file, src = updated.src, alt = updated.alt;
+                                if (file !== undefined) {
+                                    if (field.onUpload) {
+                                        field.onUpload(file, function (url) {
+                                            field.setSrc(url);
+                                            field.setFile(null);
+                                        });
+                                    }
+                                    else {
+                                        field.setFile(file);
+                                        field.setSrc(null);
+                                    }
+                                }
+                                else if (src) {
+                                    field.setSrc(src);
+                                    field.setFile(null);
+                                }
+                                field.setAlt(alt);
+                            }
+                            return [2];
+                    }
+                });
+            }); });
+        };
+        ImageField.prototype.setSrc = function (src, fireUpdate) {
+            if (fireUpdate === void 0) { fireUpdate = true; }
+            if (src) {
+                if (this.isImg) {
+                    this.$field.setAttribute("src", src);
+                }
+                else {
+                    this.$field.style.backgroundImage = "url(" + src;
+                }
+            }
+            this.updateProperty("src", src, fireUpdate);
+        };
+        ImageField.prototype.setAlt = function (alt) {
+            this.$field.setAttribute(this.isImg ? "alt" : "title", alt || "");
+            this.updateProperty("alt", alt);
+        };
+        ImageField.prototype.setFile = function (file) {
+            if (file !== null) {
+                if (this.isImg) {
+                    this.$field.setAttribute("src", file);
+                }
+                else {
+                    this.$field.style.backgroundImage = "url(" + file + ")";
+                }
+            }
+            this.updateProperty("file", file);
+        };
+        ImageField.prototype.setLink = function (url) {
+            if (url && url.href) {
+                if (!this.$link) {
+                    this.$link = $dom.el("<a href='" + url.href + "' title='" + url.title + "' target='" + url.target + "'></a>");
+                    $dom.on(this.$link, "click", function (ev) {
+                        ev.stopPropagation();
+                        return false;
+                    });
+                    $dom.wrap(this.$field, this.$link);
+                }
+                else {
+                    this.$link.href = url.href;
+                }
+            }
+            else if (this.$link) {
+                $dom.unwrap(this.$field);
+                this.$link = undefined;
+                delete this.$link;
+            }
+            this.updateProperty("link", url);
+        };
+        ImageField.prototype.getEl = function () {
+            var $el = _super.prototype.getEl.call(this);
+            var link = this.data.link;
+            if (link && link.href) {
+                var $link = $dom.el("<a href='" + link.href + "' title='" + link.title + "' target='" + link.target + "'></a>");
+                $link.appendChild($el);
+                return $link;
+            }
+            return $el;
+        };
+        return ImageField;
+    }(BaseField));
 
     var Block = (function () {
         function Block(name, html, preview, data, events) {
@@ -2170,7 +1959,6 @@ var BrickyEditor = (function (exports) {
         };
         return Block;
     }());
-    //# sourceMappingURL=Block.js.map
 
     var getContainerData = function (container, ignoreHtml) { return container.blocks.map(function (block) { return block.getData(ignoreHtml); }); };
     var getContainerHtml = function (container) {
@@ -2301,9 +2089,36 @@ var BrickyEditor = (function (exports) {
         };
         return BlocksContainer;
     }());
-    //# sourceMappingURL=BlocksContainer.js.map
 
-    var Editor$1 = (function () {
+    var defaultButtons = [
+        { icon: "bold", command: "Bold", range: true },
+        { icon: "italic", command: "Italic", range: true },
+        { icon: "link", command: "CreateLink", range: true },
+        {
+            icon: "list-ul",
+            command: "insertUnorderedList",
+            range: true,
+        },
+        {
+            icon: "list-ol",
+            command: "insertOrderedList",
+            range: true,
+        },
+        { icon: "undo", command: "Undo", range: false },
+        { icon: "repeat", command: "Redo", range: false },
+    ];
+    var defaultOptions = {
+        templatesUrl: "templates/bootstrap4.html",
+        compactTools: false,
+        compactToolsWidth: 768,
+        ignoreHtml: true,
+        onError: function (data) {
+            console.log(data.message);
+        },
+        htmlToolsButtons: defaultButtons,
+    };
+
+    var Editor = (function () {
         function Editor($editor, options) {
             var _this = this;
             this.isLoaded = false;
@@ -2321,7 +2136,6 @@ var BrickyEditor = (function (exports) {
             this.options = __assign(__assign({}, defaultOptions), options);
             this.container = this.createContainer();
             Editor.UI = new UI(this);
-            setUI(Editor.UI);
             this.tryBindFormSubmit();
         }
         Editor.prototype.initAsync = function () {
@@ -2489,9 +2303,8 @@ var BrickyEditor = (function (exports) {
         };
         return Editor;
     }());
-    //# sourceMappingURL=Editor.js.map
 
-    exports.Editor = Editor$1;
+    exports.Editor = Editor;
 
     return exports;
 

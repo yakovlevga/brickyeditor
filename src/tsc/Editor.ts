@@ -10,11 +10,11 @@ import { defaultOptions } from "src/defaults";
 import { EditorStrings } from "src/EditorStrings";
 import { BaseField, ContainerField } from "src/fields/Fields";
 import { getRequest } from "src/httpTransport";
+import { setUI } from "src/shared";
 import { getTemplate, loadTemplatesAsync } from "src/template";
 import { bre } from "src/Types/bre";
 import { Selectors } from "src/ui/Selectors";
 import { UI } from "src/ui/UI";
-import { setUI } from "src/shared";
 
 export class Editor {
   public static UI: UI;

@@ -4,8 +4,17 @@ const createElement = <TElement extends HTMLElement>(
   const temp = document.createElement("div");
   temp.innerHTML = html;
   const result = temp.children[0] as TElement;
-  temp.innerHTML = null;
+  temp.innerHTML = "";
   return result;
+};
+
+const toggleVisibility = (el: HTMLElement, visible?: boolean) => {
+  if (visible !== undefined) {
+    el.style.display = visible ? "initial" : "none";
+    return;
+  }
+
+  el.style.display = el.style.display !== "none" ? "none" : "initial";
 };
 
 const modalTemplate = `
@@ -21,14 +30,14 @@ const showModal = (props: {
   onOk?: () => void;
   onCancel?: () => void;
 }) => {
-  let element = createElement(modalTemplate);
+  const element = createElement(modalTemplate);
   const placeholder = element.getElementsByClassName(
     "bre-modal-placeholder"
   )[0];
 
   const closeModal = () => {
     element.remove();
-    element = null;
+    (element as any) = null;
   };
 
   const { content, onOk, onCancel } = props;
@@ -49,7 +58,9 @@ const showModal = (props: {
     `<button type="button">Cancel</button>`
   );
   buttonCancel.addEventListener("click", () => {
-    onCancel();
+    if (onCancel) {
+      onCancel();
+    }
     closeModal();
   });
   placeholder.appendChild(buttonCancel);
@@ -57,4 +68,4 @@ const showModal = (props: {
   document.body.appendChild(element);
 };
 
-export const helpers = { createElement, showModal };
+export const helpers = { createElement, showModal, toggleVisibility };

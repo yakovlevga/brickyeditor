@@ -1,88 +1,102 @@
-import { $dom } from "src/common/DOMHelpers";
-import { Editor } from "src/Editor";
-import { HtmlLinkParams } from "src/HtmlLinkParams";
-import { Selectors } from "src/ui/Selectors";
-import { PromptParameter } from "src/Prompt/Prompt";
 import { str } from "src/common/Common";
+import { $dom } from "src/common/DOMHelpers";
+import { helpers } from "src/helpers";
+import { locales } from "src/locales";
+import { promptAsync } from "src/prompt";
+import { bre } from "src/Types/bre";
+import { Selectors } from "src/ui/Selectors";
 
-export class HtmlTools {
-  private $control: HTMLElement;
+type LinkPromptParams = {
+  href: bre.prompt.PromptParameter;
+  title: bre.prompt.PromptParameter;
+  target: bre.prompt.PromptParameter;
+};
 
-  constructor(private editor: Editor) {
-    if (editor.options.htmlToolsButtons) {
-      this.buttons = editor.options.htmlToolsButtons;
+const getPromptParams = (link?: HTMLLinkElement): LinkPromptParams => ({
+  title: {
+    title: locales.prompt.link.title.title,
+    placeholder: locales.prompt.link.title.placeholder,
+    value: link ? link.getAttribute("title") : "",
+  },
+  href: {
+    title: locales.prompt.link.href.title,
+    placeholder: locales.prompt.link.href.placeholder,
+    value: link ? link.getAttribute("href") : "",
+  },
+  target: {
+    type: "select",
+    title: locales.prompt.link.target.title,
+    value: link ? link.getAttribute("target") : "",
+    options: [
+      { title: "", value: "" },
+      { title: locales.prompt.link.target.blank, value: "_blank" },
+      { title: locales.prompt.link.target.parent, value: "_parent" },
+      { title: locales.prompt.link.target.self, value: "_self" },
+      { title: locales.prompt.link.target.top, value: "_top" },
+    ],
+  },
+});
+
+const promptLinkParamsAsync = async (selection: Selection) => {
+  //  let link: HtmlLinkParams;
+
+  let currentLink;
+  if (
+    selection.anchorNode !== null &&
+    selection.anchorNode.parentNode !== null &&
+    str.equalsInvariant(selection.anchorNode.parentNode.nodeName, "a")
+  ) {
+    currentLink = selection.anchorNode.parentNode as HTMLLinkElement;
+  }
+  const promptParams = getPromptParams(currentLink);
+
+  return await promptAsync(promptParams);
+};
+
+const renderButtonElement = ({
+  icon,
+  command,
+  range,
+  aValueArgument,
+}: bre.IHtmlToolsButton): HTMLElement => {
+  const $btn = helpers.createElement(
+    `<button type="button" class="bre-btn"><i class="fa fa-${icon}"></i></button>`
+  );
+
+  $btn.onclick = async () => {
+    const selection = window.getSelection();
+    if (selection === null) {
+      return;
     }
-    this.setControl();
-  }
 
-  private buttons = [
-    { icon: "bold", command: "Bold", range: true, aValueArgument: null },
-    { icon: "italic", command: "Italic", range: true, aValueArgument: null },
-    { icon: "link", command: "CreateLink", range: true, aValueArgument: null },
-    {
-      icon: "list-ul",
-      command: "insertUnorderedList",
-      range: true,
-      aValueArgument: null,
-    },
-    {
-      icon: "list-ol",
-      command: "insertOrderedList",
-      range: true,
-      aValueArgument: null,
-    },
-    { icon: "undo", command: "Undo", range: false, aValueArgument: null },
-    { icon: "repeat", command: "Redo", range: false, aValueArgument: null },
-  ];
+    const selectionRange =
+      selection.rangeCount > 0 ? selection.getRangeAt(0) : null;
 
-  private setControl() {
-    let $panel = $dom.el('<div class="bre-html-tools-panel"></div>');
-    this.buttons.forEach(b => {
-      let $btn = this.getButtonElement(
-        b.icon,
-        b.command,
-        b.range,
-        b.aValueArgument
-      );
-      $panel.appendChild($btn);
-    });
+    if (range && !selectionRange) {
+      return;
+    }
 
-    this.$control = $dom.el('<div class="bre-html-tools bre-btn-group"></div>');
-    this.$control.appendChild($panel);
-    $dom.hide(this.$control);
-    this.editor.$editor.appendChild(this.$control);
-  }
+    if (command === "CreateLink") {
+      const link = await promptLinkParamsAsync(selection);
 
-  private getButtonElement(
-    icon: string,
-    command: string,
-    rangeCommand: boolean = true,
-    aValueArgument: string = null
-  ): HTMLElement {
-    let $btn = $dom.el(
-      `<button type="button" class="bre-btn"><i class="fa fa-${icon}"></i></button>`
-    );
+      if (link === null) {
+        return;
+      }
 
-    $btn.onclick = async () => {
-      let selection = window.getSelection();
-      let selectionRange =
-        selection.rangeCount > 0 ? selection.getRangeAt(0) : null;
+      if (link.href) {
+        document.execCommand(command, false, link.href);
 
-      if (rangeCommand && !selectionRange) return;
-
-      if (command == "CreateLink") {
-        const params = this.getLinkPromptParamsInternal(selection);
-        const fields = await Editor.UI.modal.promptAsync(params);
-        const link = HtmlLinkParams.getLinkFromParams(fields);
-
-        if (link.href) {
-          document.execCommand(command, false, link.href);
+        if (
+          selection.anchorNode !== null &&
+          selection.anchorNode.parentElement !== null
+        ) {
           if (link.target) {
             selection.anchorNode.parentElement.setAttribute(
               "target",
               link.target
             );
           }
+
           if (link.title) {
             selection.anchorNode.parentElement.setAttribute(
               "title",
@@ -90,31 +104,56 @@ export class HtmlTools {
             );
           }
         }
-      } else {
-        if (typeof aValueArgument === "string") {
-          var valueArgument = aValueArgument.replace(
-            "%%SELECTION%%",
-            selection.toString()
-          );
-        }
-
-        try {
-          document.execCommand(command, false, valueArgument);
-        } catch {
-          this.wrapSelectionToContainer(selection);
-          document.execCommand(command, false, valueArgument);
-        }
+      }
+    } else {
+      let valueArgument;
+      if (typeof aValueArgument === "string") {
+        valueArgument = aValueArgument.replace(
+          "%%SELECTION%%",
+          selection.toString()
+        );
       }
 
-      return false;
-    };
+      try {
+        document.execCommand(command, false, valueArgument);
+      } catch {
+        wrapSelectionToContainer(selection);
+        document.execCommand(command, false, valueArgument);
+      }
+    }
 
-    return $btn;
+    return false;
+  };
+
+  return $btn;
+};
+
+const renderControl = (buttons: bre.IHtmlToolsButton[]) => {
+  const $panel = helpers.createElement(
+    '<div class="bre-html-tools-panel"></div>'
+  );
+
+  buttons.map(renderButtonElement).forEach($btn => $panel.appendChild($btn));
+
+  const $controlRoot = helpers.createElement(
+    '<div class="bre-html-tools bre-btn-group"></div>'
+  );
+  $controlRoot.appendChild($panel);
+  helpers.toggleVisibility($controlRoot, false);
+
+  return $controlRoot;
+};
+
+// ** Firefox execCommand hack */
+// TODO: Check if it was fixed in latest versions
+const wrapSelectionToContainer = (selection: Selection) => {
+  if (selection.anchorNode === null) {
+    return;
   }
 
-  //** Firefox execCommand hack */
-  private wrapSelectionToContainer(selection: Selection) {
-    let $container = selection.anchorNode.parentElement;
+  const $container = selection.anchorNode.parentElement;
+
+  if ($container !== null) {
     const $wrapper = $dom.el(
       `<div class="bre-temp-container" contenteditable="true">${$container.innerHTML}</div>`
     );
@@ -127,50 +166,24 @@ export class HtmlTools {
     selection.removeAllRanges();
     selection.addRange(range);
   }
+};
 
-  public show(rect: ClientRect) {
-    // check if some text is seleted
-    if (rect && rect.width > 1) {
-      const $editor = this.editor.$editor;
-      const offset = $dom.offset($editor);
+let control: HTMLElement;
 
-      var editorWidth = $editor.clientWidth;
-      var top = rect.top - offset.top + $dom.windowScrollTop() + rect.height;
+export const initHtmlTools = ({ htmlToolsButtons }: bre.Options) => {
+  control = renderControl(htmlToolsButtons);
+  document.body.appendChild(control);
+};
 
-      var controlWidth = this.$control.clientWidth;
-      var left = rect.left - offset.left + rect.width / 2 - controlWidth / 2;
-      if (left < 0) {
-        left = 0;
-      } else if (left + controlWidth > editorWidth) {
-        left = editorWidth - controlWidth;
-      }
-
-      this.$control.style.top = `${top}px`;
-      this.$control.style.left = `${left}px`;
-      $dom.show(this.$control);
-    } else {
-      $dom.hide(this.$control);
-    }
+export const toggleHtmlTools = (rect: ClientRect | null) => {
+  // check if some text is seleted
+  if (rect !== null && rect.width > 1) {
+    const top = rect.top + rect.height;
+    const left = rect.left;
+    control.style.top = `${top}px`;
+    control.style.left = `${left}px`;
+    helpers.toggleVisibility(control, true);
+  } else {
+    helpers.toggleVisibility(control, false);
   }
-
-  private getLinkPromptParamsInternal(selection: Selection): PromptParameter[] {
-    var link: HtmlLinkParams;
-
-    if (
-      selection &&
-      selection.anchorNode &&
-      str.equalsInvariant(selection.anchorNode.parentNode.nodeName, "a")
-    ) {
-      var $a = selection.anchorNode.parentNode as HTMLElement;
-      link = new HtmlLinkParams(
-        $a.getAttribute("href"),
-        $a.getAttribute("title"),
-        $a.getAttribute("target")
-      );
-    } else {
-      link = new HtmlLinkParams();
-    }
-
-    return link.getLinkPromptParams();
-  }
-}
+};

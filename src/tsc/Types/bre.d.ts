@@ -37,7 +37,7 @@ declare namespace bre {
     /** Ignore blocks html field, if you need only json */
     ignoreHtml: boolean;
     /** Custom Html editor buttons */
-    htmlToolsButtons?: bre.IHtmlToolsButton[];
+    htmlToolsButtons: bre.IHtmlToolsButton[];
     /** Form selector to bind form submit event */
     formSelector: string;
     /** Input selector to put json to on form submit */
@@ -91,11 +91,20 @@ declare namespace bre {
     }
   }
 
+  type HtmlToolsButtonCommands =
+    | "Bold"
+    | "Italic"
+    | "CreateLink"
+    | "insertOrderedList"
+    | "insertUnorderedList"
+    | "Undo"
+    | "Redo";
+
   interface IHtmlToolsButton {
     icon: string;
-    command: string;
+    command: HtmlToolsButtonCommands;
     range: boolean;
-    aValueArgument: string;
+    aValueArgument?: string;
   }
 
   interface IBlockData {
@@ -121,13 +130,17 @@ declare namespace bre {
   // }
 
   namespace prompt {
-    type PromptParameterType = "text" | "file";
+    type PromptParameterType = "text" | "file" | "select";
 
-    type PromptParameter = {
+    type PromptParameter<TValue = any> = {
       type?: PromptParameterType;
-      value: any;
+      value: TValue;
       title: string;
       placeholder?: string;
+      options?: {
+        title: string;
+        value: string;
+      }[];
     };
 
     type PromptParameters = {

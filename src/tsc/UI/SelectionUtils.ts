@@ -3,7 +3,7 @@ import { $dom } from "src/common/DOMHelpers";
 export class SelectionUtils {
   public static bindTextSelection(
     $el: HTMLElement,
-    handler: (rect: ClientRect) => any
+    handler: (rect: ClientRect | null) => any
   ) {
     if (!$dom.matches($el, "[contenteditable]")) {
       return;
@@ -11,27 +11,24 @@ export class SelectionUtils {
 
     $dom.on($el, "mouseup", () => {
       setTimeout(() => {
-        let rect = this.getSelectionRect();
+        const rect = this.getSelectionRect();
         handler(rect);
       }, 0);
     });
 
-    $dom.on($el, "keyup", ev => {
-      let rect = this.getSelectionRect();
+    $dom.on($el, "keyup", () => {
+      const rect = this.getSelectionRect();
       handler(rect);
     });
   }
 
-  private static getSelectionRect(): ClientRect {
-    let selection = window.getSelection();
-    let range = selection.getRangeAt(0);
-    if (range) {
-      let rect = range.getBoundingClientRect();
-      if (rect) {
-        return rect;
-      }
+  private static getSelectionRect() {
+    const selection = window.getSelection();
+    if (selection === null) {
+      return null;
     }
 
-    return null;
+    const range = selection.getRangeAt(0);
+    return range.getBoundingClientRect();
   }
 }

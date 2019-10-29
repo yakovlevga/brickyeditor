@@ -40,6 +40,23 @@ export const locales = {
         placeholder: "Paste link to youtube, instagram, etc.",
       },
     },
+    link: {
+      href: {
+        title: "Url",
+        placeholder: "https://put-your-link.here",
+      },
+      title: {
+        title: "Title",
+        placeholder: "Title attribute for link",
+      },
+      target: {
+        title: "Target",
+        blank: "Blank",
+        self: "Self",
+        parent: "Parent",
+        top: "Top",
+      },
+    },
   },
 
   htmlEditorLinkUrlTitle: "Url",

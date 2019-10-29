@@ -1,11 +1,11 @@
 import { $dom } from "src/common/DOMHelpers";
 import { Editor } from "src/Editor";
 import { EditorStrings } from "src/EditorStrings";
+import { getTemplatePreview } from "src/template";
 import { bre } from "src/Types/bre";
-import { HtmlTools } from "src/ui/HtmlTools";
+import { initHtmlTools } from "src/UI/htmlTools";
 import { Modal } from "src/ui/Modal";
 import { Selectors } from "src/ui/Selectors";
-import { getTemplatePreview } from "src/template";
 
 export class UI {
   public static initBtnDeck($btnsDeck: HTMLElement) {
@@ -63,24 +63,21 @@ export class UI {
   }
 
   // Modal
-  public modal: Modal;
-
-  // Html Editing Tools
-  public htmlTools: HtmlTools;
+  public modal?: Modal;
 
   // Templates
-  private $tools: HTMLElement;
-  private $toolsBtn: HTMLElement;
-  private $toolsTemplates: HTMLElement;
-  private $toolsHideBtn: HTMLElement;
-  private $toolsLoader: HTMLElement;
+  private $tools?: HTMLElement;
+  private $toolsBtn?: HTMLElement;
+  private $toolsTemplates?: HTMLElement;
+  private $toolsHideBtn?: HTMLElement;
+  private $toolsLoader?: HTMLElement;
 
   constructor(public editor: Editor) {
     this.editor = editor;
 
+    initHtmlTools(editor.options);
     this.setTools();
     this.setModal();
-    this.htmlTools = new HtmlTools(this.editor);
   }
 
   public toggleToolsLoader(toggle: boolean) {
