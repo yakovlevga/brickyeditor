@@ -14,6 +14,7 @@ import { getTemplate, loadTemplatesAsync } from "src/template";
 import { bre } from "src/Types/bre";
 import { Selectors } from "src/ui/Selectors";
 import { UI } from "src/ui/UI";
+import { setUI } from "src/shared";
 
 export class Editor {
   public static UI: UI;
@@ -32,6 +33,7 @@ export class Editor {
     this.container = this.createContainer();
 
     Editor.UI = new UI(this);
+    setUI(Editor.UI);
 
     this.tryBindFormSubmit();
   }

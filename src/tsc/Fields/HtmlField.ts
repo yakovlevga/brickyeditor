@@ -1,6 +1,6 @@
 import { $dom } from "src/common/DOMHelpers";
-import { Editor } from "src/Editor";
 import { BaseField } from "src/fields/BaseField";
+import { getUI } from "src/shared";
 import { SelectionUtils } from "src/ui/SelectionUtils";
 import { Selectors } from "src/ui/Selectors";
 
@@ -18,7 +18,10 @@ export class HtmlField extends BaseField {
     $field.innerHTML = this.data.html;
 
     SelectionUtils.bindTextSelection($field, rect => {
-      Editor.UI.htmlTools.show(rect);
+      const UI = getUI();
+      if (UI !== null) {
+        UI.htmlTools.show(rect);
+      }
     });
 
     $dom.ons($field, "blur keyup paste input", ev => {

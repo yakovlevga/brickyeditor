@@ -282,18 +282,6 @@ var BrickyEditor = (function (exports) {
     var EditorStrings = (function () {
         function EditorStrings() {
         }
-        EditorStrings.errorBlocksFileNotFound = function (url) {
-            return "Blocks file not found. Requested file: " + url + ".";
-        };
-        EditorStrings.errorTemplatesFileNotFound = function (url) {
-            return "Templates file not found. Requested file: " + url + ".";
-        };
-        EditorStrings.errorBlockTemplateNotFound = function (templateName) {
-            return "Template \"" + templateName + "\" not found.";
-        };
-        EditorStrings.errorTemplateParsing = function (name) {
-            return "Template parsing error: " + name + ".";
-        };
         EditorStrings.embedFieldLinkTitle = "Link to embed media";
         EditorStrings.embedFieldLinkPlaceholder = "Link to instagram, youtube and etc.";
         EditorStrings.imageFieldLinkTitle = "Image link";
@@ -316,6 +304,18 @@ var BrickyEditor = (function (exports) {
         EditorStrings.buttonOk = "Ok";
         EditorStrings.buttonCancel = "Cancel";
         EditorStrings.defaultTemplatesGroupName = "Other templates";
+        EditorStrings.errorBlocksFileNotFound = function (url) {
+            return "Blocks file not found. Requested file: " + url + ".";
+        };
+        EditorStrings.errorTemplatesFileNotFound = function (url) {
+            return "Templates file not found. Requested file: " + url + ".";
+        };
+        EditorStrings.errorBlockTemplateNotFound = function (templateName) {
+            return "Template \"" + templateName + "\" not found.";
+        };
+        EditorStrings.errorTemplateParsing = function (name) {
+            return "Template parsing error: " + name + ".";
+        };
         return EditorStrings;
     }());
     //# sourceMappingURL=EditorStrings.js.map
@@ -325,6 +325,9 @@ var BrickyEditor = (function (exports) {
             return s !== undefined ? s.replace(/\s\s+/g, " ").trim() : "";
         },
         equalsInvariant: function (s1, s2) {
+            if (!s1 || !s2) {
+                return s1 === s2;
+            }
             return s1.toLowerCase() === s2.toLowerCase();
         },
         startsWith: function (s1, s2) { return s1.indexOf(s2) === 0; },
@@ -798,15 +801,17 @@ var BrickyEditor = (function (exports) {
         var fileInput = helpers.createElement("<input type=\"file\" id=\"bre-modal-modal-" + key + "\" class=\"bre-input\" placeholder=\"" + p.placeholder + "\">");
         var fileName = helpers.createElement("<span class='bre-image-input-filename'></span>");
         var updatePreview = function () {
-            if (file === undefined) {
+            if (file === undefined || file === null) {
                 fileName.innerText = "";
-                filePreview.src = null;
+                filePreview.src = "//:0";
             }
             else {
                 fileName.innerText = file.name;
                 var reader = new FileReader();
                 reader.onload = function (ev) {
-                    filePreview.src = ev.target.result.toString();
+                    if (ev.target !== null && ev.target.result !== null) {
+                        filePreview.src = ev.target.result.toString();
+                    }
                 };
                 reader.readAsDataURL(file);
             }
@@ -943,6 +948,12 @@ var BrickyEditor = (function (exports) {
         };
         return EmbedField;
     }(BaseField));
+    //# sourceMappingURL=EmbedField.js.map
+
+    var _ui = null;
+    var setUI = function (ui) { return (_ui = ui); };
+    var getUI = function () { return _ui; };
+    //# sourceMappingURL=shared.js.map
 
     var SelectionUtils = (function () {
         function SelectionUtils() {
@@ -994,7 +1005,10 @@ var BrickyEditor = (function (exports) {
             this.setHtml(html, false);
             $field.innerHTML = this.data.html;
             SelectionUtils.bindTextSelection($field, function (rect) {
-                Editor.UI.htmlTools.show(rect);
+                var UI = getUI();
+                if (UI !== null) {
+                    UI.htmlTools.show(rect);
+                }
             });
             $dom.ons($field, "blur keyup paste input", function (ev) {
                 _this.setHtml($field.innerHTML);
@@ -1026,7 +1040,6 @@ var BrickyEditor = (function (exports) {
         };
         return HtmlField;
     }(BaseField));
-    //# sourceMappingURL=HtmlField.js.map
 
     var getPromptParams$1 = function (_a) {
         var src = _a.src, file = _a.file, alt = _a.alt;
@@ -1065,7 +1078,6 @@ var BrickyEditor = (function (exports) {
         ImageField.prototype.bind = function () {
             var _this = this;
             var field = this;
-            var data = this.data;
             this.setSrc(this.data.src, false);
             this.$field.addEventListener("click", function () { return __awaiter(_this, void 0, void 0, function () {
                 var params, updated, file, src, alt;
@@ -1114,16 +1126,16 @@ var BrickyEditor = (function (exports) {
             this.updateProperty("src", src, fireUpdate);
         };
         ImageField.prototype.setAlt = function (alt) {
-            this.$field.setAttribute(this.isImg ? "alt" : "title", alt);
+            this.$field.setAttribute(this.isImg ? "alt" : "title", alt || "");
             this.updateProperty("alt", alt);
         };
         ImageField.prototype.setFile = function (file) {
-            if (file) {
+            if (file !== null) {
                 if (this.isImg) {
-                    this.$field.setAttribute("src", fileContent);
+                    this.$field.setAttribute("src", file);
                 }
                 else {
-                    this.$field.style.backgroundImage = "url(" + fileContent + ")";
+                    this.$field.style.backgroundImage = "url(" + file + ")";
                 }
             }
             this.updateProperty("file", file);
@@ -1144,7 +1156,7 @@ var BrickyEditor = (function (exports) {
             }
             else if (this.$link) {
                 $dom.unwrap(this.$field);
-                this.$link = null;
+                this.$link = undefined;
                 delete this.$link;
             }
             this.updateProperty("link", url);
@@ -1273,6 +1285,7 @@ var BrickyEditor = (function (exports) {
             this.options = __assign(__assign({}, defaultOptions), options);
             this.container = this.createContainer();
             Editor.UI = new UI(this);
+            setUI(Editor.UI);
             this.tryBindFormSubmit();
         }
         Editor.prototype.initAsync = function () {
@@ -2308,6 +2321,7 @@ var BrickyEditor = (function (exports) {
             this.options = __assign(__assign({}, defaultOptions), options);
             this.container = this.createContainer();
             Editor.UI = new UI(this);
+            setUI(Editor.UI);
             this.tryBindFormSubmit();
         }
         Editor.prototype.initAsync = function () {
