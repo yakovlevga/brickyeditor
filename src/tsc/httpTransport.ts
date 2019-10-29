@@ -65,11 +65,11 @@ export const loadScript = (url: string) => {
 };
 
 // https://stackoverflow.com/a/31556957
-export const jsonp = (url: string) => {
-  return new Promise((resolve, reject) => {
+export const jsonp = <TResponse>(url: string) => {
+  return new Promise<TResponse>((resolve, reject) => {
     const id = "_" + Math.round(10000 * Math.random());
     const callbackName = "jsonp_callback_" + id;
-    (window as any)[callbackName] = (data: any) => {
+    (window as any)[callbackName] = (data: TResponse) => {
       delete (window as any)[callbackName];
       const element = document.getElementById(id);
       if (element !== null) {

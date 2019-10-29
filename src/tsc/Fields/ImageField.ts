@@ -2,10 +2,11 @@ import { $dom } from "src/common/DOMHelpers";
 import { BaseField } from "src/fields/BaseField";
 import { HtmlLinkParams } from "src/HtmlLinkParams";
 import { locales } from "src/locales";
-import { prompt } from "src/prompt";
-import { PromptParameter, PromptParameterImage } from "src/prompt/Prompt";
+import { promptAsync } from "src/prompt";
+import { bre } from "src/Types/bre";
 
 type ImageFieldData = {
+  name: "image";
   src: string;
   alt: string;
   file: File;
@@ -48,8 +49,8 @@ export class ImageField extends BaseField<ImageFieldData> {
       this._isImg || this.$field.tagName.toLowerCase() === "img");
   }
 
-  public _isImg: boolean;
-  private $link: HTMLLinkElement;
+  public _isImg?: boolean;
+  private $link?: HTMLLinkElement;
 
   public bind() {
     const field = this;
@@ -58,7 +59,7 @@ export class ImageField extends BaseField<ImageFieldData> {
     this.setSrc(this.data.src, false);
     this.$field.addEventListener("click", async () => {
       const params = getPromptParams(this.data);
-      const updated = await prompt<ImagePromptParams>(params);
+      const updated = await promptAsync<ImagePromptParams>(params);
 
       if (updated !== null) {
         const { file, src, alt } = updated;

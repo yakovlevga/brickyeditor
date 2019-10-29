@@ -1,4 +1,5 @@
-import { helpers } from "./helpers";
+import { helpers } from "src/helpers";
+import { bre } from "src/Types/bre";
 
 type FieldEditor = (props: {
   key: string;
@@ -69,17 +70,19 @@ const parameterEditors: {
   file: fileFieldEditor,
 };
 
-export const prompt = <TParams extends bre.prompt.PromptParameters>(
+export const promptAsync = <TParams extends bre.prompt.PromptParameters>(
   params: TParams
 ): Promise<
-  {
-    [TKey in keyof TParams]?: string;
-  }
+  | {
+      [TKey in keyof TParams]?: string;
+    }
+  | null
 > =>
   new Promise<
-    {
-      [TKey in keyof TParams]?: any;
-    }
+    | {
+        [TKey in keyof TParams]?: any;
+      }
+    | null
   >(resolve => {
     const result: {
       [TKey in keyof TParams]?: any;

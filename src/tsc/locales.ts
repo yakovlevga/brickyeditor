@@ -34,6 +34,12 @@ export const locales = {
         subtitle: "Link to open on image click",
       },
     },
+    embed: {
+      url: {
+        title: "URL to media",
+        placeholder: "Paste link to youtube, instagram, etc.",
+      },
+    },
   },
 
   htmlEditorLinkUrlTitle: "Url",

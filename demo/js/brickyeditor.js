@@ -573,168 +573,6 @@ var BrickyEditor = (function (exports) {
     }(BaseField));
     //# sourceMappingURL=ContainerField.js.map
 
-    var PromptParameter = (function () {
-        function PromptParameter(key, title, value, placeholder) {
-            this.key = key;
-            this.title = title;
-            this.placeholder = placeholder || "";
-            this.value = value;
-        }
-        PromptParameter.prototype.parseValue = function () {
-            if (this.$input) {
-                this.value = this.$input.value;
-            }
-            this.$control = null;
-            delete this._$control;
-        };
-        Object.defineProperty(PromptParameter.prototype, "$control", {
-            get: function () {
-                if (!this._$control) {
-                    this._$control = $dom.el("<div class=" + (this.key ? "bre-prompt-field" : "bre-prompt-subtitle") + ">\n                            <label class=\"bre-label\" for=\"" + this.key + "\">" + (this.title ? this.title : "Select file...") + "</label>\n                        </div>");
-                    this.$input = this.key ? this.getEditor() : null;
-                    if (this.$input != null) {
-                        this._$control.appendChild(this.$input);
-                    }
-                }
-                return this._$control;
-            },
-            set: function (value) {
-                this._$control = value;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        PromptParameter.prototype.getEditor = function () {
-            var $input = document.createElement("input");
-            $input.id = this.key;
-            $input.className = "bre-input";
-            $input.setAttribute("type", "text");
-            $input.setAttribute("placeholder", this.placeholder);
-            $input.value = this.value || "";
-            return $input;
-        };
-        return PromptParameter;
-    }());
-    //# sourceMappingURL=PromptParameter.js.map
-
-    var PromptParameterImage = (function (_super) {
-        __extends(PromptParameterImage, _super);
-        function PromptParameterImage(key, title, value, placeholder) {
-            var _this = _super.call(this, key, title, value, placeholder) || this;
-            if (value) {
-                _this._value = value;
-            }
-            return _this;
-        }
-        PromptParameterImage.prototype.parseValue = function () {
-            this.value = this._value;
-            this.$control = null;
-            delete this._$control;
-            this._value = null;
-            delete this._value;
-        };
-        PromptParameterImage.prototype.getEditor = function () {
-            var field = this;
-            var img = this.value && this.value.fileContent ? this.value.fileContent : "";
-            var $editor = $dom.el("\n                <div class='bre-image-input'>\n                    <label for=\"" + this.key + "\">\n                        " + this.placeholder + "\n                    </label>                        \n                    <img src=\"" + img + "\"/>                    \n                    <input type=\"file\" id=\"" + this.key + "\" class=\"bre-input\" placeholder=\"" + this.placeholder + "\">\n                </div>\n                <small class='bre-image-input-filename'></small>");
-            var $file = $editor.querySelector("input");
-            var $filePreview = $editor.querySelector("img");
-            var $fileName = $editor.querySelector(".bre-image-input-filename");
-            var value = this.value;
-            field.updatePreview($filePreview, $fileName, this.value);
-            $file.onchange = function () {
-                if ($file.files && $file.files[0]) {
-                    var reader = new FileReader();
-                    reader.onload = function (ev) {
-                        var target = ev.target;
-                        field._value = new PromptParameterImageResult();
-                        field._value.fileContent = target.result;
-                        field._value.fileInfo = new PromptParameterImageResultFile($file.files[0]);
-                        field.updatePreview($filePreview, $fileName, field._value);
-                    };
-                    reader.readAsDataURL($file.files[0]);
-                }
-            };
-            return $editor;
-        };
-        PromptParameterImage.prototype.updatePreview = function ($filePreview, $fileName, value) {
-            if (!value) {
-                return;
-            }
-            $filePreview.src = value.fileContent;
-            $filePreview.classList.add("bre-loaded");
-            $fileName.innerText = value.fileInfo.name;
-        };
-        return PromptParameterImage;
-    }(PromptParameter));
-    //# sourceMappingURL=PromptParameterImage.js.map
-
-    var PromptParameterImageResult = (function () {
-        function PromptParameterImageResult() {
-        }
-        return PromptParameterImageResult;
-    }());
-    var PromptParameterImageResultFile = (function () {
-        function PromptParameterImageResultFile(file) {
-            this.name = file.name;
-            this.size = file.size;
-            this.type = file.type;
-            this.lastModified = file.lastModified;
-            this.lastModifiedDate = file.lastModifiedDate;
-        }
-        return PromptParameterImageResultFile;
-    }());
-    //# sourceMappingURL=PromptParameterImageResult.js.map
-
-    var PromptParameterList = (function () {
-        function PromptParameterList(params) {
-            this.params = params;
-        }
-        PromptParameterList.prototype.getValue = function (key) {
-            var param = this.params.find(function (p) {
-                return p.key === key;
-            });
-            return param ? param.value : null;
-        };
-        return PromptParameterList;
-    }());
-    //# sourceMappingURL=PromptParameterList.js.map
-
-    var PromptParameterOption = (function () {
-        function PromptParameterOption(title, value, selected) {
-            if (selected === void 0) { selected = false; }
-            this.title = title;
-            this.value = value;
-            this.selected = selected;
-        }
-        return PromptParameterOption;
-    }());
-    //# sourceMappingURL=PromptParameterOption.js.map
-
-    //# sourceMappingURL=Prompt.js.map
-
-    var PromptParameterOptions = (function (_super) {
-        __extends(PromptParameterOptions, _super);
-        function PromptParameterOptions(key, title, options, value, placeholder) {
-            var _this = _super.call(this, key, title, value, placeholder) || this;
-            _this.options = [];
-            options.forEach(function (kv) {
-                _this.options.push(new PromptParameterOption(kv[0], kv[1], kv[1] == value));
-            });
-            return _this;
-        }
-        PromptParameterOptions.prototype.getEditor = function () {
-            var options = this.options.map(function (opt) {
-                return "<option value=\"" + opt.value + "\" " + (opt.selected ? "selected" : "") + ">" + (opt.title ? opt.title : opt.value) + "</option>";
-            });
-            return $dom.el("<select type=\"text\" id=\"" + this.key + "\" class=\"brickyeditor-input\" placeholder=\"" + this.placeholder + "\">" + options + "</select>");
-        };
-        return PromptParameterOptions;
-    }(PromptParameter));
-    //# sourceMappingURL=PromptParameterOptions.js.map
-
-    //# sourceMappingURL=Prompt.js.map
-
     var getRequest = function (url) {
         return new Promise(function (resolve, reject) {
             var request = new XMLHttpRequest();
@@ -765,6 +603,32 @@ var BrickyEditor = (function (exports) {
             request = null;
         });
     };
+    var loadScript = function (url) {
+        return new Promise(function (resolve, reject) {
+            var script = document.createElement("script");
+            var done = false;
+            var scriptDocLoadedHandler = function () {
+                debugger;
+                var readyState = script.readyState;
+                if (done === false &&
+                    (readyState === undefined ||
+                        readyState === "loaded" ||
+                        readyState === "complete")) {
+                    done = true;
+                    resolve();
+                }
+                else {
+                    reject();
+                }
+            };
+            script.onload = scriptDocLoadedHandler;
+            if (script.onreadystatechange !== undefined) {
+                script.onreadystatechange = scriptDocLoadedHandler;
+            }
+            script.src = url;
+            document.head.appendChild(script);
+        });
+    };
     var jsonp = function (url) {
         return new Promise(function (resolve, reject) {
             var id = "_" + Math.round(10000 * Math.random());
@@ -789,69 +653,237 @@ var BrickyEditor = (function (exports) {
     };
     //# sourceMappingURL=httpTransport.js.map
 
-    var EmbedService = (function () {
-        function EmbedService() {
+    var postProcessEmbed = function (provider) {
+        switch (provider) {
+            case "Instagram":
+                var instgrm = window.instgrm;
+                if (instgrm !== undefined) {
+                    instgrm.Embeds.process();
+                }
+                break;
+            default:
+                break;
         }
-        EmbedService.getEmbedAsync = function (embedUrl) {
-            var _this = this;
-            var url = "https://noembed.com/embed?url=" + embedUrl;
-            return new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
-                var data, err_1;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0:
-                            _a.trys.push([0, 2, , 3]);
-                            return [4, jsonp(url)];
-                        case 1:
-                            data = _a.sent();
-                            resolve(data);
-                            return [3, 3];
-                        case 2:
-                            err_1 = _a.sent();
-                            reject(err_1);
-                            return [3, 3];
-                        case 3: return [2];
-                    }
-                });
-            }); });
+    };
+    var getEmbedAsync = function (embedUrl) {
+        var url = "https://noembed.com/embed?url=" + embedUrl;
+        return new Promise(function (resolve, reject) { return __awaiter(void 0, void 0, void 0, function () {
+            var data, err_1;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        _a.trys.push([0, 2, , 3]);
+                        return [4, jsonp(url)];
+                    case 1:
+                        data = _a.sent();
+                        resolve(data);
+                        return [3, 3];
+                    case 2:
+                        err_1 = _a.sent();
+                        reject(err_1);
+                        return [3, 3];
+                    case 3: return [2];
+                }
+            });
+        }); });
+    };
+    //# sourceMappingURL=embed.js.map
+
+    var createElement = function (html) {
+        var temp = document.createElement("div");
+        temp.innerHTML = html;
+        var result = temp.children[0];
+        temp.innerHTML = null;
+        return result;
+    };
+    var modalTemplate = "\n<div>\n  <div class=\"bre-modal\" style=\"display: block;\">\n    <div class=\"bre-modal-placeholder\">\n    </div>\n  </div>\n</div>";
+    var showModal = function (props) {
+        var element = createElement(modalTemplate);
+        var placeholder = element.getElementsByClassName("bre-modal-placeholder")[0];
+        var closeModal = function () {
+            element.remove();
+            element = null;
         };
-        EmbedService.processEmbed = function (provider) {
-            switch (provider) {
-                case EmbedService.Instagram:
-                    if (instgrm) {
-                        instgrm.Embeds.process();
-                    }
-                    break;
-                default:
-                    break;
+        var content = props.content, onOk = props.onOk, onCancel = props.onCancel;
+        content.forEach(function (el) { return placeholder.appendChild(el); });
+        if (onOk !== undefined) {
+            var buttonOk = createElement("<button type=\"button\">Save</button>");
+            buttonOk.addEventListener("click", function () {
+                onOk();
+                closeModal();
+            });
+            placeholder.appendChild(buttonOk);
+        }
+        var buttonCancel = createElement("<button type=\"button\">Cancel</button>");
+        buttonCancel.addEventListener("click", function () {
+            onCancel();
+            closeModal();
+        });
+        placeholder.appendChild(buttonCancel);
+        document.body.appendChild(element);
+    };
+    var helpers = { createElement: createElement, showModal: showModal };
+    //# sourceMappingURL=helpers.js.map
+
+    var locales = {
+        errorBlocksFileNotFound: function (url) {
+            return "Blocks file not found. Requested file: " + url + ".";
+        },
+        errorTemplatesFileNotFound: function (url) {
+            return "Templates file not found. Requested file: " + url + ".";
+        },
+        errorBlockTemplateNotFound: function (templateName) {
+            return "Template \"" + templateName + "\" not found.";
+        },
+        errorTemplateParsing: function (name) {
+            return "Template parsing error: " + name + ".";
+        },
+        embedFieldLinkTitle: "Link to embed media",
+        embedFieldLinkPlaceholder: "Link to instagram, youtube and etc.",
+        prompt: {
+            image: {
+                link: {
+                    title: "Image link",
+                    placeholder: "http://url-to-image.png",
+                },
+                alt: {
+                    title: "Image alt",
+                    placeholder: "Image 'alt' attribute value",
+                },
+                upload: {
+                    title: "or Upload a file",
+                    placeholder: "select file",
+                    button: "Select file",
+                },
+                url: {
+                    subtitle: "Link to open on image click",
+                },
+            },
+            embed: {
+                url: {
+                    title: "URL to media",
+                    placeholder: "Paste link to youtube, instagram, etc.",
+                },
+            },
+        },
+        htmlEditorLinkUrlTitle: "Url",
+        htmlEditorLinkUrlPlaceholder: "http://put-your-link.here",
+        htmlEditorLinkTitleTitle: "Title",
+        htmlEditorLinkTitlePlaceholder: "Title attribute for link",
+        htmlEditorLinkTargetTitle: "Target",
+        htmlEditorLinkTargetBlank: "Blank",
+        htmlEditorLinkTargetSelf: "Self",
+        htmlEditorLinkTargetParent: "Parent",
+        htmlEditorLinkTargetTop: "Top",
+        buttonClose: "close",
+        buttonOk: "Ok",
+        buttonCancel: "Cancel",
+        defaultTemplatesGroupName: "Other templates",
+    };
+    //# sourceMappingURL=locales.js.map
+
+    var textFieldEditor = function (_a) {
+        var key = _a.key, p = _a.p, data = _a.data;
+        var html = "<input type='text' name='" + key + "' placeholder='" + p.placeholder + "' value='" + (p.value || "") + "' />";
+        var input = helpers.createElement(html);
+        input.onchange = function () {
+            data[key] = input.value;
+        };
+        return input;
+    };
+    var fileFieldEditor = function (_a) {
+        var key = _a.key, p = _a.p, data = _a.data;
+        var file = data[key];
+        var filePreview = helpers.createElement("<img src=\"" + p.value + "\"/>");
+        var fileInput = helpers.createElement("<input type=\"file\" id=\"bre-modal-modal-" + key + "\" class=\"bre-input\" placeholder=\"" + p.placeholder + "\">");
+        var fileName = helpers.createElement("<span class='bre-image-input-filename'></span>");
+        var updatePreview = function () {
+            if (file === undefined) {
+                fileName.innerText = "";
+                filePreview.src = null;
+            }
+            else {
+                fileName.innerText = file.name;
+                var reader = new FileReader();
+                reader.onload = function (ev) {
+                    filePreview.src = ev.target.result.toString();
+                };
+                reader.readAsDataURL(file);
             }
         };
-        EmbedService.Instagram = "Instagram";
-        return EmbedService;
-    }());
-    //# sourceMappingURL=EmbedService.js.map
+        fileInput.onchange = function () {
+            file = fileInput.files && fileInput.files[0];
+            updatePreview();
+            data[key] = file;
+        };
+        updatePreview();
+        var editor = helpers.createElement("<div class='bre-image-input'>\n    <label for=\"bre-modal-modal-" + key + "\">\n      " + p.placeholder + "\n    </label>\n  </div>");
+        editor.append(filePreview, fileInput, fileName);
+        return editor;
+    };
+    var parameterEditors = {
+        text: textFieldEditor,
+        file: fileFieldEditor,
+    };
+    var promptAsync = function (params) {
+        return new Promise(function (resolve) {
+            var result = {};
+            var editors = Object.keys(params).map(function (key) {
+                var p = params[key];
+                var editor = parameterEditors[p.type || "text"]({
+                    key: key,
+                    p: p,
+                    data: result,
+                });
+                return editor;
+            });
+            helpers.showModal({
+                content: editors,
+                onOk: function () { return resolve(result); },
+                onCancel: function () { return resolve(null); },
+            });
+        });
+    };
+    //# sourceMappingURL=prompt.js.map
 
-    //# sourceMappingURL=Services.js.map
-
+    var getPromptParams = function (_a) {
+        var url = _a.url;
+        return ({
+            url: {
+                value: url || "http://instagr.am/p/BO9VX2Vj4fF/",
+                title: locales.prompt.embed.url.title,
+                placeholder: locales.prompt.embed.url.placeholder,
+            },
+        });
+    };
+    var promptEmbedMediaUrl = function (field) { return __awaiter(void 0, void 0, void 0, function () {
+        var params, updated, url;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    params = getPromptParams(field.data);
+                    return [4, promptAsync(params)];
+                case 1:
+                    updated = _a.sent();
+                    if (!(updated !== null)) return [3, 3];
+                    url = updated.url;
+                    if (!(url !== undefined)) return [3, 3];
+                    field.setUrl(url);
+                    return [4, field.loadMedia(true)];
+                case 2:
+                    _a.sent();
+                    _a.label = 3;
+                case 3: return [2];
+            }
+        });
+    }); };
     var EmbedField = (function (_super) {
         __extends(EmbedField, _super);
         function EmbedField() {
             return _super !== null && _super.apply(this, arguments) || this;
         }
-        Object.defineProperty(EmbedField.prototype, "settings", {
-            get: function () {
-                var _this = this;
-                return function (field) {
-                    _this.showEmbedLoaderAsync(field);
-                };
-            },
-            enumerable: true,
-            configurable: true
-        });
         EmbedField.prototype.getSettingsEl = function () {
-            var $el = $dom.el('<div style="position: absolute;width: 100%; height: 100px;;text-align: center;font-weight: bold;vertical-align: middle;background: #333;opacity: 0.2;">Change embed element link</div>');
-            $dom.before(this.$field, $el);
-            return $el;
+            return null;
         };
         EmbedField.prototype.bind = function () {
             var _this = this;
@@ -859,7 +891,7 @@ var BrickyEditor = (function (exports) {
             var $field = this.$field;
             $dom.on($field, "click", function () { return __awaiter(_this, void 0, void 0, function () {
                 return __generator(this, function (_a) {
-                    this.showEmbedLoaderAsync(field);
+                    promptEmbedMediaUrl(field);
                     return [2];
                 });
             }); });
@@ -875,22 +907,23 @@ var BrickyEditor = (function (exports) {
                             if (!field.data || !field.data.url) {
                                 return [2];
                             }
-                            return [4, EmbedService.getEmbedAsync(field.data.url)];
+                            return [4, getEmbedAsync(field.data.url)];
                         case 1:
                             json = _a.sent();
                             field.setEmbed(json, fireUpdate);
                             $embed = $dom.el(json.html);
                             $script = $dom.first($embed, "script");
-                            if ($script) {
-                                $script.remove();
-                                scriptSrc = $script.src;
-                                if (str.startsWith(scriptSrc, "//")) {
-                                    scriptSrc = "https:" + scriptSrc;
-                                    loadScript(scriptSrc).then(function () {
-                                        EmbedService.processEmbed(json.provider_name);
-                                    });
-                                }
-                            }
+                            if (!$script) return [3, 3];
+                            $script.remove();
+                            scriptSrc = $script.src;
+                            if (!str.startsWith(scriptSrc, "//")) return [3, 3];
+                            scriptSrc = "https:" + scriptSrc;
+                            return [4, loadScript(scriptSrc)];
+                        case 2:
+                            _a.sent();
+                            postProcessEmbed(json.provider_name);
+                            _a.label = 3;
+                        case 3:
                             field.$field.innerHTML = "";
                             field.$field.removeAttribute("class");
                             field.$field.removeAttribute("style");
@@ -907,32 +940,6 @@ var BrickyEditor = (function (exports) {
         };
         EmbedField.prototype.setUrl = function (value) {
             this.updateProperty("url", value);
-        };
-        EmbedField.prototype.showEmbedLoaderAsync = function (field) {
-            return __awaiter(this, void 0, void 0, function () {
-                var fields, url;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0: return [4, Editor.UI.modal.promptAsync(field.getPromptParams())];
-                        case 1:
-                            fields = _a.sent();
-                            if (!(fields != null)) return [3, 3];
-                            url = fields.getValue("url");
-                            if (!url) return [3, 3];
-                            field.setUrl(url);
-                            return [4, field.loadMedia(true)];
-                        case 2:
-                            _a.sent();
-                            _a.label = 3;
-                        case 3: return [2];
-                    }
-                });
-            });
-        };
-        EmbedField.prototype.getPromptParams = function () {
-            return [
-                new PromptParameter("url", EditorStrings.embedFieldLinkTitle, this.data.url || "http://instagr.am/p/BO9VX2Vj4fF/", EditorStrings.embedFieldLinkPlaceholder),
-            ];
         };
         return EmbedField;
     }(BaseField));
@@ -1021,158 +1028,7 @@ var BrickyEditor = (function (exports) {
     }(BaseField));
     //# sourceMappingURL=HtmlField.js.map
 
-    var locales = {
-        errorBlocksFileNotFound: function (url) {
-            return "Blocks file not found. Requested file: " + url + ".";
-        },
-        errorTemplatesFileNotFound: function (url) {
-            return "Templates file not found. Requested file: " + url + ".";
-        },
-        errorBlockTemplateNotFound: function (templateName) {
-            return "Template \"" + templateName + "\" not found.";
-        },
-        errorTemplateParsing: function (name) {
-            return "Template parsing error: " + name + ".";
-        },
-        embedFieldLinkTitle: "Link to embed media",
-        embedFieldLinkPlaceholder: "Link to instagram, youtube and etc.",
-        prompt: {
-            image: {
-                link: {
-                    title: "Image link",
-                    placeholder: "http://url-to-image.png",
-                },
-                alt: {
-                    title: "Image alt",
-                    placeholder: "Image 'alt' attribute value",
-                },
-                upload: {
-                    title: "or Upload a file",
-                    placeholder: "select file",
-                    button: "Select file",
-                },
-                url: {
-                    subtitle: "Link to open on image click",
-                },
-            },
-        },
-        htmlEditorLinkUrlTitle: "Url",
-        htmlEditorLinkUrlPlaceholder: "http://put-your-link.here",
-        htmlEditorLinkTitleTitle: "Title",
-        htmlEditorLinkTitlePlaceholder: "Title attribute for link",
-        htmlEditorLinkTargetTitle: "Target",
-        htmlEditorLinkTargetBlank: "Blank",
-        htmlEditorLinkTargetSelf: "Self",
-        htmlEditorLinkTargetParent: "Parent",
-        htmlEditorLinkTargetTop: "Top",
-        buttonClose: "close",
-        buttonOk: "Ok",
-        buttonCancel: "Cancel",
-        defaultTemplatesGroupName: "Other templates",
-    };
-    //# sourceMappingURL=locales.js.map
-
-    var createElement = function (html) {
-        var temp = document.createElement("div");
-        temp.innerHTML = html;
-        var result = temp.children[0];
-        temp.innerHTML = null;
-        return result;
-    };
-    var modalTemplate = "\n<div>\n  <div class=\"bre-modal\" style=\"display: block;\">\n    <div class=\"bre-modal-placeholder\">\n    </div>\n  </div>\n</div>";
-    var showModal = function (props) {
-        var element = createElement(modalTemplate);
-        var placeholder = element.getElementsByClassName("bre-modal-placeholder")[0];
-        var closeModal = function () {
-            element.remove();
-            element = null;
-        };
-        var content = props.content, onOk = props.onOk, onCancel = props.onCancel;
-        content.forEach(function (el) { return placeholder.appendChild(el); });
-        if (onOk !== undefined) {
-            var buttonOk = createElement("<button type=\"button\">Save</button>");
-            buttonOk.addEventListener("click", function () {
-                onOk();
-                closeModal();
-            });
-            placeholder.appendChild(buttonOk);
-        }
-        var buttonCancel = createElement("<button type=\"button\">Cancel</button>");
-        buttonCancel.addEventListener("click", function () {
-            onCancel();
-            closeModal();
-        });
-        placeholder.appendChild(buttonCancel);
-        document.body.appendChild(element);
-    };
-    var helpers = { createElement: createElement, showModal: showModal };
-    //# sourceMappingURL=helpers.js.map
-
-    var textFieldEditor = function (_a) {
-        var key = _a.key, p = _a.p, data = _a.data;
-        var html = "<input type='text' name='" + key + "' placeholder='" + p.placeholder + "' value='" + (p.value || "") + "' />";
-        var input = helpers.createElement(html);
-        input.onchange = function () {
-            data[key] = input.value;
-        };
-        return input;
-    };
-    var fileFieldEditor = function (_a) {
-        var key = _a.key, p = _a.p, data = _a.data;
-        var file = data[key];
-        var filePreview = helpers.createElement("<img src=\"" + p.value + "\"/>");
-        var fileInput = helpers.createElement("<input type=\"file\" id=\"bre-modal-modal-" + key + "\" class=\"bre-input\" placeholder=\"" + p.placeholder + "\">");
-        var fileName = helpers.createElement("<span class='bre-image-input-filename'></span>");
-        var updatePreview = function () {
-            if (file === undefined) {
-                fileName.innerText = "";
-                filePreview.src = null;
-            }
-            else {
-                fileName.innerText = file.name;
-                var reader = new FileReader();
-                reader.onload = function (ev) {
-                    filePreview.src = ev.target.result.toString();
-                };
-                reader.readAsDataURL(file);
-            }
-        };
-        fileInput.onchange = function () {
-            file = fileInput.files && fileInput.files[0];
-            updatePreview();
-            data[key] = file;
-        };
-        updatePreview();
-        var editor = helpers.createElement("<div class='bre-image-input'>\n    <label for=\"bre-modal-modal-" + key + "\">\n      " + p.placeholder + "\n    </label>\n  </div>");
-        editor.append(filePreview, fileInput, fileName);
-        return editor;
-    };
-    var parameterEditors = {
-        text: textFieldEditor,
-        file: fileFieldEditor,
-    };
-    var prompt = function (params) {
-        return new Promise(function (resolve) {
-            var result = {};
-            var editors = Object.keys(params).map(function (key) {
-                var p = params[key];
-                var editor = parameterEditors[p.type || "text"]({
-                    key: key,
-                    p: p,
-                    data: result,
-                });
-                return editor;
-            });
-            helpers.showModal({
-                content: editors,
-                onOk: function () { return resolve(result); },
-                onCancel: function () { return resolve(null); },
-            });
-        });
-    };
-    //# sourceMappingURL=prompt.js.map
-
-    var getPromptParams = function (_a) {
+    var getPromptParams$1 = function (_a) {
         var src = _a.src, file = _a.file, alt = _a.alt;
         return ({
             src: {
@@ -1216,8 +1072,8 @@ var BrickyEditor = (function (exports) {
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
-                            params = getPromptParams(this.data);
-                            return [4, prompt(params)];
+                            params = getPromptParams$1(this.data);
+                            return [4, promptAsync(params)];
                         case 1:
                             updated = _a.sent();
                             if (updated !== null) {
@@ -1585,6 +1441,168 @@ var BrickyEditor = (function (exports) {
         return Editor;
     }());
     //# sourceMappingURL=Editor.js.map
+
+    var PromptParameter = (function () {
+        function PromptParameter(key, title, value, placeholder) {
+            this.key = key;
+            this.title = title;
+            this.placeholder = placeholder || "";
+            this.value = value;
+        }
+        PromptParameter.prototype.parseValue = function () {
+            if (this.$input) {
+                this.value = this.$input.value;
+            }
+            this.$control = null;
+            delete this._$control;
+        };
+        Object.defineProperty(PromptParameter.prototype, "$control", {
+            get: function () {
+                if (!this._$control) {
+                    this._$control = $dom.el("<div class=" + (this.key ? "bre-prompt-field" : "bre-prompt-subtitle") + ">\n                            <label class=\"bre-label\" for=\"" + this.key + "\">" + (this.title ? this.title : "Select file...") + "</label>\n                        </div>");
+                    this.$input = this.key ? this.getEditor() : null;
+                    if (this.$input != null) {
+                        this._$control.appendChild(this.$input);
+                    }
+                }
+                return this._$control;
+            },
+            set: function (value) {
+                this._$control = value;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        PromptParameter.prototype.getEditor = function () {
+            var $input = document.createElement("input");
+            $input.id = this.key;
+            $input.className = "bre-input";
+            $input.setAttribute("type", "text");
+            $input.setAttribute("placeholder", this.placeholder);
+            $input.value = this.value || "";
+            return $input;
+        };
+        return PromptParameter;
+    }());
+    //# sourceMappingURL=PromptParameter.js.map
+
+    var PromptParameterImage = (function (_super) {
+        __extends(PromptParameterImage, _super);
+        function PromptParameterImage(key, title, value, placeholder) {
+            var _this = _super.call(this, key, title, value, placeholder) || this;
+            if (value) {
+                _this._value = value;
+            }
+            return _this;
+        }
+        PromptParameterImage.prototype.parseValue = function () {
+            this.value = this._value;
+            this.$control = null;
+            delete this._$control;
+            this._value = null;
+            delete this._value;
+        };
+        PromptParameterImage.prototype.getEditor = function () {
+            var field = this;
+            var img = this.value && this.value.fileContent ? this.value.fileContent : "";
+            var $editor = $dom.el("\n                <div class='bre-image-input'>\n                    <label for=\"" + this.key + "\">\n                        " + this.placeholder + "\n                    </label>                        \n                    <img src=\"" + img + "\"/>                    \n                    <input type=\"file\" id=\"" + this.key + "\" class=\"bre-input\" placeholder=\"" + this.placeholder + "\">\n                </div>\n                <small class='bre-image-input-filename'></small>");
+            var $file = $editor.querySelector("input");
+            var $filePreview = $editor.querySelector("img");
+            var $fileName = $editor.querySelector(".bre-image-input-filename");
+            var value = this.value;
+            field.updatePreview($filePreview, $fileName, this.value);
+            $file.onchange = function () {
+                if ($file.files && $file.files[0]) {
+                    var reader = new FileReader();
+                    reader.onload = function (ev) {
+                        var target = ev.target;
+                        field._value = new PromptParameterImageResult();
+                        field._value.fileContent = target.result;
+                        field._value.fileInfo = new PromptParameterImageResultFile($file.files[0]);
+                        field.updatePreview($filePreview, $fileName, field._value);
+                    };
+                    reader.readAsDataURL($file.files[0]);
+                }
+            };
+            return $editor;
+        };
+        PromptParameterImage.prototype.updatePreview = function ($filePreview, $fileName, value) {
+            if (!value) {
+                return;
+            }
+            $filePreview.src = value.fileContent;
+            $filePreview.classList.add("bre-loaded");
+            $fileName.innerText = value.fileInfo.name;
+        };
+        return PromptParameterImage;
+    }(PromptParameter));
+    //# sourceMappingURL=PromptParameterImage.js.map
+
+    var PromptParameterImageResult = (function () {
+        function PromptParameterImageResult() {
+        }
+        return PromptParameterImageResult;
+    }());
+    var PromptParameterImageResultFile = (function () {
+        function PromptParameterImageResultFile(file) {
+            this.name = file.name;
+            this.size = file.size;
+            this.type = file.type;
+            this.lastModified = file.lastModified;
+            this.lastModifiedDate = file.lastModifiedDate;
+        }
+        return PromptParameterImageResultFile;
+    }());
+    //# sourceMappingURL=PromptParameterImageResult.js.map
+
+    var PromptParameterList = (function () {
+        function PromptParameterList(params) {
+            this.params = params;
+        }
+        PromptParameterList.prototype.getValue = function (key) {
+            var param = this.params.find(function (p) {
+                return p.key === key;
+            });
+            return param ? param.value : null;
+        };
+        return PromptParameterList;
+    }());
+    //# sourceMappingURL=PromptParameterList.js.map
+
+    var PromptParameterOption = (function () {
+        function PromptParameterOption(title, value, selected) {
+            if (selected === void 0) { selected = false; }
+            this.title = title;
+            this.value = value;
+            this.selected = selected;
+        }
+        return PromptParameterOption;
+    }());
+    //# sourceMappingURL=PromptParameterOption.js.map
+
+    //# sourceMappingURL=Prompt.js.map
+
+    var PromptParameterOptions = (function (_super) {
+        __extends(PromptParameterOptions, _super);
+        function PromptParameterOptions(key, title, options, value, placeholder) {
+            var _this = _super.call(this, key, title, value, placeholder) || this;
+            _this.options = [];
+            options.forEach(function (kv) {
+                _this.options.push(new PromptParameterOption(kv[0], kv[1], kv[1] == value));
+            });
+            return _this;
+        }
+        PromptParameterOptions.prototype.getEditor = function () {
+            var options = this.options.map(function (opt) {
+                return "<option value=\"" + opt.value + "\" " + (opt.selected ? "selected" : "") + ">" + (opt.title ? opt.title : opt.value) + "</option>";
+            });
+            return $dom.el("<select type=\"text\" id=\"" + this.key + "\" class=\"brickyeditor-input\" placeholder=\"" + this.placeholder + "\">" + options + "</select>");
+        };
+        return PromptParameterOptions;
+    }(PromptParameter));
+    //# sourceMappingURL=PromptParameterOptions.js.map
+
+    //# sourceMappingURL=Prompt.js.map
 
     var HtmlLinkParams = (function () {
         function HtmlLinkParams(href, title, target) {

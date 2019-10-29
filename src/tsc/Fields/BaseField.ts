@@ -135,7 +135,8 @@ export abstract class BaseField<TData extends bre.Data = bre.Data> {
     $el.attributes.removeNamedItem(Selectors.attrField);
     return $el;
   }
-  protected getSettingsEl(): HTMLElement {
+
+  protected getSettingsEl(): HTMLElement | null {
     return null;
   }
 
