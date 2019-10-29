@@ -1,46 +1,42 @@
 export class EditorStrings {
-  static errorBlocksFileNotFound = function(url: string) {
-    return `Blocks file not found. Requested file: ${url}.`;
-  };
-  static errorTemplatesFileNotFound = function(url: string) {
-    return `Templates file not found. Requested file: ${url}.`;
-  };
-  static errorBlockTemplateNotFound = function(templateName: string) {
-    return `Template "${templateName}" not found.`;
-  };
-  static errorTemplateParsing = function(name: string) {
-    return `Template parsing error: ${name}.`;
-  };
+  public static embedFieldLinkTitle = "Link to embed media";
+  public static embedFieldLinkPlaceholder =
+    "Link to instagram, youtube and etc.";
 
-  static embedFieldLinkTitle = "Link to embed media";
-  static embedFieldLinkPlaceholder = "Link to instagram, youtube and etc.";
+  public static imageFieldLinkTitle = "Image link";
+  public static imageFieldLinkPlaceholder = "http://url-to-image.png";
 
-  static imageFieldLinkTitle = "Image link";
-  static imageFieldLinkPlaceholder = "http://url-to-image.png";
+  public static imageFieldUploadTitle = "or Upload a file";
+  public static imageFieldUploadButton = "Select file";
 
-  static imageFieldUploadTitle = "or Upload a file";
-  static imageFieldUploadButton = "Select file";
+  public static imageFieldAltTitle = "Alt";
+  public static imageFieldAltPlaceholder = "Image 'alt' attribute value";
 
-  static imageFieldAltTitle = "Alt";
-  static imageFieldAltPlaceholder = "Image 'alt' attribute value";
+  public static imageFieldUrlSubtitle = "Link to open on image click";
 
-  static imageFieldUrlSubtitle = "Link to open on image click";
+  public static htmlEditorLinkUrlTitle = "Url";
+  public static htmlEditorLinkUrlPlaceholder = "http://put-your-link.here";
 
-  static htmlEditorLinkUrlTitle = "Url";
-  static htmlEditorLinkUrlPlaceholder = "http://put-your-link.here";
+  public static htmlEditorLinkTitleTitle = "Title";
+  public static htmlEditorLinkTitlePlaceholder = "Title attribute for link";
 
-  static htmlEditorLinkTitleTitle = "Title";
-  static htmlEditorLinkTitlePlaceholder = "Title attribute for link";
+  public static htmlEditorLinkTargetTitle = "Target";
+  public static htmlEditorLinkTargetBlank = "Blank";
+  public static htmlEditorLinkTargetSelf = "Self";
+  public static htmlEditorLinkTargetParent = "Parent";
+  public static htmlEditorLinkTargetTop = "Top";
 
-  static htmlEditorLinkTargetTitle = "Target";
-  static htmlEditorLinkTargetBlank = "Blank";
-  static htmlEditorLinkTargetSelf = "Self";
-  static htmlEditorLinkTargetParent = "Parent";
-  static htmlEditorLinkTargetTop = "Top";
+  public static buttonClose = "close";
+  public static buttonOk = "Ok";
+  public static buttonCancel = "Cancel";
 
-  static buttonClose = "close";
-  static buttonOk = "Ok";
-  static buttonCancel = "Cancel";
-
-  static defaultTemplatesGroupName = "Other templates";
+  public static defaultTemplatesGroupName = "Other templates";
+  public static errorBlocksFileNotFound = (url: string) =>
+    `Blocks file not found. Requested file: ${url}.`;
+  public static errorTemplatesFileNotFound = (url: string) =>
+    `Templates file not found. Requested file: ${url}.`;
+  public static errorBlockTemplateNotFound = (templateName: string) =>
+    `Template "${templateName}" not found.`;
+  public static errorTemplateParsing = (name: string) =>
+    `Template parsing error: ${name}.`;
 }
