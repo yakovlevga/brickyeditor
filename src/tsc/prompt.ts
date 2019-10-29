@@ -19,7 +19,7 @@ const textFieldEditor: FieldEditor = ({ key, p, data }) => {
 };
 
 const fileFieldEditor: FieldEditor = ({ key, p, data }) => {
-  let file: File = data[key];
+  let file: File | null = data[key];
 
   const filePreview = helpers.createElement<HTMLImageElement>(
     `<img src="${p.value}"/>`
@@ -32,14 +32,16 @@ const fileFieldEditor: FieldEditor = ({ key, p, data }) => {
   );
 
   const updatePreview = () => {
-    if (file === undefined) {
+    if (file === undefined || file === null) {
       fileName.innerText = "";
-      filePreview.src = null;
+      filePreview.src = "//:0";
     } else {
       fileName.innerText = file.name;
       const reader = new FileReader();
       reader.onload = ev => {
-        filePreview.src = ev.target.result.toString();
+        if (ev.target !== null && ev.target.result !== null) {
+          filePreview.src = ev.target.result.toString();
+        }
       };
       reader.readAsDataURL(file);
     }
