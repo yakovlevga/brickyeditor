@@ -33,7 +33,9 @@ export class EmbedField extends BaseField {
 
   async loadMedia(fireUpdate: boolean) {
     let field = this;
-    if (!field.data || !field.data.url) return;
+    if (!field.data || !field.data.url) {
+      return;
+    }
 
     const json = await EmbedService.getEmbedAsync(field.data.url);
 
@@ -42,10 +44,10 @@ export class EmbedField extends BaseField {
     const $script = $dom.first($embed, "script") as HTMLScriptElement;
     if ($script) {
       $script.remove();
-      var scriptSrc = $script.src;
+      let scriptSrc = $script.src;
       if (str.startsWith(scriptSrc, "//")) {
         scriptSrc = "https:" + scriptSrc;
-        http.getScript(scriptSrc).then(() => {
+        loadScript(scriptSrc).then(() => {
           EmbedService.processEmbed(json.provider_name);
         });
       }
@@ -58,7 +60,7 @@ export class EmbedField extends BaseField {
     field.select();
   }
 
-  setEmbed(value: any, fireUpdate: boolean = true) {
+  public setEmbed(value: any, fireUpdate: boolean = true) {
     this.updateProperty("embed", value, fireUpdate);
   }
 

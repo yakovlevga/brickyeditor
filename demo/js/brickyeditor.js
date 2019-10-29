@@ -787,6 +787,7 @@ var BrickyEditor = (function (exports) {
                 document.documentElement).appendChild(script);
         });
     };
+    //# sourceMappingURL=httpTransport.js.map
 
     var EmbedService = (function () {
         function EmbedService() {
@@ -828,6 +829,7 @@ var BrickyEditor = (function (exports) {
         EmbedService.Instagram = "Instagram";
         return EmbedService;
     }());
+    //# sourceMappingURL=EmbedService.js.map
 
     //# sourceMappingURL=Services.js.map
 
@@ -870,8 +872,9 @@ var BrickyEditor = (function (exports) {
                     switch (_a.label) {
                         case 0:
                             field = this;
-                            if (!field.data || !field.data.url)
+                            if (!field.data || !field.data.url) {
                                 return [2];
+                            }
                             return [4, EmbedService.getEmbedAsync(field.data.url)];
                         case 1:
                             json = _a.sent();
@@ -883,7 +886,7 @@ var BrickyEditor = (function (exports) {
                                 scriptSrc = $script.src;
                                 if (str.startsWith(scriptSrc, "//")) {
                                     scriptSrc = "https:" + scriptSrc;
-                                    http.getScript(scriptSrc).then(function () {
+                                    loadScript(scriptSrc).then(function () {
                                         EmbedService.processEmbed(json.provider_name);
                                     });
                                 }
@@ -933,7 +936,6 @@ var BrickyEditor = (function (exports) {
         };
         return EmbedField;
     }(BaseField));
-    //# sourceMappingURL=EmbedField.js.map
 
     var SelectionUtils = (function () {
         function SelectionUtils() {
@@ -1395,6 +1397,7 @@ var BrickyEditor = (function (exports) {
             $preview: $preview,
         };
     };
+    //# sourceMappingURL=template.js.map
 
     var Editor = (function () {
         function Editor($editor, options) {
@@ -1581,6 +1584,7 @@ var BrickyEditor = (function (exports) {
         };
         return Editor;
     }());
+    //# sourceMappingURL=Editor.js.map
 
     var HtmlLinkParams = (function () {
         function HtmlLinkParams(href, title, target) {
@@ -2453,6 +2457,7 @@ var BrickyEditor = (function (exports) {
         };
         return Editor;
     }());
+    //# sourceMappingURL=Editor.js.map
 
     exports.Editor = Editor$1;
 

@@ -27,16 +27,24 @@ export const getRequest = (url: string): Promise<any> => {
   });
 };
 
-export const getScript = (url: string) => {
+type ScriptDocument = {
+  readyState?: "loaded" | "complete";
+};
+
+export const loadScript = (url: string) => {
   return new Promise((resolve, reject) => {
     const script = document.createElement("script");
+
     let done = false;
-    const loaded = function() {
+    const scriptDocLoadedHandler = () => {
+      debugger;
+      // TODO: I really need to check if this work the right way
+      const { readyState } = script as ScriptDocument;
       if (
-        !done &&
-        (!this.readyState ||
-          this.readyState === "loaded" ||
-          this.readyState === "complete")
+        done === false &&
+        (readyState === undefined ||
+          readyState === "loaded" ||
+          readyState === "complete")
       ) {
         done = true;
         resolve();
@@ -44,14 +52,15 @@ export const getScript = (url: string) => {
         reject();
       }
     };
-    script.onload = loaded;
+
+    script.onload = scriptDocLoadedHandler;
+    // TODO: IE hack, do we really need this, check the IE8+
     if ((script as any).onreadystatechange !== undefined) {
-      (script as any).onreadystatechange = loaded;
+      (script as any).onreadystatechange = scriptDocLoadedHandler;
     }
 
     script.src = url;
-    const head = document.getElementsByTagName("head")[0];
-    head.appendChild(script);
+    document.head.appendChild(script);
   });
 };
 
