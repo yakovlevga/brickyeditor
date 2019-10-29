@@ -54,7 +54,6 @@ export class ImageField extends BaseField<ImageFieldData> {
 
   public bind() {
     const field = this;
-    const data = this.data;
 
     this.setSrc(this.data.src, false);
     this.$field.addEventListener("click", async () => {
@@ -113,7 +112,7 @@ export class ImageField extends BaseField<ImageFieldData> {
     });
   }
 
-  public setSrc(src: string, fireUpdate: boolean = true) {
+  public setSrc(src: string | null, fireUpdate: boolean = true) {
     if (src) {
       if (this.isImg) {
         this.$field.setAttribute("src", src);
@@ -124,19 +123,20 @@ export class ImageField extends BaseField<ImageFieldData> {
     this.updateProperty("src", src, fireUpdate);
   }
 
-  public setAlt(alt: string) {
-    this.$field.setAttribute(this.isImg ? "alt" : "title", alt);
+  public setAlt(alt?: string) {
+    this.$field.setAttribute(this.isImg ? "alt" : "title", alt || "");
     this.updateProperty("alt", alt);
   }
 
-  public setFile(file: File) {
-    if (file) {
+  public setFile(file: string | null) {
+    if (file !== null) {
       if (this.isImg) {
-        this.$field.setAttribute("src", fileContent);
+        this.$field.setAttribute("src", file);
       } else {
-        this.$field.style.backgroundImage = `url(${fileContent})`;
+        this.$field.style.backgroundImage = `url(${file})`;
       }
     }
+
     this.updateProperty("file", file);
   }
 
@@ -158,7 +158,7 @@ export class ImageField extends BaseField<ImageFieldData> {
       }
     } else if (this.$link) {
       $dom.unwrap(this.$field);
-      this.$link = null;
+      this.$link = undefined;
       delete this.$link;
     }
 
