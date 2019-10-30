@@ -102,9 +102,28 @@ const parseElementData = <TData>(
   return data;
 };
 
+const readFileAsync = async (file: File) =>
+  new Promise<string>((resolve, reject) => {
+    const reader: FileReader = new FileReader();
+
+    reader.onload = ev => {
+      if (ev.target !== null && ev.target.result !== null) {
+        const result = ev.target.result.toString();
+        resolve(result);
+      }
+    };
+
+    try {
+      reader.readAsDataURL(file);
+    } catch (ex) {
+      reject(ex);
+    }
+  });
+
 export const helpers = {
   createElement,
   parseElementData,
   showModal,
   toggleVisibility,
+  readFileAsync,
 };

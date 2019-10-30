@@ -390,11 +390,31 @@ var BrickyEditor = (function (exports) {
         }
         return data;
     };
+    var readFileAsync = function (file) { return __awaiter(void 0, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            return [2, new Promise(function (resolve, reject) {
+                    var reader = new FileReader();
+                    reader.onload = function (ev) {
+                        if (ev.target !== null && ev.target.result !== null) {
+                            var result = ev.target.result.toString();
+                            resolve(result);
+                        }
+                    };
+                    try {
+                        reader.readAsDataURL(file);
+                    }
+                    catch (ex) {
+                        reject(ex);
+                    }
+                })];
+        });
+    }); };
     var helpers = {
         createElement: createElement,
         parseElementData: parseElementData,
         showModal: showModal,
         toggleVisibility: toggleVisibility,
+        readFileAsync: readFileAsync,
     };
     //# sourceMappingURL=helpers.js.map
 
@@ -752,22 +772,26 @@ var BrickyEditor = (function (exports) {
         var filePreview = helpers.createElement("<img src=\"" + p.value + "\"/>");
         var fileInput = helpers.createElement("<input type=\"file\" id=\"bre-modal-modal-" + key + "\" class=\"bre-input\" placeholder=\"" + p.placeholder + "\">");
         var fileName = helpers.createElement("<span class='bre-image-input-filename'></span>");
-        var updatePreview = function () {
-            if (file === undefined || file === null) {
-                fileName.innerText = "";
-                filePreview.src = "//:0";
-            }
-            else {
-                fileName.innerText = file.name;
-                var reader = new FileReader();
-                reader.onload = function (ev) {
-                    if (ev.target !== null && ev.target.result !== null) {
-                        filePreview.src = ev.target.result.toString();
-                    }
-                };
-                reader.readAsDataURL(file);
-            }
-        };
+        var updatePreview = function () { return __awaiter(void 0, void 0, void 0, function () {
+            var fileContent;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        if (!(file === undefined || file === null)) return [3, 1];
+                        fileName.innerText = "";
+                        filePreview.src = "//:0";
+                        return [3, 3];
+                    case 1:
+                        fileName.innerText = file.name;
+                        return [4, helpers.readFileAsync(file)];
+                    case 2:
+                        fileContent = _a.sent();
+                        filePreview.src = fileContent;
+                        _a.label = 3;
+                    case 3: return [2];
+                }
+            });
+        }); };
         fileInput.onchange = function () {
             file = fileInput.files && fileInput.files[0];
             updatePreview();
@@ -1175,7 +1199,6 @@ var BrickyEditor = (function (exports) {
         $element.addEventListener("input", updateHtmlProp);
         $element.addEventListener("paste", function (ev) {
             ev.preventDefault();
-            debugger;
             if (ev.clipboardData) {
                 var text = ev.clipboardData.getData("text/plain");
                 document.execCommand("insertHTML", false, text);
@@ -1245,7 +1268,7 @@ var BrickyEditor = (function (exports) {
             },
         };
         $element.addEventListener("click", function () { return __awaiter(void 0, void 0, void 0, function () {
-            var params, promptResponse, updatedData;
+            var params, promptResponse, updatedData, fileContent;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -1257,21 +1280,30 @@ var BrickyEditor = (function (exports) {
                             return [2];
                         }
                         updatedData = __assign(__assign({}, field.data), { alt: promptResponse.alt });
-                        if (promptResponse.file !== undefined) {
-                            if (props.onUpload) {
-                                props.onUpload(promptResponse.file, function (src) {
-                                    updatedData = __assign(__assign({}, updatedData), { src: src, file: undefined });
-                                });
-                            }
-                            else {
-                                updatedData = __assign(__assign({}, updatedData), { src: undefined, file: promptResponse.file });
-                            }
-                        }
-                        else if (promptResponse.src) {
+                        debugger;
+                        if (!(promptResponse.file !== undefined)) return [3, 5];
+                        if (!props.onUpload) return [3, 2];
+                        props.onUpload(promptResponse.file, function (src) {
+                            updatedData = __assign(__assign({}, updatedData), { src: src, file: undefined });
+                        });
+                        return [3, 4];
+                    case 2: return [4, helpers.readFileAsync(promptResponse.file)];
+                    case 3:
+                        fileContent = _a.sent();
+                        updatedData = __assign(__assign({}, updatedData), { src: fileContent, file: undefined });
+                        _a.label = 4;
+                    case 4: return [3, 6];
+                    case 5:
+                        if (promptResponse.src) {
                             updatedData = __assign(__assign({}, updatedData), { src: promptResponse.src, file: undefined });
                         }
+                        _a.label = 6;
+                    case 6:
                         field.data = updatedData;
                         updateImageElement(updatedData);
+                        if (field.onUpdate) {
+                            field.onUpdate(field);
+                        }
                         return [2];
                 }
             });

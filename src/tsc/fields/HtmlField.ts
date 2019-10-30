@@ -56,8 +56,6 @@ export const createHtmlField: HtmlFieldFactory = (props, data) => {
 
   $element.addEventListener("paste", ev => {
     ev.preventDefault();
-    // const ev = e.originalEvent as any;
-    debugger;
     if (ev.clipboardData) {
       const text = ev.clipboardData.getData("text/plain");
       document.execCommand("insertHTML", false, text);

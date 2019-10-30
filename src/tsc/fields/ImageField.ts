@@ -100,6 +100,7 @@ export const createImageField: ImageFieldFactory = (props, data) => {
       alt: promptResponse.alt,
     };
 
+    debugger;
     if (promptResponse.file !== undefined) {
       // todo: add some common handler for image uploading?
       if (props.onUpload) {
@@ -111,10 +112,11 @@ export const createImageField: ImageFieldFactory = (props, data) => {
           };
         });
       } else {
+        const fileContent = await helpers.readFileAsync(promptResponse.file);
         updatedData = {
           ...updatedData,
-          src: undefined,
-          file: promptResponse.file,
+          src: fileContent,
+          file: undefined,
         };
       }
     } else if (promptResponse.src) {
@@ -127,6 +129,10 @@ export const createImageField: ImageFieldFactory = (props, data) => {
 
     field.data = updatedData;
     updateImageElement(updatedData);
+
+    if (field.onUpdate) {
+      field.onUpdate(field);
+    }
   });
 
   return field;

@@ -32,19 +32,14 @@ const fileFieldEditor: FieldEditor = ({ key, p, data }) => {
     `<span class='bre-image-input-filename'></span>`
   );
 
-  const updatePreview = () => {
+  const updatePreview = async () => {
     if (file === undefined || file === null) {
       fileName.innerText = "";
       filePreview.src = "//:0";
     } else {
       fileName.innerText = file.name;
-      const reader = new FileReader();
-      reader.onload = ev => {
-        if (ev.target !== null && ev.target.result !== null) {
-          filePreview.src = ev.target.result.toString();
-        }
-      };
-      reader.readAsDataURL(file);
+      const fileContent = await helpers.readFileAsync(file);
+      filePreview.src = fileContent;
     }
   };
 
