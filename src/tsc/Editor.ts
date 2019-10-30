@@ -8,7 +8,7 @@ import { Common, str } from "src/common/Common";
 import { $dom } from "src/common/DOMHelpers";
 import { defaultOptions } from "src/defaults";
 import { EditorStrings } from "src/EditorStrings";
-import { BaseField, ContainerField } from "src/fields/Fields";
+import { ContainerField } from "src/fields/Fields";
 import { getRequest } from "src/httpTransport";
 import { setUI } from "src/shared";
 import { getTemplate, loadTemplatesAsync } from "src/template";
@@ -94,7 +94,6 @@ export class Editor {
     if (blocks && blocks.length) {
       blocks.forEach(block => {
         const template = getTemplate(block.template);
-        debugger;
         if (template) {
           this.container.addBlock(
             template.name,

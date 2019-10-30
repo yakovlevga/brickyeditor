@@ -1,4 +1,4 @@
-import { FieldFactory, getFieldElement } from "src/fields/BaseField";
+import { FieldFactory, getFieldElement } from "src/fields/field";
 import { helpers } from "src/helpers";
 import { locales } from "src/locales";
 import { promptAsync } from "src/prompt";
@@ -66,7 +66,7 @@ export const createImageField: ImageFieldFactory = (props, data) => {
   }
 
   const field: bre.core.field.Field<ImageFieldData> = {
-    type: "html",
+    type: "image",
     name: data.name,
     $field: $element,
     data,
@@ -100,7 +100,6 @@ export const createImageField: ImageFieldFactory = (props, data) => {
       alt: promptResponse.alt,
     };
 
-    debugger;
     if (promptResponse.file !== undefined) {
       // todo: add some common handler for image uploading?
       if (props.onUpload) {

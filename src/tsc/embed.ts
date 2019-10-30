@@ -10,10 +10,13 @@ type WindowWithInstgrm = {
 
 type EmbedServiceName = "Instagram";
 
-type NoembedResponse = {
+export type NoembedResponse = {
   provider_name: EmbedServiceName;
   html: string;
 };
+
+export const preProcessEmbedUrl = (url: string) =>
+  url.replace("https://www.instagram.com", "http://instagr.am");
 
 export const postProcessEmbed = (provider: EmbedServiceName) => {
   switch (provider) {

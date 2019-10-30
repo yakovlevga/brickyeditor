@@ -27,21 +27,19 @@ export const getRequest = (url: string): Promise<any> => {
   });
 };
 
-type ScriptDocument = {
-  readyState?: "loaded" | "complete";
-};
-
-export const loadScript = (url: string) => {
+export const loadScriptAsync = (url: string) => {
   return new Promise((resolve, reject) => {
     const script = document.createElement("script");
 
     let done = false;
     const scriptDocLoadedHandler = () => {
-      debugger;
-      // TODO: need to check if this work in the right way
-      const { readyState } = script as ScriptDocument;
+      const { readyState } = script as {
+        readyState?: "loaded" | "complete";
+      };
+
       if (
         done === false &&
+        // IE hack
         (readyState === undefined ||
           readyState === "loaded" ||
           readyState === "complete")
@@ -59,7 +57,7 @@ export const loadScript = (url: string) => {
       (script as any).onreadystatechange = scriptDocLoadedHandler;
     }
 
-    script.src = url;
+    script.src = url.indexOf("//") === 0 ? `https:${url}` : url;
     document.head.appendChild(script);
   });
 };

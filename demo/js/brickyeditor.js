@@ -516,12 +516,11 @@ var BrickyEditor = (function (exports) {
             request = null;
         });
     };
-    var loadScript = function (url) {
+    var loadScriptAsync = function (url) {
         return new Promise(function (resolve, reject) {
             var script = document.createElement("script");
             var done = false;
             var scriptDocLoadedHandler = function () {
-                debugger;
                 var readyState = script.readyState;
                 if (done === false &&
                     (readyState === undefined ||
@@ -538,7 +537,7 @@ var BrickyEditor = (function (exports) {
             if (script.onreadystatechange !== undefined) {
                 script.onreadystatechange = scriptDocLoadedHandler;
             }
-            script.src = url;
+            script.src = url.indexOf("//") === 0 ? "https:" + url : url;
             document.head.appendChild(script);
         });
     };
@@ -1166,6 +1165,134 @@ var BrickyEditor = (function (exports) {
     }());
     //# sourceMappingURL=BlockUIAction.js.map
 
+    var preProcessEmbedUrl = function (url) {
+        return url.replace("https://www.instagram.com", "http://instagr.am");
+    };
+    var postProcessEmbed = function (provider) {
+        switch (provider) {
+            case "Instagram":
+                var instgrm = window.instgrm;
+                if (instgrm !== undefined) {
+                    instgrm.Embeds.process();
+                }
+                break;
+            default:
+                break;
+        }
+    };
+    var getEmbedAsync = function (embedUrl) {
+        var url = "https://noembed.com/embed?url=" + embedUrl;
+        return new Promise(function (resolve, reject) { return __awaiter(void 0, void 0, void 0, function () {
+            var data, err_1;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        _a.trys.push([0, 2, , 3]);
+                        return [4, jsonp(url)];
+                    case 1:
+                        data = _a.sent();
+                        resolve(data);
+                        return [3, 3];
+                    case 2:
+                        err_1 = _a.sent();
+                        reject(err_1);
+                        return [3, 3];
+                    case 3: return [2];
+                }
+            });
+        }); });
+    };
+    //# sourceMappingURL=embed.js.map
+
+    var providerScriptsLoaded = {};
+    var getPromptParams = function (_a) {
+        var url = _a.url;
+        return ({
+            url: {
+                value: url || "http://instagr.am/p/BO9VX2Vj4fF/",
+                title: locales.prompt.embed.url.title,
+                placeholder: locales.prompt.embed.url.placeholder,
+            },
+        });
+    };
+    var createEmbedField = function (props, data) {
+        var $element = props.$element;
+        var field = {
+            type: "embed",
+            name: data.name,
+            $field: $element,
+            data: data,
+            getElement: function () {
+                var $copy = getFieldElement($element);
+                return $copy;
+            },
+        };
+        var updateEmbedMedia = function (url, fireUpdate) { return __awaiter(void 0, void 0, void 0, function () {
+            var embed, $embed, $script;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        if (url === undefined) {
+                            return [2];
+                        }
+                        return [4, getEmbedAsync(preProcessEmbedUrl(url))];
+                    case 1:
+                        embed = _a.sent();
+                        field.data = __assign(__assign({}, field.data), { url: url,
+                            embed: embed });
+                        $embed = helpers.createElement("<div>" + embed.html + "</div>");
+                        $script = $embed.querySelector("script");
+                        if ($script !== null) {
+                            $script.remove();
+                        }
+                        $element.innerHTML = "";
+                        $element.removeAttribute("class");
+                        $element.removeAttribute("style");
+                        $element.appendChild($embed);
+                        if (!($script !== null)) return [3, 4];
+                        if (!(providerScriptsLoaded[$script.src] === undefined)) return [3, 3];
+                        return [4, loadScriptAsync($script.src)];
+                    case 2:
+                        _a.sent();
+                        providerScriptsLoaded[embed.provider_name] = true;
+                        _a.label = 3;
+                    case 3:
+                        setTimeout(function () { return postProcessEmbed(embed.provider_name); }, 100);
+                        _a.label = 4;
+                    case 4:
+                        return [2];
+                }
+            });
+        }); };
+        updateEmbedMedia(data.url, false);
+        var promptEmbedMediaUrl = function () { return __awaiter(void 0, void 0, void 0, function () {
+            var params, updated, url;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        params = getPromptParams(field.data);
+                        return [4, promptAsync(params)];
+                    case 1:
+                        updated = _a.sent();
+                        if (updated !== null) {
+                            url = updated.url;
+                            if (url !== undefined) {
+                                updateEmbedMedia(url, true);
+                            }
+                        }
+                        return [2];
+                }
+            });
+        }); };
+        $element.addEventListener("click", function () { return __awaiter(void 0, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                promptEmbedMediaUrl();
+                return [2];
+            });
+        }); });
+        return field;
+    };
+
     var createHtmlField = function (props, data) {
         var $element = props.$element;
         $element.setAttribute(Selectors.attrContentEditable, "true");
@@ -1211,9 +1338,9 @@ var BrickyEditor = (function (exports) {
         });
         return field;
     };
-    //# sourceMappingURL=HtmlField.js.map
+    //# sourceMappingURL=html.js.map
 
-    var getPromptParams = function (_a) {
+    var getPromptParams$1 = function (_a) {
         var src = _a.src, file = _a.file, alt = _a.alt;
         return ({
             src: {
@@ -1252,7 +1379,7 @@ var BrickyEditor = (function (exports) {
             updateImageElement(data);
         }
         var field = {
-            type: "html",
+            type: "image",
             name: data.name,
             $field: $element,
             data: data,
@@ -1272,7 +1399,7 @@ var BrickyEditor = (function (exports) {
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        params = getPromptParams(field.data);
+                        params = getPromptParams$1(field.data);
                         return [4, promptAsync(params)];
                     case 1:
                         promptResponse = _a.sent();
@@ -1280,7 +1407,6 @@ var BrickyEditor = (function (exports) {
                             return [2];
                         }
                         updatedData = __assign(__assign({}, field.data), { alt: promptResponse.alt });
-                        debugger;
                         if (!(promptResponse.file !== undefined)) return [3, 5];
                         if (!props.onUpload) return [3, 2];
                         props.onUpload(promptResponse.file, function (src) {
@@ -1310,6 +1436,7 @@ var BrickyEditor = (function (exports) {
         }); });
         return field;
     };
+    //# sourceMappingURL=image.js.map
 
     var _fields = {
         html: function (props, data) {
@@ -1322,7 +1449,7 @@ var BrickyEditor = (function (exports) {
             return createImageField(props, data);
         },
         embed: function (props, data) {
-            return createHtmlField(props, data);
+            return createEmbedField(props, data);
         },
     };
     var createField = function (props) {
@@ -1387,7 +1514,7 @@ var BrickyEditor = (function (exports) {
         };
         return BaseField;
     }());
-    //# sourceMappingURL=BaseField.js.map
+    //# sourceMappingURL=field.js.map
 
     var ContainerField = (function (_super) {
         __extends(ContainerField, _super);
@@ -1436,146 +1563,6 @@ var BrickyEditor = (function (exports) {
         return ContainerField;
     }(BaseField));
     //# sourceMappingURL=ContainerField.js.map
-
-    var postProcessEmbed = function (provider) {
-        switch (provider) {
-            case "Instagram":
-                var instgrm = window.instgrm;
-                if (instgrm !== undefined) {
-                    instgrm.Embeds.process();
-                }
-                break;
-            default:
-                break;
-        }
-    };
-    var getEmbedAsync = function (embedUrl) {
-        var url = "https://noembed.com/embed?url=" + embedUrl;
-        return new Promise(function (resolve, reject) { return __awaiter(void 0, void 0, void 0, function () {
-            var data, err_1;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        _a.trys.push([0, 2, , 3]);
-                        return [4, jsonp(url)];
-                    case 1:
-                        data = _a.sent();
-                        resolve(data);
-                        return [3, 3];
-                    case 2:
-                        err_1 = _a.sent();
-                        reject(err_1);
-                        return [3, 3];
-                    case 3: return [2];
-                }
-            });
-        }); });
-    };
-    //# sourceMappingURL=embed.js.map
-
-    var getPromptParams$1 = function (_a) {
-        var url = _a.url;
-        return ({
-            url: {
-                value: url || "http://instagr.am/p/BO9VX2Vj4fF/",
-                title: locales.prompt.embed.url.title,
-                placeholder: locales.prompt.embed.url.placeholder,
-            },
-        });
-    };
-    var promptEmbedMediaUrl = function (field) { return __awaiter(void 0, void 0, void 0, function () {
-        var params, updated, url;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    params = getPromptParams$1(field.data);
-                    return [4, promptAsync(params)];
-                case 1:
-                    updated = _a.sent();
-                    if (!(updated !== null)) return [3, 3];
-                    url = updated.url;
-                    if (!(url !== undefined)) return [3, 3];
-                    field.setUrl(url);
-                    return [4, field.loadMedia(true)];
-                case 2:
-                    _a.sent();
-                    _a.label = 3;
-                case 3: return [2];
-            }
-        });
-    }); };
-    var renderEmbedFieldSettingsUI = function ($field) {
-        var $el = helpers.createElement("<div style=\"\n      position: absolute;\n      width: 100%; \n      height: 100px;\n      text-align: center;\n      font-weight: bold;\n      vertical-align: middle;\n      background: #333;\n      opacity: 0.2;\">\n      Change embed element link\n    </div>");
-        $dom.before($field, $el);
-        return $el;
-    };
-    var EmbedField = (function (_super) {
-        __extends(EmbedField, _super);
-        function EmbedField() {
-            return _super !== null && _super.apply(this, arguments) || this;
-        }
-        EmbedField.prototype.getSettingsEl = function () {
-            return renderEmbedFieldSettingsUI(this.$field);
-        };
-        EmbedField.prototype.bind = function () {
-            var _this = this;
-            var field = this;
-            var $field = this.$field;
-            $field.addEventListener("click", function () { return __awaiter(_this, void 0, void 0, function () {
-                return __generator(this, function (_a) {
-                    promptEmbedMediaUrl(field);
-                    return [2];
-                });
-            }); });
-            field.loadMedia(false);
-        };
-        EmbedField.prototype.loadMedia = function (fireUpdate) {
-            return __awaiter(this, void 0, void 0, function () {
-                var field, json, $embed, $script, scriptSrc;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0:
-                            field = this;
-                            if (!field.data || !field.data.url) {
-                                return [2];
-                            }
-                            return [4, getEmbedAsync(field.data.url)];
-                        case 1:
-                            json = _a.sent();
-                            field.setEmbed(json, fireUpdate);
-                            $embed = helpers.createElement(json.html);
-                            $script = $dom.first($embed, "script");
-                            if (!$script) return [3, 3];
-                            $script.remove();
-                            scriptSrc = $script.src;
-                            if (!str.startsWith(scriptSrc, "//")) return [3, 3];
-                            scriptSrc = "https:" + scriptSrc;
-                            return [4, loadScript(scriptSrc)];
-                        case 2:
-                            _a.sent();
-                            postProcessEmbed(json.provider_name);
-                            _a.label = 3;
-                        case 3:
-                            field.$field.innerHTML = "";
-                            field.$field.removeAttribute("class");
-                            field.$field.removeAttribute("style");
-                            field.$field.appendChild($embed);
-                            field.select();
-                            return [2];
-                    }
-                });
-            });
-        };
-        EmbedField.prototype.setEmbed = function (value, fireUpdate) {
-            if (fireUpdate === void 0) { fireUpdate = true; }
-            this.updateProperty("embed", value, fireUpdate);
-        };
-        EmbedField.prototype.setUrl = function (value) {
-            this.updateProperty("url", value);
-        };
-        return EmbedField;
-    }(BaseField));
-    //# sourceMappingURL=EmbedField.js.map
 
     //# sourceMappingURL=Fields.js.map
 
@@ -1924,7 +1911,6 @@ var BrickyEditor = (function (exports) {
             if (blocks && blocks.length) {
                 blocks.forEach(function (block) {
                     var template = getTemplate(block.template);
-                    debugger;
                     if (template) {
                         _this.container.addBlock(template.name, template.$html.innerHTML, block.fields, undefined, false);
                     }

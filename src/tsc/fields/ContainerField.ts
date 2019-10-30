@@ -5,7 +5,7 @@ import {
   getContainerHtml,
 } from "src/BlocksContainer";
 import { $dom } from "src/common/DOMHelpers";
-import { BaseField } from "src/fields/BaseField";
+import { BaseField } from "src/fields/field";
 import { helpers } from "src/helpers";
 import { Selectors } from "src/ui/Selectors";
 

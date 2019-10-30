@@ -3,7 +3,7 @@ import {
   getFieldElement,
   toggleFieldSelection,
   updateFieldProperty,
-} from "src/fields/BaseField";
+} from "src/fields/field";
 import { bre } from "src/types/bre";
 import { toggleHtmlTools } from "src/ui/htmlTools";
 import { SelectionUtils } from "src/ui/SelectionUtils";

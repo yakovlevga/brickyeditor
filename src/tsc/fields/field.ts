@@ -1,6 +1,7 @@
 import { str } from "src/common/Common";
-import { createHtmlField, HtmlFieldData } from "src/fields/HtmlField";
-import { createImageField, ImageFieldData } from "src/fields/ImageField";
+import { createEmbedField, EmbedFieldData } from "src/fields/embed";
+import { createHtmlField, HtmlFieldData } from "src/fields/html";
+import { createImageField, ImageFieldData } from "src/fields/image";
 import { helpers } from "src/helpers";
 import { bre } from "src/types/bre";
 import { Selectors } from "src/ui/Selectors";
@@ -41,9 +42,9 @@ const _fields: {
       data as ImageFieldData
     ),
   embed: (props, data) =>
-    createHtmlField(
-      props as CreateFieldProps<HtmlFieldData>,
-      data as HtmlFieldData
+    createEmbedField(
+      props as CreateFieldProps<EmbedFieldData>,
+      data as EmbedFieldData
     ),
 };
 
