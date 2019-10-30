@@ -2,14 +2,18 @@ import { BlockUI } from "src/block/BlockUI";
 import { BlockUIAction } from "src/block/BlockUIAction";
 import { str } from "src/common/Common";
 import { $dom } from "src/common/DOMHelpers";
-import {
-  ContainerField,
-  createField,
-  toggleFieldSelection,
-} from "src/fields/Fields";
+import { createField, toggleFieldSelection } from "src/fields/field";
 import { helpers } from "src/helpers";
 import { bre } from "src/types/bre";
 import { Selectors } from "src/ui/Selectors";
+
+export const createBlock = (
+  template: bre.core.ITemplate,
+  isPreview: boolean,
+  data?: bre.core.field.Field[],
+  events?: bre.core.block.Events
+) =>
+  new Block(template.name, template.$html.innerHTML, isPreview, data, events);
 
 export class Block {
   public template: string;
@@ -43,7 +47,7 @@ export class Block {
       return false;
     }
 
-    return this.selectedField instanceof ContainerField;
+    return this.selectedField.type === "container";
   }
 
   public delete() {

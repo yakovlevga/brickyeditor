@@ -1,6 +1,5 @@
 import { Block } from "src/block/Block";
 import { $dom } from "src/common/DOMHelpers";
-import { BaseField } from "src/fields/Fields";
 import { helpers } from "src/helpers";
 import { bre } from "src/types/bre";
 
@@ -42,6 +41,40 @@ const toggleContainerPlaceholderIfNeed = (
   }
 };
 
+export const addBlockToContainer = (
+  container: bre.core.IBlocksContainer,
+  block: Block,
+  idx?: number,
+  select: boolean = true
+) => {
+  const { $editor } = block.ui;
+  if ($editor === undefined) {
+    return;
+  }
+
+  idx = idx || container.blocks.length;
+
+  container.blocks = [
+    ...container.blocks.slice(0, idx),
+    block,
+    ...container.blocks.slice(idx),
+  ];
+
+  // UI
+  if (idx === 0) {
+    container.$element.append($editor);
+  } else {
+    container.$element.children[idx].after($editor);
+  }
+  //
+
+  // TODO: select block
+  // if (select) {
+  //   block.select();
+  //   block.scrollTo();
+  // }
+};
+
 export class BlocksContainer implements bre.core.IBlocksContainer {
   public $element: HTMLElement;
   public $placeholder?: HTMLElement;
@@ -63,7 +96,7 @@ export class BlocksContainer implements bre.core.IBlocksContainer {
       oldValue: any,
       newValue: any
     ) => any,
-    private onUpload: bre.FileUploadHandler,
+    private onUpload?: bre.FileUploadHandler,
     usePlaceholder: boolean = false
   ) {
     this.$element = $element;
@@ -75,7 +108,7 @@ export class BlocksContainer implements bre.core.IBlocksContainer {
   public addBlock(
     name: string,
     html: string,
-    data?: BaseField[],
+    data?: bre.core.field.Field[],
     idx?: number,
     select: boolean = true
   ) {
@@ -97,7 +130,7 @@ export class BlocksContainer implements bre.core.IBlocksContainer {
     }
   }
 
-  private insertBlock(block: Block, idx?: number) {
+  public insertBlock(block: Block, idx?: number) {
     idx = idx || this.blocks.length;
     if (this.selectedBlock) {
       idx = this.blocks.indexOf(this.selectedBlock) + 1;
@@ -106,10 +139,10 @@ export class BlocksContainer implements bre.core.IBlocksContainer {
     this.blocks.splice(idx, 0, block);
     if (idx === 0) {
       // todo: move to block ui
-      this.$element.appendChild(block.ui.$editor);
+      this.$element.appendChild(block.ui.$editor!);
     } else {
       // todo: move to block ui
-      $dom.after(this.blocks[idx - 1].ui.$editor, block.ui.$editor);
+      $dom.after(this.blocks[idx - 1].ui.$editor!, block.ui.$editor!);
     }
 
     this.onAddBlock(block, idx);
@@ -121,14 +154,14 @@ export class BlocksContainer implements bre.core.IBlocksContainer {
   private deleteBlock(block: Block) {
     const idx = this.blocks.indexOf(block);
     this.blocks.splice(idx, 1);
-    block = null;
+    (block as any) = null;
 
     if (idx < this.blocks.length) {
       this.blocks[idx].select();
     } else if (this.blocks.length > 0) {
       this.blocks[idx - 1].select();
     } else {
-      this.selectedBlock = null;
+      this.selectedBlock = undefined;
     }
 
     // Trigger event
@@ -146,10 +179,12 @@ export class BlocksContainer implements bre.core.IBlocksContainer {
     }
 
     const $anchorBlock = this.blocks[new_idx].ui.$editor;
-    if (offset > 0) {
-      $dom.after($anchorBlock, block.ui.$editor);
-    } else if (offset < 0) {
-      $dom.before($anchorBlock, block.ui.$editor);
+    if ($anchorBlock) {
+      if (offset > 0) {
+        $dom.after($anchorBlock, block.ui.$editor!);
+      } else if (offset < 0) {
+        $dom.before($anchorBlock, block.ui.$editor!);
+      }
     }
 
     this.blocks.splice(idx, 1);
@@ -187,7 +222,7 @@ export class BlocksContainer implements bre.core.IBlocksContainer {
   }
 
   private deselectBlock(block: Block) {
-    this.selectedBlock = null;
+    this.selectedBlock = undefined;
     this.onDeselectBlock(block);
   }
 }

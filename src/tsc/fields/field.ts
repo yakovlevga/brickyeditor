@@ -5,6 +5,7 @@ import { createImageField, ImageFieldData } from "src/fields/image";
 import { helpers } from "src/helpers";
 import { bre } from "src/types/bre";
 import { Selectors } from "src/ui/Selectors";
+import { ContainerFieldData, createContainerField } from "src/fields/container";
 
 export type CreateFieldProps<
   TData extends bre.BaseFieldData = bre.BaseFieldData
@@ -32,9 +33,9 @@ const _fields: {
       data as HtmlFieldData
     ),
   container: (props, data) =>
-    createHtmlField(
-      props as CreateFieldProps<HtmlFieldData>,
-      data as HtmlFieldData
+    createContainerField(
+      props as CreateFieldProps<ContainerFieldData>,
+      data as ContainerFieldData
     ),
   image: (props, data) =>
     createImageField(

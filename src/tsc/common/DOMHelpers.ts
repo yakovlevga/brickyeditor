@@ -10,7 +10,7 @@ export class $dom {
   }
 
   static unwrap(el: HTMLElement) {
-    if (!el.parentElement) return;
+    if (!el.parentElement) { return; }
 
     var parentsParent = el.parentElement.parentElement;
     if (parentsParent) {
@@ -22,7 +22,7 @@ export class $dom {
 
   // IE8+
   // http://youmightnotneedjquery.com/
-  static hide(el: HTMLElement) {
+  public static hide(el: HTMLElement) {
     el.style.display = "none";
   }
 
@@ -33,14 +33,14 @@ export class $dom {
   }
 
   // https://stackoverflow.com/a/21696585
-  static isHidden(el: HTMLElement) {
+  public static isHidden(el: HTMLElement) {
     var style = window.getComputedStyle(el);
     return style.display === "none";
   }
 
   // IE8+
   // http://youmightnotneedjquery.com/
-  static toggle(el: HTMLElement, force?: boolean) {
+  public static toggle(el: HTMLElement, force?: boolean) {
     const show = force ? force.valueOf() : this.isHidden(el);
     if (show) {
       this.show(el);
@@ -49,7 +49,7 @@ export class $dom {
     }
   }
 
-  static before(el: HTMLElement, elToInsert: HTMLElement | HTMLElement[]) {
+  public static before(el: HTMLElement, elToInsert: HTMLElement | HTMLElement[]) {
     if (elToInsert instanceof HTMLElement) {
       el.parentNode.insertBefore(elToInsert, el);
     } else {
@@ -124,7 +124,7 @@ export class $dom {
     if (el.classList) {
       el.classList.toggle(className);
     } else {
-      let classes = el.className.split(" ");
+      const classes = el.className.split(" ");
       let existingIndex = -1;
       for (let i = classes.length; i--; ) {
         if (classes[i] === className) {

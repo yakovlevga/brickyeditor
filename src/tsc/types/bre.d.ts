@@ -1,4 +1,5 @@
 import { Block } from "src/block/Block";
+import { ContainerFieldData } from "src/fields/container";
 
 declare var instgrm: any;
 
@@ -110,6 +111,10 @@ declare namespace bre {
         onUpdate?: (field: Field) => void;
         onSelect?: (field: Field) => void;
         onDeselect?: (field: Field) => void;
+      };
+
+      type ContainerField = Field<ContainerFieldData> & {
+        container: IBlocksContainer;
       };
     }
   }

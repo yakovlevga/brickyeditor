@@ -1,5 +1,6 @@
-import { Block } from "src/block/Block";
+import { Block, createBlock } from "src/block/Block";
 import {
+  addBlockToContainer,
   BlocksContainer,
   getContainerData,
   getContainerHtml,
@@ -8,13 +9,28 @@ import { Common, str } from "src/common/Common";
 import { $dom } from "src/common/DOMHelpers";
 import { defaultOptions } from "src/defaults";
 import { EditorStrings } from "src/EditorStrings";
-import { ContainerField } from "src/fields/Fields";
 import { getRequest } from "src/httpTransport";
 import { setUI } from "src/shared";
 import { getTemplate, loadTemplatesAsync } from "src/template";
 import { bre } from "src/types/bre";
 import { Selectors } from "src/ui/Selectors";
 import { UI } from "src/ui/UI";
+
+const getCurrentContainer = (
+  container: bre.core.IBlocksContainer
+): bre.core.IBlocksContainer => {
+  if (container.selectedBlock && container.selectedBlock.isContainer()) {
+    const field = container.selectedBlock.selectedField;
+
+    if (field && field.type === "container") {
+      return getCurrentContainer(
+        (field as bre.core.field.ContainerField).container
+      );
+    }
+  }
+
+  return container;
+};
 
 export class Editor {
   public static UI: UI;
@@ -95,13 +111,15 @@ export class Editor {
       blocks.forEach(block => {
         const template = getTemplate(block.template);
         if (template) {
-          this.container.addBlock(
-            template.name,
-            template.$html.innerHTML,
-            block.fields,
-            undefined,
-            false
-          );
+          const b = createBlock(template, false, block.fields);
+          addBlockToContainer(this.container, b);
+          // this.container.addBlock(
+          //   template.name,
+          //   template.$html.innerHTML,
+          //   block.fields,
+          //   undefined,
+          //   false
+          // );
         } else {
           const message = EditorStrings.errorBlockTemplateNotFound(
             block.template
@@ -113,14 +131,9 @@ export class Editor {
   }
 
   public addBlock(template: bre.core.ITemplate) {
-    const container = this.getContainer(this.container);
-    container.addBlock(
-      template.name,
-      template.$html.innerHTML,
-      undefined,
-      undefined,
-      true
-    );
+    const container = getCurrentContainer(this.container);
+    const block = createBlock(template, false);
+    addBlockToContainer(container, block);
   }
 
   private onError = (message: string, code: number = 0) =>
@@ -204,17 +217,6 @@ export class Editor {
         resolve(null);
       }
     });
-  }
-
-  private getContainer(container: BlocksContainer): BlocksContainer {
-    if (container.selectedBlock && container.selectedBlock.isContainer()) {
-      const field = container.selectedBlock.selectedField as ContainerField;
-      if (field) {
-        return this.getContainer(field.container);
-      }
-    }
-
-    return container;
   }
 
   private trigger(event: bre.Event, data: any) {
