@@ -1,8 +1,7 @@
 import { $dom } from "src/common/DOMHelpers";
 import { BaseField } from "src/fields/BaseField";
-import { HtmlLinkParams } from "src/HtmlLinkParams";
 import { locales } from "src/locales";
-import { promptAsync } from "src/prompt";
+import { LinkPromptParams, promptAsync } from "src/prompt";
 import { bre } from "src/Types/bre";
 
 type ImageFieldData = {
@@ -140,7 +139,7 @@ export class ImageField extends BaseField<ImageFieldData> {
     this.updateProperty("file", file);
   }
 
-  public setLink(url: HtmlLinkParams) {
+  public setLink(url: LinkPromptParams) {
     if (url && url.href) {
       if (!this.$link) {
         this.$link = $dom.el(
@@ -154,7 +153,7 @@ export class ImageField extends BaseField<ImageFieldData> {
         $dom.wrap(this.$field, this.$link);
         // this.$field.wrap(this.$link);
       } else {
-        this.$link.href = url.href;
+        this.$link.href = url.href.value;
       }
     } else if (this.$link) {
       $dom.unwrap(this.$field);

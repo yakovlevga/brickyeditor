@@ -1,3 +1,5 @@
+import { getSelectionRanges, restoreSelection } from "src/ui/SelectionUtils";
+
 const createElement = <TElement extends HTMLElement>(
   html: string
 ): TElement => {
@@ -30,6 +32,8 @@ const showModal = (props: {
   onOk?: () => void;
   onCancel?: () => void;
 }) => {
+  const selection = getSelectionRanges();
+
   const element = createElement(modalTemplate);
   const placeholder = element.getElementsByClassName(
     "bre-modal-placeholder"
@@ -38,6 +42,8 @@ const showModal = (props: {
   const closeModal = () => {
     element.remove();
     (element as any) = null;
+
+    restoreSelection(selection);
   };
 
   const { content, onOk, onCancel } = props;

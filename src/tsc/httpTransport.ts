@@ -38,7 +38,7 @@ export const loadScript = (url: string) => {
     let done = false;
     const scriptDocLoadedHandler = () => {
       debugger;
-      // TODO: I really need to check if this work the right way
+      // TODO: need to check if this work in the right way
       const { readyState } = script as ScriptDocument;
       if (
         done === false &&

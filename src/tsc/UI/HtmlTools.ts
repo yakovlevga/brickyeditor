@@ -1,41 +1,8 @@
 import { str } from "src/common/Common";
-import { $dom } from "src/common/DOMHelpers";
 import { helpers } from "src/helpers";
-import { locales } from "src/locales";
-import { promptAsync } from "src/prompt";
+import { getLinkPromptParams, promptAsync } from "src/prompt";
 import { bre } from "src/Types/bre";
 import { Selectors } from "src/ui/Selectors";
-
-type LinkPromptParams = {
-  href: bre.prompt.PromptParameter;
-  title: bre.prompt.PromptParameter;
-  target: bre.prompt.PromptParameter;
-};
-
-const getPromptParams = (link?: HTMLLinkElement): LinkPromptParams => ({
-  title: {
-    title: locales.prompt.link.title.title,
-    placeholder: locales.prompt.link.title.placeholder,
-    value: link ? link.getAttribute("title") : "",
-  },
-  href: {
-    title: locales.prompt.link.href.title,
-    placeholder: locales.prompt.link.href.placeholder,
-    value: link ? link.getAttribute("href") : "",
-  },
-  target: {
-    type: "select",
-    title: locales.prompt.link.target.title,
-    value: link ? link.getAttribute("target") : "",
-    options: [
-      { title: "", value: "" },
-      { title: locales.prompt.link.target.blank, value: "_blank" },
-      { title: locales.prompt.link.target.parent, value: "_parent" },
-      { title: locales.prompt.link.target.self, value: "_self" },
-      { title: locales.prompt.link.target.top, value: "_top" },
-    ],
-  },
-});
 
 const promptLinkParamsAsync = async (selection: Selection) => {
   //  let link: HtmlLinkParams;
@@ -48,7 +15,7 @@ const promptLinkParamsAsync = async (selection: Selection) => {
   ) {
     currentLink = selection.anchorNode.parentNode as HTMLLinkElement;
   }
-  const promptParams = getPromptParams(currentLink);
+  const promptParams = getLinkPromptParams(currentLink);
 
   return await promptAsync(promptParams);
 };
@@ -154,7 +121,7 @@ const wrapSelectionToContainer = (selection: Selection) => {
   const $container = selection.anchorNode.parentElement;
 
   if ($container !== null) {
-    const $wrapper = $dom.el(
+    const $wrapper = helpers.createElement(
       `<div class="bre-temp-container" contenteditable="true">${$container.innerHTML}</div>`
     );
     $container.innerHTML = "";

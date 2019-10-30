@@ -294,46 +294,7 @@ var BrickyEditor = (function (exports) {
         };
         return $dom;
     }());
-
-    var EditorStrings = (function () {
-        function EditorStrings() {
-        }
-        EditorStrings.embedFieldLinkTitle = "Link to embed media";
-        EditorStrings.embedFieldLinkPlaceholder = "Link to instagram, youtube and etc.";
-        EditorStrings.imageFieldLinkTitle = "Image link";
-        EditorStrings.imageFieldLinkPlaceholder = "http://url-to-image.png";
-        EditorStrings.imageFieldUploadTitle = "or Upload a file";
-        EditorStrings.imageFieldUploadButton = "Select file";
-        EditorStrings.imageFieldAltTitle = "Alt";
-        EditorStrings.imageFieldAltPlaceholder = "Image 'alt' attribute value";
-        EditorStrings.imageFieldUrlSubtitle = "Link to open on image click";
-        EditorStrings.htmlEditorLinkUrlTitle = "Url";
-        EditorStrings.htmlEditorLinkUrlPlaceholder = "http://put-your-link.here";
-        EditorStrings.htmlEditorLinkTitleTitle = "Title";
-        EditorStrings.htmlEditorLinkTitlePlaceholder = "Title attribute for link";
-        EditorStrings.htmlEditorLinkTargetTitle = "Target";
-        EditorStrings.htmlEditorLinkTargetBlank = "Blank";
-        EditorStrings.htmlEditorLinkTargetSelf = "Self";
-        EditorStrings.htmlEditorLinkTargetParent = "Parent";
-        EditorStrings.htmlEditorLinkTargetTop = "Top";
-        EditorStrings.buttonClose = "close";
-        EditorStrings.buttonOk = "Ok";
-        EditorStrings.buttonCancel = "Cancel";
-        EditorStrings.defaultTemplatesGroupName = "Other templates";
-        EditorStrings.errorBlocksFileNotFound = function (url) {
-            return "Blocks file not found. Requested file: " + url + ".";
-        };
-        EditorStrings.errorTemplatesFileNotFound = function (url) {
-            return "Templates file not found. Requested file: " + url + ".";
-        };
-        EditorStrings.errorBlockTemplateNotFound = function (templateName) {
-            return "Template \"" + templateName + "\" not found.";
-        };
-        EditorStrings.errorTemplateParsing = function (name) {
-            return "Template parsing error: " + name + ".";
-        };
-        return EditorStrings;
-    }());
+    //# sourceMappingURL=DOMHelpers.js.map
 
     var str = {
         totalTrim: function (s) {
@@ -401,6 +362,100 @@ var BrickyEditor = (function (exports) {
         };
         return Common;
     }());
+    //# sourceMappingURL=Common.js.map
+
+    var EditorStrings = (function () {
+        function EditorStrings() {
+        }
+        EditorStrings.embedFieldLinkTitle = "Link to embed media";
+        EditorStrings.embedFieldLinkPlaceholder = "Link to instagram, youtube and etc.";
+        EditorStrings.imageFieldLinkTitle = "Image link";
+        EditorStrings.imageFieldLinkPlaceholder = "http://url-to-image.png";
+        EditorStrings.imageFieldUploadTitle = "or Upload a file";
+        EditorStrings.imageFieldUploadButton = "Select file";
+        EditorStrings.imageFieldAltTitle = "Alt";
+        EditorStrings.imageFieldAltPlaceholder = "Image 'alt' attribute value";
+        EditorStrings.imageFieldUrlSubtitle = "Link to open on image click";
+        EditorStrings.htmlEditorLinkUrlTitle = "Url";
+        EditorStrings.htmlEditorLinkUrlPlaceholder = "http://put-your-link.here";
+        EditorStrings.htmlEditorLinkTitleTitle = "Title";
+        EditorStrings.htmlEditorLinkTitlePlaceholder = "Title attribute for link";
+        EditorStrings.htmlEditorLinkTargetTitle = "Target";
+        EditorStrings.htmlEditorLinkTargetBlank = "Blank";
+        EditorStrings.htmlEditorLinkTargetSelf = "Self";
+        EditorStrings.htmlEditorLinkTargetParent = "Parent";
+        EditorStrings.htmlEditorLinkTargetTop = "Top";
+        EditorStrings.buttonClose = "close";
+        EditorStrings.buttonOk = "Ok";
+        EditorStrings.buttonCancel = "Cancel";
+        EditorStrings.defaultTemplatesGroupName = "Other templates";
+        EditorStrings.errorBlocksFileNotFound = function (url) {
+            return "Blocks file not found. Requested file: " + url + ".";
+        };
+        EditorStrings.errorTemplatesFileNotFound = function (url) {
+            return "Templates file not found. Requested file: " + url + ".";
+        };
+        EditorStrings.errorBlockTemplateNotFound = function (templateName) {
+            return "Template \"" + templateName + "\" not found.";
+        };
+        EditorStrings.errorTemplateParsing = function (name) {
+            return "Template parsing error: " + name + ".";
+        };
+        return EditorStrings;
+    }());
+    //# sourceMappingURL=EditorStrings.js.map
+
+    var getSelectionRanges = function () {
+        var selection = window.getSelection();
+        if (selection === null) {
+            return null;
+        }
+        var selectionRanges = [];
+        for (var idx = 0; idx < selection.rangeCount; idx++) {
+            selectionRanges.push(selection.getRangeAt(idx));
+        }
+        return selectionRanges;
+    };
+    var restoreSelection = function (selectionRanges) {
+        if (selectionRanges === null || selectionRanges.length === 0) {
+            return;
+        }
+        var selection = window.getSelection();
+        if (selection !== null) {
+            selection.removeAllRanges();
+            selectionRanges.forEach(function (range) { return selection.addRange(range); });
+        }
+    };
+    var SelectionUtils = (function () {
+        function SelectionUtils() {
+        }
+        SelectionUtils.bindTextSelection = function ($el, handler) {
+            var _this = this;
+            if (!$dom.matches($el, "[contenteditable]")) {
+                return;
+            }
+            $dom.on($el, "mouseup", function () {
+                setTimeout(function () {
+                    var rect = _this.getSelectionRect();
+                    handler(rect);
+                }, 0);
+            });
+            $dom.on($el, "keyup", function () {
+                var rect = _this.getSelectionRect();
+                handler(rect);
+            });
+        };
+        SelectionUtils.getSelectionRect = function () {
+            var selection = window.getSelection();
+            if (selection === null) {
+                return null;
+            }
+            var range = selection.getRangeAt(0);
+            return range.getBoundingClientRect();
+        };
+        return SelectionUtils;
+    }());
+    //# sourceMappingURL=SelectionUtils.js.map
 
     var createElement = function (html) {
         var temp = document.createElement("div");
@@ -418,11 +473,13 @@ var BrickyEditor = (function (exports) {
     };
     var modalTemplate = "\n<div>\n  <div class=\"bre-modal\" style=\"display: block;\">\n    <div class=\"bre-modal-placeholder\">\n    </div>\n  </div>\n</div>";
     var showModal = function (props) {
+        var selection = getSelectionRanges();
         var element = createElement(modalTemplate);
         var placeholder = element.getElementsByClassName("bre-modal-placeholder")[0];
         var closeModal = function () {
             element.remove();
             element = null;
+            restoreSelection(selection);
         };
         var content = props.content, onOk = props.onOk, onCancel = props.onCancel;
         content.forEach(function (el) { return placeholder.appendChild(el); });
@@ -524,6 +581,7 @@ var BrickyEditor = (function (exports) {
                 document.documentElement).appendChild(script);
         });
     };
+    //# sourceMappingURL=httpTransport.js.map
 
     var Selectors = (function () {
         function Selectors() {
@@ -550,6 +608,7 @@ var BrickyEditor = (function (exports) {
         Selectors.selectorHtmlToolsCommandRange = Selectors.attr(Selectors.htmlToolsCommandRange);
         return Selectors;
     }());
+    //# sourceMappingURL=Selectors.js.map
 
     var allTemplates = [];
     var getTemplate = function (templateName) {
@@ -639,6 +698,7 @@ var BrickyEditor = (function (exports) {
             $preview: $preview,
         };
     };
+    //# sourceMappingURL=template.js.map
 
     var locales = {
         errorBlocksFileNotFound: function (url) {
@@ -712,6 +772,7 @@ var BrickyEditor = (function (exports) {
         buttonCancel: "Cancel",
         defaultTemplatesGroupName: "Other templates",
     };
+    //# sourceMappingURL=locales.js.map
 
     var textFieldEditor = function (_a) {
         var key = _a.key, p = _a.p, data = _a.data;
@@ -795,8 +856,7 @@ var BrickyEditor = (function (exports) {
             });
         });
     };
-
-    var getPromptParams = function (link) { return ({
+    var getLinkPromptParams = function (link) { return ({
         title: {
             title: locales.prompt.link.title.title,
             placeholder: locales.prompt.link.title.placeholder,
@@ -820,6 +880,8 @@ var BrickyEditor = (function (exports) {
             ],
         },
     }); };
+    //# sourceMappingURL=prompt.js.map
+
     var promptLinkParamsAsync = function (selection) { return __awaiter(void 0, void 0, void 0, function () {
         var currentLink, promptParams;
         return __generator(this, function (_a) {
@@ -830,7 +892,7 @@ var BrickyEditor = (function (exports) {
                         str.equalsInvariant(selection.anchorNode.parentNode.nodeName, "a")) {
                         currentLink = selection.anchorNode.parentNode;
                     }
-                    promptParams = getPromptParams(currentLink);
+                    promptParams = getLinkPromptParams(currentLink);
                     return [4, promptAsync(promptParams)];
                 case 1: return [2, _a.sent()];
             }
@@ -905,7 +967,7 @@ var BrickyEditor = (function (exports) {
         }
         var $container = selection.anchorNode.parentElement;
         if ($container !== null) {
-            var $wrapper = $dom.el("<div class=\"bre-temp-container\" contenteditable=\"true\">" + $container.innerHTML + "</div>");
+            var $wrapper = helpers.createElement("<div class=\"bre-temp-container\" contenteditable=\"true\">" + $container.innerHTML + "</div>");
             $container.innerHTML = "";
             $container.removeAttribute(Selectors.attrContentEditable);
             $container.appendChild($wrapper);
@@ -933,231 +995,7 @@ var BrickyEditor = (function (exports) {
             helpers.toggleVisibility(control, false);
         }
     };
-
-    var PromptParameter = (function () {
-        function PromptParameter(key, title, value, placeholder) {
-            this.key = key;
-            this.title = title;
-            this.placeholder = placeholder || "";
-            this.value = value;
-        }
-        PromptParameter.prototype.parseValue = function () {
-            if (this.$input) {
-                this.value = this.$input.value;
-            }
-            this.$control = null;
-            delete this._$control;
-        };
-        Object.defineProperty(PromptParameter.prototype, "$control", {
-            get: function () {
-                if (!this._$control) {
-                    this._$control = $dom.el("<div class=" + (this.key ? "bre-prompt-field" : "bre-prompt-subtitle") + ">\n                            <label class=\"bre-label\" for=\"" + this.key + "\">" + (this.title ? this.title : "Select file...") + "</label>\n                        </div>");
-                    this.$input = this.key ? this.getEditor() : null;
-                    if (this.$input != null) {
-                        this._$control.appendChild(this.$input);
-                    }
-                }
-                return this._$control;
-            },
-            set: function (value) {
-                this._$control = value;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        PromptParameter.prototype.getEditor = function () {
-            var $input = document.createElement("input");
-            $input.id = this.key;
-            $input.className = "bre-input";
-            $input.setAttribute("type", "text");
-            $input.setAttribute("placeholder", this.placeholder);
-            $input.value = this.value || "";
-            return $input;
-        };
-        return PromptParameter;
-    }());
-
-    var PromptParameterImage = (function (_super) {
-        __extends(PromptParameterImage, _super);
-        function PromptParameterImage(key, title, value, placeholder) {
-            var _this = _super.call(this, key, title, value, placeholder) || this;
-            if (value) {
-                _this._value = value;
-            }
-            return _this;
-        }
-        PromptParameterImage.prototype.parseValue = function () {
-            this.value = this._value;
-            this.$control = null;
-            delete this._$control;
-            this._value = null;
-            delete this._value;
-        };
-        PromptParameterImage.prototype.getEditor = function () {
-            var field = this;
-            var img = this.value && this.value.fileContent ? this.value.fileContent : "";
-            var $editor = $dom.el("\n                <div class='bre-image-input'>\n                    <label for=\"" + this.key + "\">\n                        " + this.placeholder + "\n                    </label>                        \n                    <img src=\"" + img + "\"/>                    \n                    <input type=\"file\" id=\"" + this.key + "\" class=\"bre-input\" placeholder=\"" + this.placeholder + "\">\n                </div>\n                <small class='bre-image-input-filename'></small>");
-            var $file = $editor.querySelector("input");
-            var $filePreview = $editor.querySelector("img");
-            var $fileName = $editor.querySelector(".bre-image-input-filename");
-            var value = this.value;
-            field.updatePreview($filePreview, $fileName, this.value);
-            $file.onchange = function () {
-                if ($file.files && $file.files[0]) {
-                    var reader = new FileReader();
-                    reader.onload = function (ev) {
-                        var target = ev.target;
-                        field._value = new PromptParameterImageResult();
-                        field._value.fileContent = target.result;
-                        field._value.fileInfo = new PromptParameterImageResultFile($file.files[0]);
-                        field.updatePreview($filePreview, $fileName, field._value);
-                    };
-                    reader.readAsDataURL($file.files[0]);
-                }
-            };
-            return $editor;
-        };
-        PromptParameterImage.prototype.updatePreview = function ($filePreview, $fileName, value) {
-            if (!value) {
-                return;
-            }
-            $filePreview.src = value.fileContent;
-            $filePreview.classList.add("bre-loaded");
-            $fileName.innerText = value.fileInfo.name;
-        };
-        return PromptParameterImage;
-    }(PromptParameter));
-
-    var PromptParameterImageResult = (function () {
-        function PromptParameterImageResult() {
-        }
-        return PromptParameterImageResult;
-    }());
-    var PromptParameterImageResultFile = (function () {
-        function PromptParameterImageResultFile(file) {
-            this.name = file.name;
-            this.size = file.size;
-            this.type = file.type;
-            this.lastModified = file.lastModified;
-            this.lastModifiedDate = file.lastModifiedDate;
-        }
-        return PromptParameterImageResultFile;
-    }());
-
-    var PromptParameterList = (function () {
-        function PromptParameterList(params) {
-            this.params = params;
-        }
-        PromptParameterList.prototype.getValue = function (key) {
-            var param = this.params.find(function (p) {
-                return p.key === key;
-            });
-            return param ? param.value : null;
-        };
-        return PromptParameterList;
-    }());
-
-    var PromptParameterOption = (function () {
-        function PromptParameterOption(title, value, selected) {
-            if (selected === void 0) { selected = false; }
-            this.title = title;
-            this.value = value;
-            this.selected = selected;
-        }
-        return PromptParameterOption;
-    }());
-
-    var PromptParameterOptions = (function (_super) {
-        __extends(PromptParameterOptions, _super);
-        function PromptParameterOptions(key, title, options, value, placeholder) {
-            var _this = _super.call(this, key, title, value, placeholder) || this;
-            _this.options = [];
-            options.forEach(function (kv) {
-                _this.options.push(new PromptParameterOption(kv[0], kv[1], kv[1] == value));
-            });
-            return _this;
-        }
-        PromptParameterOptions.prototype.getEditor = function () {
-            var options = this.options.map(function (opt) {
-                return "<option value=\"" + opt.value + "\" " + (opt.selected ? "selected" : "") + ">" + (opt.title ? opt.title : opt.value) + "</option>";
-            });
-            return $dom.el("<select type=\"text\" id=\"" + this.key + "\" class=\"brickyeditor-input\" placeholder=\"" + this.placeholder + "\">" + options + "</select>");
-        };
-        return PromptParameterOptions;
-    }(PromptParameter));
-
-    var Modal = (function () {
-        function Modal($control, $closeBtn, $form, $btns, $okBtn, $cancelBtn) {
-            this.$control = $control;
-            this.$closeBtn = $closeBtn;
-            this.$form = $form;
-            this.$btns = $btns;
-            this.$okBtn = $okBtn;
-            this.$cancelBtn = $cancelBtn;
-            var modal = this;
-            $dom.on($closeBtn, "click", function () {
-                modal.hideModal();
-            });
-        }
-        Modal.prototype.hideModal = function () {
-            this.restoreSelection();
-            $dom.hide(this.$control);
-        };
-        Modal.prototype.showModal = function ($html, showBtns) {
-            if (showBtns === void 0) { showBtns = true; }
-            this.saveSelection();
-            $dom.toggle(this.$btns, showBtns);
-            if ($html) {
-                this.$form.appendChild($html);
-                if ($dom.isHidden($html)) {
-                    $dom.show($html);
-                }
-            }
-            $dom.show(this.$control);
-        };
-        Modal.prototype.promptAsync = function (fields) {
-            var _this = this;
-            var modal = this;
-            return new Promise(function (resolve, reject) {
-                for (var i = 0; i < modal.$form.children.length; i++) {
-                    var child = modal.$form.children[i];
-                    if (child !== _this.$btns) {
-                        modal.$form.removeChild(child);
-                    }
-                }
-                fields.forEach(function (field) {
-                    $dom.before(_this.$btns, field.$control);
-                });
-                $dom.on(modal.$okBtn, "click", function () {
-                    fields.forEach(function (field) { return field.parseValue(); });
-                    modal.hideModal();
-                    var list = new PromptParameterList(fields);
-                    resolve(list);
-                });
-                $dom.on(modal.$cancelBtn, "click", function () {
-                    modal.hideModal();
-                    resolve(null);
-                });
-                modal.showModal();
-            });
-        };
-        Modal.prototype.saveSelection = function () {
-            var selection = window.getSelection();
-            this.selectionRanges = [];
-            for (var idx = 0; idx < selection.rangeCount; idx++) {
-                this.selectionRanges.push(selection.getRangeAt(idx));
-            }
-        };
-        Modal.prototype.restoreSelection = function () {
-            if (!this.selectionRanges || this.selectionRanges.length === 0) {
-                return;
-            }
-            var selection = window.getSelection();
-            selection.removeAllRanges();
-            this.selectionRanges.forEach(function (range) { return selection.addRange(range); });
-        };
-        return Modal;
-    }());
+    //# sourceMappingURL=htmlTools.js.map
 
     var UI = (function () {
         function UI(editor) {
@@ -1165,7 +1003,6 @@ var BrickyEditor = (function (exports) {
             this.editor = editor;
             initHtmlTools(editor.options);
             this.setTools();
-            this.setModal();
         }
         UI.initBtnDeck = function ($btnsDeck) {
             var $btns = $dom.select($btnsDeck, ".bre-btn");
@@ -1273,26 +1110,9 @@ var BrickyEditor = (function (exports) {
             $dom.toggleClass(this.$tools, "bre-tools-collapsed", !$dom.hasClass(this.$toolsHideBtn, "bre-tools-toggle-collapsed"));
             $dom.toggleClass(this.$toolsHideBtn, "bre-tools-toggle-collapsed");
         };
-        UI.prototype.setModal = function () {
-            var $modal = $dom.el('<div class="bre bre-modal"><div class="bre-modal-placeholder"></div></div>');
-            var $modalCloseBtn = $dom.el("<div class=\"bre-modal-close\"><a href=\"#\">" + EditorStrings.buttonClose + " \u2716</a></div>");
-            var $modalContent = $dom.el('<div class="bre-modal-content"></div>');
-            var $modalForm = $dom.el("<form></form>");
-            var $modalBtns = $dom.el('<div class="bre-btns"></div>');
-            var $modalOk = $dom.el("<button type=\"button\" class=\"bre-btn bre-btn-primary\">" + EditorStrings.buttonOk + "</button>");
-            var $modalCancel = $dom.el("<button type=\"button\" class=\"bre-btn\">" + EditorStrings.buttonCancel + "</button>");
-            $modalBtns.appendChild($modalOk);
-            $modalBtns.appendChild($modalCancel);
-            $modalForm.appendChild($modalBtns);
-            $modalContent.appendChild($modalForm);
-            var $placeholder = $dom.first($modal, ".bre-modal-placeholder");
-            $placeholder.appendChild($modalCloseBtn);
-            $placeholder.appendChild($modalContent);
-            this.modal = new Modal($modal, $modalCloseBtn, $modalForm, $modalBtns, $modalOk, $modalCancel);
-            this.editor.$editor.appendChild($modal);
-        };
         return UI;
     }());
+    //# sourceMappingURL=UI.js.map
 
     var BlockUI = (function () {
         function BlockUI($block, preview, actions, onSelect) {
@@ -1342,6 +1162,7 @@ var BrickyEditor = (function (exports) {
         };
         return BlockUI;
     }());
+    //# sourceMappingURL=BlockUI.js.map
 
     var BlockUIAction = (function () {
         function BlockUIAction(icon, action, title) {
@@ -1351,6 +1172,7 @@ var BrickyEditor = (function (exports) {
         }
         return BlockUIAction;
     }());
+    //# sourceMappingURL=BlockUIAction.js.map
 
     var BaseField = (function () {
         function BaseField($field, data, onSelect, onUpdate, onUpload) {
@@ -1452,6 +1274,7 @@ var BrickyEditor = (function (exports) {
         BaseField._fields = {};
         return BaseField;
     }());
+    //# sourceMappingURL=BaseField.js.map
 
     var ContainerField = (function (_super) {
         __extends(ContainerField, _super);
@@ -1499,6 +1322,7 @@ var BrickyEditor = (function (exports) {
         };
         return ContainerField;
     }(BaseField));
+    //# sourceMappingURL=ContainerField.js.map
 
     var postProcessEmbed = function (provider) {
         switch (provider) {
@@ -1534,8 +1358,9 @@ var BrickyEditor = (function (exports) {
             });
         }); });
     };
+    //# sourceMappingURL=embed.js.map
 
-    var getPromptParams$1 = function (_a) {
+    var getPromptParams = function (_a) {
         var url = _a.url;
         return ({
             url: {
@@ -1550,7 +1375,7 @@ var BrickyEditor = (function (exports) {
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    params = getPromptParams$1(field.data);
+                    params = getPromptParams(field.data);
                     return [4, promptAsync(params)];
                 case 1:
                     updated = _a.sent();
@@ -1632,36 +1457,7 @@ var BrickyEditor = (function (exports) {
         };
         return EmbedField;
     }(BaseField));
-
-    var SelectionUtils = (function () {
-        function SelectionUtils() {
-        }
-        SelectionUtils.bindTextSelection = function ($el, handler) {
-            var _this = this;
-            if (!$dom.matches($el, "[contenteditable]")) {
-                return;
-            }
-            $dom.on($el, "mouseup", function () {
-                setTimeout(function () {
-                    var rect = _this.getSelectionRect();
-                    handler(rect);
-                }, 0);
-            });
-            $dom.on($el, "keyup", function () {
-                var rect = _this.getSelectionRect();
-                handler(rect);
-            });
-        };
-        SelectionUtils.getSelectionRect = function () {
-            var selection = window.getSelection();
-            if (selection === null) {
-                return null;
-            }
-            var range = selection.getRangeAt(0);
-            return range.getBoundingClientRect();
-        };
-        return SelectionUtils;
-    }());
+    //# sourceMappingURL=EmbedField.js.map
 
     var HtmlField = (function (_super) {
         __extends(HtmlField, _super);
@@ -1711,8 +1507,9 @@ var BrickyEditor = (function (exports) {
         };
         return HtmlField;
     }(BaseField));
+    //# sourceMappingURL=HtmlField.js.map
 
-    var getPromptParams$2 = function (_a) {
+    var getPromptParams$1 = function (_a) {
         var src = _a.src, file = _a.file, alt = _a.alt;
         return ({
             src: {
@@ -1755,7 +1552,7 @@ var BrickyEditor = (function (exports) {
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
-                            params = getPromptParams$2(this.data);
+                            params = getPromptParams$1(this.data);
                             return [4, promptAsync(params)];
                         case 1:
                             updated = _a.sent();
@@ -1822,7 +1619,7 @@ var BrickyEditor = (function (exports) {
                     $dom.wrap(this.$field, this.$link);
                 }
                 else {
-                    this.$link.href = url.href;
+                    this.$link.href = url.href.value;
                 }
             }
             else if (this.$link) {
@@ -1844,6 +1641,9 @@ var BrickyEditor = (function (exports) {
         };
         return ImageField;
     }(BaseField));
+    //# sourceMappingURL=ImageField.js.map
+
+    //# sourceMappingURL=Fields.js.map
 
     var Block = (function () {
         function Block(name, html, preview, data, events) {
@@ -1959,6 +1759,7 @@ var BrickyEditor = (function (exports) {
         };
         return Block;
     }());
+    //# sourceMappingURL=Block.js.map
 
     var getContainerData = function (container, ignoreHtml) { return container.blocks.map(function (block) { return block.getData(ignoreHtml); }); };
     var getContainerHtml = function (container) {
@@ -2089,6 +1890,7 @@ var BrickyEditor = (function (exports) {
         };
         return BlocksContainer;
     }());
+    //# sourceMappingURL=BlocksContainer.js.map
 
     var defaultButtons = [
         { icon: "bold", command: "Bold", range: true },
@@ -2117,6 +1919,9 @@ var BrickyEditor = (function (exports) {
         },
         htmlToolsButtons: defaultButtons,
     };
+    //# sourceMappingURL=defaults.js.map
+
+    //# sourceMappingURL=shared.js.map
 
     var Editor = (function () {
         function Editor($editor, options) {
@@ -2303,6 +2108,7 @@ var BrickyEditor = (function (exports) {
         };
         return Editor;
     }());
+    //# sourceMappingURL=Editor.js.map
 
     exports.Editor = Editor;
 

@@ -1,6 +1,5 @@
 import { $dom } from "src/common/DOMHelpers";
 import { Editor } from "src/Editor";
-import { EditorStrings } from "src/EditorStrings";
 import { getTemplatePreview } from "src/template";
 import { bre } from "src/Types/bre";
 import { initHtmlTools } from "src/UI/htmlTools";
@@ -77,7 +76,6 @@ export class UI {
 
     initHtmlTools(editor.options);
     this.setTools();
-    this.setModal();
   }
 
   public toggleToolsLoader(toggle: boolean) {
@@ -160,41 +158,32 @@ export class UI {
     $dom.toggleClass(this.$toolsHideBtn, "bre-tools-toggle-collapsed");
   }
 
-  private setModal() {
-    const $modal = $dom.el(
-      '<div class="bre bre-modal"><div class="bre-modal-placeholder"></div></div>'
-    );
-    const $modalCloseBtn = $dom.el(
-      `<div class="bre-modal-close"><a href="#">${EditorStrings.buttonClose} ✖</a></div>`
-    );
-    const $modalContent = $dom.el('<div class="bre-modal-content"></div>');
-    const $modalForm = $dom.el("<form></form>");
-    const $modalBtns = $dom.el('<div class="bre-btns"></div>');
-    const $modalOk = $dom.el(
-      `<button type="button" class="bre-btn bre-btn-primary">${EditorStrings.buttonOk}</button>`
-    );
-    const $modalCancel = $dom.el(
-      `<button type="button" class="bre-btn">${EditorStrings.buttonCancel}</button>`
-    );
+  // private setModal() {
+  //   const $modal = $dom.el(
+  //     '<div class="bre bre-modal"><div class="bre-modal-placeholder"></div></div>'
+  //   );
+  //   const $modalCloseBtn = $dom.el(
+  //     `<div class="bre-modal-close"><a href="#">${EditorStrings.buttonClose} ✖</a></div>`
+  //   );
+  //   const $modalContent = $dom.el('<div class="bre-modal-content"></div>');
+  //   const $modalForm = $dom.el("<form></form>");
+  //   const $modalBtns = $dom.el('<div class="bre-btns"></div>');
+  //   const $modalOk = $dom.el(
+  //     `<button type="button" class="bre-btn bre-btn-primary">${EditorStrings.buttonOk}</button>`
+  //   );
+  //   const $modalCancel = $dom.el(
+  //     `<button type="button" class="bre-btn">${EditorStrings.buttonCancel}</button>`
+  //   );
 
-    $modalBtns.appendChild($modalOk);
-    $modalBtns.appendChild($modalCancel);
-    $modalForm.appendChild($modalBtns);
-    $modalContent.appendChild($modalForm);
+  //   $modalBtns.appendChild($modalOk);
+  //   $modalBtns.appendChild($modalCancel);
+  //   $modalForm.appendChild($modalBtns);
+  //   $modalContent.appendChild($modalForm);
 
-    const $placeholder = $dom.first($modal, ".bre-modal-placeholder");
-    $placeholder.appendChild($modalCloseBtn);
-    $placeholder.appendChild($modalContent);
+  //   const $placeholder = $dom.first($modal, ".bre-modal-placeholder");
+  //   $placeholder.appendChild($modalCloseBtn);
+  //   $placeholder.appendChild($modalContent);
 
-    this.modal = new Modal(
-      $modal,
-      $modalCloseBtn,
-      $modalForm,
-      $modalBtns,
-      $modalOk,
-      $modalCancel
-    );
-
-    this.editor.$editor.appendChild($modal);
-  }
+  //   this.editor.$editor.appendChild($modal);
+  // }
 }
