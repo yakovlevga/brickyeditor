@@ -80,7 +80,7 @@ export class EmbedField extends BaseField<EmbedFieldData> {
     const field = this;
     const $field = this.$field;
 
-    $dom.on($field, "click", async () => {
+    $field.addEventListener("click", async () => {
       promptEmbedMediaUrl(field);
     });
 

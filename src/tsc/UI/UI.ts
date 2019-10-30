@@ -10,7 +10,7 @@ export class UI {
   public static initBtnDeck($btnsDeck: HTMLElement) {
     const $btns = $dom.select($btnsDeck, ".bre-btn");
     const $firstBtn = $btns[0];
-    $dom.on($firstBtn, "click", ev => {
+    $firstBtn.addEventListener("click", ev => {
       UI.toggleBtnDeck($btnsDeck);
       ev.stopPropagation();
       return false;
@@ -105,7 +105,7 @@ export class UI {
         $group.appendChild($preview);
       });
 
-      $dom.on($header, "click", () => {
+      $header.addEventListener("click", () => {
         $dom.toggle($group);
       });
       this.$toolsTemplates.appendChild($group);

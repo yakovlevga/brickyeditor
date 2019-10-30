@@ -66,6 +66,9 @@ define("tsc/common/Common", ["require", "exports"], function (require, exports) 
             return s !== undefined ? s.replace(/\s\s+/g, " ").trim() : "";
         },
         equalsInvariant: function (s1, s2) {
+            if (!s1 || !s2) {
+                return s1 === s2;
+            }
             return s1.toLowerCase() === s2.toLowerCase();
         },
         startsWith: function (s1, s2) { return s1.indexOf(s2) === 0; },
@@ -187,10 +190,12 @@ define("tsc/common/DOMHelpers", ["require", "exports"], function (require, expor
         };
         $dom.toggle = function (el, force) {
             var show = force ? force.valueOf() : this.isHidden(el);
-            if (show)
+            if (show) {
                 this.show(el);
-            else
+            }
+            else {
                 this.hide(el);
+            }
         };
         $dom.before = function (el, elToInsert) {
             var _this = this;
@@ -202,37 +207,48 @@ define("tsc/common/DOMHelpers", ["require", "exports"], function (require, expor
             }
         };
         $dom.after = function (el, elToInsert) {
-            if (el.nextSibling)
+            if (el.nextSibling) {
                 el.parentNode.insertBefore(elToInsert, el);
-            else
+            }
+            else {
                 el.parentNode.appendChild(elToInsert);
+            }
         };
         $dom.hasClass = function (el, className) {
-            if (el.classList)
+            if (el.classList) {
                 return el.classList.contains(className);
-            else
+            }
+            else {
                 return new RegExp("(^| )" + className + "( |$)", "gi").test(el.className);
+            }
         };
         $dom.addClass = function (el, className) {
-            if (this.hasClass(el, className))
+            if (this.hasClass(el, className)) {
                 return;
-            if (el.classList)
+            }
+            if (el.classList) {
                 el.classList.add(className);
-            else
+            }
+            else {
                 el.className += " " + className;
+            }
         };
         $dom.removeClass = function (el, className) {
-            if (el.classList)
+            if (el.classList) {
                 el.classList.remove(className);
-            else
+            }
+            else {
                 el.className = el.className.replace(new RegExp("(^|\\b)" + className.split(" ").join("|") + "(\\b|$)", "gi"), " ");
+            }
         };
         $dom.toggleClass = function (el, className, force) {
             if (force) {
-                if (force.valueOf())
+                if (force.valueOf()) {
                     this.addClass(el, className);
-                else
+                }
+                else {
                     this.removeClass(el, className);
+                }
                 return;
             }
             if (el.classList) {
@@ -242,13 +258,16 @@ define("tsc/common/DOMHelpers", ["require", "exports"], function (require, expor
                 var classes = el.className.split(" ");
                 var existingIndex = -1;
                 for (var i = classes.length; i--;) {
-                    if (classes[i] === className)
+                    if (classes[i] === className) {
                         existingIndex = i;
+                    }
                 }
-                if (existingIndex >= 0)
+                if (existingIndex >= 0) {
                     classes.splice(existingIndex, 1);
-                else
+                }
+                else {
                     classes.push(className);
+                }
                 el.className = classes.join(" ");
             }
         };
@@ -261,8 +280,9 @@ define("tsc/common/DOMHelpers", ["require", "exports"], function (require, expor
         };
         $dom.replaceWith = function (from, to) {
             var parent = from.parentElement;
-            if (parent)
+            if (parent) {
                 parent.replaceChild(to, from);
+            }
         };
         $dom.select = function (el, selector, addBack) {
             if (addBack === void 0) { addBack = false; }
@@ -294,11 +314,11 @@ define("tsc/common/DOMHelpers", ["require", "exports"], function (require, expor
         };
         $dom.matches = function (el, selector) {
             var matches = el.matches ||
-                el["matchesSelector"] ||
+                el.matchesSelector ||
                 el.msMatchesSelector ||
-                el["mozMatchesSelector"] ||
+                el.mozMatchesSelector ||
                 el.webkitMatchesSelector ||
-                el["oMatchesSelector"];
+                el.oMatchesSelector;
             return matches.call(el, selector);
         };
         $dom.data = function (el, prop) {
@@ -335,23 +355,87 @@ define("tsc/block/BlockUIAction", ["require", "exports"], function (require, exp
     }());
     exports.BlockUIAction = BlockUIAction;
 });
-define("tsc/helpers", ["require", "exports"], function (require, exports) {
+define("tsc/ui/SelectionUtils", ["require", "exports", "tsc/common/DOMHelpers"], function (require, exports, DOMHelpers_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.getSelectionRanges = function () {
+        var selection = window.getSelection();
+        if (selection === null) {
+            return null;
+        }
+        var selectionRanges = [];
+        for (var idx = 0; idx < selection.rangeCount; idx++) {
+            selectionRanges.push(selection.getRangeAt(idx));
+        }
+        return selectionRanges;
+    };
+    exports.restoreSelection = function (selectionRanges) {
+        if (selectionRanges === null || selectionRanges.length === 0) {
+            return;
+        }
+        var selection = window.getSelection();
+        if (selection !== null) {
+            selection.removeAllRanges();
+            selectionRanges.forEach(function (range) { return selection.addRange(range); });
+        }
+    };
+    var SelectionUtils = (function () {
+        function SelectionUtils() {
+        }
+        SelectionUtils.bindTextSelection = function ($el, handler) {
+            var _this = this;
+            if (!DOMHelpers_1.$dom.matches($el, "[contenteditable]")) {
+                return;
+            }
+            DOMHelpers_1.$dom.on($el, "mouseup", function () {
+                setTimeout(function () {
+                    var rect = _this.getSelectionRect();
+                    handler(rect);
+                }, 0);
+            });
+            DOMHelpers_1.$dom.on($el, "keyup", function () {
+                var rect = _this.getSelectionRect();
+                handler(rect);
+            });
+        };
+        SelectionUtils.getSelectionRect = function () {
+            var selection = window.getSelection();
+            if (selection === null) {
+                return null;
+            }
+            var range = selection.getRangeAt(0);
+            return range.getBoundingClientRect();
+        };
+        return SelectionUtils;
+    }());
+    exports.SelectionUtils = SelectionUtils;
+});
+define("tsc/helpers", ["require", "exports", "tsc/ui/SelectionUtils"], function (require, exports, SelectionUtils_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var createElement = function (html) {
         var temp = document.createElement("div");
         temp.innerHTML = html;
         var result = temp.children[0];
-        temp.innerHTML = null;
+        temp.innerHTML = "";
         return result;
+    };
+    var toggleVisibility = function (el, visible) {
+        if (visible !== undefined) {
+            el.style.display = visible ? "initial" : "none";
+            return;
+        }
+        el.style.display = el.style.display !== "none" ? "none" : "initial";
     };
     var modalTemplate = "\n<div>\n  <div class=\"bre-modal\" style=\"display: block;\">\n    <div class=\"bre-modal-placeholder\">\n    </div>\n  </div>\n</div>";
     var showModal = function (props) {
+        var selection = SelectionUtils_1.getSelectionRanges();
         var element = createElement(modalTemplate);
         var placeholder = element.getElementsByClassName("bre-modal-placeholder")[0];
         var closeModal = function () {
             element.remove();
             element = null;
+            SelectionUtils_1.restoreSelection(selection);
         };
         var content = props.content, onOk = props.onOk, onCancel = props.onCancel;
         content.forEach(function (el) { return placeholder.appendChild(el); });
@@ -365,15 +449,17 @@ define("tsc/helpers", ["require", "exports"], function (require, exports) {
         }
         var buttonCancel = createElement("<button type=\"button\">Cancel</button>");
         buttonCancel.addEventListener("click", function () {
-            onCancel();
+            if (onCancel) {
+                onCancel();
+            }
             closeModal();
         });
         placeholder.appendChild(buttonCancel);
         document.body.appendChild(element);
     };
-    exports.helpers = { createElement: createElement, showModal: showModal };
+    exports.helpers = { createElement: createElement, showModal: showModal, toggleVisibility: toggleVisibility };
 });
-define("tsc/BlocksContainer", ["require", "exports", "tsc/block/Block", "tsc/common/DOMHelpers", "tsc/helpers"], function (require, exports, Block_1, DOMHelpers_1, helpers_1) {
+define("tsc/BlocksContainer", ["require", "exports", "tsc/block/Block", "tsc/common/DOMHelpers", "tsc/helpers"], function (require, exports, Block_1, DOMHelpers_2, helpers_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.getContainerData = function (container, ignoreHtml) { return container.blocks.map(function (block) { return block.getData(ignoreHtml); }); };
@@ -445,7 +531,7 @@ define("tsc/BlocksContainer", ["require", "exports", "tsc/block/Block", "tsc/com
                 this.$element.appendChild(block.ui.$editor);
             }
             else {
-                DOMHelpers_1.$dom.after(this.blocks[idx - 1].ui.$editor, block.ui.$editor);
+                DOMHelpers_2.$dom.after(this.blocks[idx - 1].ui.$editor, block.ui.$editor);
             }
             this.onAddBlock(block, idx);
             block.select(undefined);
@@ -475,10 +561,10 @@ define("tsc/BlocksContainer", ["require", "exports", "tsc/block/Block", "tsc/com
             }
             var $anchorBlock = this.blocks[new_idx].ui.$editor;
             if (offset > 0) {
-                DOMHelpers_1.$dom.after($anchorBlock, block.ui.$editor);
+                DOMHelpers_2.$dom.after($anchorBlock, block.ui.$editor);
             }
             else if (offset < 0) {
-                DOMHelpers_1.$dom.before($anchorBlock, block.ui.$editor);
+                DOMHelpers_2.$dom.before($anchorBlock, block.ui.$editor);
             }
             this.blocks.splice(idx, 1);
             this.blocks.splice(new_idx, 0, block);
@@ -510,6 +596,23 @@ define("tsc/BlocksContainer", ["require", "exports", "tsc/block/Block", "tsc/com
 define("tsc/defaults", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    var defaultButtons = [
+        { icon: "bold", command: "Bold", range: true },
+        { icon: "italic", command: "Italic", range: true },
+        { icon: "link", command: "CreateLink", range: true },
+        {
+            icon: "list-ul",
+            command: "insertUnorderedList",
+            range: true,
+        },
+        {
+            icon: "list-ol",
+            command: "insertOrderedList",
+            range: true,
+        },
+        { icon: "undo", command: "Undo", range: false },
+        { icon: "repeat", command: "Redo", range: false },
+    ];
     exports.defaultOptions = {
         templatesUrl: "templates/bootstrap4.html",
         compactTools: false,
@@ -518,6 +621,7 @@ define("tsc/defaults", ["require", "exports"], function (require, exports) {
         onError: function (data) {
             console.log(data.message);
         },
+        htmlToolsButtons: defaultButtons,
     };
 });
 define("tsc/EditorStrings", ["require", "exports"], function (require, exports) {
@@ -646,6 +750,13 @@ define("tsc/httpTransport", ["require", "exports"], function (require, exports) 
         });
     };
 });
+define("tsc/shared", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var _ui = null;
+    exports.setUI = function (ui) { return (_ui = ui); };
+    exports.getUI = function () { return _ui; };
+});
 define("tsc/ui/Selectors", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -676,7 +787,7 @@ define("tsc/ui/Selectors", ["require", "exports"], function (require, exports) {
     }());
     exports.Selectors = Selectors;
 });
-define("tsc/template", ["require", "exports", "tsc/block/Block", "tsc/common/Common", "tsc/common/DOMHelpers", "tsc/EditorStrings", "tsc/helpers", "tsc/httpTransport", "tsc/ui/Selectors"], function (require, exports, Block_2, Common_1, DOMHelpers_2, EditorStrings_1, helpers_2, httpTransport_1, Selectors_1) {
+define("tsc/template", ["require", "exports", "tsc/block/Block", "tsc/common/Common", "tsc/common/DOMHelpers", "tsc/EditorStrings", "tsc/helpers", "tsc/httpTransport", "tsc/ui/Selectors"], function (require, exports, Block_2, Common_1, DOMHelpers_3, EditorStrings_1, helpers_2, httpTransport_1, Selectors_1) {
     "use strict";
     var _this = this;
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -702,7 +813,7 @@ define("tsc/template", ["require", "exports", "tsc/block/Block", "tsc/common/Com
                     $data = helpers_2.helpers.createElement("<div>" + data + "</div>");
                     $style = $data.querySelector("style");
                     if ($style !== null) {
-                        DOMHelpers_2.$dom.before($editor, $style);
+                        DOMHelpers_3.$dom.before($editor, $style);
                     }
                     $groups = $data.querySelectorAll(Selectors_1.Selectors.selectorTemplateGroup);
                     $groups.forEach(function ($group) {
@@ -769,7 +880,7 @@ define("tsc/template", ["require", "exports", "tsc/block/Block", "tsc/common/Com
         };
     };
 });
-define("tsc/Editor", ["require", "exports", "tsc/BlocksContainer", "tsc/common/Common", "tsc/common/DOMHelpers", "tsc/defaults", "tsc/EditorStrings", "tsc/Fields/Fields", "tsc/httpTransport", "tsc/template", "tsc/ui/Selectors", "tsc/ui/UI"], function (require, exports, BlocksContainer_1, Common_2, DOMHelpers_3, defaults_1, EditorStrings_2, Fields_1, httpTransport_2, template_1, Selectors_2, UI_1) {
+define("tsc/Editor", ["require", "exports", "tsc/BlocksContainer", "tsc/common/Common", "tsc/common/DOMHelpers", "tsc/defaults", "tsc/EditorStrings", "tsc/Fields/Fields", "tsc/httpTransport", "tsc/shared", "tsc/template", "tsc/ui/Selectors", "tsc/ui/UI"], function (require, exports, BlocksContainer_1, Common_2, DOMHelpers_4, defaults_1, EditorStrings_2, Fields_1, httpTransport_2, shared_1, template_1, Selectors_2, UI_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Editor = (function () {
@@ -790,6 +901,7 @@ define("tsc/Editor", ["require", "exports", "tsc/BlocksContainer", "tsc/common/C
             this.options = __assign({}, defaults_1.defaultOptions, options);
             this.container = this.createContainer();
             Editor.UI = new UI_1.UI(this);
+            shared_1.setUI(Editor.UI);
             this.tryBindFormSubmit();
         }
         Editor.prototype.initAsync = function () {
@@ -821,15 +933,15 @@ define("tsc/Editor", ["require", "exports", "tsc/BlocksContainer", "tsc/common/C
         Editor.prototype.tryBindFormSubmit = function () {
             var editor = this;
             var $form = this.options.formSelector
-                ? DOMHelpers_3.$dom.find(this.options.formSelector)
+                ? DOMHelpers_4.$dom.find(this.options.formSelector)
                 : null;
             var $input = this.options.inputSelector
-                ? DOMHelpers_3.$dom.find(this.options.inputSelector)
+                ? DOMHelpers_4.$dom.find(this.options.inputSelector)
                 : null;
             if (!$form || !$input || !($input instanceof HTMLInputElement)) {
                 return;
             }
-            DOMHelpers_3.$dom.on($form, "submit", function () {
+            DOMHelpers_4.$dom.on($form, "submit", function () {
                 $input.value = JSON.stringify(editor.getData());
                 return true;
             });
@@ -948,7 +1060,7 @@ define("tsc/Editor", ["require", "exports", "tsc/BlocksContainer", "tsc/common/C
         };
         Editor.prototype.trigger = function (event, data) {
             var editor = this;
-            DOMHelpers_3.$dom.trigger(this.$editor, "bre." + event, data);
+            DOMHelpers_4.$dom.trigger(this.$editor, "bre." + event, data);
             Common_2.Common.propsEach(editor.options, function (key, value) {
                 if (Common_2.str.equalsInvariant(key, event) && value) {
                     value(data);
@@ -959,295 +1071,239 @@ define("tsc/Editor", ["require", "exports", "tsc/BlocksContainer", "tsc/common/C
     }());
     exports.Editor = Editor;
 });
-define("tsc/prompt/PromptParameter", ["require", "exports", "tsc/common/DOMHelpers"], function (require, exports, DOMHelpers_4) {
+define("tsc/locales", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    var PromptParameter = (function () {
-        function PromptParameter(key, title, value, placeholder) {
-            this.key = key;
-            this.title = title;
-            this.placeholder = placeholder || "";
-            this.value = value;
-        }
-        PromptParameter.prototype.parseValue = function () {
-            if (this.$input) {
-                this.value = this.$input.value;
-            }
-            this.$control = null;
-            delete this._$control;
+    exports.locales = {
+        errorBlocksFileNotFound: function (url) {
+            return "Blocks file not found. Requested file: " + url + ".";
+        },
+        errorTemplatesFileNotFound: function (url) {
+            return "Templates file not found. Requested file: " + url + ".";
+        },
+        errorBlockTemplateNotFound: function (templateName) {
+            return "Template \"" + templateName + "\" not found.";
+        },
+        errorTemplateParsing: function (name) {
+            return "Template parsing error: " + name + ".";
+        },
+        embedFieldLinkTitle: "Link to embed media",
+        embedFieldLinkPlaceholder: "Link to instagram, youtube and etc.",
+        prompt: {
+            image: {
+                link: {
+                    title: "Image link",
+                    placeholder: "http://url-to-image.png",
+                },
+                alt: {
+                    title: "Image alt",
+                    placeholder: "Image 'alt' attribute value",
+                },
+                upload: {
+                    title: "or Upload a file",
+                    placeholder: "select file",
+                    button: "Select file",
+                },
+                url: {
+                    subtitle: "Link to open on image click",
+                },
+            },
+            embed: {
+                url: {
+                    title: "URL to media",
+                    placeholder: "Paste link to youtube, instagram, etc.",
+                },
+            },
+            link: {
+                href: {
+                    title: "Url",
+                    placeholder: "https://put-your-link.here",
+                },
+                title: {
+                    title: "Title",
+                    placeholder: "Title attribute for link",
+                },
+                target: {
+                    title: "Target",
+                    blank: "Blank",
+                    self: "Self",
+                    parent: "Parent",
+                    top: "Top",
+                },
+            },
+        },
+        htmlEditorLinkUrlTitle: "Url",
+        htmlEditorLinkUrlPlaceholder: "http://put-your-link.here",
+        htmlEditorLinkTitleTitle: "Title",
+        htmlEditorLinkTitlePlaceholder: "Title attribute for link",
+        htmlEditorLinkTargetTitle: "Target",
+        htmlEditorLinkTargetBlank: "Blank",
+        htmlEditorLinkTargetSelf: "Self",
+        htmlEditorLinkTargetParent: "Parent",
+        htmlEditorLinkTargetTop: "Top",
+        buttonClose: "close",
+        buttonOk: "Ok",
+        buttonCancel: "Cancel",
+        defaultTemplatesGroupName: "Other templates",
+    };
+});
+define("tsc/prompt", ["require", "exports", "tsc/helpers", "tsc/locales"], function (require, exports, helpers_3, locales_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var textFieldEditor = function (_a) {
+        var key = _a.key, p = _a.p, data = _a.data;
+        var html = "<input type='text' name='" + key + "' placeholder='" + p.placeholder + "' value='" + (p.value || "") + "' />";
+        var input = helpers_3.helpers.createElement(html);
+        input.onchange = function () {
+            data[key] = input.value;
         };
-        Object.defineProperty(PromptParameter.prototype, "$control", {
-            get: function () {
-                if (!this._$control) {
-                    this._$control = DOMHelpers_4.$dom.el("<div class=" + (this.key ? "bre-prompt-field" : "bre-prompt-subtitle") + ">\n                            <label class=\"bre-label\" for=\"" + this.key + "\">" + (this.title ? this.title : "Select file...") + "</label>\n                        </div>");
-                    this.$input = this.key ? this.getEditor() : null;
-                    if (this.$input != null) {
-                        this._$control.appendChild(this.$input);
+        return input;
+    };
+    var fileFieldEditor = function (_a) {
+        var key = _a.key, p = _a.p, data = _a.data;
+        var file = data[key];
+        var filePreview = helpers_3.helpers.createElement("<img src=\"" + p.value + "\"/>");
+        var fileInput = helpers_3.helpers.createElement("<input type=\"file\" id=\"bre-modal-modal-" + key + "\" class=\"bre-input\" placeholder=\"" + p.placeholder + "\">");
+        var fileName = helpers_3.helpers.createElement("<span class='bre-image-input-filename'></span>");
+        var updatePreview = function () {
+            if (file === undefined || file === null) {
+                fileName.innerText = "";
+                filePreview.src = "//:0";
+            }
+            else {
+                fileName.innerText = file.name;
+                var reader = new FileReader();
+                reader.onload = function (ev) {
+                    if (ev.target !== null && ev.target.result !== null) {
+                        filePreview.src = ev.target.result.toString();
                     }
-                }
-                return this._$control;
-            },
-            set: function (value) {
-                this._$control = value;
-            },
-            enumerable: true,
-            configurable: true
+                };
+                reader.readAsDataURL(file);
+            }
+        };
+        fileInput.onchange = function () {
+            file = fileInput.files && fileInput.files[0];
+            updatePreview();
+            data[key] = file;
+        };
+        updatePreview();
+        var editor = helpers_3.helpers.createElement("<div class='bre-image-input'>\n    <label for=\"bre-modal-modal-" + key + "\">\n      " + p.placeholder + "\n    </label>\n  </div>");
+        editor.append(filePreview, fileInput, fileName);
+        return editor;
+    };
+    var selectFieldEditor = function (_a) {
+        var key = _a.key, p = _a.p, data = _a.data;
+        if (p.options === undefined) {
+            throw new Error("Empty options");
+        }
+        var options = p.options
+            .map(function (o) {
+            return "<option value=\"" + o.title + "\" " + (o.value === p.value ? "selected" : "") + ">" + o.title + "</option>";
+        })
+            .join("\n");
+        var html = "<select name='" + key + "' placeholder='" + p.placeholder + "'>" + options + "</select>";
+        var select = helpers_3.helpers.createElement(html);
+        select.onchange = function () {
+            data[key] = select.value;
+        };
+        return select;
+    };
+    var parameterEditors = {
+        text: textFieldEditor,
+        file: fileFieldEditor,
+        select: selectFieldEditor,
+    };
+    exports.promptAsync = function (params) {
+        return new Promise(function (resolve) {
+            var result = {};
+            var editors = Object.keys(params).map(function (key) {
+                var p = params[key];
+                var editor = parameterEditors[p.type || "text"]({
+                    key: key,
+                    p: p,
+                    data: result,
+                });
+                return editor;
+            });
+            helpers_3.helpers.showModal({
+                content: editors,
+                onOk: function () { return resolve(result); },
+                onCancel: function () { return resolve(null); },
+            });
         });
-        PromptParameter.prototype.getEditor = function () {
-            var $input = document.createElement("input");
-            $input.id = this.key;
-            $input.className = "bre-input";
-            $input.setAttribute("type", "text");
-            $input.setAttribute("placeholder", this.placeholder);
-            $input.value = this.value || "";
-            return $input;
-        };
-        return PromptParameter;
-    }());
-    exports.PromptParameter = PromptParameter;
+    };
+    exports.getLinkPromptParams = function (link) { return ({
+        title: {
+            title: locales_1.locales.prompt.link.title.title,
+            placeholder: locales_1.locales.prompt.link.title.placeholder,
+            value: link ? link.getAttribute("title") : "",
+        },
+        href: {
+            title: locales_1.locales.prompt.link.href.title,
+            placeholder: locales_1.locales.prompt.link.href.placeholder,
+            value: link ? link.getAttribute("href") : "",
+        },
+        target: {
+            type: "select",
+            title: locales_1.locales.prompt.link.target.title,
+            value: link ? link.getAttribute("target") : "",
+            options: [
+                { title: "", value: "" },
+                { title: locales_1.locales.prompt.link.target.blank, value: "_blank" },
+                { title: locales_1.locales.prompt.link.target.parent, value: "_parent" },
+                { title: locales_1.locales.prompt.link.target.self, value: "_self" },
+                { title: locales_1.locales.prompt.link.target.top, value: "_top" },
+            ],
+        },
+    }); };
 });
-define("tsc/prompt/PromptParameterImage", ["require", "exports", "tsc/common/DOMHelpers", "tsc/Prompt/Prompt"], function (require, exports, DOMHelpers_5, Prompt_1) {
+define("tsc/UI/htmlTools", ["require", "exports", "tsc/common/Common", "tsc/helpers", "tsc/prompt", "tsc/ui/Selectors"], function (require, exports, Common_3, helpers_4, prompt_1, Selectors_3) {
     "use strict";
+    var _this = this;
     Object.defineProperty(exports, "__esModule", { value: true });
-    var PromptParameterImage = (function (_super) {
-        __extends(PromptParameterImage, _super);
-        function PromptParameterImage(key, title, value, placeholder) {
-            var _this = _super.call(this, key, title, value, placeholder) || this;
-            if (value) {
-                _this._value = value;
+    var promptLinkParamsAsync = function (selection) { return __awaiter(_this, void 0, void 0, function () {
+        var currentLink, promptParams;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    if (selection.anchorNode !== null &&
+                        selection.anchorNode.parentNode !== null &&
+                        Common_3.str.equalsInvariant(selection.anchorNode.parentNode.nodeName, "a")) {
+                        currentLink = selection.anchorNode.parentNode;
+                    }
+                    promptParams = prompt_1.getLinkPromptParams(currentLink);
+                    return [4, prompt_1.promptAsync(promptParams)];
+                case 1: return [2, _a.sent()];
             }
-            return _this;
-        }
-        PromptParameterImage.prototype.parseValue = function () {
-            this.value = this._value;
-            this.$control = null;
-            delete this._$control;
-            this._value = null;
-            delete this._value;
-        };
-        PromptParameterImage.prototype.getEditor = function () {
-            var field = this;
-            var img = this.value && this.value.fileContent ? this.value.fileContent : "";
-            var $editor = DOMHelpers_5.$dom.el("\n                <div class='bre-image-input'>\n                    <label for=\"" + this.key + "\">\n                        " + this.placeholder + "\n                    </label>                        \n                    <img src=\"" + img + "\"/>                    \n                    <input type=\"file\" id=\"" + this.key + "\" class=\"bre-input\" placeholder=\"" + this.placeholder + "\">\n                </div>\n                <small class='bre-image-input-filename'></small>");
-            var $file = $editor.querySelector("input");
-            var $filePreview = $editor.querySelector("img");
-            var $fileName = $editor.querySelector(".bre-image-input-filename");
-            var value = this.value;
-            field.updatePreview($filePreview, $fileName, this.value);
-            $file.onchange = function () {
-                if ($file.files && $file.files[0]) {
-                    var reader = new FileReader();
-                    reader.onload = function (ev) {
-                        var target = ev.target;
-                        field._value = new Prompt_1.PromptParameterImageResult();
-                        field._value.fileContent = target.result;
-                        field._value.fileInfo = new Prompt_1.PromptParameterImageResultFile($file.files[0]);
-                        field.updatePreview($filePreview, $fileName, field._value);
-                    };
-                    reader.readAsDataURL($file.files[0]);
-                }
-            };
-            return $editor;
-        };
-        PromptParameterImage.prototype.updatePreview = function ($filePreview, $fileName, value) {
-            if (!value) {
-                return;
-            }
-            $filePreview.src = value.fileContent;
-            $filePreview.classList.add("bre-loaded");
-            $fileName.innerText = value.fileInfo.name;
-        };
-        return PromptParameterImage;
-    }(Prompt_1.PromptParameter));
-    exports.PromptParameterImage = PromptParameterImage;
-});
-define("tsc/prompt/PromptParameterImageResult", ["require", "exports"], function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var PromptParameterImageResult = (function () {
-        function PromptParameterImageResult() {
-        }
-        return PromptParameterImageResult;
-    }());
-    exports.PromptParameterImageResult = PromptParameterImageResult;
-    var PromptParameterImageResultFile = (function () {
-        function PromptParameterImageResultFile(file) {
-            this.name = file.name;
-            this.size = file.size;
-            this.type = file.type;
-            this.lastModified = file.lastModified;
-            this.lastModifiedDate = file.lastModifiedDate;
-        }
-        return PromptParameterImageResultFile;
-    }());
-    exports.PromptParameterImageResultFile = PromptParameterImageResultFile;
-});
-define("tsc/prompt/PromptParameterList", ["require", "exports"], function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var PromptParameterList = (function () {
-        function PromptParameterList(params) {
-            this.params = params;
-        }
-        PromptParameterList.prototype.getValue = function (key) {
-            var param = this.params.find(function (p) {
-                return p.key === key;
-            });
-            return param ? param.value : null;
-        };
-        return PromptParameterList;
-    }());
-    exports.PromptParameterList = PromptParameterList;
-});
-define("tsc/prompt/PromptParameterOption", ["require", "exports"], function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var PromptParameterOption = (function () {
-        function PromptParameterOption(title, value, selected) {
-            if (selected === void 0) { selected = false; }
-            this.title = title;
-            this.value = value;
-            this.selected = selected;
-        }
-        return PromptParameterOption;
-    }());
-    exports.PromptParameterOption = PromptParameterOption;
-});
-define("tsc/prompt/PromptParameterOptions", ["require", "exports", "tsc/common/DOMHelpers", "tsc/Prompt/Prompt"], function (require, exports, DOMHelpers_6, Prompt_2) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var PromptParameterOptions = (function (_super) {
-        __extends(PromptParameterOptions, _super);
-        function PromptParameterOptions(key, title, options, value, placeholder) {
-            var _this = _super.call(this, key, title, value, placeholder) || this;
-            _this.options = [];
-            options.forEach(function (kv) {
-                _this.options.push(new Prompt_2.PromptParameterOption(kv[0], kv[1], kv[1] == value));
-            });
-            return _this;
-        }
-        PromptParameterOptions.prototype.getEditor = function () {
-            var options = this.options.map(function (opt) {
-                return "<option value=\"" + opt.value + "\" " + (opt.selected ? "selected" : "") + ">" + (opt.title ? opt.title : opt.value) + "</option>";
-            });
-            return DOMHelpers_6.$dom.el("<select type=\"text\" id=\"" + this.key + "\" class=\"brickyeditor-input\" placeholder=\"" + this.placeholder + "\">" + options + "</select>");
-        };
-        return PromptParameterOptions;
-    }(Prompt_2.PromptParameter));
-    exports.PromptParameterOptions = PromptParameterOptions;
-});
-define("tsc/Prompt/Prompt", ["require", "exports", "tsc/prompt/PromptParameter", "tsc/prompt/PromptParameterImage", "tsc/prompt/PromptParameterImageResult", "tsc/prompt/PromptParameterList", "tsc/prompt/PromptParameterOption", "tsc/prompt/PromptParameterOptions"], function (require, exports, PromptParameter_1, PromptParameterImage_1, PromptParameterImageResult_1, PromptParameterList_1, PromptParameterOption_1, PromptParameterOptions_1) {
-    "use strict";
-    function __export(m) {
-        for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
-    }
-    Object.defineProperty(exports, "__esModule", { value: true });
-    __export(PromptParameter_1);
-    __export(PromptParameterImage_1);
-    __export(PromptParameterImageResult_1);
-    __export(PromptParameterList_1);
-    __export(PromptParameterOption_1);
-    __export(PromptParameterOptions_1);
-});
-define("tsc/HtmlLinkParams", ["require", "exports", "tsc/EditorStrings", "tsc/Prompt/Prompt"], function (require, exports, EditorStrings_3, Prompt_3) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var HtmlLinkParams = (function () {
-        function HtmlLinkParams(href, title, target) {
-            if (href === void 0) { href = ""; }
-            if (title === void 0) { title = ""; }
-            if (target === void 0) { target = ""; }
-            this.href = href;
-            this.title = title;
-            this.target = target;
-        }
-        HtmlLinkParams.getLinkFromParams = function (fields) {
-            var href = fields.getValue("href");
-            var title = fields.getValue("title");
-            var target = fields.getValue("target");
-            return new HtmlLinkParams(href, title, target);
-        };
-        HtmlLinkParams.prototype.getLinkPromptParams = function () {
-            return [
-                new Prompt_3.PromptParameter("href", EditorStrings_3.EditorStrings.htmlEditorLinkUrlTitle, this.href, EditorStrings_3.EditorStrings.htmlEditorLinkUrlPlaceholder),
-                new Prompt_3.PromptParameter("title", EditorStrings_3.EditorStrings.htmlEditorLinkTitleTitle, this.title, EditorStrings_3.EditorStrings.htmlEditorLinkTitlePlaceholder),
-                new Prompt_3.PromptParameterOptions("target", EditorStrings_3.EditorStrings.htmlEditorLinkTargetTitle, [
-                    ["", ""],
-                    [EditorStrings_3.EditorStrings.htmlEditorLinkTargetBlank, "_blank"],
-                    [EditorStrings_3.EditorStrings.htmlEditorLinkTargetSelf, "_self"],
-                    [EditorStrings_3.EditorStrings.htmlEditorLinkTargetParent, "_parent"],
-                    [EditorStrings_3.EditorStrings.htmlEditorLinkTargetTop, "_top"],
-                ], this.target),
-            ];
-        };
-        return HtmlLinkParams;
-    }());
-    exports.HtmlLinkParams = HtmlLinkParams;
-});
-define("tsc/ui/HtmlTools", ["require", "exports", "tsc/common/DOMHelpers", "tsc/Editor", "tsc/HtmlLinkParams", "tsc/ui/Selectors", "tsc/common/Common"], function (require, exports, DOMHelpers_7, Editor_1, HtmlLinkParams_1, Selectors_3, Common_3) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var HtmlTools = (function () {
-        function HtmlTools(editor) {
-            this.editor = editor;
-            this.buttons = [
-                { icon: "bold", command: "Bold", range: true, aValueArgument: null },
-                { icon: "italic", command: "Italic", range: true, aValueArgument: null },
-                { icon: "link", command: "CreateLink", range: true, aValueArgument: null },
-                {
-                    icon: "list-ul",
-                    command: "insertUnorderedList",
-                    range: true,
-                    aValueArgument: null,
-                },
-                {
-                    icon: "list-ol",
-                    command: "insertOrderedList",
-                    range: true,
-                    aValueArgument: null,
-                },
-                { icon: "undo", command: "Undo", range: false, aValueArgument: null },
-                { icon: "repeat", command: "Redo", range: false, aValueArgument: null },
-            ];
-            if (editor.options.htmlToolsButtons) {
-                this.buttons = editor.options.htmlToolsButtons;
-            }
-            this.setControl();
-        }
-        HtmlTools.prototype.setControl = function () {
-            var _this = this;
-            var $panel = DOMHelpers_7.$dom.el('<div class="bre-html-tools-panel"></div>');
-            this.buttons.forEach(function (b) {
-                var $btn = _this.getButtonElement(b.icon, b.command, b.range, b.aValueArgument);
-                $panel.appendChild($btn);
-            });
-            this.$control = DOMHelpers_7.$dom.el('<div class="bre-html-tools bre-btn-group"></div>');
-            this.$control.appendChild($panel);
-            DOMHelpers_7.$dom.hide(this.$control);
-            this.editor.$editor.appendChild(this.$control);
-        };
-        HtmlTools.prototype.getButtonElement = function (icon, command, rangeCommand, aValueArgument) {
-            var _this = this;
-            if (rangeCommand === void 0) { rangeCommand = true; }
-            if (aValueArgument === void 0) { aValueArgument = null; }
-            var $btn = DOMHelpers_7.$dom.el("<button type=\"button\" class=\"bre-btn\"><i class=\"fa fa-" + icon + "\"></i></button>");
-            $btn.onclick = function () { return __awaiter(_this, void 0, void 0, function () {
-                var selection, selectionRange, params, fields, link, valueArgument;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0:
-                            selection = window.getSelection();
-                            selectionRange = selection.rangeCount > 0 ? selection.getRangeAt(0) : null;
-                            if (rangeCommand && !selectionRange)
-                                return [2];
-                            if (!(command == "CreateLink")) return [3, 2];
-                            params = this.getLinkPromptParamsInternal(selection);
-                            return [4, Editor_1.Editor.UI.modal.promptAsync(params)];
-                        case 1:
-                            fields = _a.sent();
-                            link = HtmlLinkParams_1.HtmlLinkParams.getLinkFromParams(fields);
-                            if (link.href) {
-                                document.execCommand(command, false, link.href);
+        });
+    }); };
+    var renderButtonElement = function (_a) {
+        var icon = _a.icon, command = _a.command, range = _a.range, aValueArgument = _a.aValueArgument;
+        var $btn = helpers_4.helpers.createElement("<button type=\"button\" class=\"bre-btn\"><i class=\"fa fa-" + icon + "\"></i></button>");
+        $btn.onclick = function () { return __awaiter(_this, void 0, void 0, function () {
+            var selection, selectionRange, link, valueArgument;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        selection = window.getSelection();
+                        if (selection === null) {
+                            return [2];
+                        }
+                        selectionRange = selection.rangeCount > 0 ? selection.getRangeAt(0) : null;
+                        if (range && !selectionRange) {
+                            return [2];
+                        }
+                        if (!(command === "CreateLink")) return [3, 2];
+                        return [4, promptLinkParamsAsync(selection)];
+                    case 1:
+                        link = _a.sent();
+                        if (link === null) {
+                            return [2];
+                        }
+                        if (link.href) {
+                            document.execCommand(command, false, link.href);
+                            if (selection.anchorNode !== null &&
+                                selection.anchorNode.parentElement !== null) {
                                 if (link.target) {
                                     selection.anchorNode.parentElement.setAttribute("target", link.target);
                                 }
@@ -1255,28 +1311,42 @@ define("tsc/ui/HtmlTools", ["require", "exports", "tsc/common/DOMHelpers", "tsc/
                                     selection.anchorNode.parentElement.setAttribute("title", link.title);
                                 }
                             }
-                            return [3, 3];
-                        case 2:
-                            if (typeof aValueArgument === "string") {
-                                valueArgument = aValueArgument.replace("%%SELECTION%%", selection.toString());
-                            }
-                            try {
-                                document.execCommand(command, false, valueArgument);
-                            }
-                            catch (_b) {
-                                this.wrapSelectionToContainer(selection);
-                                document.execCommand(command, false, valueArgument);
-                            }
-                            _a.label = 3;
-                        case 3: return [2, false];
-                    }
-                });
-            }); };
-            return $btn;
-        };
-        HtmlTools.prototype.wrapSelectionToContainer = function (selection) {
-            var $container = selection.anchorNode.parentElement;
-            var $wrapper = DOMHelpers_7.$dom.el("<div class=\"bre-temp-container\" contenteditable=\"true\">" + $container.innerHTML + "</div>");
+                        }
+                        return [3, 3];
+                    case 2:
+                        valueArgument = void 0;
+                        if (typeof aValueArgument === "string") {
+                            valueArgument = aValueArgument.replace("%%SELECTION%%", selection.toString());
+                        }
+                        try {
+                            document.execCommand(command, false, valueArgument);
+                        }
+                        catch (_b) {
+                            wrapSelectionToContainer(selection);
+                            document.execCommand(command, false, valueArgument);
+                        }
+                        _a.label = 3;
+                    case 3: return [2, false];
+                }
+            });
+        }); };
+        return $btn;
+    };
+    var renderControl = function (buttons) {
+        var $panel = helpers_4.helpers.createElement('<div class="bre-html-tools-panel"></div>');
+        buttons.map(renderButtonElement).forEach(function ($btn) { return $panel.appendChild($btn); });
+        var $controlRoot = helpers_4.helpers.createElement('<div class="bre-html-tools bre-btn-group"></div>');
+        $controlRoot.appendChild($panel);
+        helpers_4.helpers.toggleVisibility($controlRoot, false);
+        return $controlRoot;
+    };
+    var wrapSelectionToContainer = function (selection) {
+        if (selection.anchorNode === null) {
+            return;
+        }
+        var $container = selection.anchorNode.parentElement;
+        if ($container !== null) {
+            var $wrapper = helpers_4.helpers.createElement("<div class=\"bre-temp-container\" contenteditable=\"true\">" + $container.innerHTML + "</div>");
             $container.innerHTML = "";
             $container.removeAttribute(Selectors_3.Selectors.attrContentEditable);
             $container.appendChild($wrapper);
@@ -1284,47 +1354,28 @@ define("tsc/ui/HtmlTools", ["require", "exports", "tsc/common/DOMHelpers", "tsc/
             range.selectNodeContents($wrapper);
             selection.removeAllRanges();
             selection.addRange(range);
-        };
-        HtmlTools.prototype.show = function (rect) {
-            if (rect && rect.width > 1) {
-                var $editor = this.editor.$editor;
-                var offset = DOMHelpers_7.$dom.offset($editor);
-                var editorWidth = $editor.clientWidth;
-                var top = rect.top - offset.top + DOMHelpers_7.$dom.windowScrollTop() + rect.height;
-                var controlWidth = this.$control.clientWidth;
-                var left = rect.left - offset.left + rect.width / 2 - controlWidth / 2;
-                if (left < 0) {
-                    left = 0;
-                }
-                else if (left + controlWidth > editorWidth) {
-                    left = editorWidth - controlWidth;
-                }
-                this.$control.style.top = top + "px";
-                this.$control.style.left = left + "px";
-                DOMHelpers_7.$dom.show(this.$control);
-            }
-            else {
-                DOMHelpers_7.$dom.hide(this.$control);
-            }
-        };
-        HtmlTools.prototype.getLinkPromptParamsInternal = function (selection) {
-            var link;
-            if (selection &&
-                selection.anchorNode &&
-                Common_3.str.equalsInvariant(selection.anchorNode.parentNode.nodeName, "a")) {
-                var $a = selection.anchorNode.parentNode;
-                link = new HtmlLinkParams_1.HtmlLinkParams($a.getAttribute("href"), $a.getAttribute("title"), $a.getAttribute("target"));
-            }
-            else {
-                link = new HtmlLinkParams_1.HtmlLinkParams();
-            }
-            return link.getLinkPromptParams();
-        };
-        return HtmlTools;
-    }());
-    exports.HtmlTools = HtmlTools;
+        }
+    };
+    var control;
+    exports.initHtmlTools = function (_a) {
+        var htmlToolsButtons = _a.htmlToolsButtons;
+        control = renderControl(htmlToolsButtons);
+        document.body.appendChild(control);
+    };
+    exports.toggleHtmlTools = function (rect) {
+        if (rect !== null && rect.width > 1) {
+            var top_1 = rect.top + rect.height;
+            var left = rect.left;
+            control.style.top = top_1 + "px";
+            control.style.left = left + "px";
+            helpers_4.helpers.toggleVisibility(control, true);
+        }
+        else {
+            helpers_4.helpers.toggleVisibility(control, false);
+        }
+    };
 });
-define("tsc/ui/Modal", ["require", "exports", "tsc/common/DOMHelpers", "tsc/Prompt/Prompt"], function (require, exports, DOMHelpers_8, Prompt_4) {
+define("tsc/ui/Modal", ["require", "exports", "tsc/common/DOMHelpers", "src/Prompt/Prompt"], function (require, exports, DOMHelpers_5, Prompt_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Modal = (function () {
@@ -1336,25 +1387,25 @@ define("tsc/ui/Modal", ["require", "exports", "tsc/common/DOMHelpers", "tsc/Prom
             this.$okBtn = $okBtn;
             this.$cancelBtn = $cancelBtn;
             var modal = this;
-            DOMHelpers_8.$dom.on($closeBtn, "click", function () {
+            DOMHelpers_5.$dom.on($closeBtn, "click", function () {
                 modal.hideModal();
             });
         }
         Modal.prototype.hideModal = function () {
             this.restoreSelection();
-            DOMHelpers_8.$dom.hide(this.$control);
+            DOMHelpers_5.$dom.hide(this.$control);
         };
         Modal.prototype.showModal = function ($html, showBtns) {
             if (showBtns === void 0) { showBtns = true; }
             this.saveSelection();
-            DOMHelpers_8.$dom.toggle(this.$btns, showBtns);
+            DOMHelpers_5.$dom.toggle(this.$btns, showBtns);
             if ($html) {
                 this.$form.appendChild($html);
-                if (DOMHelpers_8.$dom.isHidden($html)) {
-                    DOMHelpers_8.$dom.show($html);
+                if (DOMHelpers_5.$dom.isHidden($html)) {
+                    DOMHelpers_5.$dom.show($html);
                 }
             }
-            DOMHelpers_8.$dom.show(this.$control);
+            DOMHelpers_5.$dom.show(this.$control);
         };
         Modal.prototype.promptAsync = function (fields) {
             var _this = this;
@@ -1367,15 +1418,15 @@ define("tsc/ui/Modal", ["require", "exports", "tsc/common/DOMHelpers", "tsc/Prom
                     }
                 }
                 fields.forEach(function (field) {
-                    DOMHelpers_8.$dom.before(_this.$btns, field.$control);
+                    DOMHelpers_5.$dom.before(_this.$btns, field.$control);
                 });
-                DOMHelpers_8.$dom.on(modal.$okBtn, "click", function () {
+                DOMHelpers_5.$dom.on(modal.$okBtn, "click", function () {
                     fields.forEach(function (field) { return field.parseValue(); });
                     modal.hideModal();
-                    var list = new Prompt_4.PromptParameterList(fields);
+                    var list = new Prompt_1.PromptParameterList(fields);
                     resolve(list);
                 });
-                DOMHelpers_8.$dom.on(modal.$cancelBtn, "click", function () {
+                DOMHelpers_5.$dom.on(modal.$cancelBtn, "click", function () {
                     modal.hideModal();
                     resolve(null);
                 });
@@ -1401,28 +1452,27 @@ define("tsc/ui/Modal", ["require", "exports", "tsc/common/DOMHelpers", "tsc/Prom
     }());
     exports.Modal = Modal;
 });
-define("tsc/ui/UI", ["require", "exports", "tsc/common/DOMHelpers", "tsc/EditorStrings", "tsc/ui/HtmlTools", "tsc/ui/Modal", "tsc/ui/Selectors", "tsc/template"], function (require, exports, DOMHelpers_9, EditorStrings_4, HtmlTools_1, Modal_1, Selectors_4, template_2) {
+define("tsc/ui/UI", ["require", "exports", "tsc/common/DOMHelpers", "tsc/template", "tsc/UI/htmlTools", "tsc/ui/Selectors"], function (require, exports, DOMHelpers_6, template_2, htmlTools_1, Selectors_4) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var UI = (function () {
         function UI(editor) {
             this.editor = editor;
             this.editor = editor;
+            htmlTools_1.initHtmlTools(editor.options);
             this.setTools();
-            this.setModal();
-            this.htmlTools = new HtmlTools_1.HtmlTools(this.editor);
         }
         UI.initBtnDeck = function ($btnsDeck) {
-            var $btns = DOMHelpers_9.$dom.select($btnsDeck, ".bre-btn");
+            var $btns = DOMHelpers_6.$dom.select($btnsDeck, ".bre-btn");
             var $firstBtn = $btns[0];
-            DOMHelpers_9.$dom.on($firstBtn, "click", function (ev) {
+            DOMHelpers_6.$dom.on($firstBtn, "click", function (ev) {
                 UI.toggleBtnDeck($btnsDeck);
                 ev.stopPropagation();
                 return false;
             });
         };
         UI.toggleBtnDeck = function ($btnsDeck, isOn) {
-            var $btns = DOMHelpers_9.$dom.select($btnsDeck, ".bre-btn");
+            var $btns = DOMHelpers_6.$dom.select($btnsDeck, ".bre-btn");
             if (!$btns || $btns.length === 0) {
                 return;
             }
@@ -1453,11 +1503,11 @@ define("tsc/ui/UI", ["require", "exports", "tsc/common/DOMHelpers", "tsc/EditorS
                 $btnsDeck.style.height = size + "px";
                 $btnsDeck.style.width = (size + gap) * $btns.length - gap + "px";
             }
-            DOMHelpers_9.$dom.toggleClass($firstBtn, "bre-btn-active", !isOn);
+            DOMHelpers_6.$dom.toggleClass($firstBtn, "bre-btn-active", !isOn);
             $btnsDeck.dataset.isOn = String(!isOn);
         };
         UI.prototype.toggleToolsLoader = function (toggle) {
-            DOMHelpers_9.$dom.toggle(this.$toolsLoader, toggle);
+            DOMHelpers_6.$dom.toggle(this.$toolsLoader, toggle);
         };
         UI.prototype.setTemplates = function (templateGroups) {
             var _this = this;
@@ -1466,9 +1516,9 @@ define("tsc/ui/UI", ["require", "exports", "tsc/common/DOMHelpers", "tsc/EditorS
                 if (group.templates.length === 0) {
                     return;
                 }
-                var $header = DOMHelpers_9.$dom.el("<div class='" + Selectors_4.Selectors.classTemplateGroup + "'>" + group.name + "</div>");
+                var $header = DOMHelpers_6.$dom.el("<div class='" + Selectors_4.Selectors.classTemplateGroup + "'>" + group.name + "</div>");
                 _this.$toolsTemplates.appendChild($header);
-                var $group = DOMHelpers_9.$dom.el("<div></div>");
+                var $group = DOMHelpers_6.$dom.el("<div></div>");
                 group.templates.forEach(function (template) {
                     var $preview = template_2.getTemplatePreview(template);
                     $preview.setAttribute("title", template.name);
@@ -1479,8 +1529,8 @@ define("tsc/ui/UI", ["require", "exports", "tsc/common/DOMHelpers", "tsc/EditorS
                     };
                     $group.appendChild($preview);
                 });
-                DOMHelpers_9.$dom.on($header, "click", function () {
-                    DOMHelpers_9.$dom.toggle($group);
+                DOMHelpers_6.$dom.on($header, "click", function () {
+                    DOMHelpers_6.$dom.toggle($group);
                 });
                 _this.$toolsTemplates.appendChild($group);
             });
@@ -1500,47 +1550,29 @@ define("tsc/ui/UI", ["require", "exports", "tsc/common/DOMHelpers", "tsc/EditorS
         });
         UI.prototype.setTools = function () {
             var _this = this;
-            this.$tools = DOMHelpers_9.$dom.el('<div class="bre bre-tools" data-bricky-tools></div>');
-            this.$toolsTemplates = DOMHelpers_9.$dom.el('<div class="bre-tools-templates"></div>');
-            this.$toolsLoader = DOMHelpers_9.$dom.el('<div class="bre-tools-loader"><b>Loading...</b></div>');
-            this.$toolsHideBtn = DOMHelpers_9.$dom.el('<button type="button" class="bre-tools-toggle"><div>►</div></button>');
+            this.$tools = DOMHelpers_6.$dom.el('<div class="bre bre-tools" data-bricky-tools></div>');
+            this.$toolsTemplates = DOMHelpers_6.$dom.el('<div class="bre-tools-templates"></div>');
+            this.$toolsLoader = DOMHelpers_6.$dom.el('<div class="bre-tools-loader"><b>Loading...</b></div>');
+            this.$toolsHideBtn = DOMHelpers_6.$dom.el('<button type="button" class="bre-tools-toggle"><div>►</div></button>');
             this.$tools.appendChild(this.$toolsHideBtn);
             this.$tools.appendChild(this.$toolsLoader);
             this.$tools.appendChild(this.$toolsTemplates);
             this.$toolsHideBtn.onclick = function (ev) { return _this.toggleTools(); };
             this.editor.$editor.appendChild(this.$tools);
             if (this.isCompactTools) {
-                DOMHelpers_9.$dom.addClass(this.$tools, "bre-tools-templates-compact");
+                DOMHelpers_6.$dom.addClass(this.$tools, "bre-tools-templates-compact");
                 this.toggleTools();
             }
         };
         UI.prototype.toggleTools = function () {
-            DOMHelpers_9.$dom.toggleClass(this.$tools, "bre-tools-collapsed", !DOMHelpers_9.$dom.hasClass(this.$toolsHideBtn, "bre-tools-toggle-collapsed"));
-            DOMHelpers_9.$dom.toggleClass(this.$toolsHideBtn, "bre-tools-toggle-collapsed");
-        };
-        UI.prototype.setModal = function () {
-            var $modal = DOMHelpers_9.$dom.el('<div class="bre bre-modal"><div class="bre-modal-placeholder"></div></div>');
-            var $modalCloseBtn = DOMHelpers_9.$dom.el("<div class=\"bre-modal-close\"><a href=\"#\">" + EditorStrings_4.EditorStrings.buttonClose + " \u2716</a></div>");
-            var $modalContent = DOMHelpers_9.$dom.el('<div class="bre-modal-content"></div>');
-            var $modalForm = DOMHelpers_9.$dom.el("<form></form>");
-            var $modalBtns = DOMHelpers_9.$dom.el('<div class="bre-btns"></div>');
-            var $modalOk = DOMHelpers_9.$dom.el("<button type=\"button\" class=\"bre-btn bre-btn-primary\">" + EditorStrings_4.EditorStrings.buttonOk + "</button>");
-            var $modalCancel = DOMHelpers_9.$dom.el("<button type=\"button\" class=\"bre-btn\">" + EditorStrings_4.EditorStrings.buttonCancel + "</button>");
-            $modalBtns.appendChild($modalOk);
-            $modalBtns.appendChild($modalCancel);
-            $modalForm.appendChild($modalBtns);
-            $modalContent.appendChild($modalForm);
-            var $placeholder = DOMHelpers_9.$dom.first($modal, ".bre-modal-placeholder");
-            $placeholder.appendChild($modalCloseBtn);
-            $placeholder.appendChild($modalContent);
-            this.modal = new Modal_1.Modal($modal, $modalCloseBtn, $modalForm, $modalBtns, $modalOk, $modalCancel);
-            this.editor.$editor.appendChild($modal);
+            DOMHelpers_6.$dom.toggleClass(this.$tools, "bre-tools-collapsed", !DOMHelpers_6.$dom.hasClass(this.$toolsHideBtn, "bre-tools-toggle-collapsed"));
+            DOMHelpers_6.$dom.toggleClass(this.$toolsHideBtn, "bre-tools-toggle-collapsed");
         };
         return UI;
     }());
     exports.UI = UI;
 });
-define("tsc/block/BlockUI", ["require", "exports", "tsc/common/DOMHelpers", "tsc/ui/UI"], function (require, exports, DOMHelpers_10, UI_2) {
+define("tsc/block/BlockUI", ["require", "exports", "tsc/common/DOMHelpers", "tsc/ui/UI"], function (require, exports, DOMHelpers_7, UI_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var BlockUI = (function () {
@@ -1559,27 +1591,27 @@ define("tsc/block/BlockUI", ["require", "exports", "tsc/common/DOMHelpers", "tsc
         };
         BlockUI.prototype.buildEditorUI = function (actions) {
             var _this = this;
-            this.$tools = DOMHelpers_10.$dom.el('<div class="bre-block-tools bre-btn-deck"></div>');
+            this.$tools = DOMHelpers_7.$dom.el('<div class="bre-block-tools bre-btn-deck"></div>');
             actions.forEach(function (action) {
                 var $btn = _this.buildButton(action);
                 _this.$tools.appendChild($btn);
             });
             UI_2.UI.initBtnDeck(this.$tools);
-            this.$editor = DOMHelpers_10.$dom.el('<div class="bre-block-wrapper"></div>');
+            this.$editor = DOMHelpers_7.$dom.el('<div class="bre-block-wrapper"></div>');
             this.$editor.appendChild(this.$tools);
             this.$editor.appendChild(this.$block);
-            DOMHelpers_10.$dom.on(this.$editor, "mouseover", function () {
+            DOMHelpers_7.$dom.on(this.$editor, "mouseover", function () {
                 _this.$editor.classList.add("bre-active");
             });
-            DOMHelpers_10.$dom.on(this.$editor, "mouseout", function () {
+            DOMHelpers_7.$dom.on(this.$editor, "mouseout", function () {
                 _this.$editor.classList.remove("bre-active");
             });
-            DOMHelpers_10.$dom.on(this.$editor, "click", function () {
+            DOMHelpers_7.$dom.on(this.$editor, "click", function () {
                 _this.onSelect();
             });
         };
         BlockUI.prototype.buildButton = function (action) {
-            var $el = DOMHelpers_10.$dom.el("<button type=\"button\" class=\"bre-btn\"><i class=\"fa fa-" + action.icon + "\"></i></button>");
+            var $el = DOMHelpers_7.$dom.el("<button type=\"button\" class=\"bre-btn\"><i class=\"fa fa-" + action.icon + "\"></i></button>");
             if (action.action) {
                 $el.onclick = function (ev) {
                     action.action();
@@ -1593,7 +1625,7 @@ define("tsc/block/BlockUI", ["require", "exports", "tsc/common/DOMHelpers", "tsc
     }());
     exports.BlockUI = BlockUI;
 });
-define("tsc/block/Block", ["require", "exports", "tsc/block/BlockUI", "tsc/block/BlockUIAction", "tsc/common/Common", "tsc/common/DOMHelpers", "tsc/Fields/Fields", "tsc/ui/Selectors"], function (require, exports, BlockUI_1, BlockUIAction_1, Common_4, DOMHelpers_11, Fields_2, Selectors_5) {
+define("tsc/block/Block", ["require", "exports", "tsc/block/BlockUI", "tsc/block/BlockUIAction", "tsc/common/Common", "tsc/common/DOMHelpers", "tsc/Fields/Fields", "tsc/ui/Selectors"], function (require, exports, BlockUI_1, BlockUIAction_1, Common_4, DOMHelpers_8, Fields_2, Selectors_5) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Block = (function () {
@@ -1603,7 +1635,7 @@ define("tsc/block/Block", ["require", "exports", "tsc/block/BlockUI", "tsc/block
             this.name = name;
             this.html = html;
             this.events = events;
-            var $block = DOMHelpers_11.$dom.el(html);
+            var $block = DOMHelpers_8.$dom.el(html);
             this.bindFields($block, data);
             var actions = this.getActions();
             this.ui = new BlockUI_1.BlockUI($block, preview, actions, function () { return _this.select(); });
@@ -1647,7 +1679,7 @@ define("tsc/block/Block", ["require", "exports", "tsc/block/BlockUI", "tsc/block
             this.events.onDeselect(this);
         };
         Block.prototype.scrollTo = function () {
-            var top = DOMHelpers_11.$dom.offset(this.ui.$editor).top - 100;
+            var top = DOMHelpers_8.$dom.offset(this.ui.$editor).top - 100;
             top = top > 0 ? top : 0;
         };
         Block.prototype.getData = function (ignoreHtml) {
@@ -1665,17 +1697,17 @@ define("tsc/block/Block", ["require", "exports", "tsc/block/BlockUI", "tsc/block
             return data;
         };
         Block.prototype.getHtml = function (trim) {
-            var $html = DOMHelpers_11.$dom.el(this.html);
+            var $html = DOMHelpers_8.$dom.el(this.html);
             var fieldsHtml = {};
             this.fields.forEach(function (field) {
                 var name = field.name || field.data.name;
                 fieldsHtml[name] = field.getEl();
             });
-            DOMHelpers_11.$dom.select($html, Selectors_5.Selectors.selectorField, true).forEach(function ($elem) {
-                var fieldData = DOMHelpers_11.$dom.data($elem, "breField");
+            DOMHelpers_8.$dom.select($html, Selectors_5.Selectors.selectorField, true).forEach(function ($elem) {
+                var fieldData = DOMHelpers_8.$dom.data($elem, "breField");
                 var name = fieldData.name;
                 var $field = fieldsHtml[name];
-                DOMHelpers_11.$dom.replaceWith($elem, $field);
+                DOMHelpers_8.$dom.replaceWith($elem, $field);
             });
             var html = $html.outerHTML;
             if (!html) {
@@ -1685,7 +1717,7 @@ define("tsc/block/Block", ["require", "exports", "tsc/block/BlockUI", "tsc/block
         };
         Block.prototype.bindFields = function ($block, data) {
             var block = this;
-            var $fields = DOMHelpers_11.$dom.select($block, Selectors_5.Selectors.selectorField, true);
+            var $fields = DOMHelpers_8.$dom.select($block, Selectors_5.Selectors.selectorField, true);
             $fields.forEach(function ($elem) {
                 var onUpdate = function (property, oldValue, newValue) {
                     if (block.events.onUpdate !== undefined) {
@@ -1712,7 +1744,7 @@ define("tsc/block/Block", ["require", "exports", "tsc/block/BlockUI", "tsc/block
     }());
     exports.Block = Block;
 });
-define("tsc/fields/BaseField", ["require", "exports", "tsc/common/Common", "tsc/common/DOMHelpers", "tsc/Fields/Fields", "tsc/ui/Selectors"], function (require, exports, Common_5, DOMHelpers_12, Fields_3, Selectors_6) {
+define("tsc/fields/BaseField", ["require", "exports", "tsc/common/Common", "tsc/common/DOMHelpers", "tsc/Fields/Fields", "tsc/ui/Selectors"], function (require, exports, Common_5, DOMHelpers_9, Fields_3, Selectors_6) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var BaseField = (function () {
@@ -1744,7 +1776,7 @@ define("tsc/fields/BaseField", ["require", "exports", "tsc/common/Common", "tsc/
             this.commonFieldsRegistered = true;
         };
         BaseField.createField = function ($field, data, onSelect, onUpdate, onUpload) {
-            var fieldData = DOMHelpers_12.$dom.data($field, "breField");
+            var fieldData = DOMHelpers_9.$dom.data($field, "breField");
             if (!fieldData || !fieldData.name) {
                 throw new Error("There is no data or data doesn't contains 'name' in field " + $field.innerHTML);
             }
@@ -1817,7 +1849,7 @@ define("tsc/fields/BaseField", ["require", "exports", "tsc/common/Common", "tsc/
     }());
     exports.BaseField = BaseField;
 });
-define("tsc/fields/ContainerField", ["require", "exports", "tsc/BlocksContainer", "tsc/common/DOMHelpers", "tsc/fields/BaseField", "tsc/ui/Selectors"], function (require, exports, BlocksContainer_2, DOMHelpers_13, BaseField_1, Selectors_7) {
+define("tsc/fields/ContainerField", ["require", "exports", "tsc/BlocksContainer", "tsc/common/DOMHelpers", "tsc/fields/BaseField", "tsc/ui/Selectors"], function (require, exports, BlocksContainer_2, DOMHelpers_10, BaseField_1, Selectors_7) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var ContainerField = (function (_super) {
@@ -1841,8 +1873,8 @@ define("tsc/fields/ContainerField", ["require", "exports", "tsc/BlocksContainer"
             }, function (block) {
                 field.updateBlocks();
             }, field.onUpload, true);
-            DOMHelpers_13.$dom.addClass($field, Selectors_7.Selectors.selectorFieldContainer);
-            DOMHelpers_13.$dom.on($field, "click", function (ev) {
+            DOMHelpers_10.$dom.addClass($field, Selectors_7.Selectors.selectorFieldContainer);
+            DOMHelpers_10.$dom.on($field, "click", function (ev) {
                 field.select();
                 ev.stopPropagation();
                 return false;
@@ -1862,7 +1894,7 @@ define("tsc/fields/ContainerField", ["require", "exports", "tsc/BlocksContainer"
         ContainerField.prototype.getEl = function () {
             var container = this.container;
             var html = BlocksContainer_2.getContainerHtml(container);
-            return DOMHelpers_13.$dom.el(html);
+            return DOMHelpers_10.$dom.el(html);
         };
         return ContainerField;
     }(BaseField_1.BaseField));
@@ -1907,134 +1939,7 @@ define("tsc/embed", ["require", "exports", "tsc/httpTransport"], function (requi
         }); });
     };
 });
-define("tsc/locales", ["require", "exports"], function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.locales = {
-        errorBlocksFileNotFound: function (url) {
-            return "Blocks file not found. Requested file: " + url + ".";
-        },
-        errorTemplatesFileNotFound: function (url) {
-            return "Templates file not found. Requested file: " + url + ".";
-        },
-        errorBlockTemplateNotFound: function (templateName) {
-            return "Template \"" + templateName + "\" not found.";
-        },
-        errorTemplateParsing: function (name) {
-            return "Template parsing error: " + name + ".";
-        },
-        embedFieldLinkTitle: "Link to embed media",
-        embedFieldLinkPlaceholder: "Link to instagram, youtube and etc.",
-        prompt: {
-            image: {
-                link: {
-                    title: "Image link",
-                    placeholder: "http://url-to-image.png",
-                },
-                alt: {
-                    title: "Image alt",
-                    placeholder: "Image 'alt' attribute value",
-                },
-                upload: {
-                    title: "or Upload a file",
-                    placeholder: "select file",
-                    button: "Select file",
-                },
-                url: {
-                    subtitle: "Link to open on image click",
-                },
-            },
-            embed: {
-                url: {
-                    title: "URL to media",
-                    placeholder: "Paste link to youtube, instagram, etc.",
-                },
-            },
-        },
-        htmlEditorLinkUrlTitle: "Url",
-        htmlEditorLinkUrlPlaceholder: "http://put-your-link.here",
-        htmlEditorLinkTitleTitle: "Title",
-        htmlEditorLinkTitlePlaceholder: "Title attribute for link",
-        htmlEditorLinkTargetTitle: "Target",
-        htmlEditorLinkTargetBlank: "Blank",
-        htmlEditorLinkTargetSelf: "Self",
-        htmlEditorLinkTargetParent: "Parent",
-        htmlEditorLinkTargetTop: "Top",
-        buttonClose: "close",
-        buttonOk: "Ok",
-        buttonCancel: "Cancel",
-        defaultTemplatesGroupName: "Other templates",
-    };
-});
-define("tsc/prompt", ["require", "exports", "tsc/helpers"], function (require, exports, helpers_3) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var textFieldEditor = function (_a) {
-        var key = _a.key, p = _a.p, data = _a.data;
-        var html = "<input type='text' name='" + key + "' placeholder='" + p.placeholder + "' value='" + (p.value || "") + "' />";
-        var input = helpers_3.helpers.createElement(html);
-        input.onchange = function () {
-            data[key] = input.value;
-        };
-        return input;
-    };
-    var fileFieldEditor = function (_a) {
-        var key = _a.key, p = _a.p, data = _a.data;
-        var file = data[key];
-        var filePreview = helpers_3.helpers.createElement("<img src=\"" + p.value + "\"/>");
-        var fileInput = helpers_3.helpers.createElement("<input type=\"file\" id=\"bre-modal-modal-" + key + "\" class=\"bre-input\" placeholder=\"" + p.placeholder + "\">");
-        var fileName = helpers_3.helpers.createElement("<span class='bre-image-input-filename'></span>");
-        var updatePreview = function () {
-            if (file === undefined || file === null) {
-                fileName.innerText = "";
-                filePreview.src = "//:0";
-            }
-            else {
-                fileName.innerText = file.name;
-                var reader = new FileReader();
-                reader.onload = function (ev) {
-                    if (ev.target !== null && ev.target.result !== null) {
-                        filePreview.src = ev.target.result.toString();
-                    }
-                };
-                reader.readAsDataURL(file);
-            }
-        };
-        fileInput.onchange = function () {
-            file = fileInput.files && fileInput.files[0];
-            updatePreview();
-            data[key] = file;
-        };
-        updatePreview();
-        var editor = helpers_3.helpers.createElement("<div class='bre-image-input'>\n    <label for=\"bre-modal-modal-" + key + "\">\n      " + p.placeholder + "\n    </label>\n  </div>");
-        editor.append(filePreview, fileInput, fileName);
-        return editor;
-    };
-    var parameterEditors = {
-        text: textFieldEditor,
-        file: fileFieldEditor,
-    };
-    exports.promptAsync = function (params) {
-        return new Promise(function (resolve) {
-            var result = {};
-            var editors = Object.keys(params).map(function (key) {
-                var p = params[key];
-                var editor = parameterEditors[p.type || "text"]({
-                    key: key,
-                    p: p,
-                    data: result,
-                });
-                return editor;
-            });
-            helpers_3.helpers.showModal({
-                content: editors,
-                onOk: function () { return resolve(result); },
-                onCancel: function () { return resolve(null); },
-            });
-        });
-    };
-});
-define("tsc/fields/EmbedField", ["require", "exports", "tsc/common/Common", "tsc/common/DOMHelpers", "tsc/embed", "tsc/fields/BaseField", "tsc/helpers", "tsc/httpTransport", "tsc/locales", "tsc/prompt"], function (require, exports, Common_6, DOMHelpers_14, embed_1, BaseField_2, helpers_4, httpTransport_4, locales_1, prompt_1) {
+define("tsc/fields/EmbedField", ["require", "exports", "tsc/common/Common", "tsc/common/DOMHelpers", "tsc/embed", "tsc/fields/BaseField", "tsc/helpers", "tsc/httpTransport", "tsc/locales", "tsc/prompt"], function (require, exports, Common_6, DOMHelpers_11, embed_1, BaseField_2, helpers_5, httpTransport_4, locales_2, prompt_2) {
     "use strict";
     var _this = this;
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -2043,8 +1948,8 @@ define("tsc/fields/EmbedField", ["require", "exports", "tsc/common/Common", "tsc
         return ({
             url: {
                 value: url || "http://instagr.am/p/BO9VX2Vj4fF/",
-                title: locales_1.locales.prompt.embed.url.title,
-                placeholder: locales_1.locales.prompt.embed.url.placeholder,
+                title: locales_2.locales.prompt.embed.url.title,
+                placeholder: locales_2.locales.prompt.embed.url.placeholder,
             },
         });
     };
@@ -2054,7 +1959,7 @@ define("tsc/fields/EmbedField", ["require", "exports", "tsc/common/Common", "tsc
             switch (_a.label) {
                 case 0:
                     params = getPromptParams(field.data);
-                    return [4, prompt_1.promptAsync(params)];
+                    return [4, prompt_2.promptAsync(params)];
                 case 1:
                     updated = _a.sent();
                     if (!(updated !== null)) return [3, 3];
@@ -2070,8 +1975,8 @@ define("tsc/fields/EmbedField", ["require", "exports", "tsc/common/Common", "tsc
         });
     }); };
     var renderEmbedFieldSettingsUI = function ($field) {
-        var $el = helpers_4.helpers.createElement("<div style=\"\n      position: absolute;\n      width: 100%; \n      height: 100px;\n      text-align: center;\n      font-weight: bold;\n      vertical-align: middle;\n      background: #333;\n      opacity: 0.2;\">\n      Change embed element link\n    </div>");
-        DOMHelpers_14.$dom.before($field, $el);
+        var $el = helpers_5.helpers.createElement("<div style=\"\n      position: absolute;\n      width: 100%; \n      height: 100px;\n      text-align: center;\n      font-weight: bold;\n      vertical-align: middle;\n      background: #333;\n      opacity: 0.2;\">\n      Change embed element link\n    </div>");
+        DOMHelpers_11.$dom.before($field, $el);
         return $el;
     };
     var EmbedField = (function (_super) {
@@ -2086,7 +1991,7 @@ define("tsc/fields/EmbedField", ["require", "exports", "tsc/common/Common", "tsc
             var _this = this;
             var field = this;
             var $field = this.$field;
-            DOMHelpers_14.$dom.on($field, "click", function () { return __awaiter(_this, void 0, void 0, function () {
+            DOMHelpers_11.$dom.on($field, "click", function () { return __awaiter(_this, void 0, void 0, function () {
                 return __generator(this, function (_a) {
                     promptEmbedMediaUrl(field);
                     return [2];
@@ -2108,8 +2013,8 @@ define("tsc/fields/EmbedField", ["require", "exports", "tsc/common/Common", "tsc
                         case 1:
                             json = _a.sent();
                             field.setEmbed(json, fireUpdate);
-                            $embed = DOMHelpers_14.$dom.el(json.html);
-                            $script = DOMHelpers_14.$dom.first($embed, "script");
+                            $embed = DOMHelpers_11.$dom.el(json.html);
+                            $script = DOMHelpers_11.$dom.first($embed, "script");
                             if (!$script) return [3, 3];
                             $script.remove();
                             scriptSrc = $script.src;
@@ -2142,44 +2047,7 @@ define("tsc/fields/EmbedField", ["require", "exports", "tsc/common/Common", "tsc
     }(BaseField_2.BaseField));
     exports.EmbedField = EmbedField;
 });
-define("tsc/ui/SelectionUtils", ["require", "exports", "tsc/common/DOMHelpers"], function (require, exports, DOMHelpers_15) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var SelectionUtils = (function () {
-        function SelectionUtils() {
-        }
-        SelectionUtils.bindTextSelection = function ($el, handler) {
-            var _this = this;
-            if (!DOMHelpers_15.$dom.matches($el, "[contenteditable]")) {
-                return;
-            }
-            DOMHelpers_15.$dom.on($el, "mouseup", function () {
-                setTimeout(function () {
-                    var rect = _this.getSelectionRect();
-                    handler(rect);
-                }, 0);
-            });
-            DOMHelpers_15.$dom.on($el, "keyup", function (ev) {
-                var rect = _this.getSelectionRect();
-                handler(rect);
-            });
-        };
-        SelectionUtils.getSelectionRect = function () {
-            var selection = window.getSelection();
-            var range = selection.getRangeAt(0);
-            if (range) {
-                var rect = range.getBoundingClientRect();
-                if (rect) {
-                    return rect;
-                }
-            }
-            return null;
-        };
-        return SelectionUtils;
-    }());
-    exports.SelectionUtils = SelectionUtils;
-});
-define("tsc/fields/HtmlField", ["require", "exports", "tsc/common/DOMHelpers", "tsc/Editor", "tsc/fields/BaseField", "tsc/ui/SelectionUtils", "tsc/ui/Selectors"], function (require, exports, DOMHelpers_16, Editor_2, BaseField_3, SelectionUtils_1, Selectors_8) {
+define("tsc/fields/HtmlField", ["require", "exports", "tsc/common/DOMHelpers", "tsc/fields/BaseField", "tsc/UI/htmlTools", "tsc/ui/SelectionUtils", "tsc/ui/Selectors"], function (require, exports, DOMHelpers_12, BaseField_3, htmlTools_2, SelectionUtils_2, Selectors_8) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var HtmlField = (function (_super) {
@@ -2191,25 +2059,25 @@ define("tsc/fields/HtmlField", ["require", "exports", "tsc/common/DOMHelpers", "
             var _this = this;
             var field = this;
             var $field = this.$field;
-            if (!DOMHelpers_16.$dom.matches($field, Selectors_8.Selectors.selectorContentEditable)) {
+            if (!DOMHelpers_12.$dom.matches($field, Selectors_8.Selectors.selectorContentEditable)) {
                 $field.setAttribute(Selectors_8.Selectors.attrContentEditable, "true");
             }
             var html = this.data.html || this.$field.innerHTML;
             this.setHtml(html, false);
             $field.innerHTML = this.data.html;
-            SelectionUtils_1.SelectionUtils.bindTextSelection($field, function (rect) {
-                Editor_2.Editor.UI.htmlTools.show(rect);
+            SelectionUtils_2.SelectionUtils.bindTextSelection($field, function (rect) {
+                htmlTools_2.toggleHtmlTools(rect);
             });
-            DOMHelpers_16.$dom.ons($field, "blur keyup paste input", function (ev) {
+            DOMHelpers_12.$dom.ons($field, "blur keyup paste input", function () {
                 _this.setHtml($field.innerHTML);
             });
-            DOMHelpers_16.$dom.on($field, "paste", function (e) {
+            DOMHelpers_12.$dom.on($field, "paste", function (e) {
                 e.preventDefault();
                 var ev = e.originalEvent;
                 var text = ev.clipboardData.getData("text/plain");
                 document.execCommand("insertHTML", false, text);
             });
-            DOMHelpers_16.$dom.on($field, "click", function (ev) {
+            DOMHelpers_12.$dom.on($field, "click", function (ev) {
                 field.select();
                 ev.stopPropagation();
                 return false;
@@ -2232,7 +2100,7 @@ define("tsc/fields/HtmlField", ["require", "exports", "tsc/common/DOMHelpers", "
     }(BaseField_3.BaseField));
     exports.HtmlField = HtmlField;
 });
-define("tsc/fields/ImageField", ["require", "exports", "tsc/common/DOMHelpers", "tsc/fields/BaseField", "tsc/locales", "tsc/prompt"], function (require, exports, DOMHelpers_17, BaseField_4, locales_2, prompt_2) {
+define("tsc/fields/ImageField", ["require", "exports", "tsc/common/DOMHelpers", "tsc/fields/BaseField", "tsc/locales", "tsc/prompt"], function (require, exports, DOMHelpers_13, BaseField_4, locales_3, prompt_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var getPromptParams = function (_a) {
@@ -2240,19 +2108,19 @@ define("tsc/fields/ImageField", ["require", "exports", "tsc/common/DOMHelpers", 
         return ({
             src: {
                 value: src,
-                title: locales_2.locales.prompt.image.link.title,
-                placeholder: locales_2.locales.prompt.image.link.placeholder,
+                title: locales_3.locales.prompt.image.link.title,
+                placeholder: locales_3.locales.prompt.image.link.placeholder,
             },
             file: {
                 type: "file",
                 value: file,
-                title: locales_2.locales.prompt.image.upload.title,
-                placeholder: locales_2.locales.prompt.image.upload.placeholder,
+                title: locales_3.locales.prompt.image.upload.title,
+                placeholder: locales_3.locales.prompt.image.upload.placeholder,
             },
             alt: {
                 value: alt,
-                title: locales_2.locales.prompt.image.alt.title,
-                placeholder: locales_2.locales.prompt.image.alt.placeholder,
+                title: locales_3.locales.prompt.image.alt.title,
+                placeholder: locales_3.locales.prompt.image.alt.placeholder,
             },
         });
     };
@@ -2279,7 +2147,7 @@ define("tsc/fields/ImageField", ["require", "exports", "tsc/common/DOMHelpers", 
                     switch (_a.label) {
                         case 0:
                             params = getPromptParams(this.data);
-                            return [4, prompt_2.promptAsync(params)];
+                            return [4, prompt_3.promptAsync(params)];
                         case 1:
                             updated = _a.sent();
                             if (updated !== null) {
@@ -2337,19 +2205,19 @@ define("tsc/fields/ImageField", ["require", "exports", "tsc/common/DOMHelpers", 
         ImageField.prototype.setLink = function (url) {
             if (url && url.href) {
                 if (!this.$link) {
-                    this.$link = DOMHelpers_17.$dom.el("<a href='" + url.href + "' title='" + url.title + "' target='" + url.target + "'></a>");
-                    DOMHelpers_17.$dom.on(this.$link, "click", function (ev) {
+                    this.$link = DOMHelpers_13.$dom.el("<a href='" + url.href + "' title='" + url.title + "' target='" + url.target + "'></a>");
+                    DOMHelpers_13.$dom.on(this.$link, "click", function (ev) {
                         ev.stopPropagation();
                         return false;
                     });
-                    DOMHelpers_17.$dom.wrap(this.$field, this.$link);
+                    DOMHelpers_13.$dom.wrap(this.$field, this.$link);
                 }
                 else {
-                    this.$link.href = url.href;
+                    this.$link.href = url.href.value;
                 }
             }
             else if (this.$link) {
-                DOMHelpers_17.$dom.unwrap(this.$field);
+                DOMHelpers_13.$dom.unwrap(this.$field);
                 this.$link = undefined;
                 delete this.$link;
             }
@@ -2359,7 +2227,7 @@ define("tsc/fields/ImageField", ["require", "exports", "tsc/common/DOMHelpers", 
             var $el = _super.prototype.getEl.call(this);
             var link = this.data.link;
             if (link && link.href) {
-                var $link = DOMHelpers_17.$dom.el("<a href='" + link.href + "' title='" + link.title + "' target='" + link.target + "'></a>");
+                var $link = DOMHelpers_13.$dom.el("<a href='" + link.href + "' title='" + link.title + "' target='" + link.target + "'></a>");
                 $link.appendChild($el);
                 return $link;
             }

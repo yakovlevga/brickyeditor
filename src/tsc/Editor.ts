@@ -77,7 +77,7 @@ export class Editor {
       return;
     }
 
-    $dom.on($form, "submit", () => {
+    $form.addEventListener("submit", () => {
       ($input as HTMLInputElement).value = JSON.stringify(editor.getData());
       return true;
     });

@@ -145,7 +145,7 @@ export class ImageField extends BaseField<ImageFieldData> {
         this.$link = $dom.el(
           `<a href='${url.href}' title='${url.title}' target='${url.target}'></a>`
         ) as HTMLLinkElement;
-        $dom.on(this.$link, "click", ev => {
+        this.$link.addEventListener("click", ev => {
           ev.stopPropagation();
           return false;
         });

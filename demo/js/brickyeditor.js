@@ -502,6 +502,7 @@ var BrickyEditor = (function (exports) {
         document.body.appendChild(element);
     };
     var helpers = { createElement: createElement, showModal: showModal, toggleVisibility: toggleVisibility };
+    //# sourceMappingURL=helpers.js.map
 
     var getRequest = function (url) {
         return new Promise(function (resolve, reject) {

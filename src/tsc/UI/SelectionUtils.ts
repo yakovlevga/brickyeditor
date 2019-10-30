@@ -34,14 +34,14 @@ export class SelectionUtils {
       return;
     }
 
-    $dom.on($el, "mouseup", () => {
+    $el.addEventListener("mouseup", () => {
       setTimeout(() => {
         const rect = this.getSelectionRect();
         handler(rect);
       }, 0);
     });
 
-    $dom.on($el, "keyup", () => {
+    $el.addEventListener("keyup", () => {
       const rect = this.getSelectionRect();
       handler(rect);
     });

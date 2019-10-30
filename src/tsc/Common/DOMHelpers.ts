@@ -8,28 +8,6 @@ export class $dom {
     return el;
   }
 
-  static ons(
-    el: HTMLElement,
-    events: string,
-    listener: (this: HTMLElement, ev: any) => any
-  ) {
-    events.split(" ").forEach(ev => {
-      this.on(el, ev, listener);
-    });
-  }
-
-  static on(
-    el: HTMLElement,
-    event: string,
-    listener: (this: HTMLElement, ev: any) => any
-  ) {
-    if ((<any>el).attachEvent)
-      return (<any>el).attachEvent(`on${event}`, listener);
-    else {
-      return el.addEventListener(event, listener, false);
-    }
-  }
-
   static offset(el: HTMLElement) {
     const rect = el.getBoundingClientRect();
     const $body = document.body;
@@ -78,8 +56,11 @@ export class $dom {
   // http://youmightnotneedjquery.com/
   static toggle(el: HTMLElement, force?: boolean) {
     const show = force ? force.valueOf() : this.isHidden(el);
-    if (show) { this.show(el); }
-    else { this.hide(el); }
+    if (show) {
+      this.show(el);
+    } else {
+      this.hide(el);
+    }
   }
 
   static before(el: HTMLElement, elToInsert: HTMLElement | HTMLElement[]) {
@@ -91,15 +72,19 @@ export class $dom {
   }
 
   public static after(el: HTMLElement, elToInsert: HTMLElement) {
-    if (el.nextSibling) { el.parentNode.insertBefore(elToInsert, el); }
-    else { el.parentNode.appendChild(elToInsert); }
+    if (el.nextSibling) {
+      el.parentNode.insertBefore(elToInsert, el);
+    } else {
+      el.parentNode.appendChild(elToInsert);
+    }
   }
 
   // IE8+
   // http://youmightnotneedjquery.com/
   static hasClass(el: HTMLElement, className: string) {
-    if (el.classList) { return el.classList.contains(className); }
-    else {
+    if (el.classList) {
+      return el.classList.contains(className);
+    } else {
       return new RegExp("(^| )" + className + "( |$)", "gi").test(el.className);
     }
   }
@@ -107,17 +92,23 @@ export class $dom {
   // IE8+
   // http://youmightnotneedjquery.com/
   static addClass(el: HTMLElement, className: string) {
-    if (this.hasClass(el, className)) { return; }
+    if (this.hasClass(el, className)) {
+      return;
+    }
 
-    if (el.classList) { el.classList.add(className); }
-    else { el.className += " " + className; }
+    if (el.classList) {
+      el.classList.add(className);
+    } else {
+      el.className += " " + className;
+    }
   }
 
   // IE8+
   // http://youmightnotneedjquery.com/
   static removeClass(el: HTMLElement, className: string) {
-    if (el.classList) { el.classList.remove(className); }
-    else {
+    if (el.classList) {
+      el.classList.remove(className);
+    } else {
       el.className = el.className.replace(
         new RegExp(
           "(^|\\b)" + className.split(" ").join("|") + "(\\b|$)",
@@ -130,10 +121,13 @@ export class $dom {
 
   // IE8+
   // http://youmightnotneedjquery.com/
-  static toggleClass(el: HTMLElement, className: string, force?: boolean) {
+  public static toggleClass(el: HTMLElement, className: string, force?: boolean) {
     if (force) {
-      if (force.valueOf()) { this.addClass(el, className); }
-      else { this.removeClass(el, className); }
+      if (force.valueOf()) {
+        this.addClass(el, className);
+      } else {
+        this.removeClass(el, className);
+      }
       return;
     }
 
@@ -143,17 +137,22 @@ export class $dom {
       var classes = el.className.split(" ");
       var existingIndex = -1;
       for (var i = classes.length; i--; ) {
-        if (classes[i] === className) { existingIndex = i; }
+        if (classes[i] === className) {
+          existingIndex = i;
+        }
       }
 
-      if (existingIndex >= 0) { classes.splice(existingIndex, 1); }
-      else { classes.push(className); }
+      if (existingIndex >= 0) {
+        classes.splice(existingIndex, 1);
+      } else {
+        classes.push(className);
+      }
 
       el.className = classes.join(" ");
     }
   }
 
-  static windowScrollTop(): number {
+  public static windowScrollTop(): number {
     return window.pageYOffset !== undefined
       ? window.pageYOffset
       : (<any>(
@@ -163,9 +162,11 @@ export class $dom {
         )).scrollTop;
   }
 
-  static replaceWith(from: HTMLElement, to: HTMLElement) {
+  public static replaceWith(from: HTMLElement, to: HTMLElement) {
     const parent = from.parentElement;
-    if (parent) { parent.replaceChild(to, from); }
+    if (parent) {
+      parent.replaceChild(to, from);
+    }
   }
 
   public static select(
@@ -174,7 +175,7 @@ export class $dom {
     addBack: boolean = false
   ): HTMLElement[] {
     const elements = el.querySelectorAll(selector);
-    var result = Array.prototype.slice.call(elements) as HTMLElement[];
+    let result = Array.prototype.slice.call(elements) as HTMLElement[];
 
     if (addBack && addBack.valueOf() && $dom.matches(el, selector)) {
       result.push(el);
@@ -198,9 +199,9 @@ export class $dom {
   // http://youmightnotneedjquery.com/
   public static trigger(el: Element, ev: string, data: any) {
     if ((window as any).CustomEvent) {
-      var event = new CustomEvent(ev, { detail: data });
+      let event = new CustomEvent(ev, { detail: data });
     } else {
-      var event = document.createEvent("CustomEvent");
+      let event = document.createEvent("CustomEvent");
       event.initCustomEvent(ev, true, true, data);
     }
     el.dispatchEvent(event);

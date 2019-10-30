@@ -1,13 +1,30 @@
 import { BlockUIAction } from "src/block/BlockUIAction";
 import { $dom } from "src/common/DOMHelpers";
+import { helpers } from "src/helpers";
 import { UI } from "src/ui/UI";
 
+const renderButton = (action: BlockUIAction): HTMLElement => {
+  const $el = helpers.createElement(
+    `<button type="button" class="bre-btn"><i class="fa fa-${action.icon}"></i></button>`
+  );
+
+  if (action.action) {
+    $el.onclick = ev => {
+      action.action!();
+      ev.stopPropagation();
+      return false;
+    };
+  }
+
+  return $el;
+};
+
 export class BlockUI {
-  public $editor: HTMLElement; // block editor
-  public $tools: HTMLElement; // block tools
+  public $editor?: HTMLElement; // block editor
+  public $tools?: HTMLElement; // block tools
   public $block: HTMLElement; // block
 
-  private onSelect: () => void;
+  private onSelect?: () => void;
 
   constructor(
     $block: HTMLElement,
@@ -25,11 +42,15 @@ export class BlockUI {
   }
 
   public delete() {
-    this.$editor.remove();
+    if (this.$editor) {
+      this.$editor.remove();
+    }
   }
 
   public toggleSelection(isOn: boolean) {
-    this.$editor.classList.toggle("bre-selected", isOn);
+    if (this.$editor) {
+      this.$editor.classList.toggle("bre-selected", isOn);
+    }
   }
 
   /**
@@ -38,8 +59,8 @@ export class BlockUI {
   private buildEditorUI(actions: BlockUIAction[]) {
     this.$tools = $dom.el('<div class="bre-block-tools bre-btn-deck"></div>');
     actions.forEach(action => {
-      const $btn = this.buildButton(action);
-      this.$tools.appendChild($btn);
+      const $btn = renderButton(action);
+      this.$tools!.appendChild($btn);
     });
     UI.initBtnDeck(this.$tools);
 
@@ -47,41 +68,18 @@ export class BlockUI {
     this.$editor.appendChild(this.$tools);
     this.$editor.appendChild(this.$block);
 
-    $dom.on(this.$editor, "mouseover", () => {
-      this.$editor.classList.add("bre-active");
+    this.$editor.addEventListener("mouseover", () => {
+      this.$editor!.classList.add("bre-active");
     });
 
-    $dom.on(this.$editor, "mouseout", () => {
-      this.$editor.classList.remove("bre-active");
+    this.$editor.addEventListener("mouseout", () => {
+      this.$editor!.classList.remove("bre-active");
     });
 
-    $dom.on(this.$editor, "click", () => {
-      this.onSelect();
+    this.$editor.addEventListener("click", () => {
+      if (this.onSelect) {
+        this.onSelect();
+      }
     });
-
-    // this.$editor.hover(
-    //     () => { this.$editor.classList.add('bre-active'); },
-    //     () => { this.$editor.classList.remove('bre-active'); });
-
-    // this.$block.on('click', () => this.onSelect());
-  }
-
-  /**
-   * Build button element with icon and action
-   *
-   * @param action Button action
-   */
-  private buildButton(action: BlockUIAction): HTMLElement {
-    const $el = $dom.el(
-      `<button type="button" class="bre-btn"><i class="fa fa-${action.icon}"></i></button>`
-    );
-    if (action.action) {
-      $el.onclick = ev => {
-        action.action();
-        ev.stopPropagation();
-        return false;
-      };
-    }
-    return $el;
   }
 }

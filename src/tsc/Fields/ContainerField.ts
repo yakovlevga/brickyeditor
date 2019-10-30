@@ -41,7 +41,7 @@ export class ContainerField extends BaseField {
     );
 
     $dom.addClass($field, Selectors.selectorFieldContainer);
-    $dom.on($field, "click", ev => {
+    $field.addEventListener("click", ev => {
       field.select();
       ev.stopPropagation();
       return false;

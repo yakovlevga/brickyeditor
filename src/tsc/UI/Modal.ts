@@ -14,7 +14,7 @@ export class Modal {
     private $cancelBtn: HTMLElement
   ) {
     const modal = this;
-    $dom.on($closeBtn, "click", () => {
+    $closeBtn.addEventListener("click", () => {
       modal.hideModal();
     });
   }
@@ -55,14 +55,14 @@ export class Modal {
         $dom.before(this.$btns, field.$control);
       });
 
-      $dom.on(modal.$okBtn, "click", () => {
+      modal.$okBtn.addEventListener("click", () => {
         fields.forEach(field => field.parseValue());
         modal.hideModal();
         const list = new PromptParameterList(fields);
         resolve(list);
       });
 
-      $dom.on(modal.$cancelBtn, "click", () => {
+      modal.$cancelBtn.addEventListener("click", () => {
         modal.hideModal();
         resolve(null);
       });

@@ -1,5 +1,6 @@
 import { $dom } from "src/common/DOMHelpers";
 import { BaseField } from "src/fields/BaseField";
+import { helpers } from "src/helpers";
 import { toggleHtmlTools } from "src/UI/htmlTools";
 import { SelectionUtils } from "src/ui/SelectionUtils";
 import { Selectors } from "src/ui/Selectors";
@@ -21,18 +22,21 @@ export class HtmlField extends BaseField {
       toggleHtmlTools(rect);
     });
 
-    $dom.ons($field, "blur keyup paste input", () => {
+    helpers.addEventListeners($field, "blur keyup paste input", () => {
       this.setHtml($field.innerHTML);
     });
 
-    $dom.on($field, "paste", e => {
-      e.preventDefault();
-      const ev = e.originalEvent as any;
-      const text = ev.clipboardData.getData("text/plain");
-      document.execCommand("insertHTML", false, text);
+    $field.addEventListener("paste", ev => {
+      ev.preventDefault();
+      // const ev = e.originalEvent as any;
+      debugger;
+      if (ev.clipboardData) {
+        const text = ev.clipboardData.getData("text/plain");
+        document.execCommand("insertHTML", false, text);
+      }
     });
 
-    $dom.on($field, "click", ev => {
+    $field.addEventListener("click", ev => {
       // Prevents the event from bubbling up the DOM tree
       field.select();
       ev.stopPropagation();

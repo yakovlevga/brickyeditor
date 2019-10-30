@@ -74,4 +74,20 @@ const showModal = (props: {
   document.body.appendChild(element);
 };
 
-export const helpers = { createElement, showModal, toggleVisibility };
+const addEventListeners = (
+  el: HTMLElement,
+  types: string,
+  listener: EventListenerOrEventListenerObject,
+  options?: boolean | EventListenerOptions
+) => {
+  types
+    .split(" ")
+    .forEach(type => el.addEventListener(type, listener, options));
+};
+
+export const helpers = {
+  createElement,
+  showModal,
+  toggleVisibility,
+  addEventListeners,
+};
