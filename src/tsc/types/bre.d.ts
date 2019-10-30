@@ -109,17 +109,20 @@ declare namespace bre {
         [TKey: string]: any;
       };
 
-      type FieldData<
-        TData extends bre.core.field.FieldData = bre.core.field.FieldData
-      > = {
+      type BaseFieldData = {
         type: FieldType;
         name: string;
+      };
+
+      type FieldData<
+        TData extends BaseFieldData = BaseFieldData
+      > = BaseFieldData & {
         data: TData;
       };
 
       type Field<
         TData extends bre.core.field.FieldData = bre.core.field.FieldData
-      > = FieldData & {
+      > = FieldData<TData> & {
         $field: HTMLElement;
         getElement: (field: Field) => HTMLElement;
 
@@ -154,8 +157,6 @@ declare namespace bre {
   //   name: string;
   //   value: any;
   // };
-
-  type BaseFieldData = { name: string; type: bre.core.field.FieldType };
   //  & {
   //   [TKey: string]: any;
   // };
