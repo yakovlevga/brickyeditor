@@ -3,7 +3,8 @@ import { BlockUIAction } from "src/block/BlockUIAction";
 import { str } from "src/common/Common";
 import { $dom } from "src/common/DOMHelpers";
 import { BaseField, ContainerField } from "src/fields/Fields";
-import { bre } from "src/Types/bre";
+import { helpers } from "src/helpers";
+import { bre } from "src/types/bre";
 import { Selectors } from "src/ui/Selectors";
 
 export class Block {
@@ -25,7 +26,7 @@ export class Block {
     this.html = html;
     this.events = events;
 
-    const $block = $dom.el(html);
+    const $block = helpers.createElement(html);
     this.bindFields($block, data);
     const actions = this.getActions();
 
@@ -106,7 +107,7 @@ export class Block {
   }
 
   public getHtml(trim: boolean): string {
-    const $html = $dom.el(this.html);
+    const $html = helpers.createElement(this.html);
     const fieldsHtml: {
       [TKey: string]: HTMLElement;
     } = {};

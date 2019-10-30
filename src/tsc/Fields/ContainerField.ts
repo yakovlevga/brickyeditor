@@ -6,6 +6,7 @@ import {
 } from "src/BlocksContainer";
 import { $dom } from "src/common/DOMHelpers";
 import { BaseField } from "src/fields/BaseField";
+import { helpers } from "src/helpers";
 import { Selectors } from "src/ui/Selectors";
 
 export class ContainerField extends BaseField {
@@ -65,6 +66,6 @@ export class ContainerField extends BaseField {
   public getEl(): HTMLElement {
     const { container } = this;
     const html = getContainerHtml(container);
-    return $dom.el(html);
+    return helpers.createElement(html);
   }
 }

@@ -2,7 +2,8 @@ import { $dom } from "src/common/DOMHelpers";
 import { BaseField } from "src/fields/BaseField";
 import { locales } from "src/locales";
 import { LinkPromptParams, promptAsync } from "src/prompt";
-import { bre } from "src/Types/bre";
+import { bre } from "src/types/bre";
+import { helpers } from "src/helpers";
 
 type ImageFieldData = {
   name: "image";
@@ -142,7 +143,7 @@ export class ImageField extends BaseField<ImageFieldData> {
   public setLink(url: LinkPromptParams) {
     if (url && url.href) {
       if (!this.$link) {
-        this.$link = $dom.el(
+        this.$link = helpers.createElement(
           `<a href='${url.href}' title='${url.title}' target='${url.target}'></a>`
         ) as HTMLLinkElement;
         this.$link.addEventListener("click", ev => {
@@ -150,7 +151,11 @@ export class ImageField extends BaseField<ImageFieldData> {
           return false;
         });
 
-        $dom.wrap(this.$field, this.$link);
+        const { parentElement } = this.$field;
+        if (parentElement !== null) {
+          parentElement.insertBefore(this.$link, this.$field);
+          this.$link.appendChild(this.$link);
+        }
         // this.$field.wrap(this.$link);
       } else {
         this.$link.href = url.href.value;
@@ -168,7 +173,7 @@ export class ImageField extends BaseField<ImageFieldData> {
     const $el = super.getEl();
     const { link } = this.data;
     if (link && link.href) {
-      const $link = $dom.el(
+      const $link = helpers.createElement(
         `<a href='${link.href}' title='${link.title}' target='${link.target}'></a>`
       );
       $link.appendChild($el);

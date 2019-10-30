@@ -6,7 +6,7 @@ import { helpers } from "src/helpers";
 import { loadScript } from "src/httpTransport";
 import { locales } from "src/locales";
 import { promptAsync } from "src/prompt";
-import { bre } from "src/Types/bre";
+import { bre } from "src/types/bre";
 
 // const getSettings = (field: BaseField) => {
 //   (field as EmbedField).showEmbedLoaderAsync(field);
@@ -72,8 +72,7 @@ export class EmbedField extends BaseField<EmbedFieldData> {
   // }
 
   public getSettingsEl() {
-    // TODO: renderEmbedFieldSettingsUI
-    return null;
+    return renderEmbedFieldSettingsUI(this.$field);
   }
 
   public bind() {
@@ -96,7 +95,7 @@ export class EmbedField extends BaseField<EmbedFieldData> {
     const json = await getEmbedAsync(field.data.url);
 
     field.setEmbed(json, fireUpdate);
-    const $embed = $dom.el(json.html);
+    const $embed = helpers.createElement(json.html);
     const $script = $dom.first($embed, "script") as HTMLScriptElement;
     if ($script) {
       $script.remove();

@@ -1,5 +1,4 @@
 import { BlockUIAction } from "src/block/BlockUIAction";
-import { $dom } from "src/common/DOMHelpers";
 import { helpers } from "src/helpers";
 import { UI } from "src/ui/UI";
 
@@ -57,14 +56,18 @@ export class BlockUI {
    * Generate block editor wrapper with block tools.
    */
   private buildEditorUI(actions: BlockUIAction[]) {
-    this.$tools = $dom.el('<div class="bre-block-tools bre-btn-deck"></div>');
+    this.$tools = helpers.createElement(
+      '<div class="bre-block-tools bre-btn-deck"></div>'
+    );
     actions.forEach(action => {
       const $btn = renderButton(action);
       this.$tools!.appendChild($btn);
     });
     UI.initBtnDeck(this.$tools);
 
-    this.$editor = $dom.el('<div class="bre-block-wrapper"></div>');
+    this.$editor = helpers.createElement(
+      '<div class="bre-block-wrapper"></div>'
+    );
     this.$editor.appendChild(this.$tools);
     this.$editor.appendChild(this.$block);
 

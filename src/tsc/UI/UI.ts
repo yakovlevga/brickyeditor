@@ -1,9 +1,9 @@
 import { $dom } from "src/common/DOMHelpers";
 import { Editor } from "src/Editor";
+import { helpers } from "src/helpers";
 import { getTemplatePreview } from "src/template";
-import { bre } from "src/Types/bre";
-import { initHtmlTools } from "src/UI/htmlTools";
-import { Modal } from "src/ui/Modal";
+import { bre } from "src/types/bre";
+import { initHtmlTools } from "src/ui/htmlTools";
 import { Selectors } from "src/ui/Selectors";
 
 export class UI {
@@ -61,12 +61,8 @@ export class UI {
     $btnsDeck.dataset.isOn = String(!isOn);
   }
 
-  // Modal
-  public modal?: Modal;
-
   // Templates
   private $tools?: HTMLElement;
-  private $toolsBtn?: HTMLElement;
   private $toolsTemplates?: HTMLElement;
   private $toolsHideBtn?: HTMLElement;
   private $toolsLoader?: HTMLElement;
@@ -79,7 +75,7 @@ export class UI {
   }
 
   public toggleToolsLoader(toggle: boolean) {
-    $dom.toggle(this.$toolsLoader, toggle);
+    helpers.toggleVisibility(this.$toolsLoader!, toggle);
   }
 
   public setTemplates(templateGroups: bre.core.ITemplateGroup[]) {
@@ -89,11 +85,11 @@ export class UI {
         return;
       }
 
-      const $header = $dom.el(
+      const $header = helpers.createElement(
         `<div class='${Selectors.classTemplateGroup}'>${group.name}</div>`
       );
-      this.$toolsTemplates.appendChild($header);
-      const $group = $dom.el("<div></div>");
+      this.$toolsTemplates!.appendChild($header);
+      const $group = helpers.createElement("<div></div>");
       group.templates.forEach(template => {
         const $preview = getTemplatePreview(template);
         $preview.setAttribute("title", template.name);
@@ -108,7 +104,7 @@ export class UI {
       $header.addEventListener("click", () => {
         $dom.toggle($group);
       });
-      this.$toolsTemplates.appendChild($group);
+      this.$toolsTemplates!.appendChild($group);
     });
   }
 
@@ -124,22 +120,24 @@ export class UI {
   }
 
   private setTools() {
-    this.$tools = $dom.el(
+    this.$tools = helpers.createElement(
       '<div class="bre bre-tools" data-bricky-tools></div>'
     );
 
-    this.$toolsTemplates = $dom.el('<div class="bre-tools-templates"></div>');
-    this.$toolsLoader = $dom.el(
+    this.$toolsTemplates = helpers.createElement(
+      '<div class="bre-tools-templates"></div>'
+    );
+    this.$toolsLoader = helpers.createElement(
       '<div class="bre-tools-loader"><b>Loading...</b></div>'
     );
-    this.$toolsHideBtn = $dom.el(
+    this.$toolsHideBtn = helpers.createElement(
       '<button type="button" class="bre-tools-toggle"><div>►</div></button>'
     );
 
     this.$tools.appendChild(this.$toolsHideBtn);
     this.$tools.appendChild(this.$toolsLoader);
     this.$tools.appendChild(this.$toolsTemplates);
-    this.$toolsHideBtn.onclick = ev => this.toggleTools();
+    this.$toolsHideBtn.onclick = this.toggleTools;
 
     this.editor.$editor.appendChild(this.$tools);
 
@@ -151,27 +149,27 @@ export class UI {
 
   private toggleTools() {
     $dom.toggleClass(
-      this.$tools,
+      this.$tools!,
       "bre-tools-collapsed",
-      !$dom.hasClass(this.$toolsHideBtn, "bre-tools-toggle-collapsed")
+      !$dom.hasClass(this.$toolsHideBtn!, "bre-tools-toggle-collapsed")
     );
-    $dom.toggleClass(this.$toolsHideBtn, "bre-tools-toggle-collapsed");
+    $dom.toggleClass(this.$toolsHideBtn!, "bre-tools-toggle-collapsed");
   }
 
   // private setModal() {
-  //   const $modal = $dom.el(
+  //   const $modal = helpers.createElement(
   //     '<div class="bre bre-modal"><div class="bre-modal-placeholder"></div></div>'
   //   );
-  //   const $modalCloseBtn = $dom.el(
+  //   const $modalCloseBtn = helpers.createElement(
   //     `<div class="bre-modal-close"><a href="#">${EditorStrings.buttonClose} ✖</a></div>`
   //   );
-  //   const $modalContent = $dom.el('<div class="bre-modal-content"></div>');
-  //   const $modalForm = $dom.el("<form></form>");
-  //   const $modalBtns = $dom.el('<div class="bre-btns"></div>');
-  //   const $modalOk = $dom.el(
+  //   const $modalContent = helpers.createElement('<div class="bre-modal-content"></div>');
+  //   const $modalForm = helpers.createElement("<form></form>");
+  //   const $modalBtns = helpers.createElement('<div class="bre-btns"></div>');
+  //   const $modalOk = helpers.createElement(
   //     `<button type="button" class="bre-btn bre-btn-primary">${EditorStrings.buttonOk}</button>`
   //   );
-  //   const $modalCancel = $dom.el(
+  //   const $modalCancel = helpers.createElement(
   //     `<button type="button" class="bre-btn">${EditorStrings.buttonCancel}</button>`
   //   );
 

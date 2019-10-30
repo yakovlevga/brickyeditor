@@ -1,7 +1,7 @@
 import { str } from "src/common/Common";
 import { helpers } from "src/helpers";
 import { getLinkPromptParams, promptAsync } from "src/prompt";
-import { bre } from "src/Types/bre";
+import { bre } from "src/types/bre";
 import { Selectors } from "src/ui/Selectors";
 
 const promptLinkParamsAsync = async (selection: Selection) => {

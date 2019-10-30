@@ -1,6 +1,6 @@
 import { helpers } from "src/helpers";
 import { locales } from "src/locales";
-import { bre } from "src/Types/bre";
+import { bre } from "src/types/bre";
 
 type FieldEditor = (props: {
   key: string;

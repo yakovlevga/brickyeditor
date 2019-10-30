@@ -4,7 +4,7 @@ import { $dom } from "src/common/DOMHelpers";
 import { EditorStrings } from "src/EditorStrings";
 import { helpers } from "src/helpers";
 import { getRequest } from "src/httpTransport";
-import { bre } from "src/Types/bre";
+import { bre } from "src/types/bre";
 import { Selectors } from "src/ui/Selectors";
 
 type onErrorHandler = (message: string, code?: number) => any;

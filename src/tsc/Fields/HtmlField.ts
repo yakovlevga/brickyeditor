@@ -1,7 +1,7 @@
 import { $dom } from "src/common/DOMHelpers";
 import { BaseField } from "src/fields/BaseField";
 import { helpers } from "src/helpers";
-import { toggleHtmlTools } from "src/UI/htmlTools";
+import { toggleHtmlTools } from "src/ui/htmlTools";
 import { SelectionUtils } from "src/ui/SelectionUtils";
 import { Selectors } from "src/ui/Selectors";
 

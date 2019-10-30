@@ -1,8 +1,8 @@
 import { Block } from "src/block/Block";
 import { $dom } from "src/common/DOMHelpers";
-import { BaseField } from "src/Fields/Fields";
+import { BaseField } from "src/fields/Fields";
 import { helpers } from "src/helpers";
-import { bre } from "src/Types/bre";
+import { bre } from "src/types/bre";
 
 export const getContainerData = (
   container: bre.core.IBlocksContainer,

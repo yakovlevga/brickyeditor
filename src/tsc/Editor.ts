@@ -12,7 +12,7 @@ import { BaseField, ContainerField } from "src/fields/Fields";
 import { getRequest } from "src/httpTransport";
 import { setUI } from "src/shared";
 import { getTemplate, loadTemplatesAsync } from "src/template";
-import { bre } from "src/Types/bre";
+import { bre } from "src/types/bre";
 import { Selectors } from "src/ui/Selectors";
 import { UI } from "src/ui/UI";
 

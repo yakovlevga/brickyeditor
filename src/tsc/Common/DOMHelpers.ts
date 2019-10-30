@@ -1,13 +1,4 @@
 export class $dom {
-  // Elements
-  static el(html: string): HTMLElement {
-    let div = document.createElement("div");
-    div.innerHTML = html;
-    const el = div.firstElementChild as HTMLElement;
-    div.innerHTML = null;
-    return el;
-  }
-
   static offset(el: HTMLElement) {
     const rect = el.getBoundingClientRect();
     const $body = document.body;
@@ -16,11 +7,6 @@ export class $dom {
       top: rect.top + $body.scrollTop,
       left: rect.left + $body.scrollLeft,
     };
-  }
-
-  static wrap(el: HTMLElement, toEl: HTMLElement) {
-    el.parentElement.insertBefore(toEl, el);
-    toEl.appendChild(el);
   }
 
   static unwrap(el: HTMLElement) {
@@ -121,7 +107,11 @@ export class $dom {
 
   // IE8+
   // http://youmightnotneedjquery.com/
-  public static toggleClass(el: HTMLElement, className: string, force?: boolean) {
+  public static toggleClass(
+    el: HTMLElement,
+    className: string,
+    force?: boolean
+  ) {
     if (force) {
       if (force.valueOf()) {
         this.addClass(el, className);
