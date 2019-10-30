@@ -96,22 +96,25 @@ export class Block {
     top = top > 0 ? top : 0;
   }
 
-  public getData(ignoreHtml?: boolean): bre.IBlockData {
-    const fieldsData: bre.BaseFieldData[] = [];
-    this.fields.forEach(field => {
-      fieldsData.push(field.data);
-    });
+  public getData(ignoreHtml?: boolean): bre.core.block.BlockData {
+    // const fieldsData: bre.core.field.FieldData[] = [];
 
-    const data: bre.IBlockData = {
+    const fields = this.fields.map(({ name, type, data }) => ({
+      name,
+      type,
+      data,
+    }));
+
+    const blockData: bre.core.block.BlockData = {
       template: this.template,
-      fields: fieldsData,
+      fields,
     };
 
     if (!ignoreHtml) {
-      data.html = this.getHtml(true);
+      blockData.html = this.getHtml(true);
     }
 
-    return data;
+    return blockData;
   }
 
   public getHtml(trim: boolean): string {

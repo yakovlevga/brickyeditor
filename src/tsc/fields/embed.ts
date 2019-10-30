@@ -1,4 +1,3 @@
-import { str } from "src/common/Common";
 import { $dom } from "src/common/DOMHelpers";
 import {
   getEmbedAsync,
@@ -17,7 +16,7 @@ import { bre } from "src/types/bre";
 //   (field as EmbedField).showEmbedLoaderAsync(field);
 // }
 
-export type EmbedFieldData = bre.BaseFieldData & {
+export type EmbedFieldData = bre.core.field.FieldData & {
   type: "embed";
   url?: string;
   embed?: NoembedResponse;

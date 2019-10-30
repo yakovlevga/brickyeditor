@@ -1,14 +1,14 @@
 import { str } from "src/common/Common";
+import { ContainerFieldData, createContainerField } from "src/fields/container";
 import { createEmbedField, EmbedFieldData } from "src/fields/embed";
 import { createHtmlField, HtmlFieldData } from "src/fields/html";
 import { createImageField, ImageFieldData } from "src/fields/image";
 import { helpers } from "src/helpers";
 import { bre } from "src/types/bre";
 import { Selectors } from "src/ui/Selectors";
-import { ContainerFieldData, createContainerField } from "src/fields/container";
 
 export type CreateFieldProps<
-  TData extends bre.BaseFieldData = bre.BaseFieldData
+  TData extends bre.core.field.FieldData = bre.core.field.FieldData
 > = {
   $element: HTMLElement;
   data?: bre.core.field.Data[];
@@ -18,7 +18,7 @@ export type CreateFieldProps<
 };
 
 export type FieldFactory<
-  TData extends bre.BaseFieldData = bre.BaseFieldData
+  TData extends bre.core.field.FieldData = bre.core.field.FieldData
 > = (
   props: CreateFieldProps<TData>,
   data: TData
@@ -50,10 +50,10 @@ const _fields: {
 };
 
 export const createField = (
-  props: CreateFieldProps<bre.BaseFieldData>
+  props: CreateFieldProps<bre.core.field.FieldData>
 ): bre.core.field.Field => {
   // take base field props from data-bre-field attribute
-  let fieldData = helpers.parseElementData<bre.BaseFieldData>(
+  let fieldData = helpers.parseElementData<bre.core.field.FieldData>(
     props.$element,
     "breField"
   );
@@ -91,7 +91,7 @@ export const createField = (
   }
 };
 
-export const updateFieldProperty = <TData extends bre.BaseFieldData>(
+export const updateFieldProperty = <TData extends bre.core.field.FieldData>(
   field: bre.core.field.Field<TData>,
   prop: keyof TData,
   value: any,
@@ -134,45 +134,3 @@ export const getFieldElement = ($field: HTMLElement) => {
   $el.attributes.removeNamedItem(Selectors.attrField);
   return $el;
 };
-
-export abstract class BaseField<
-  TData extends bre.BaseFieldData = bre.BaseFieldData
-> {
-  // public data: TData;
-  // protected onUpload: (file: any, callback: (url: string) => void) => void;
-
-  // protected settings: (field: BaseField<TData>) => void;
-  // private onSelect: (field: BaseField<TData>) => void;
-  // private onUpdate: (
-  //   property: keyof TData,
-  //   oldValue: any,
-  //   newValue: any
-  // ) => void;
-
-  // constructor(
-  //   $field: HTMLElement,
-  //   data: any,
-  //   onSelect: (field: BaseField<TData>) => void,
-  //   onUpdate: (property: keyof TData, oldValue: any, newValue: any) => void,
-  //   onUpload?: (file: any, callback: (url: string) => void) => void
-  // ) {
-  //   this.$field = $field;
-  //   this.data = data;
-  //   this.onSelect = onSelect;
-  //   this.onUpdate = onUpdate;
-  //   this.onUpload = onUpload;
-  //   this.bind();
-  // }
-
-  // public getEl(): HTMLElement {
-
-  // }
-
-  // protected getSettingsEl(): HTMLElement | null {
-  //   return null;
-  // }
-
-  protected bind() {
-    // should be ovverided from child
-  }
-}

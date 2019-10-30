@@ -4,15 +4,15 @@ import {
   getContainerData,
   getContainerHtml,
 } from "src/BlocksContainer";
-import { BaseField, FieldFactory } from "src/fields/field";
+import { FieldFactory } from "src/fields/field";
 import { helpers } from "src/helpers";
 import { bre } from "src/types/bre";
 import { Selectors } from "src/ui/Selectors";
 
-export type ContainerFieldData = bre.BaseFieldData & {
+export type ContainerFieldData = bre.core.field.FieldData & {
   type: "container";
-  blocks: bre.IBlockData[];
   html: string;
+  blocks: bre.core.block.BlockData[];
 };
 
 type ContainerFieldFactory = FieldFactory<ContainerFieldData>;

@@ -9,7 +9,7 @@ import { toggleHtmlTools } from "src/ui/htmlTools";
 import { SelectionUtils } from "src/ui/SelectionUtils";
 import { Selectors } from "src/ui/Selectors";
 
-export type HtmlFieldData = bre.BaseFieldData & {
+export type HtmlFieldData = bre.core.field.FieldData & {
   type: "html";
   html: string;
 };

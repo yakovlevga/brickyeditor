@@ -2,7 +2,6 @@ import { expect } from "chai";
 import { JSDOM } from "jsdom";
 import "mocha";
 
-import { BaseField } from "../tsc/fields/Fields";
 import { Template } from "../tsc/Templates/Template";
 
 const { window } = new JSDOM();

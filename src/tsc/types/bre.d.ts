@@ -71,8 +71,10 @@ declare namespace bre {
     }
 
     namespace block {
-      type Event = (block: Block) => void;
+      type BlockEvent = (block: Block) => void;
+
       type MoveEvent = (block: Block, offset: number) => void;
+
       type UpdateEvent = (
         block: Block,
         property: string,
@@ -81,13 +83,19 @@ declare namespace bre {
       ) => void;
 
       type Events = {
-        onDelete?: Event;
-        onSelect?: Event;
-        onDeselect?: Event;
-        onCopy?: Event;
+        onDelete?: BlockEvent;
+        onSelect?: BlockEvent;
+        onDeselect?: BlockEvent;
+        onCopy?: BlockEvent;
         onMove?: MoveEvent;
         onUpdate?: UpdateEvent;
         onUpload?: FileUploadHandler;
+      };
+
+      type BlockData = {
+        template: string;
+        html?: string;
+        fields: field.FieldData[];
       };
     }
 
@@ -101,10 +109,17 @@ declare namespace bre {
         [TKey: string]: any;
       };
 
-      type Field<TData extends bre.BaseFieldData = bre.BaseFieldData> = {
+      type FieldData<
+        TData extends bre.core.field.FieldData = bre.core.field.FieldData
+      > = {
         type: FieldType;
         name: string;
         data: TData;
+      };
+
+      type Field<
+        TData extends bre.core.field.FieldData = bre.core.field.FieldData
+      > = FieldData & {
         $field: HTMLElement;
         getElement: (field: Field) => HTMLElement;
 
@@ -133,12 +148,6 @@ declare namespace bre {
     command: HtmlToolsButtonCommands;
     range: boolean;
     aValueArgument?: string;
-  }
-
-  interface IBlockData {
-    template: string;
-    fields: any[];
-    html?: string;
   }
 
   // type DataField = {

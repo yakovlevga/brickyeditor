@@ -4,7 +4,7 @@ import { locales } from "src/locales";
 import { promptAsync } from "src/prompt";
 import { bre } from "src/types/bre";
 
-export type ImageFieldData = bre.BaseFieldData & {
+export type ImageFieldData = bre.core.field.FieldData & {
   type: "image";
   src?: string;
   alt?: string;
