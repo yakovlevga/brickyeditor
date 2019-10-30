@@ -2,7 +2,11 @@ import { BlockUI } from "src/block/BlockUI";
 import { BlockUIAction } from "src/block/BlockUIAction";
 import { str } from "src/common/Common";
 import { $dom } from "src/common/DOMHelpers";
-import { BaseField, ContainerField, createField } from "src/fields/Fields";
+import {
+  ContainerField,
+  createField,
+  toggleFieldSelection,
+} from "src/fields/Fields";
 import { helpers } from "src/helpers";
 import { bre } from "src/types/bre";
 import { Selectors } from "src/ui/Selectors";
@@ -10,16 +14,16 @@ import { Selectors } from "src/ui/Selectors";
 export class Block {
   public template: string;
   public html: string;
-  public fields: BaseField[] = [];
+  public fields: bre.core.field.Field[] = [];
   public ui: BlockUI;
-  public selectedField?: BaseField;
+  public selectedField?: bre.core.field.Field | null;
   public events?: bre.core.block.Events;
 
   constructor(
     template: string,
     html: string,
     preview: boolean,
-    data?: BaseField[],
+    data?: bre.core.field.Field[],
     events?: bre.core.block.Events
   ) {
     this.template = template;
@@ -44,18 +48,18 @@ export class Block {
 
   public delete() {
     this.ui.delete();
-    this.events.onDelete(this);
+    this.events!.onDelete!(this);
   }
 
   public move(offset: number) {
-    this.events.onMove(this, offset);
+    this.events!.onMove!(this, offset);
   }
 
   public clone() {
-    this.events.onCopy(this);
+    this.events!.onCopy!(this);
   }
 
-  public select(field?: BaseField): void {
+  public select(field?: bre.core.field.Field): void {
     if (field === this.selectedField) {
       return;
     }
@@ -65,31 +69,31 @@ export class Block {
     }
 
     if (this.selectedField) {
-      this.selectedField.deselect();
+      toggleFieldSelection(this.selectedField, false);
     }
 
     this.selectedField = field;
     this.ui.toggleSelection(true);
-    this.events.onSelect(this);
+    this.events!.onSelect!(this);
   }
 
   public deselect() {
     this.selectedField = null;
     this.fields.forEach(f => {
-      f.deselect();
+      toggleFieldSelection(f, false);
     });
     this.ui.toggleSelection(false);
-    this.events.onDeselect(this);
+    this.events!.onDeselect!(this);
   }
 
   public scrollTo() {
     // todo: move to block ui
-    let top = $dom.offset(this.ui.$editor).top - 100; // todo: move this magic number away
+    let top = $dom.offset(this.ui.$editor!).top - 100; // todo: move this magic number away
     top = top > 0 ? top : 0;
   }
 
   public getData(ignoreHtml?: boolean): bre.IBlockData {
-    const fieldsData: bre.Data[] = [];
+    const fieldsData: bre.BaseFieldData[] = [];
     this.fields.forEach(field => {
       fieldsData.push(field.data);
     });
@@ -113,8 +117,10 @@ export class Block {
     } = {};
 
     this.fields.forEach(field => {
-      const name: string = field.name || field.data.name;
-      fieldsHtml[name] = field.getEl();
+      if (field !== undefined) {
+        const name: string = field.name || field.data.name;
+        fieldsHtml[name] = field.getElement(field);
+      }
     });
 
     $dom.select($html, Selectors.selectorField, true).forEach($elem => {
@@ -137,25 +143,25 @@ export class Block {
    *
    * @param data Array of block fields data
    */
-  private bindFields($block: HTMLElement, data?: BaseField[]) {
+  private bindFields($block: HTMLElement, data?: bre.core.field.Data[]) {
     const block = this;
     const $fields = $dom.select($block, Selectors.selectorField, true);
-    $fields.forEach($elem => {
+    $fields.forEach($element => {
       const onUpdate = (property: string, oldValue: any, newValue: any) => {
-        if (block.events.onUpdate !== undefined) {
-          block.events.onUpdate(block, property, oldValue, newValue);
+        if (block.events!.onUpdate !== undefined) {
+          block.events!.onUpdate(block, property, oldValue, newValue);
         }
       };
 
       const onSelect = block.select;
 
-      const field = createField(
-        $elem,
+      const field = createField({
+        $element,
         data,
         onSelect,
-        onUpdate,
-        block.events ? block.events.onUpload : undefined
-      );
+        // onUpdate,
+        // block.events ? block.events.onUpload : undefined
+      });
       block.fields.push(field);
     });
   }

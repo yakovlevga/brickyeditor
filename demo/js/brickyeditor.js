@@ -368,11 +368,6 @@ var BrickyEditor = (function (exports) {
         placeholder.appendChild(buttonCancel);
         document.body.appendChild(element);
     };
-    var addEventListeners = function (el, types, listener, options) {
-        types
-            .split(" ")
-            .forEach(function (type) { return el.addEventListener(type, listener, options); });
-    };
     var parseElementData = function (el, prop) {
         var json = el.dataset[prop];
         if (json === undefined) {
@@ -400,7 +395,6 @@ var BrickyEditor = (function (exports) {
         parseElementData: parseElementData,
         showModal: showModal,
         toggleVisibility: toggleVisibility,
-        addEventListeners: addEventListeners,
     };
     //# sourceMappingURL=helpers.js.map
 
@@ -1148,97 +1142,220 @@ var BrickyEditor = (function (exports) {
     }());
     //# sourceMappingURL=BlockUIAction.js.map
 
-    var _fields = null;
-    var createField = function ($element, data, onSelect, onUpdate, onUpload) {
-        var fieldData = helpers.parseElementData($element, "breField");
+    var createHtmlField = function (props, data) {
+        var $element = props.$element;
+        $element.setAttribute(Selectors.attrContentEditable, "true");
+        if (data.html) {
+            $element.innerHTML = data.html;
+        }
+        var field = {
+            type: "html",
+            name: data.name,
+            $field: $element,
+            data: data,
+            getElement: function () {
+                var $copy = getFieldElement($element);
+                $copy.removeAttribute(Selectors.attrContentEditable);
+                return $copy;
+            },
+        };
+        SelectionUtils.bindTextSelection($element, function (rect) {
+            toggleHtmlTools(rect);
+        });
+        var updateHtmlProp = function () {
+            var value = $element.innerHTML.trim();
+            if ($element.innerHTML !== value) {
+                field.$field.innerHTML = value;
+                updateFieldProperty(field, "html", value, true);
+            }
+        };
+        $element.addEventListener("blur", updateHtmlProp);
+        $element.addEventListener("keyup", updateHtmlProp);
+        $element.addEventListener("paste", updateHtmlProp);
+        $element.addEventListener("input", updateHtmlProp);
+        $element.addEventListener("paste", function (ev) {
+            ev.preventDefault();
+            debugger;
+            if (ev.clipboardData) {
+                var text = ev.clipboardData.getData("text/plain");
+                document.execCommand("insertHTML", false, text);
+            }
+        });
+        $element.addEventListener("click", function (ev) {
+            toggleFieldSelection(field, true);
+            ev.stopPropagation();
+            return false;
+        });
+        return field;
+    };
+    //# sourceMappingURL=HtmlField.js.map
+
+    var getPromptParams = function (_a) {
+        var src = _a.src, file = _a.file, alt = _a.alt;
+        return ({
+            src: {
+                value: src,
+                title: locales.prompt.image.link.title,
+                placeholder: locales.prompt.image.link.placeholder,
+            },
+            file: {
+                type: "file",
+                value: file,
+                title: locales.prompt.image.upload.title,
+                placeholder: locales.prompt.image.upload.placeholder,
+            },
+            alt: {
+                value: alt,
+                title: locales.prompt.image.alt.title,
+                placeholder: locales.prompt.image.alt.placeholder,
+            },
+        });
+    };
+    var createImageField = function (props, data) {
+        var $element = props.$element;
+        var isImageElement = $element.tagName.toLowerCase() === "img";
+        var updateImageElement = function (d) {
+            if (isImageElement) {
+                var image = $element;
+                image.src = d.src || "";
+                image.alt = d.alt || "";
+            }
+            else {
+                $element.style.backgroundImage = "url(" + d.src + ")";
+            }
+            $element.title = d.alt || "";
+        };
+        if (data.src) {
+            updateImageElement(data);
+        }
+        var field = {
+            type: "html",
+            name: data.name,
+            $field: $element,
+            data: data,
+            getElement: function () {
+                var $copy = getFieldElement($element);
+                var link = field.data.link;
+                if (link !== undefined && link.href.length) {
+                    var $link = helpers.createElement("<a href='" + link.href + "' title='" + link.title + "' target='" + link.target + "'></a>");
+                    $link.appendChild($copy);
+                    return $link;
+                }
+                return $copy;
+            },
+        };
+        $element.addEventListener("click", function () { return __awaiter(void 0, void 0, void 0, function () {
+            var params, promptResponse, updatedData;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        params = getPromptParams(field.data);
+                        return [4, promptAsync(params)];
+                    case 1:
+                        promptResponse = _a.sent();
+                        if (promptResponse === null) {
+                            return [2];
+                        }
+                        updatedData = __assign(__assign({}, field.data), { alt: promptResponse.alt });
+                        if (promptResponse.file !== undefined) {
+                            if (props.onUpload) {
+                                props.onUpload(promptResponse.file, function (src) {
+                                    updatedData = __assign(__assign({}, updatedData), { src: src, file: undefined });
+                                });
+                            }
+                            else {
+                                updatedData = __assign(__assign({}, updatedData), { src: undefined, file: promptResponse.file });
+                            }
+                        }
+                        else if (promptResponse.src) {
+                            updatedData = __assign(__assign({}, updatedData), { src: promptResponse.src, file: undefined });
+                        }
+                        field.data = updatedData;
+                        updateImageElement(updatedData);
+                        return [2];
+                }
+            });
+        }); });
+        return field;
+    };
+
+    var _fields = {
+        html: function (props, data) {
+            return createHtmlField(props, data);
+        },
+        container: function (props, data) {
+            return createHtmlField(props, data);
+        },
+        image: function (props, data) {
+            return createImageField(props, data);
+        },
+        embed: function (props, data) {
+            return createHtmlField(props, data);
+        },
+    };
+    var createField = function (props) {
+        var fieldData = helpers.parseElementData(props.$element, "breField");
         if (fieldData === null ||
             fieldData.name === undefined ||
             fieldData.type === undefined) {
-            throw new Error("There is no data defined in a field: " + $element.innerHTML);
+            throw new Error("There is no data defined in a field: " + props.$element.innerHTML);
         }
         var name = fieldData.name, type = fieldData.type;
-        if (data !== undefined) {
-            var addFieldData = data.find(function (f) { return str.equalsInvariant(f.name, name); });
+        if (props.data !== undefined) {
+            var addFieldData = props.data.find(function (f) {
+                return str.equalsInvariant(f.name, name);
+            });
             if (addFieldData) {
                 fieldData = __assign(__assign({}, fieldData), addFieldData);
             }
         }
-        {
-            BaseField.registerCommonFields();
-        }
-        if (_fields.hasOwnProperty(type)) {
-            var field = _fields[type];
-            return new field($element, fieldData, onSelect, onUpdate, onUpload);
+        if (_fields[type] !== undefined) {
+            var createFieldFunc = _fields[type];
+            return createFieldFunc(props, fieldData);
         }
         else {
             throw new Error(type + " field not found");
         }
     };
-    var BaseField = (function () {
-        function BaseField($field, data, onSelect, onUpdate, onUpload) {
-            this.$field = $field;
-            this.data = data;
-            this.onSelect = onSelect;
-            this.onUpdate = onUpdate;
-            this.onUpload = onUpload;
-            this.bind();
+    var updateFieldProperty = function (field, prop, value, fireUpdate) {
+        var _a;
+        if (fireUpdate === void 0) { fireUpdate = true; }
+        var oldValue = field.data[prop];
+        if (oldValue === value) {
+            return;
         }
-        Object.defineProperty(BaseField, "type", {
-            get: function () {
-                var name = this.name;
-                name = name.replace("Field", "");
-                name = name.substring(0, 1).toLowerCase() + name.substring(1);
-                return name;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        BaseField.registerCommonFields = function () {
-            if (!this.commonFieldsRegistered) {
-                HtmlField.registerField();
-                ImageField.registerField();
-                EmbedField.registerField();
-                ContainerField.registerField();
+        field.data = __assign(__assign({}, field.data), (_a = {}, _a[prop] = value, _a));
+        if (fireUpdate && field.onUpdate) {
+            field.onUpdate(field);
+        }
+    };
+    var toggleFieldSelection = function (field, selected) {
+        if (selected === true) {
+            field.$field.classList.add(Selectors.selectorFieldSelected);
+            if (field.onSelect !== undefined) {
+                field.onSelect(field);
             }
-            this.commonFieldsRegistered = true;
-        };
-        BaseField.registerField = function () {
-            if (_fields.hasOwnProperty(this.type)) {
-                delete _fields[this.type];
+        }
+        else {
+            field.$field.classList.remove(Selectors.selectorFieldSelected);
+            if (field.onDeselect !== undefined) {
+                field.onDeselect(field);
             }
-            _fields[this.type] = this;
-        };
-        BaseField.prototype.deselect = function () {
-            this.$field.classList.remove(Selectors.selectorFieldSelected);
-        };
-        BaseField.prototype.getEl = function () {
-            var $el = this.$field.cloneNode(true);
-            $el.attributes.removeNamedItem(Selectors.attrField);
-            return $el;
-        };
-        BaseField.prototype.getSettingsEl = function () {
-            return null;
-        };
+        }
+    };
+    var getFieldElement = function ($field) {
+        var $el = $field.cloneNode(true);
+        $el.attributes.removeNamedItem(Selectors.attrField);
+        return $el;
+    };
+    var BaseField = (function () {
+        function BaseField() {
+        }
         BaseField.prototype.bind = function () {
         };
-        BaseField.prototype.select = function () {
-            this.$field.classList.add(Selectors.selectorFieldSelected);
-            this.onSelect(this);
-        };
-        BaseField.prototype.updateProperty = function (prop, value, fireUpdate) {
-            if (fireUpdate === void 0) { fireUpdate = true; }
-            var oldValue = this.data[prop];
-            if (oldValue === value) {
-                return;
-            }
-            this.data[prop] = value;
-            if (fireUpdate) {
-                this.onUpdate(prop, oldValue, value);
-            }
-        };
-        BaseField.commonFieldsRegistered = false;
         return BaseField;
     }());
+    //# sourceMappingURL=BaseField.js.map
 
     var ContainerField = (function (_super) {
         __extends(ContainerField, _super);
@@ -1324,7 +1441,7 @@ var BrickyEditor = (function (exports) {
     };
     //# sourceMappingURL=embed.js.map
 
-    var getPromptParams = function (_a) {
+    var getPromptParams$1 = function (_a) {
         var url = _a.url;
         return ({
             url: {
@@ -1339,7 +1456,7 @@ var BrickyEditor = (function (exports) {
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    params = getPromptParams(field.data);
+                    params = getPromptParams$1(field.data);
                     return [4, promptAsync(params)];
                 case 1:
                     updated = _a.sent();
@@ -1428,196 +1545,6 @@ var BrickyEditor = (function (exports) {
     }(BaseField));
     //# sourceMappingURL=EmbedField.js.map
 
-    var HtmlField = (function (_super) {
-        __extends(HtmlField, _super);
-        function HtmlField() {
-            return _super !== null && _super.apply(this, arguments) || this;
-        }
-        HtmlField.prototype.bind = function () {
-            var _this = this;
-            var field = this;
-            var $field = this.$field;
-            if (!$dom.matches($field, Selectors.selectorContentEditable)) {
-                $field.setAttribute(Selectors.attrContentEditable, "true");
-            }
-            var html = this.data.html || this.$field.innerHTML;
-            this.setHtml(html, false);
-            $field.innerHTML = this.data.html;
-            SelectionUtils.bindTextSelection($field, function (rect) {
-                toggleHtmlTools(rect);
-            });
-            helpers.addEventListeners($field, "blur keyup paste input", function () {
-                _this.setHtml($field.innerHTML);
-            });
-            $field.addEventListener("paste", function (ev) {
-                ev.preventDefault();
-                debugger;
-                if (ev.clipboardData) {
-                    var text = ev.clipboardData.getData("text/plain");
-                    document.execCommand("insertHTML", false, text);
-                }
-            });
-            $field.addEventListener("click", function (ev) {
-                field.select();
-                ev.stopPropagation();
-                return false;
-            });
-        };
-        HtmlField.prototype.setHtml = function (value, fireUpdate) {
-            if (fireUpdate === void 0) { fireUpdate = true; }
-            value = value.trim();
-            if (this.$field.innerHTML !== value) {
-                this.$field.innerHTML = value;
-            }
-            this.updateProperty("html", value, fireUpdate);
-        };
-        HtmlField.prototype.getEl = function () {
-            var $el = _super.prototype.getEl.call(this);
-            $el.removeAttribute(Selectors.attrContentEditable);
-            return $el;
-        };
-        return HtmlField;
-    }(BaseField));
-    //# sourceMappingURL=HtmlField.js.map
-
-    var getPromptParams$1 = function (_a) {
-        var src = _a.src, file = _a.file, alt = _a.alt;
-        return ({
-            src: {
-                value: src,
-                title: locales.prompt.image.link.title,
-                placeholder: locales.prompt.image.link.placeholder,
-            },
-            file: {
-                type: "file",
-                value: file,
-                title: locales.prompt.image.upload.title,
-                placeholder: locales.prompt.image.upload.placeholder,
-            },
-            alt: {
-                value: alt,
-                title: locales.prompt.image.alt.title,
-                placeholder: locales.prompt.image.alt.placeholder,
-            },
-        });
-    };
-    var ImageField = (function (_super) {
-        __extends(ImageField, _super);
-        function ImageField() {
-            return _super !== null && _super.apply(this, arguments) || this;
-        }
-        Object.defineProperty(ImageField.prototype, "isImg", {
-            get: function () {
-                return (this._isImg =
-                    this._isImg || this.$field.tagName.toLowerCase() === "img");
-            },
-            enumerable: true,
-            configurable: true
-        });
-        ImageField.prototype.bind = function () {
-            var _this = this;
-            var field = this;
-            this.setSrc(this.data.src, false);
-            this.$field.addEventListener("click", function () { return __awaiter(_this, void 0, void 0, function () {
-                var params, updated, file, src, alt;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0:
-                            params = getPromptParams$1(this.data);
-                            return [4, promptAsync(params)];
-                        case 1:
-                            updated = _a.sent();
-                            if (updated !== null) {
-                                file = updated.file, src = updated.src, alt = updated.alt;
-                                if (file !== undefined) {
-                                    if (field.onUpload) {
-                                        field.onUpload(file, function (url) {
-                                            field.setSrc(url);
-                                            field.setFile(null);
-                                        });
-                                    }
-                                    else {
-                                        field.setFile(file);
-                                        field.setSrc(null);
-                                    }
-                                }
-                                else if (src) {
-                                    field.setSrc(src);
-                                    field.setFile(null);
-                                }
-                                field.setAlt(alt);
-                            }
-                            return [2];
-                    }
-                });
-            }); });
-        };
-        ImageField.prototype.setSrc = function (src, fireUpdate) {
-            if (fireUpdate === void 0) { fireUpdate = true; }
-            if (src) {
-                if (this.isImg) {
-                    this.$field.setAttribute("src", src);
-                }
-                else {
-                    this.$field.style.backgroundImage = "url(" + src;
-                }
-            }
-            this.updateProperty("src", src, fireUpdate);
-        };
-        ImageField.prototype.setAlt = function (alt) {
-            this.$field.setAttribute(this.isImg ? "alt" : "title", alt || "");
-            this.updateProperty("alt", alt);
-        };
-        ImageField.prototype.setFile = function (file) {
-            if (file !== null) {
-                if (this.isImg) {
-                    this.$field.setAttribute("src", file);
-                }
-                else {
-                    this.$field.style.backgroundImage = "url(" + file + ")";
-                }
-            }
-            this.updateProperty("file", file);
-        };
-        ImageField.prototype.setLink = function (url) {
-            if (url && url.href) {
-                if (!this.$link) {
-                    this.$link = helpers.createElement("<a href='" + url.href + "' title='" + url.title + "' target='" + url.target + "'></a>");
-                    this.$link.addEventListener("click", function (ev) {
-                        ev.stopPropagation();
-                        return false;
-                    });
-                    var parentElement = this.$field.parentElement;
-                    if (parentElement !== null) {
-                        parentElement.insertBefore(this.$link, this.$field);
-                        this.$link.appendChild(this.$link);
-                    }
-                }
-                else {
-                    this.$link.href = url.href.value;
-                }
-            }
-            else if (this.$link) {
-                $dom.unwrap(this.$field);
-                this.$link = undefined;
-                delete this.$link;
-            }
-            this.updateProperty("link", url);
-        };
-        ImageField.prototype.getEl = function () {
-            var $el = _super.prototype.getEl.call(this);
-            var link = this.data.link;
-            if (link && link.href) {
-                var $link = helpers.createElement("<a href='" + link.href + "' title='" + link.title + "' target='" + link.target + "'></a>");
-                $link.appendChild($el);
-                return $link;
-            }
-            return $el;
-        };
-        return ImageField;
-    }(BaseField));
-    //# sourceMappingURL=ImageField.js.map
-
     //# sourceMappingURL=Fields.js.map
 
     var Block = (function () {
@@ -1656,7 +1583,7 @@ var BrickyEditor = (function (exports) {
                 field = this.fields[0];
             }
             if (this.selectedField) {
-                this.selectedField.deselect();
+                toggleFieldSelection(this.selectedField, false);
             }
             this.selectedField = field;
             this.ui.toggleSelection(true);
@@ -1665,7 +1592,7 @@ var BrickyEditor = (function (exports) {
         Block.prototype.deselect = function () {
             this.selectedField = null;
             this.fields.forEach(function (f) {
-                f.deselect();
+                toggleFieldSelection(f, false);
             });
             this.ui.toggleSelection(false);
             this.events.onDeselect(this);
@@ -1692,8 +1619,10 @@ var BrickyEditor = (function (exports) {
             var $html = helpers.createElement(this.html);
             var fieldsHtml = {};
             this.fields.forEach(function (field) {
-                var name = field.name || field.data.name;
-                fieldsHtml[name] = field.getEl();
+                if (field !== undefined) {
+                    var name = field.name || field.data.name;
+                    fieldsHtml[name] = field.getElement(field);
+                }
             });
             $dom.select($html, Selectors.selectorField, true).forEach(function ($elem) {
                 var fieldData = helpers.parseElementData($elem, "breField");
@@ -1710,14 +1639,13 @@ var BrickyEditor = (function (exports) {
         Block.prototype.bindFields = function ($block, data) {
             var block = this;
             var $fields = $dom.select($block, Selectors.selectorField, true);
-            $fields.forEach(function ($elem) {
-                var onUpdate = function (property, oldValue, newValue) {
-                    if (block.events.onUpdate !== undefined) {
-                        block.events.onUpdate(block, property, oldValue, newValue);
-                    }
-                };
+            $fields.forEach(function ($element) {
                 var onSelect = block.select;
-                var field = createField($elem, data, onSelect, onUpdate, block.events ? block.events.onUpload : undefined);
+                var field = createField({
+                    $element: $element,
+                    data: data,
+                    onSelect: onSelect,
+                });
                 block.fields.push(field);
             });
         };
@@ -1910,7 +1838,6 @@ var BrickyEditor = (function (exports) {
                 if (code === void 0) { code = 0; }
                 return _this.options.onError({ message: message, code: code });
             };
-            BaseField.registerCommonFields();
             this.$editor = $editor;
             this.$editor.classList.add(Selectors.classEditor);
             this.options = __assign(__assign({}, defaultOptions), options);

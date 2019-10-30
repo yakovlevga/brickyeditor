@@ -91,13 +91,25 @@ declare namespace bre {
     }
 
     namespace field {
-      type FieldType = "container" | "html" | "image" | "embed";
+      type FieldType = "html" | "container" | "image" | "embed";
 
       type Data = {
         name: string;
         type: FieldType;
       } & {
         [TKey: string]: any;
+      };
+
+      type Field<TData extends bre.BaseFieldData = bre.BaseFieldData> = {
+        type: FieldType;
+        name: string;
+        data: TData;
+        $field: HTMLElement;
+        getElement: (field: Field) => HTMLElement;
+
+        onUpdate?: (field: Field) => void;
+        onSelect?: (field: Field) => void;
+        onDeselect?: (field: Field) => void;
       };
     }
   }
@@ -129,9 +141,10 @@ declare namespace bre {
   //   value: any;
   // };
 
-  type Data = { name: string } & {
-    [TKey: string]: any;
-  };
+  type BaseFieldData = { name: string; type: bre.core.field.FieldType };
+  //  & {
+  //   [TKey: string]: any;
+  // };
 
   // namespace field {
   //   interface IBaseField<TData extends bre.Data> {
@@ -144,7 +157,7 @@ declare namespace bre {
 
     type PromptParameter<TValue = any> = {
       type?: PromptParameterType;
-      value: TValue;
+      value?: TValue;
       title: string;
       placeholder?: string;
       options?: {

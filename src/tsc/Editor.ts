@@ -25,7 +25,8 @@ export class Editor {
   private container: BlocksContainer;
 
   constructor($editor: HTMLElement, options: bre.Options) {
-    BaseField.registerCommonFields();
+    // TODO: register additional field types here
+    // BaseField.registerCommonFields();
 
     this.$editor = $editor;
     this.$editor.classList.add(Selectors.classEditor);

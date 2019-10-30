@@ -99,7 +99,7 @@ export const promptAsync = <TParams extends bre.prompt.PromptParameters>(
   params: TParams
 ): Promise<
   | {
-      [TKey in keyof TParams]?: string;
+      [TKey in keyof TParams]?: any;
     }
   | null
 > =>

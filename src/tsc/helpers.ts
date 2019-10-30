@@ -74,17 +74,6 @@ const showModal = (props: {
   document.body.appendChild(element);
 };
 
-const addEventListeners = (
-  el: HTMLElement,
-  types: string,
-  listener: EventListenerOrEventListenerObject,
-  options?: boolean | EventListenerOptions
-) => {
-  types
-    .split(" ")
-    .forEach(type => el.addEventListener(type, listener, options));
-};
-
 const parseElementData = <TData>(
   el: HTMLElement,
   prop: string
@@ -118,5 +107,4 @@ export const helpers = {
   parseElementData,
   showModal,
   toggleVisibility,
-  addEventListeners,
 };
