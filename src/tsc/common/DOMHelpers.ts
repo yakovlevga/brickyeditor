@@ -67,7 +67,7 @@ export class $dom {
 
   // IE8+
   // http://youmightnotneedjquery.com/
-  static hasClass(el: HTMLElement, className: string) {
+  public static hasClass(el: HTMLElement, className: string) {
     if (el.classList) {
       return el.classList.contains(className);
     } else {
@@ -77,7 +77,7 @@ export class $dom {
 
   // IE8+
   // http://youmightnotneedjquery.com/
-  static addClass(el: HTMLElement, className: string) {
+  public static addClass(el: HTMLElement, className: string) {
     if (this.hasClass(el, className)) {
       return;
     }
@@ -91,7 +91,7 @@ export class $dom {
 
   // IE8+
   // http://youmightnotneedjquery.com/
-  static removeClass(el: HTMLElement, className: string) {
+  public static removeClass(el: HTMLElement, className: string) {
     if (el.classList) {
       el.classList.remove(className);
     } else {
@@ -124,9 +124,9 @@ export class $dom {
     if (el.classList) {
       el.classList.toggle(className);
     } else {
-      var classes = el.className.split(" ");
-      var existingIndex = -1;
-      for (var i = classes.length; i--; ) {
+      let classes = el.className.split(" ");
+      let existingIndex = -1;
+      for (let i = classes.length; i--; ) {
         if (classes[i] === className) {
           existingIndex = i;
         }
@@ -145,11 +145,9 @@ export class $dom {
   public static windowScrollTop(): number {
     return window.pageYOffset !== undefined
       ? window.pageYOffset
-      : (<any>(
-          (document.documentElement ||
-            document.body.parentNode ||
-            document.body)
-        )).scrollTop;
+      : ((document.documentElement ||
+          document.body.parentNode ||
+          document.body) as any).scrollTop;
   }
 
   public static replaceWith(from: HTMLElement, to: HTMLElement) {
@@ -165,7 +163,7 @@ export class $dom {
     addBack: boolean = false
   ): HTMLElement[] {
     const elements = el.querySelectorAll(selector);
-    let result = Array.prototype.slice.call(elements) as HTMLElement[];
+    const result = Array.prototype.slice.call(elements) as HTMLElement[];
 
     if (addBack && addBack.valueOf() && $dom.matches(el, selector)) {
       result.push(el);
@@ -189,9 +187,9 @@ export class $dom {
   // http://youmightnotneedjquery.com/
   public static trigger(el: Element, ev: string, data: any) {
     if ((window as any).CustomEvent) {
-      let event = new CustomEvent(ev, { detail: data });
+      const event = new CustomEvent(ev, { detail: data });
     } else {
-      let event = document.createEvent("CustomEvent");
+      const event = document.createEvent("CustomEvent");
       event.initCustomEvent(ev, true, true, data);
     }
     el.dispatchEvent(event);

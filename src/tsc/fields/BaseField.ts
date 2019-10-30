@@ -1,13 +1,64 @@
-import { Common } from "src/common/Common";
-import { $dom } from "src/common/DOMHelpers";
+import { str } from "src/common/Common";
 import {
   ContainerField,
   EmbedField,
   HtmlField,
   ImageField,
 } from "src/fields/Fields";
+import { helpers } from "src/helpers";
 import { bre } from "src/types/bre";
 import { Selectors } from "src/ui/Selectors";
+
+const _fields: any | null = null;
+
+export const createField = <TData extends bre.Data = bre.Data>(
+  $element: HTMLElement,
+  data?: bre.core.field.Data[],
+  onSelect?: (field: BaseField<TData>) => void,
+  onUpdate?: (property: keyof TData, oldValue: any, newValue: any) => void,
+  onUpload?: bre.FileUploadHandler
+): BaseField<TData> => {
+  // take base field props from data-bre-field attribute
+  let fieldData = helpers.parseElementData<bre.core.field.Data>(
+    $element,
+    "breField"
+  );
+
+  if (
+    fieldData === null ||
+    fieldData.name === undefined ||
+    fieldData.type === undefined
+  ) {
+    throw new Error(
+      `There is no data defined in a field: ${$element.innerHTML}`
+    );
+  }
+
+  const { name, type } = fieldData;
+
+  // if data passed from block
+  if (data !== undefined) {
+    const addFieldData = data.find(f => str.equalsInvariant(f.name, name));
+    if (addFieldData) {
+      fieldData = {
+        ...fieldData,
+        ...addFieldData,
+      };
+    }
+  }
+
+  // find field constructor in registered fields
+  if (_fields === null) {
+    BaseField.registerCommonFields();
+  }
+
+  if (_fields.hasOwnProperty(type)) {
+    const field = _fields[type];
+    return new field($element, fieldData, onSelect, onUpdate, onUpload);
+  } else {
+    throw new Error(`${type} field not found`);
+  }
+};
 
 export abstract class BaseField<TData extends bre.Data = bre.Data> {
   public static get type(): string {
@@ -35,67 +86,14 @@ export abstract class BaseField<TData extends bre.Data = bre.Data> {
     this.commonFieldsRegistered = true;
   }
 
-  public static createField<TData extends bre.Data = bre.Data>(
-    $field: HTMLElement,
-    data: TData,
-    onSelect: (field: BaseField<TData>) => void,
-    onUpdate: (property: keyof TData, oldValue: any, newValue: any) => void,
-    onUpload?: (file: any, callback: (url: string) => void) => void
-  ): BaseField<TData> {
-    let fieldData = $dom.data<any>($field, "breField");
-    if (!fieldData || !fieldData.name) {
-      throw new Error(
-        `There is no data or data doesn't contains 'name' in field ${$field.innerHTML}`
-      );
-    }
-
-    // if data passed
-    if (data !== undefined) {
-      let addFieldData = {};
-      // Object.keys(data).forEach(fieldName => {
-      //   data[fieldName].
-      // })
-      for (const field in data) {
-        if (field.name.toLowerCase() === fieldData.name.toLowerCase()) {
-          // get current field data
-          addFieldData = field;
-          break;
-        }
-      }
-
-      // if there is some additional data, pass it to data object
-      if (addFieldData) {
-        fieldData = Common.extend(fieldData, addFieldData);
-      }
-    }
-
-    const type = fieldData.type;
-    if (type != null) {
-      // find field constructor in registered fields
-      if (!BaseField.commonFieldsRegistered) {
-        BaseField.registerCommonFields();
-      }
-
-      if (this._fields.hasOwnProperty(type)) {
-        const field = this._fields[type];
-        return new field($field, fieldData, onSelect, onUpdate, onUpload);
-      } else {
-        throw new Error(`${type} field not found`);
-      }
-    } else {
-      throw new Error(`Field type not defined in data-bre-field attribute`);
-    }
-  }
-  private static _fields: any = {};
-
   private static registerField() {
     // check if already registered to avoid dublicates
-    if (this._fields.hasOwnProperty(this.type)) {
-      delete this._fields[this.type];
+    if (_fields.hasOwnProperty(this.type)) {
+      delete _fields[this.type];
     }
 
     // add field class to registered fields
-    this._fields[this.type] = this;
+    _fields[this.type] = this;
   }
 
   public $field: HTMLElement;

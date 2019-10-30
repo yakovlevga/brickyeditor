@@ -85,8 +85,37 @@ const addEventListeners = (
     .forEach(type => el.addEventListener(type, listener, options));
 };
 
+const parseElementData = <TData>(
+  el: HTMLElement,
+  prop: string
+): TData | null => {
+  let json = el.dataset[prop];
+  if (json === undefined) {
+    return null;
+  }
+
+  let data: TData | null = null;
+
+  try {
+    data = JSON.parse(json);
+  } catch (e) {
+    if (e instanceof SyntaxError) {
+      json = json.replace(/'/g, '"');
+      try {
+        data = JSON.parse(json) as TData;
+      } catch {
+        // TODO: log error
+        return null;
+      }
+    }
+  }
+
+  return data;
+};
+
 export const helpers = {
   createElement,
+  parseElementData,
   showModal,
   toggleVisibility,
   addEventListeners,

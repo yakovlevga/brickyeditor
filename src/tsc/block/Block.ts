@@ -2,13 +2,13 @@ import { BlockUI } from "src/block/BlockUI";
 import { BlockUIAction } from "src/block/BlockUIAction";
 import { str } from "src/common/Common";
 import { $dom } from "src/common/DOMHelpers";
-import { BaseField, ContainerField } from "src/fields/Fields";
+import { BaseField, ContainerField, createField } from "src/fields/Fields";
 import { helpers } from "src/helpers";
 import { bre } from "src/types/bre";
 import { Selectors } from "src/ui/Selectors";
 
 export class Block {
-  public name: string;
+  public template: string;
   public html: string;
   public fields: BaseField[] = [];
   public ui: BlockUI;
@@ -16,13 +16,13 @@ export class Block {
   public events?: bre.core.block.Events;
 
   constructor(
-    name: string,
+    template: string,
     html: string,
     preview: boolean,
     data?: BaseField[],
     events?: bre.core.block.Events
   ) {
-    this.name = name;
+    this.template = template;
     this.html = html;
     this.events = events;
 
@@ -95,7 +95,7 @@ export class Block {
     });
 
     const data: bre.IBlockData = {
-      template: this.name,
+      template: this.template,
       fields: fieldsData,
     };
 
@@ -118,7 +118,7 @@ export class Block {
     });
 
     $dom.select($html, Selectors.selectorField, true).forEach($elem => {
-      const fieldData = $dom.data<any>($elem, "breField");
+      const fieldData = helpers.parseElementData<any>($elem, "breField");
       const name = fieldData.name;
       const $field = fieldsHtml[name];
       $dom.replaceWith($elem, $field);
@@ -149,7 +149,7 @@ export class Block {
 
       const onSelect = block.select;
 
-      const field = BaseField.createField(
+      const field = createField(
         $elem,
         data,
         onSelect,

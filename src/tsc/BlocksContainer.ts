@@ -164,7 +164,13 @@ export class BlocksContainer implements bre.core.IBlocksContainer {
   private copyBlock(block: Block) {
     const idx = this.blocks.indexOf(block) + 1;
     // const copy = this.addBlock(
-    this.addBlock(block.name, block.html, block.getData().fields, idx, true);
+    this.addBlock(
+      block.template,
+      block.html,
+      block.getData().fields,
+      idx,
+      true
+    );
   }
 
   private selectBlock(block: Block) {

@@ -92,7 +92,8 @@ export class Editor {
   public loadBlocks(blocks: Block[]) {
     if (blocks && blocks.length) {
       blocks.forEach(block => {
-        const template = getTemplate(block.name);
+        const template = getTemplate(block.template);
+        debugger;
         if (template) {
           this.container.addBlock(
             template.name,
@@ -102,7 +103,9 @@ export class Editor {
             false
           );
         } else {
-          const message = EditorStrings.errorBlockTemplateNotFound(block.name);
+          const message = EditorStrings.errorBlockTemplateNotFound(
+            block.template
+          );
           this.onError(message);
         }
       });

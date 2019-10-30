@@ -89,6 +89,17 @@ declare namespace bre {
         onUpload?: FileUploadHandler;
       };
     }
+
+    namespace field {
+      type FieldType = "container" | "html" | "image" | "embed";
+
+      type Data = {
+        name: string;
+        type: FieldType;
+      } & {
+        [TKey: string]: any;
+      };
+    }
   }
 
   type HtmlToolsButtonCommands =
@@ -118,8 +129,7 @@ declare namespace bre {
   //   value: any;
   // };
 
-  type Data = {
-    name: string;
+  type Data = { name: string } & {
     [TKey: string]: any;
   };
 

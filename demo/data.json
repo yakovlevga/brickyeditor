@@ -1,10 +1,12 @@
-[{
-    "template": "Container",
+[
+  {
+    "template": "Display Heading 1",
     "fields": [
-        {
-            "name": "text",
-            "type": "html",
-            "html": "Hi! This is bricky editor example."
-        }
+      {
+        "name": "text",
+        "type": "html",
+        "html": "Header"
+      }
     ]
-}]
+  }
+]
