@@ -91,7 +91,7 @@ export class UI {
       this.$toolsTemplates!.appendChild($header);
       const $group = helpers.createElement("<div></div>");
       group.templates.forEach(template => {
-        const $preview = getTemplatePreview(template);
+        const { $preview } = template;
         $preview.setAttribute("title", template.name);
         $preview.onclick = ev => {
           editor.addBlock(template);

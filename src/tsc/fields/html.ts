@@ -17,9 +17,7 @@ export type HtmlFieldData = bre.core.field.FieldData & {
 type HtmlFieldFactory = FieldFactory<HtmlFieldData>;
 
 export const createHtmlField: HtmlFieldFactory = (props, data) => {
-  const { $element } = props;
-
-  $element.setAttribute(Selectors.attrContentEditable, "true");
+  const { $element, preview } = props;
 
   if (data.html) {
     $element.innerHTML = data.html;
@@ -49,25 +47,29 @@ export const createHtmlField: HtmlFieldFactory = (props, data) => {
     }
   };
 
-  $element.addEventListener("blur", updateHtmlProp);
-  $element.addEventListener("keyup", updateHtmlProp);
-  $element.addEventListener("paste", updateHtmlProp);
-  $element.addEventListener("input", updateHtmlProp);
+  if (!preview) {
+    $element.setAttribute(Selectors.attrContentEditable, "true");
 
-  $element.addEventListener("paste", ev => {
-    ev.preventDefault();
-    if (ev.clipboardData) {
-      const text = ev.clipboardData.getData("text/plain");
-      document.execCommand("insertHTML", false, text);
-    }
-  });
+    $element.addEventListener("blur", updateHtmlProp);
+    $element.addEventListener("keyup", updateHtmlProp);
+    $element.addEventListener("paste", updateHtmlProp);
+    $element.addEventListener("input", updateHtmlProp);
 
-  $element.addEventListener("click", ev => {
-    // Prevents the event from bubbling up the DOM tree
-    toggleFieldSelection(field, true);
-    ev.stopPropagation();
-    return false;
-  });
+    $element.addEventListener("paste", ev => {
+      ev.preventDefault();
+      if (ev.clipboardData) {
+        const text = ev.clipboardData.getData("text/plain");
+        document.execCommand("insertHTML", false, text);
+      }
+    });
+
+    $element.addEventListener("click", ev => {
+      // Prevents the event from bubbling up the DOM tree
+      toggleFieldSelection(field, true);
+      ev.stopPropagation();
+      return false;
+    });
+  }
 
   return field;
 };

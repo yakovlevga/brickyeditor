@@ -1,4 +1,4 @@
-import { Block } from "src/block/Block";
+import { createBlockFromTemplate, bindFields } from "src/block/Block";
 import { str } from "src/common/Common";
 import { $dom } from "src/common/DOMHelpers";
 import { EditorStrings } from "src/EditorStrings";
@@ -48,7 +48,7 @@ export const loadTemplatesAsync = async (
 
     $groups.forEach($group => {
       const name = $group.getAttribute("title");
-      const templates = parseTemplates($group, onError);
+      const templates = parseTemplates($group);
       grouppedTemplates.push({ name, templates });
       $group.remove();
 
@@ -57,7 +57,7 @@ export const loadTemplatesAsync = async (
     });
 
     // the rest ungroupped templates
-    const ungrouppedTemplates = parseTemplates($data, onError);
+    const ungrouppedTemplates = parseTemplates($data);
     const ungrouppedTemplatesGroupName =
       grouppedTemplates.length > 0
         ? EditorStrings.defaultTemplatesGroupName
@@ -78,7 +78,7 @@ export const loadTemplatesAsync = async (
   }
 };
 
-const parseTemplates = ($el: HTMLElement, onError: onErrorHandler) => {
+const parseTemplates = ($el: HTMLElement) => {
   const templates: bre.core.ITemplate[] = [];
 
   const $templates = $el.querySelectorAll<HTMLElement>(
@@ -86,7 +86,7 @@ const parseTemplates = ($el: HTMLElement, onError: onErrorHandler) => {
   );
 
   $templates.forEach($template => {
-    const template = createTemplate($template, onError);
+    const template = createTemplate($template);
     if (template !== null) {
       templates.push(template);
     }
@@ -103,11 +103,7 @@ export const getTemplatePreview = (template: bre.core.ITemplate) => {
   return $template;
 };
 
-const createTemplate = (
-  $template: HTMLElement,
-  onError: onErrorHandler
-): bre.core.ITemplate | null => {
-  const $html = $template;
+const createTemplate = ($template: HTMLElement): bre.core.ITemplate | null => {
   const name = $template.dataset.name || "";
 
   let $preview = $template.querySelector<HTMLElement>(
@@ -117,20 +113,13 @@ const createTemplate = (
   if ($preview !== null) {
     $template.removeChild($preview);
   } else {
-    const block = new Block(name, $html.innerHTML, true);
-    const blockHtml = block.getHtml(true);
-
-    if (blockHtml === null) {
-      onError(EditorStrings.errorTemplateParsing(name));
-      return null;
-    }
-
-    $preview = helpers.createElement(blockHtml);
+    $preview = $template.cloneNode(true) as HTMLElement;
+    bindFields($preview, true);
   }
 
   return {
     name,
-    $html,
+    $html: $template,
     $preview,
   };
 };

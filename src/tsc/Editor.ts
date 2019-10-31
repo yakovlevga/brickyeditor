@@ -126,7 +126,6 @@ export class Editor {
 
   public addBlock(blockTemplate: bre.core.ITemplate) {
     const container = getCurrentContainer(this.container);
-    // const block = createBlock(template, false);
     addBlockToContainer(container, {
       blockTemplate,
     });

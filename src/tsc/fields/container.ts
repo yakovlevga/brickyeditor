@@ -1,9 +1,7 @@
-import { Block } from "src/block/Block";
 import {
-  BlocksContainer,
+  createContainer,
   getContainerData,
   getContainerHtml,
-  createContainer,
 } from "src/BlocksContainer";
 import { FieldFactory } from "src/fields/field";
 import { helpers } from "src/helpers";
@@ -19,7 +17,7 @@ export type ContainerFieldData = bre.core.field.FieldData & {
 type ContainerFieldFactory = FieldFactory<ContainerFieldData>;
 
 export const createContainerField: ContainerFieldFactory = (props, data) => {
-  const { $element } = props;
+  const { $element, preview } = props;
 
   const updateBlocks = () => {
     const blocks = getContainerData(container, true);
@@ -49,7 +47,7 @@ export const createContainerField: ContainerFieldFactory = (props, data) => {
   //   true
   // );
 
-  const container = createContainer($element, true);
+  const container = createContainer($element, !preview);
 
   const field: bre.core.field.ContainerField = {
     type: "container",
@@ -65,12 +63,14 @@ export const createContainerField: ContainerFieldFactory = (props, data) => {
 
   $element.classList.add(Selectors.selectorFieldContainer);
 
-  $element.addEventListener("click", ev => {
-    // TODO:
-    // field.select();
-    ev.stopPropagation();
-    return false;
-  });
+  if (!preview) {
+    $element.addEventListener("click", ev => {
+      // TODO:
+      // field.select();
+      ev.stopPropagation();
+      return false;
+    });
+  }
 
   return field;
 };

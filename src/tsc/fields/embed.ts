@@ -62,7 +62,7 @@ const renderEmbedFieldSettingsUI = ($field: HTMLElement) => {
 };
 
 export const createEmbedField: EmbedFieldFactory = (props, data) => {
-  const { $element } = props;
+  const { $element, preview } = props;
 
   const field: bre.core.field.Field<EmbedFieldData> = {
     type: "embed",
@@ -131,9 +131,11 @@ export const createEmbedField: EmbedFieldFactory = (props, data) => {
     }
   };
 
-  $element.addEventListener("click", async () => {
-    promptEmbedMediaUrl();
-  });
+  if (!preview) {
+    $element.addEventListener("click", async () => {
+      promptEmbedMediaUrl();
+    });
+  }
 
   return field;
 };

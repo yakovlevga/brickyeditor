@@ -259,6 +259,33 @@ var BrickyEditor = (function (exports) {
     }());
     //# sourceMappingURL=DOMHelpers.js.map
 
+    var str = {
+        totalTrim: function (s) {
+            return s !== undefined ? s.replace(/\s\s+/g, " ").trim() : "";
+        },
+        equalsInvariant: function (s1, s2) {
+            if (!s1 || !s2) {
+                return s1 === s2;
+            }
+            return s1.toLowerCase() === s2.toLowerCase();
+        },
+        startsWith: function (s1, s2) { return s1.indexOf(s2) === 0; },
+    };
+    var Common = (function () {
+        function Common() {
+        }
+        Common.propsEach = function (obj, func) {
+            for (var key in obj) {
+                if (obj.hasOwnProperty(key)) {
+                    var value = obj[key];
+                    func(key, value);
+                }
+            }
+        };
+        return Common;
+    }());
+    //# sourceMappingURL=Common.js.map
+
     var getSelectionRanges = function () {
         var selection = window.getSelection();
         if (selection === null) {
@@ -405,73 +432,57 @@ var BrickyEditor = (function (exports) {
     };
     //# sourceMappingURL=helpers.js.map
 
-    var str = {
-        totalTrim: function (s) {
-            return s !== undefined ? s.replace(/\s\s+/g, " ").trim() : "";
-        },
-        equalsInvariant: function (s1, s2) {
-            if (!s1 || !s2) {
-                return s1 === s2;
-            }
-            return s1.toLowerCase() === s2.toLowerCase();
-        },
-        startsWith: function (s1, s2) { return s1.indexOf(s2) === 0; },
-    };
-    var Common = (function () {
-        function Common() {
+    var Selectors = (function () {
+        function Selectors() {
         }
-        Common.propsEach = function (obj, func) {
-            for (var key in obj) {
-                if (obj.hasOwnProperty(key)) {
-                    var value = obj[key];
-                    func(key, value);
-                }
-            }
+        Selectors.attr = function (attr) {
+            return "[" + attr + "]";
         };
-        return Common;
+        Selectors.attrContentEditable = "contenteditable";
+        Selectors.selectorContentEditable = "contenteditable";
+        Selectors.attrField = "data-bre-field";
+        Selectors.selectorField = "[" + Selectors.attrField + "]";
+        Selectors.classEditor = "bre-editor";
+        Selectors.classTemplate = "bre-template";
+        Selectors.selectorTemplate = "." + Selectors.classTemplate;
+        Selectors.classTemplateGroup = "bre-template-group";
+        Selectors.selectorTemplateGroup = "." + Selectors.classTemplateGroup;
+        Selectors.selectorTemplatePreview = ".bre-template-preview";
+        Selectors.classMobile = "brickyeditor-tools-mobile";
+        Selectors.htmlToolsCommand = "data-bre-doc-command";
+        Selectors.htmlToolsCommandRange = "data-bre-doc-command-range";
+        Selectors.selectorFieldSelected = "bre-field-selected";
+        Selectors.selectorFieldContainer = "bre-field-container";
+        Selectors.selectorHtmlToolsCommand = Selectors.attr(Selectors.htmlToolsCommand);
+        Selectors.selectorHtmlToolsCommandRange = Selectors.attr(Selectors.htmlToolsCommandRange);
+        return Selectors;
     }());
-    //# sourceMappingURL=Common.js.map
+    //# sourceMappingURL=Selectors.js.map
 
-    var EditorStrings = (function () {
-        function EditorStrings() {
+    var createContainerField = function (props, data) {
+        var $element = props.$element, preview = props.preview;
+        var container = createContainer($element, !preview);
+        var field = {
+            type: "container",
+            name: data.name,
+            $field: $element,
+            data: data,
+            container: container,
+            getElement: function () {
+                var html = getContainerHtml(container);
+                return helpers.createElement(html);
+            },
+        };
+        $element.classList.add(Selectors.selectorFieldContainer);
+        if (!preview) {
+            $element.addEventListener("click", function (ev) {
+                ev.stopPropagation();
+                return false;
+            });
         }
-        EditorStrings.embedFieldLinkTitle = "Link to embed media";
-        EditorStrings.embedFieldLinkPlaceholder = "Link to instagram, youtube and etc.";
-        EditorStrings.imageFieldLinkTitle = "Image link";
-        EditorStrings.imageFieldLinkPlaceholder = "http://url-to-image.png";
-        EditorStrings.imageFieldUploadTitle = "or Upload a file";
-        EditorStrings.imageFieldUploadButton = "Select file";
-        EditorStrings.imageFieldAltTitle = "Alt";
-        EditorStrings.imageFieldAltPlaceholder = "Image 'alt' attribute value";
-        EditorStrings.imageFieldUrlSubtitle = "Link to open on image click";
-        EditorStrings.htmlEditorLinkUrlTitle = "Url";
-        EditorStrings.htmlEditorLinkUrlPlaceholder = "http://put-your-link.here";
-        EditorStrings.htmlEditorLinkTitleTitle = "Title";
-        EditorStrings.htmlEditorLinkTitlePlaceholder = "Title attribute for link";
-        EditorStrings.htmlEditorLinkTargetTitle = "Target";
-        EditorStrings.htmlEditorLinkTargetBlank = "Blank";
-        EditorStrings.htmlEditorLinkTargetSelf = "Self";
-        EditorStrings.htmlEditorLinkTargetParent = "Parent";
-        EditorStrings.htmlEditorLinkTargetTop = "Top";
-        EditorStrings.buttonClose = "close";
-        EditorStrings.buttonOk = "Ok";
-        EditorStrings.buttonCancel = "Cancel";
-        EditorStrings.defaultTemplatesGroupName = "Other templates";
-        EditorStrings.errorBlocksFileNotFound = function (url) {
-            return "Blocks file not found. Requested file: " + url + ".";
-        };
-        EditorStrings.errorTemplatesFileNotFound = function (url) {
-            return "Templates file not found. Requested file: " + url + ".";
-        };
-        EditorStrings.errorBlockTemplateNotFound = function (templateName) {
-            return "Template \"" + templateName + "\" not found.";
-        };
-        EditorStrings.errorTemplateParsing = function (name) {
-            return "Template parsing error: " + name + ".";
-        };
-        return EditorStrings;
-    }());
-    //# sourceMappingURL=EditorStrings.js.map
+        return field;
+    };
+    //# sourceMappingURL=container.js.map
 
     var getRequest = function (url) {
         return new Promise(function (resolve, reject) {
@@ -552,122 +563,44 @@ var BrickyEditor = (function (exports) {
     };
     //# sourceMappingURL=httpTransport.js.map
 
-    var Selectors = (function () {
-        function Selectors() {
+    var preProcessEmbedUrl = function (url) {
+        return url.replace("https://www.instagram.com", "http://instagr.am");
+    };
+    var postProcessEmbed = function (provider) {
+        switch (provider) {
+            case "Instagram":
+                var instgrm = window.instgrm;
+                if (instgrm !== undefined) {
+                    instgrm.Embeds.process();
+                }
+                break;
+            default:
+                break;
         }
-        Selectors.attr = function (attr) {
-            return "[" + attr + "]";
-        };
-        Selectors.attrContentEditable = "contenteditable";
-        Selectors.selectorContentEditable = "contenteditable";
-        Selectors.attrField = "data-bre-field";
-        Selectors.selectorField = "[" + Selectors.attrField + "]";
-        Selectors.classEditor = "bre-editor";
-        Selectors.classTemplate = "bre-template";
-        Selectors.selectorTemplate = "." + Selectors.classTemplate;
-        Selectors.classTemplateGroup = "bre-template-group";
-        Selectors.selectorTemplateGroup = "." + Selectors.classTemplateGroup;
-        Selectors.selectorTemplatePreview = ".bre-template-preview";
-        Selectors.classMobile = "brickyeditor-tools-mobile";
-        Selectors.htmlToolsCommand = "data-bre-doc-command";
-        Selectors.htmlToolsCommandRange = "data-bre-doc-command-range";
-        Selectors.selectorFieldSelected = "bre-field-selected";
-        Selectors.selectorFieldContainer = "bre-field-container";
-        Selectors.selectorHtmlToolsCommand = Selectors.attr(Selectors.htmlToolsCommand);
-        Selectors.selectorHtmlToolsCommandRange = Selectors.attr(Selectors.htmlToolsCommandRange);
-        return Selectors;
-    }());
-    //# sourceMappingURL=Selectors.js.map
-
-    var allTemplates = [];
-    var getTemplate = function (templateName) {
-        var template = allTemplates.find(function (x) {
-            return str.equalsInvariant(x.name, templateName);
-        });
-        return template || null;
     };
-    var loadTemplatesAsync = function (url, $editor, onError) { return __awaiter(void 0, void 0, void 0, function () {
-        var grouppedTemplates, data, $data, $style, $groups, ungrouppedTemplates, ungrouppedTemplatesGroupName, err_1;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    grouppedTemplates = [];
-                    _a.label = 1;
-                case 1:
-                    _a.trys.push([1, 3, , 4]);
-                    return [4, getRequest(url)];
-                case 2:
-                    data = _a.sent();
-                    $data = helpers.createElement("<div>" + data + "</div>");
-                    $style = $data.querySelector("style");
-                    if ($style !== null) {
-                        $dom.before($editor, $style);
-                    }
-                    $groups = $data.querySelectorAll(Selectors.selectorTemplateGroup);
-                    $groups.forEach(function ($group) {
-                        var name = $group.getAttribute("title");
-                        var templates = parseTemplates($group, onError);
-                        grouppedTemplates.push({ name: name, templates: templates });
-                        $group.remove();
-                        allTemplates = __spreadArrays(allTemplates, templates);
-                    });
-                    ungrouppedTemplates = parseTemplates($data, onError);
-                    ungrouppedTemplatesGroupName = grouppedTemplates.length > 0
-                        ? EditorStrings.defaultTemplatesGroupName
-                        : "";
-                    grouppedTemplates.push({
-                        name: ungrouppedTemplatesGroupName,
-                        templates: ungrouppedTemplates,
-                    });
-                    allTemplates = __spreadArrays(allTemplates, ungrouppedTemplates);
-                    return [2, grouppedTemplates];
-                case 3:
-                    err_1 = _a.sent();
-                    onError(EditorStrings.errorTemplatesFileNotFound(url));
-                    throw err_1;
-                case 4: return [2];
-            }
-        });
-    }); };
-    var parseTemplates = function ($el, onError) {
-        var templates = [];
-        var $templates = $el.querySelectorAll(Selectors.selectorTemplate);
-        $templates.forEach(function ($template) {
-            var template = createTemplate($template, onError);
-            if (template !== null) {
-                templates.push(template);
-            }
-        });
-        return templates;
+    var getEmbedAsync = function (embedUrl) {
+        var url = "https://noembed.com/embed?url=" + embedUrl;
+        return new Promise(function (resolve, reject) { return __awaiter(void 0, void 0, void 0, function () {
+            var data, err_1;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        _a.trys.push([0, 2, , 3]);
+                        return [4, jsonp(url)];
+                    case 1:
+                        data = _a.sent();
+                        resolve(data);
+                        return [3, 3];
+                    case 2:
+                        err_1 = _a.sent();
+                        reject(err_1);
+                        return [3, 3];
+                    case 3: return [2];
+                }
+            });
+        }); });
     };
-    var getTemplatePreview = function (template) {
-        var $template = helpers.createElement("<div class='" + Selectors.classTemplate + "'></div>");
-        $template.appendChild(template.$preview);
-        return $template;
-    };
-    var createTemplate = function ($template, onError) {
-        var $html = $template;
-        var name = $template.dataset.name || "";
-        var $preview = $template.querySelector(Selectors.selectorTemplatePreview);
-        if ($preview !== null) {
-            $template.removeChild($preview);
-        }
-        else {
-            var block = new Block(name, $html.innerHTML, true);
-            var blockHtml = block.getHtml(true);
-            if (blockHtml === null) {
-                onError(EditorStrings.errorTemplateParsing(name));
-                return null;
-            }
-            $preview = helpers.createElement(blockHtml);
-        }
-        return {
-            name: name,
-            $html: $html,
-            $preview: $preview,
-        };
-    };
-    //# sourceMappingURL=template.js.map
+    //# sourceMappingURL=embed.js.map
 
     var locales = {
         errorBlocksFileNotFound: function (url) {
@@ -855,6 +788,98 @@ var BrickyEditor = (function (exports) {
     }); };
     //# sourceMappingURL=prompt.js.map
 
+    var providerScriptsLoaded = {};
+    var getPromptParams = function (_a) {
+        var url = _a.url;
+        return ({
+            url: {
+                value: url || "http://instagr.am/p/BO9VX2Vj4fF/",
+                title: locales.prompt.embed.url.title,
+                placeholder: locales.prompt.embed.url.placeholder,
+            },
+        });
+    };
+    var createEmbedField = function (props, data) {
+        var $element = props.$element, preview = props.preview;
+        var field = {
+            type: "embed",
+            name: data.name,
+            $field: $element,
+            data: data,
+            getElement: function () {
+                var $copy = getFieldElement($element);
+                return $copy;
+            },
+        };
+        var updateEmbedMedia = function (url, fireUpdate) { return __awaiter(void 0, void 0, void 0, function () {
+            var embed, $embed, $script;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        if (url === undefined) {
+                            return [2];
+                        }
+                        return [4, getEmbedAsync(preProcessEmbedUrl(url))];
+                    case 1:
+                        embed = _a.sent();
+                        field.data = __assign(__assign({}, field.data), { url: url,
+                            embed: embed });
+                        $embed = helpers.createElement("<div>" + embed.html + "</div>");
+                        $script = $embed.querySelector("script");
+                        if ($script !== null) {
+                            $script.remove();
+                        }
+                        $element.innerHTML = "";
+                        $element.removeAttribute("class");
+                        $element.removeAttribute("style");
+                        $element.appendChild($embed);
+                        if (!($script !== null)) return [3, 4];
+                        if (!(providerScriptsLoaded[$script.src] === undefined)) return [3, 3];
+                        return [4, loadScriptAsync($script.src)];
+                    case 2:
+                        _a.sent();
+                        providerScriptsLoaded[embed.provider_name] = true;
+                        _a.label = 3;
+                    case 3:
+                        setTimeout(function () { return postProcessEmbed(embed.provider_name); }, 100);
+                        _a.label = 4;
+                    case 4:
+                        return [2];
+                }
+            });
+        }); };
+        updateEmbedMedia(data.url, false);
+        var promptEmbedMediaUrl = function () { return __awaiter(void 0, void 0, void 0, function () {
+            var params, updated, url;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        params = getPromptParams(field.data);
+                        return [4, promptAsync(params)];
+                    case 1:
+                        updated = _a.sent();
+                        if (updated !== null) {
+                            url = updated.url;
+                            if (url !== undefined) {
+                                updateEmbedMedia(url, true);
+                            }
+                        }
+                        return [2];
+                }
+            });
+        }); };
+        if (!preview) {
+            $element.addEventListener("click", function () { return __awaiter(void 0, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    promptEmbedMediaUrl();
+                    return [2];
+                });
+            }); });
+        }
+        return field;
+    };
+    //# sourceMappingURL=embed.js.map
+
     var promptLinkParamsAsync = function (selection) { return __awaiter(void 0, void 0, void 0, function () {
         var currentLink, promptParams;
         return __generator(this, function (_a) {
@@ -970,6 +995,468 @@ var BrickyEditor = (function (exports) {
     };
     //# sourceMappingURL=htmlTools.js.map
 
+    var createHtmlField = function (props, data) {
+        var $element = props.$element, preview = props.preview;
+        if (data.html) {
+            $element.innerHTML = data.html;
+        }
+        var field = {
+            type: "html",
+            name: data.name,
+            $field: $element,
+            data: data,
+            getElement: function () {
+                var $copy = getFieldElement($element);
+                $copy.removeAttribute(Selectors.attrContentEditable);
+                return $copy;
+            },
+        };
+        SelectionUtils.bindTextSelection($element, function (rect) {
+            toggleHtmlTools(rect);
+        });
+        var updateHtmlProp = function () {
+            var value = $element.innerHTML.trim();
+            if ($element.innerHTML !== value) {
+                field.$field.innerHTML = value;
+                updateFieldProperty(field, "html", value, true);
+            }
+        };
+        if (!preview) {
+            $element.setAttribute(Selectors.attrContentEditable, "true");
+            $element.addEventListener("blur", updateHtmlProp);
+            $element.addEventListener("keyup", updateHtmlProp);
+            $element.addEventListener("paste", updateHtmlProp);
+            $element.addEventListener("input", updateHtmlProp);
+            $element.addEventListener("paste", function (ev) {
+                ev.preventDefault();
+                if (ev.clipboardData) {
+                    var text = ev.clipboardData.getData("text/plain");
+                    document.execCommand("insertHTML", false, text);
+                }
+            });
+            $element.addEventListener("click", function (ev) {
+                toggleFieldSelection(field, true);
+                ev.stopPropagation();
+                return false;
+            });
+        }
+        return field;
+    };
+    //# sourceMappingURL=html.js.map
+
+    var getPromptParams$1 = function (_a) {
+        var src = _a.src, file = _a.file, alt = _a.alt;
+        return ({
+            src: {
+                value: src,
+                title: locales.prompt.image.link.title,
+                placeholder: locales.prompt.image.link.placeholder,
+            },
+            file: {
+                type: "file",
+                value: file,
+                title: locales.prompt.image.upload.title,
+                placeholder: locales.prompt.image.upload.placeholder,
+            },
+            alt: {
+                value: alt,
+                title: locales.prompt.image.alt.title,
+                placeholder: locales.prompt.image.alt.placeholder,
+            },
+        });
+    };
+    var createImageField = function (props, data) {
+        var $element = props.$element, preview = props.preview;
+        var isImageElement = $element.tagName.toLowerCase() === "img";
+        var updateImageElement = function (d) {
+            if (isImageElement) {
+                var image = $element;
+                image.src = d.src || "";
+                image.alt = d.alt || "";
+            }
+            else {
+                $element.style.backgroundImage = "url(" + d.src + ")";
+            }
+            $element.title = d.alt || "";
+        };
+        if (data.src) {
+            updateImageElement(data);
+        }
+        var field = {
+            type: "image",
+            name: data.name,
+            $field: $element,
+            data: data,
+            getElement: function () {
+                var $copy = getFieldElement($element);
+                var link = field.data.link;
+                if (link !== undefined && link.href.length) {
+                    var $link = helpers.createElement("<a href='" + link.href + "' title='" + link.title + "' target='" + link.target + "'></a>");
+                    $link.appendChild($copy);
+                    return $link;
+                }
+                return $copy;
+            },
+        };
+        if (!preview) {
+            $element.addEventListener("click", function () { return __awaiter(void 0, void 0, void 0, function () {
+                var params, promptResponse, updatedData, fileContent;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            params = getPromptParams$1(field.data);
+                            return [4, promptAsync(params)];
+                        case 1:
+                            promptResponse = _a.sent();
+                            if (promptResponse === null) {
+                                return [2];
+                            }
+                            updatedData = __assign(__assign({}, field.data), { alt: promptResponse.alt });
+                            if (!(promptResponse.file !== undefined)) return [3, 5];
+                            if (!props.onUpload) return [3, 2];
+                            props.onUpload(promptResponse.file, function (src) {
+                                updatedData = __assign(__assign({}, updatedData), { src: src, file: undefined });
+                            });
+                            return [3, 4];
+                        case 2: return [4, helpers.readFileAsync(promptResponse.file)];
+                        case 3:
+                            fileContent = _a.sent();
+                            updatedData = __assign(__assign({}, updatedData), { src: fileContent, file: undefined });
+                            _a.label = 4;
+                        case 4: return [3, 6];
+                        case 5:
+                            if (promptResponse.src) {
+                                updatedData = __assign(__assign({}, updatedData), { src: promptResponse.src, file: undefined });
+                            }
+                            _a.label = 6;
+                        case 6:
+                            field.data = updatedData;
+                            updateImageElement(updatedData);
+                            if (field.onUpdate) {
+                                field.onUpdate(field);
+                            }
+                            return [2];
+                    }
+                });
+            }); });
+        }
+        return field;
+    };
+    //# sourceMappingURL=image.js.map
+
+    var _fields = {
+        html: function (props, data) {
+            return createHtmlField(props, data);
+        },
+        container: function (props, data) {
+            return createContainerField(props, data);
+        },
+        image: function (props, data) {
+            return createImageField(props, data);
+        },
+        embed: function (props, data) {
+            return createEmbedField(props, data);
+        },
+    };
+    var createField = function (props) {
+        var $element = props.$element, fields = props.fields;
+        var fieldData = helpers.parseElementData($element, "breField");
+        if (fieldData === null ||
+            fieldData.name === undefined ||
+            fieldData.type === undefined) {
+            throw new Error("There is no data defined in a field: " + $element.innerHTML);
+        }
+        var name = fieldData.name, type = fieldData.type;
+        if (fields !== undefined) {
+            var addFieldData = fields.find(function (f) { return str.equalsInvariant(f.name, name); });
+            if (addFieldData) {
+                fieldData = __assign(__assign({}, fieldData), addFieldData);
+            }
+        }
+        if (_fields[type] !== undefined) {
+            var createFieldFunc = _fields[type];
+            return createFieldFunc(props, fieldData);
+        }
+        else {
+            throw new Error(type + " field not found");
+        }
+    };
+    var updateFieldProperty = function (field, prop, value, fireUpdate) {
+        var _a;
+        if (fireUpdate === void 0) { fireUpdate = true; }
+        var oldValue = field.data[prop];
+        if (oldValue === value) {
+            return;
+        }
+        field.data = __assign(__assign({}, field.data), (_a = {}, _a[prop] = value, _a));
+        if (fireUpdate && field.onUpdate) {
+            field.onUpdate(field);
+        }
+    };
+    var toggleFieldSelection = function (field, selected) {
+        if (selected === true) {
+            field.$field.classList.add(Selectors.selectorFieldSelected);
+            if (field.onSelect !== undefined) {
+                field.onSelect(field);
+            }
+        }
+        else {
+            field.$field.classList.remove(Selectors.selectorFieldSelected);
+            if (field.onDeselect !== undefined) {
+                field.onDeselect(field);
+            }
+        }
+    };
+    var getFieldElement = function ($field) {
+        var $el = $field.cloneNode(true);
+        $el.attributes.removeNamedItem(Selectors.attrField);
+        return $el;
+    };
+    //# sourceMappingURL=field.js.map
+
+    var EditorStrings = (function () {
+        function EditorStrings() {
+        }
+        EditorStrings.embedFieldLinkTitle = "Link to embed media";
+        EditorStrings.embedFieldLinkPlaceholder = "Link to instagram, youtube and etc.";
+        EditorStrings.imageFieldLinkTitle = "Image link";
+        EditorStrings.imageFieldLinkPlaceholder = "http://url-to-image.png";
+        EditorStrings.imageFieldUploadTitle = "or Upload a file";
+        EditorStrings.imageFieldUploadButton = "Select file";
+        EditorStrings.imageFieldAltTitle = "Alt";
+        EditorStrings.imageFieldAltPlaceholder = "Image 'alt' attribute value";
+        EditorStrings.imageFieldUrlSubtitle = "Link to open on image click";
+        EditorStrings.htmlEditorLinkUrlTitle = "Url";
+        EditorStrings.htmlEditorLinkUrlPlaceholder = "http://put-your-link.here";
+        EditorStrings.htmlEditorLinkTitleTitle = "Title";
+        EditorStrings.htmlEditorLinkTitlePlaceholder = "Title attribute for link";
+        EditorStrings.htmlEditorLinkTargetTitle = "Target";
+        EditorStrings.htmlEditorLinkTargetBlank = "Blank";
+        EditorStrings.htmlEditorLinkTargetSelf = "Self";
+        EditorStrings.htmlEditorLinkTargetParent = "Parent";
+        EditorStrings.htmlEditorLinkTargetTop = "Top";
+        EditorStrings.buttonClose = "close";
+        EditorStrings.buttonOk = "Ok";
+        EditorStrings.buttonCancel = "Cancel";
+        EditorStrings.defaultTemplatesGroupName = "Other templates";
+        EditorStrings.errorBlocksFileNotFound = function (url) {
+            return "Blocks file not found. Requested file: " + url + ".";
+        };
+        EditorStrings.errorTemplatesFileNotFound = function (url) {
+            return "Templates file not found. Requested file: " + url + ".";
+        };
+        EditorStrings.errorBlockTemplateNotFound = function (templateName) {
+            return "Template \"" + templateName + "\" not found.";
+        };
+        EditorStrings.errorTemplateParsing = function (name) {
+            return "Template parsing error: " + name + ".";
+        };
+        return EditorStrings;
+    }());
+    //# sourceMappingURL=EditorStrings.js.map
+
+    var allTemplates = [];
+    var getTemplate = function (templateName) {
+        var template = allTemplates.find(function (x) {
+            return str.equalsInvariant(x.name, templateName);
+        });
+        if (template === undefined) {
+            throw new Error("Template is not registred: " + templateName);
+        }
+        return template;
+    };
+    var loadTemplatesAsync = function (url, $editor, onError) { return __awaiter(void 0, void 0, void 0, function () {
+        var grouppedTemplates, data, $data, $style, $groups, ungrouppedTemplates, ungrouppedTemplatesGroupName, err_1;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    grouppedTemplates = [];
+                    _a.label = 1;
+                case 1:
+                    _a.trys.push([1, 3, , 4]);
+                    return [4, getRequest(url)];
+                case 2:
+                    data = _a.sent();
+                    $data = helpers.createElement("<div>" + data + "</div>");
+                    $style = $data.querySelector("style");
+                    if ($style !== null) {
+                        $dom.before($editor, $style);
+                    }
+                    $groups = $data.querySelectorAll(Selectors.selectorTemplateGroup);
+                    $groups.forEach(function ($group) {
+                        var name = $group.getAttribute("title");
+                        var templates = parseTemplates($group);
+                        grouppedTemplates.push({ name: name, templates: templates });
+                        $group.remove();
+                        allTemplates = __spreadArrays(allTemplates, templates);
+                    });
+                    ungrouppedTemplates = parseTemplates($data);
+                    ungrouppedTemplatesGroupName = grouppedTemplates.length > 0
+                        ? EditorStrings.defaultTemplatesGroupName
+                        : "";
+                    grouppedTemplates.push({
+                        name: ungrouppedTemplatesGroupName,
+                        templates: ungrouppedTemplates,
+                    });
+                    allTemplates = __spreadArrays(allTemplates, ungrouppedTemplates);
+                    return [2, grouppedTemplates];
+                case 3:
+                    err_1 = _a.sent();
+                    onError(EditorStrings.errorTemplatesFileNotFound(url));
+                    throw err_1;
+                case 4: return [2];
+            }
+        });
+    }); };
+    var parseTemplates = function ($el) {
+        var templates = [];
+        var $templates = $el.querySelectorAll(Selectors.selectorTemplate);
+        $templates.forEach(function ($template) {
+            var template = createTemplate($template);
+            if (template !== null) {
+                templates.push(template);
+            }
+        });
+        return templates;
+    };
+    var createTemplate = function ($template) {
+        var name = $template.dataset.name || "";
+        var $preview = $template.querySelector(Selectors.selectorTemplatePreview);
+        if ($preview !== null) {
+            $template.removeChild($preview);
+        }
+        else {
+            $preview = $template.cloneNode(true);
+            bindFields($preview, true);
+        }
+        return {
+            name: name,
+            $html: $template,
+            $preview: $preview,
+        };
+    };
+    //# sourceMappingURL=template.js.map
+
+    var findFields = function ($html) {
+        var nodes = $html.querySelectorAll(Selectors.selectorField);
+        var $fields = nodes.length > 0 ? Array.prototype.slice.call(nodes) : [];
+        if ($html.attributes.getNamedItem(Selectors.attrField) !== null) {
+            $fields = __spreadArrays($fields, [$html]);
+        }
+        return $fields;
+    };
+    var bindFields = function ($element, preview, fields) {
+        if (fields === void 0) { fields = []; }
+        var $fields = findFields($element);
+        $fields.forEach(function ($field) {
+            return createField({
+                $element: $field,
+                fields: fields,
+                preview: preview,
+            });
+        });
+    };
+    var createBlockFromData = function (blockData) {
+        var template = blockData.template, fields = blockData.fields;
+        var blockTemplate = getTemplate(template);
+        return createBlockFromTemplate(blockTemplate, fields);
+    };
+    var createBlockFromTemplate = function (blockTemplate, fields) {
+        if (fields === void 0) { fields = []; }
+        var $element = blockTemplate.$html.cloneNode(true);
+        bindFields($element, false, fields);
+        return {
+            $element: $element,
+            data: {
+                template: blockTemplate.name,
+                fields: fields,
+            },
+        };
+    };
+    //# sourceMappingURL=Block.js.map
+
+    var getContainerData = function (container, ignoreHtml) { return container.blocks.map(function (block) { return block.getData(ignoreHtml); }); };
+    var getContainerHtml = function (container) {
+        var html = container.blocks.map(function (block) { return block.getHtml(true); }).join("\n");
+        var root = container.$element.cloneNode(false);
+        root.innerHTML = html;
+        return root.outerHTML;
+    };
+    var getDefaultPlaceholder = function () {
+        return helpers.createElement('<i data-bre-placeholder="true">Click here to select this container...</i>');
+    };
+    var toggleContainersPlaceholder = function (container) {
+        if (container.$placeholder === null) {
+            return;
+        }
+        if (container.$element.childElementCount === 0) {
+            container.$element.appendChild(container.$placeholder);
+        }
+        else {
+            container.$element.removeChild(container.$placeholder);
+        }
+    };
+    var addBlockToContainer = function (container, options) {
+        var block = options.blockData !== undefined
+            ? createBlockFromData(options.blockData)
+            : createBlockFromTemplate(options.blockTemplate);
+        var idx = options.idx || container.blocks.length;
+        container.blocks = __spreadArrays(container.blocks.slice(0, idx), [
+            block
+        ], container.blocks.slice(idx));
+        toggleContainersPlaceholder(container);
+        var $container = container.$element;
+        var $block = block.$element;
+        if (idx === 0) {
+            $container.append($block);
+        }
+        else {
+            $container.children[idx].after($block);
+        }
+    };
+    var createContainer = function ($element, usePlaceholder) {
+        var $placeholder = usePlaceholder ? getDefaultPlaceholder() : null;
+        var container = {
+            $element: $element,
+            $placeholder: $placeholder,
+            blocks: [],
+        };
+        toggleContainersPlaceholder(container);
+        return container;
+    };
+    //# sourceMappingURL=BlocksContainer.js.map
+
+    var defaultButtons = [
+        { icon: "bold", command: "Bold", range: true },
+        { icon: "italic", command: "Italic", range: true },
+        { icon: "link", command: "CreateLink", range: true },
+        {
+            icon: "list-ul",
+            command: "insertUnorderedList",
+            range: true,
+        },
+        {
+            icon: "list-ol",
+            command: "insertOrderedList",
+            range: true,
+        },
+        { icon: "undo", command: "Undo", range: false },
+        { icon: "repeat", command: "Redo", range: false },
+    ];
+    var defaultOptions = {
+        templatesUrl: "templates/bootstrap4.html",
+        compactTools: false,
+        compactToolsWidth: 768,
+        ignoreHtml: true,
+        onError: function (data) {
+            console.log(data.message);
+        },
+        htmlToolsButtons: defaultButtons,
+    };
+    //# sourceMappingURL=defaults.js.map
+
+    //# sourceMappingURL=shared.js.map
+
     var UI = (function () {
         function UI(editor) {
             this.editor = editor;
@@ -1035,7 +1522,7 @@ var BrickyEditor = (function (exports) {
                 _this.$toolsTemplates.appendChild($header);
                 var $group = helpers.createElement("<div></div>");
                 group.templates.forEach(function (template) {
-                    var $preview = getTemplatePreview(template);
+                    var $preview = template.$preview;
                     $preview.setAttribute("title", template.name);
                     $preview.onclick = function (ev) {
                         editor.addBlock(template);
@@ -1086,839 +1573,6 @@ var BrickyEditor = (function (exports) {
     }());
     //# sourceMappingURL=UI.js.map
 
-    var renderButton = function (action) {
-        var $el = helpers.createElement("<button type=\"button\" class=\"bre-btn\"><i class=\"fa fa-" + action.icon + "\"></i></button>");
-        if (action.action) {
-            $el.onclick = function (ev) {
-                action.action();
-                ev.stopPropagation();
-                return false;
-            };
-        }
-        return $el;
-    };
-    var buildEditorUI = function ($block, actions) {
-        var $tools = helpers.createElement('<div class="bre-block-tools bre-btn-deck"></div>');
-        actions.forEach(function (action) {
-            var $btn = renderButton(action);
-            $tools.appendChild($btn);
-        });
-        var $editor = helpers.createElement('<div class="bre-block-wrapper"></div>');
-        $editor.appendChild($tools);
-        $editor.appendChild($block);
-        $editor.addEventListener("mouseover", function () {
-            $editor.classList.add("bre-active");
-        });
-        $editor.addEventListener("mouseout", function () {
-            $editor.classList.remove("bre-active");
-        });
-        return $editor;
-    };
-    var getBlockUI = function ($html, actions) {
-        var $editor = buildEditorUI($html, []);
-        return $editor;
-    };
-    var BlockUI = (function () {
-        function BlockUI($block, preview, actions, onSelect) {
-            this.$block = $block;
-            this.onSelect = onSelect;
-            if (!preview) {
-                this.buildEditorUI(actions);
-            }
-        }
-        BlockUI.prototype.delete = function () {
-            if (this.$editor) {
-                this.$editor.remove();
-            }
-        };
-        BlockUI.prototype.toggleSelection = function (isOn) {
-            if (this.$editor) {
-                this.$editor.classList.toggle("bre-selected", isOn);
-            }
-        };
-        BlockUI.prototype.buildEditorUI = function (actions) {
-            var _this = this;
-            this.$tools = helpers.createElement('<div class="bre-block-tools bre-btn-deck"></div>');
-            actions.forEach(function (action) {
-                var $btn = renderButton(action);
-                _this.$tools.appendChild($btn);
-            });
-            UI.initBtnDeck(this.$tools);
-            this.$editor = helpers.createElement('<div class="bre-block-wrapper"></div>');
-            this.$editor.appendChild(this.$tools);
-            this.$editor.appendChild(this.$block);
-            this.$editor.addEventListener("mouseover", function () {
-                _this.$editor.classList.add("bre-active");
-            });
-            this.$editor.addEventListener("mouseout", function () {
-                _this.$editor.classList.remove("bre-active");
-            });
-            this.$editor.addEventListener("click", function () {
-                if (_this.onSelect) {
-                    _this.onSelect();
-                }
-            });
-        };
-        return BlockUI;
-    }());
-    //# sourceMappingURL=BlockUI.js.map
-
-    var BlockUIAction = (function () {
-        function BlockUIAction(icon, action, title) {
-            this.icon = icon;
-            this.action = action;
-            this.title = title;
-        }
-        return BlockUIAction;
-    }());
-    //# sourceMappingURL=BlockUIAction.js.map
-
-    var createContainerField = function (props, data) {
-        var $element = props.$element;
-        var updateBlocks = function () {
-            var blocks = getContainerData(container, true);
-            var html = getContainerHtml(container);
-            field.data = __assign(__assign({}, field.data), { blocks: blocks,
-                html: html });
-        };
-        var container = new BlocksContainer($element, updateBlocks, updateBlocks, function (block) {
-        }, function (block) {
-        }, updateBlocks, updateBlocks, props.onUpload, true);
-        var field = {
-            type: "container",
-            name: data.name,
-            $field: $element,
-            data: data,
-            container: container,
-            getElement: function () {
-                var html = getContainerHtml(container);
-                return helpers.createElement(html);
-            },
-        };
-        $element.classList.add(Selectors.selectorFieldContainer);
-        $element.addEventListener("click", function (ev) {
-            ev.stopPropagation();
-            return false;
-        });
-        return field;
-    };
-    //# sourceMappingURL=container.js.map
-
-    var preProcessEmbedUrl = function (url) {
-        return url.replace("https://www.instagram.com", "http://instagr.am");
-    };
-    var postProcessEmbed = function (provider) {
-        switch (provider) {
-            case "Instagram":
-                var instgrm = window.instgrm;
-                if (instgrm !== undefined) {
-                    instgrm.Embeds.process();
-                }
-                break;
-            default:
-                break;
-        }
-    };
-    var getEmbedAsync = function (embedUrl) {
-        var url = "https://noembed.com/embed?url=" + embedUrl;
-        return new Promise(function (resolve, reject) { return __awaiter(void 0, void 0, void 0, function () {
-            var data, err_1;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        _a.trys.push([0, 2, , 3]);
-                        return [4, jsonp(url)];
-                    case 1:
-                        data = _a.sent();
-                        resolve(data);
-                        return [3, 3];
-                    case 2:
-                        err_1 = _a.sent();
-                        reject(err_1);
-                        return [3, 3];
-                    case 3: return [2];
-                }
-            });
-        }); });
-    };
-    //# sourceMappingURL=embed.js.map
-
-    var providerScriptsLoaded = {};
-    var getPromptParams = function (_a) {
-        var url = _a.url;
-        return ({
-            url: {
-                value: url || "http://instagr.am/p/BO9VX2Vj4fF/",
-                title: locales.prompt.embed.url.title,
-                placeholder: locales.prompt.embed.url.placeholder,
-            },
-        });
-    };
-    var createEmbedField = function (props, data) {
-        var $element = props.$element;
-        var field = {
-            type: "embed",
-            name: data.name,
-            $field: $element,
-            data: data,
-            getElement: function () {
-                var $copy = getFieldElement($element);
-                return $copy;
-            },
-        };
-        var updateEmbedMedia = function (url, fireUpdate) { return __awaiter(void 0, void 0, void 0, function () {
-            var embed, $embed, $script;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        if (url === undefined) {
-                            return [2];
-                        }
-                        return [4, getEmbedAsync(preProcessEmbedUrl(url))];
-                    case 1:
-                        embed = _a.sent();
-                        field.data = __assign(__assign({}, field.data), { url: url,
-                            embed: embed });
-                        $embed = helpers.createElement("<div>" + embed.html + "</div>");
-                        $script = $embed.querySelector("script");
-                        if ($script !== null) {
-                            $script.remove();
-                        }
-                        $element.innerHTML = "";
-                        $element.removeAttribute("class");
-                        $element.removeAttribute("style");
-                        $element.appendChild($embed);
-                        if (!($script !== null)) return [3, 4];
-                        if (!(providerScriptsLoaded[$script.src] === undefined)) return [3, 3];
-                        return [4, loadScriptAsync($script.src)];
-                    case 2:
-                        _a.sent();
-                        providerScriptsLoaded[embed.provider_name] = true;
-                        _a.label = 3;
-                    case 3:
-                        setTimeout(function () { return postProcessEmbed(embed.provider_name); }, 100);
-                        _a.label = 4;
-                    case 4:
-                        return [2];
-                }
-            });
-        }); };
-        updateEmbedMedia(data.url, false);
-        var promptEmbedMediaUrl = function () { return __awaiter(void 0, void 0, void 0, function () {
-            var params, updated, url;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        params = getPromptParams(field.data);
-                        return [4, promptAsync(params)];
-                    case 1:
-                        updated = _a.sent();
-                        if (updated !== null) {
-                            url = updated.url;
-                            if (url !== undefined) {
-                                updateEmbedMedia(url, true);
-                            }
-                        }
-                        return [2];
-                }
-            });
-        }); };
-        $element.addEventListener("click", function () { return __awaiter(void 0, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                promptEmbedMediaUrl();
-                return [2];
-            });
-        }); });
-        return field;
-    };
-    //# sourceMappingURL=embed.js.map
-
-    var createHtmlField = function (props, data) {
-        var $element = props.$element;
-        $element.setAttribute(Selectors.attrContentEditable, "true");
-        if (data.html) {
-            $element.innerHTML = data.html;
-        }
-        var field = {
-            type: "html",
-            name: data.name,
-            $field: $element,
-            data: data,
-            getElement: function () {
-                var $copy = getFieldElement($element);
-                $copy.removeAttribute(Selectors.attrContentEditable);
-                return $copy;
-            },
-        };
-        SelectionUtils.bindTextSelection($element, function (rect) {
-            toggleHtmlTools(rect);
-        });
-        var updateHtmlProp = function () {
-            var value = $element.innerHTML.trim();
-            if ($element.innerHTML !== value) {
-                field.$field.innerHTML = value;
-                updateFieldProperty(field, "html", value, true);
-            }
-        };
-        $element.addEventListener("blur", updateHtmlProp);
-        $element.addEventListener("keyup", updateHtmlProp);
-        $element.addEventListener("paste", updateHtmlProp);
-        $element.addEventListener("input", updateHtmlProp);
-        $element.addEventListener("paste", function (ev) {
-            ev.preventDefault();
-            if (ev.clipboardData) {
-                var text = ev.clipboardData.getData("text/plain");
-                document.execCommand("insertHTML", false, text);
-            }
-        });
-        $element.addEventListener("click", function (ev) {
-            toggleFieldSelection(field, true);
-            ev.stopPropagation();
-            return false;
-        });
-        return field;
-    };
-    //# sourceMappingURL=html.js.map
-
-    var getPromptParams$1 = function (_a) {
-        var src = _a.src, file = _a.file, alt = _a.alt;
-        return ({
-            src: {
-                value: src,
-                title: locales.prompt.image.link.title,
-                placeholder: locales.prompt.image.link.placeholder,
-            },
-            file: {
-                type: "file",
-                value: file,
-                title: locales.prompt.image.upload.title,
-                placeholder: locales.prompt.image.upload.placeholder,
-            },
-            alt: {
-                value: alt,
-                title: locales.prompt.image.alt.title,
-                placeholder: locales.prompt.image.alt.placeholder,
-            },
-        });
-    };
-    var createImageField = function (props, data) {
-        var $element = props.$element;
-        var isImageElement = $element.tagName.toLowerCase() === "img";
-        var updateImageElement = function (d) {
-            if (isImageElement) {
-                var image = $element;
-                image.src = d.src || "";
-                image.alt = d.alt || "";
-            }
-            else {
-                $element.style.backgroundImage = "url(" + d.src + ")";
-            }
-            $element.title = d.alt || "";
-        };
-        if (data.src) {
-            updateImageElement(data);
-        }
-        var field = {
-            type: "image",
-            name: data.name,
-            $field: $element,
-            data: data,
-            getElement: function () {
-                var $copy = getFieldElement($element);
-                var link = field.data.link;
-                if (link !== undefined && link.href.length) {
-                    var $link = helpers.createElement("<a href='" + link.href + "' title='" + link.title + "' target='" + link.target + "'></a>");
-                    $link.appendChild($copy);
-                    return $link;
-                }
-                return $copy;
-            },
-        };
-        $element.addEventListener("click", function () { return __awaiter(void 0, void 0, void 0, function () {
-            var params, promptResponse, updatedData, fileContent;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        params = getPromptParams$1(field.data);
-                        return [4, promptAsync(params)];
-                    case 1:
-                        promptResponse = _a.sent();
-                        if (promptResponse === null) {
-                            return [2];
-                        }
-                        updatedData = __assign(__assign({}, field.data), { alt: promptResponse.alt });
-                        if (!(promptResponse.file !== undefined)) return [3, 5];
-                        if (!props.onUpload) return [3, 2];
-                        props.onUpload(promptResponse.file, function (src) {
-                            updatedData = __assign(__assign({}, updatedData), { src: src, file: undefined });
-                        });
-                        return [3, 4];
-                    case 2: return [4, helpers.readFileAsync(promptResponse.file)];
-                    case 3:
-                        fileContent = _a.sent();
-                        updatedData = __assign(__assign({}, updatedData), { src: fileContent, file: undefined });
-                        _a.label = 4;
-                    case 4: return [3, 6];
-                    case 5:
-                        if (promptResponse.src) {
-                            updatedData = __assign(__assign({}, updatedData), { src: promptResponse.src, file: undefined });
-                        }
-                        _a.label = 6;
-                    case 6:
-                        field.data = updatedData;
-                        updateImageElement(updatedData);
-                        if (field.onUpdate) {
-                            field.onUpdate(field);
-                        }
-                        return [2];
-                }
-            });
-        }); });
-        return field;
-    };
-    //# sourceMappingURL=image.js.map
-
-    var _fields = {
-        html: function (props, data) {
-            return createHtmlField(props, data);
-        },
-        container: function (props, data) {
-            return createContainerField(props, data);
-        },
-        image: function (props, data) {
-            return createImageField(props, data);
-        },
-        embed: function (props, data) {
-            return createEmbedField(props, data);
-        },
-    };
-    var createField = function (props) {
-        var fieldData = helpers.parseElementData(props.$element, "breField");
-        if (fieldData === null ||
-            fieldData.name === undefined ||
-            fieldData.type === undefined) {
-            throw new Error("There is no data defined in a field: " + props.$element.innerHTML);
-        }
-        var name = fieldData.name, type = fieldData.type;
-        if (props.data !== undefined) {
-            var addFieldData = props.data.find(function (f) {
-                return str.equalsInvariant(f.name, name);
-            });
-            if (addFieldData) {
-                fieldData = __assign(__assign({}, fieldData), addFieldData);
-            }
-        }
-        if (_fields[type] !== undefined) {
-            var createFieldFunc = _fields[type];
-            return createFieldFunc(props, fieldData);
-        }
-        else {
-            throw new Error(type + " field not found");
-        }
-    };
-    var updateFieldProperty = function (field, prop, value, fireUpdate) {
-        var _a;
-        if (fireUpdate === void 0) { fireUpdate = true; }
-        var oldValue = field.data[prop];
-        if (oldValue === value) {
-            return;
-        }
-        field.data = __assign(__assign({}, field.data), (_a = {}, _a[prop] = value, _a));
-        if (fireUpdate && field.onUpdate) {
-            field.onUpdate(field);
-        }
-    };
-    var toggleFieldSelection = function (field, selected) {
-        if (selected === true) {
-            field.$field.classList.add(Selectors.selectorFieldSelected);
-            if (field.onSelect !== undefined) {
-                field.onSelect(field);
-            }
-        }
-        else {
-            field.$field.classList.remove(Selectors.selectorFieldSelected);
-            if (field.onDeselect !== undefined) {
-                field.onDeselect(field);
-            }
-        }
-    };
-    var getFieldElement = function ($field) {
-        var $el = $field.cloneNode(true);
-        $el.attributes.removeNamedItem(Selectors.attrField);
-        return $el;
-    };
-    //# sourceMappingURL=field.js.map
-
-    var _this = undefined;
-    var findFields = function ($html) {
-        var nodes = $html.querySelectorAll(Selectors.selectorField);
-        var $fields = nodes.length > 0 ? Array.prototype.slice.call(nodes) : [];
-        if ($html.attributes.getNamedItem(Selectors.attrField) !== null) {
-            $fields = __spreadArrays($fields, [$html]);
-        }
-        return $fields;
-    };
-    var deleteBlockFromContainer = function (container, block) {
-        container.blocks = container.blocks.filter(function (b) { return b !== block; });
-        block.$element.remove();
-        block = null;
-    };
-    var cloneBlockInContainer = function (container, block) {
-        var idx = container.blocks.indexOf(block) + 1;
-        addBlockToContainer(container, block, idx, true);
-    };
-    var moveBlockInContainer = function (container, block, offset) {
-        var blocks = container.blocks;
-        var idx = blocks.indexOf(block);
-        var new_idx = idx + offset;
-        if (new_idx >= blocks.length || new_idx < 0) {
-            return;
-        }
-        var $anchorBlock = blocks[new_idx].$element;
-        if ($anchorBlock) {
-            if (offset > 0) {
-                $dom.after($anchorBlock, block.$element);
-            }
-            else if (offset < 0) {
-                $dom.before($anchorBlock, block.$element);
-            }
-        }
-        _this.blocks.splice(idx, 1);
-        _this.blocks.splice(new_idx, 0, block);
-        _this.onMoveBlock(block, idx, new_idx);
-        block.scrollTo();
-    };
-    var createBlockFromData = function (container, blockData) {
-        var template = blockData.template, data = blockData.fields;
-        var blockTemplate = getTemplate(template);
-        if (blockTemplate === null) {
-            throw new Error("Template " + template + " not found");
-        }
-        var $html = blockTemplate.$html.cloneNode(true);
-        var $fields = findFields($html);
-        var fields = $fields.map(function ($field) {
-            return createField({
-                $element: $field,
-                data: data,
-            });
-        });
-        var actions = [
-            new BlockUIAction("ellipsis-h"),
-            new BlockUIAction("trash-o", function (b) { return deleteBlockFromContainer(container, b); }),
-            new BlockUIAction("copy", function (b) { return cloneBlockInContainer(container, b); }),
-            new BlockUIAction("angle-up", function (b) { return moveBlockInContainer(container, b, -1); }),
-            new BlockUIAction("angle-down", function (b) {
-                return moveBlockInContainer(container, b, -1);
-            }),
-        ];
-        var $element = getBlockUI($html, actions);
-        var block = {
-            template: template,
-            fields: fields,
-            $element: $element,
-        };
-        return block;
-    };
-    var Block = (function () {
-        function Block(template, html, preview, data, events) {
-            var _this = this;
-            this.fields = [];
-            this.template = template;
-            this.html = html;
-            this.events = events;
-            var $block = helpers.createElement(html);
-            this.bindFields($block, data);
-            var actions = this.getActions();
-            this.ui = new BlockUI($block, preview, actions, function () { return _this.select(); });
-        }
-        Block.prototype.isContainer = function () {
-            if (!this.selectedField) {
-                return false;
-            }
-            return this.selectedField.type === "container";
-        };
-        Block.prototype.delete = function () {
-            this.ui.delete();
-            this.events.onDelete(this);
-        };
-        Block.prototype.move = function (offset) {
-            this.events.onMove(this, offset);
-        };
-        Block.prototype.clone = function () {
-            this.events.onCopy(this);
-        };
-        Block.prototype.select = function (field) {
-            if (field === this.selectedField) {
-                return;
-            }
-            if (field === null) {
-                field = this.fields[0];
-            }
-            if (this.selectedField) {
-                toggleFieldSelection(this.selectedField, false);
-            }
-            this.selectedField = field;
-            this.ui.toggleSelection(true);
-            this.events.onSelect(this);
-        };
-        Block.prototype.deselect = function () {
-            this.selectedField = null;
-            this.fields.forEach(function (f) {
-                toggleFieldSelection(f, false);
-            });
-            this.ui.toggleSelection(false);
-            this.events.onDeselect(this);
-        };
-        Block.prototype.scrollTo = function () {
-            var top = $dom.offset(this.ui.$editor).top - 100;
-            top = top > 0 ? top : 0;
-        };
-        Block.prototype.getData = function (ignoreHtml) {
-            var fields = this.fields.map(function (_a) {
-                var name = _a.name, type = _a.type, data = _a.data;
-                return ({
-                    name: name,
-                    type: type,
-                    data: data,
-                });
-            });
-            var blockData = {
-                template: this.template,
-                fields: fields,
-            };
-            if (!ignoreHtml) {
-                blockData.html = this.getHtml(true);
-            }
-            return blockData;
-        };
-        Block.prototype.getHtml = function (trim) {
-            var $html = helpers.createElement(this.html);
-            var fieldsHtml = {};
-            this.fields.forEach(function (field) {
-                if (field !== undefined) {
-                    var name = field.name || field.data.name;
-                    fieldsHtml[name] = field.getElement(field);
-                }
-            });
-            $dom.select($html, Selectors.selectorField, true).forEach(function ($elem) {
-                var fieldData = helpers.parseElementData($elem, "breField");
-                var name = fieldData.name;
-                var $field = fieldsHtml[name];
-                $dom.replaceWith($elem, $field);
-            });
-            var html = $html.outerHTML;
-            if (!html) {
-                return null;
-            }
-            return trim ? str.totalTrim(html) : html;
-        };
-        Block.prototype.bindFields = function ($block, data) {
-            var block = this;
-            var $fields = $dom.select($block, Selectors.selectorField, true);
-            $fields.forEach(function ($element) {
-                var onSelect = block.select;
-                var field = createField({
-                    $element: $element,
-                    data: data,
-                    onSelect: onSelect,
-                });
-                block.fields.push(field);
-            });
-        };
-        Block.prototype.getActions = function () {
-            var block = this;
-            var actions = [
-                new BlockUIAction("ellipsis-h"),
-                new BlockUIAction("trash-o", function () { return block.delete(); }),
-                new BlockUIAction("copy", function () { return block.clone(); }),
-                new BlockUIAction("angle-up", function () { return block.move(-1); }),
-                new BlockUIAction("angle-down", function () { return block.move(1); }),
-            ];
-            return actions;
-        };
-        return Block;
-    }());
-
-    var getContainerData = function (container, ignoreHtml) { return container.blocks.map(function (block) { return block.getData(ignoreHtml); }); };
-    var getContainerHtml = function (container) {
-        var html = container.blocks.map(function (block) { return block.getHtml(true); }).join("\n");
-        var root = container.$element.cloneNode(false);
-        root.innerHTML = html;
-        return root.outerHTML;
-    };
-    var getDefaultPlaceholder = function () {
-        return helpers.createElement('<i data-bre-placeholder="true">Click here to select this container...</i>');
-    };
-    var toggleContainerPlaceholderIfNeed = function (container) {
-        if (container.usePlaceholder !== true) {
-            return;
-        }
-        if (container.$placeholder !== undefined) {
-            container.$placeholder.remove();
-            container.$placeholder = undefined;
-            return;
-        }
-        if (container.blocks.length === 0) {
-            var $placeholder = getDefaultPlaceholder();
-            container.$placeholder = $placeholder;
-            container.$element.appendChild($placeholder);
-        }
-    };
-    var addBlockToContainer = function (container, blockData, idx, select) {
-        if (select === void 0) { select = true; }
-        idx = idx || container.blocks.length;
-        debugger;
-        var block = createBlockFromData(container, blockData);
-        container.blocks = __spreadArrays(container.blocks.slice(0, idx), [
-            block
-        ], container.blocks.slice(idx));
-        if (idx === 0) {
-            container.$element.append(block.$element);
-        }
-        else {
-            var prev = container.blocks[idx - 1];
-            prev.$element.after(block.$element);
-        }
-    };
-    var BlocksContainer = (function () {
-        function BlocksContainer($element, onAddBlock, onDeleteBlock, onSelectBlock, onDeselectBlock, onMoveBlock, onUpdateBlock, onUpload, usePlaceholder) {
-            if (usePlaceholder === void 0) { usePlaceholder = false; }
-            this.onAddBlock = onAddBlock;
-            this.onDeleteBlock = onDeleteBlock;
-            this.onSelectBlock = onSelectBlock;
-            this.onDeselectBlock = onDeselectBlock;
-            this.onMoveBlock = onMoveBlock;
-            this.onUpdateBlock = onUpdateBlock;
-            this.onUpload = onUpload;
-            this.blocks = [];
-            this.isContainer = true;
-            this.$element = $element;
-            this.usePlaceholder = usePlaceholder;
-            toggleContainerPlaceholderIfNeed(this);
-        }
-        BlocksContainer.prototype.addBlock = function (name, html, data, idx, select) {
-            var _this = this;
-            if (select === void 0) { select = true; }
-            var block = new Block(name, html, false, data, {
-                onDelete: this.deleteBlock,
-                onSelect: this.selectBlock,
-                onDeselect: this.deselectBlock,
-                onCopy: this.copyBlock,
-                onMove: function (b, offset) { return _this.moveBlock(b, offset); },
-                onUpdate: this.onUpdateBlock,
-                onUpload: this.onUpload,
-            });
-            this.insertBlock(block, idx);
-            if (select) {
-                block.select();
-                block.scrollTo();
-            }
-        };
-        BlocksContainer.prototype.insertBlock = function (block, idx) {
-            idx = idx || this.blocks.length;
-            if (this.selectedBlock) {
-                idx = this.blocks.indexOf(this.selectedBlock) + 1;
-            }
-            this.blocks.splice(idx, 0, block);
-            if (idx === 0) {
-                this.$element.appendChild(block.ui.$editor);
-            }
-            else {
-                $dom.after(this.blocks[idx - 1].ui.$editor, block.ui.$editor);
-            }
-            this.onAddBlock(block, idx);
-            block.select(undefined);
-            toggleContainerPlaceholderIfNeed(this);
-        };
-        BlocksContainer.prototype.deleteBlock = function (block) {
-            var idx = this.blocks.indexOf(block);
-            this.blocks.splice(idx, 1);
-            block = null;
-            if (idx < this.blocks.length) {
-                this.blocks[idx].select();
-            }
-            else if (this.blocks.length > 0) {
-                this.blocks[idx - 1].select();
-            }
-            else {
-                this.selectedBlock = undefined;
-            }
-            this.onDeleteBlock(block, idx);
-            toggleContainerPlaceholderIfNeed(this);
-        };
-        BlocksContainer.prototype.moveBlock = function (block, offset) {
-            var idx = this.blocks.indexOf(block);
-            var new_idx = idx + offset;
-            if (new_idx >= this.blocks.length || new_idx < 0) {
-                return;
-            }
-            var $anchorBlock = this.blocks[new_idx].ui.$editor;
-            if ($anchorBlock) {
-                if (offset > 0) {
-                    $dom.after($anchorBlock, block.ui.$editor);
-                }
-                else if (offset < 0) {
-                    $dom.before($anchorBlock, block.ui.$editor);
-                }
-            }
-            this.blocks.splice(idx, 1);
-            this.blocks.splice(new_idx, 0, block);
-            this.onMoveBlock(block, idx, new_idx);
-            block.scrollTo();
-        };
-        BlocksContainer.prototype.copyBlock = function (block) {
-            var idx = this.blocks.indexOf(block) + 1;
-            this.addBlock(block.template, block.html, block.getData().fields, idx, true);
-        };
-        BlocksContainer.prototype.selectBlock = function (block) {
-            if (this.selectedBlock === block) {
-                return;
-            }
-            if (this.selectedBlock) {
-                this.selectedBlock.deselect();
-            }
-            this.selectedBlock = block;
-            this.onSelectBlock(block);
-        };
-        BlocksContainer.prototype.deselectBlock = function (block) {
-            this.selectedBlock = undefined;
-            this.onDeselectBlock(block);
-        };
-        return BlocksContainer;
-    }());
-    //# sourceMappingURL=BlocksContainer.js.map
-
-    var defaultButtons = [
-        { icon: "bold", command: "Bold", range: true },
-        { icon: "italic", command: "Italic", range: true },
-        { icon: "link", command: "CreateLink", range: true },
-        {
-            icon: "list-ul",
-            command: "insertUnorderedList",
-            range: true,
-        },
-        {
-            icon: "list-ol",
-            command: "insertOrderedList",
-            range: true,
-        },
-        { icon: "undo", command: "Undo", range: false },
-        { icon: "repeat", command: "Redo", range: false },
-    ];
-    var defaultOptions = {
-        templatesUrl: "templates/bootstrap4.html",
-        compactTools: false,
-        compactToolsWidth: 768,
-        ignoreHtml: true,
-        onError: function (data) {
-            console.log(data.message);
-        },
-        htmlToolsButtons: defaultButtons,
-    };
-    //# sourceMappingURL=defaults.js.map
-
-    //# sourceMappingURL=shared.js.map
-
     var getCurrentContainer = function (container) {
         if (container.selectedBlock && container.selectedBlock.isContainer()) {
             var field = container.selectedBlock.selectedField;
@@ -1943,7 +1597,7 @@ var BrickyEditor = (function (exports) {
             this.$editor = $editor;
             this.$editor.classList.add(Selectors.classEditor);
             this.options = __assign(__assign({}, defaultOptions), options);
-            this.container = this.createContainer();
+            this.container = createContainer($editor, false);
             Editor.UI = new UI(this);
             this.tryBindFormSubmit();
         }
@@ -1989,60 +1643,21 @@ var BrickyEditor = (function (exports) {
                 return true;
             });
         };
-        Editor.prototype.loadBlocks = function (blocks) {
+        Editor.prototype.loadBlocks = function (blocksData) {
             var _this = this;
-            if (blocks !== undefined) {
-                blocks.forEach(function (blockData) {
-                    addBlockToContainer(_this.container, blockData);
+            if (blocksData) {
+                blocksData.forEach(function (blockData) {
+                    addBlockToContainer(_this.container, {
+                        blockData: blockData,
+                    });
                 });
             }
         };
-        Editor.prototype.addBlock = function (template) {
+        Editor.prototype.addBlock = function (blockTemplate) {
             var container = getCurrentContainer(this.container);
-            var block = createBlock(template, false);
-            addBlockToContainer(container, block);
-        };
-        Editor.prototype.createContainer = function () {
-            var _this = this;
-            var onAdd = function (block, idx) {
-                if (_this.isLoaded) {
-                    _this.trigger("onBlockAdd", { block: block, idx: idx });
-                    _this.trigger("onChange", {
-                        blocks: _this.getData(),
-                        html: _this.getHtml(),
-                    });
-                }
-            };
-            var onDelete = function (block, idx) {
-                _this.trigger("onBlockDelete", { block: block, idx: idx });
-                _this.trigger("onChange", {
-                    blocks: _this.getData(),
-                    html: _this.getHtml(),
-                });
-            };
-            var onUpdate = function (block, property, oldValue, newValue) {
-                _this.trigger("onBlockUpdate", {
-                    block: block,
-                    property: property,
-                    oldValue: oldValue,
-                    newValue: newValue,
-                });
-                _this.trigger("onChange", {
-                    blocks: _this.getData(),
-                    html: _this.getHtml(),
-                });
-            };
-            return new BlocksContainer(this.$editor, onAdd, onDelete, function (block) {
-                _this.trigger("onBlockSelect", { block: block });
-            }, function (block) {
-                _this.trigger("onBlockDeselect", { block: block });
-            }, function (block, from, to) {
-                _this.trigger("onBlockMove", { block: block, from: from, to: to });
-                _this.trigger("onChange", {
-                    blocks: _this.getData(),
-                    html: _this.getHtml(),
-                });
-            }, onUpdate, this.options.onUpload);
+            addBlockToContainer(container, {
+                blockTemplate: blockTemplate,
+            });
         };
         Editor.prototype.tryLoadInitialBlocksAsync = function () {
             return __awaiter(this, void 0, Promise, function () {

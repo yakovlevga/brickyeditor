@@ -45,7 +45,7 @@ const getPromptParams: (props: ImageFieldData) => ImagePromptParams = ({
 });
 
 export const createImageField: ImageFieldFactory = (props, data) => {
-  const { $element } = props;
+  const { $element, preview } = props;
 
   const isImageElement = $element.tagName.toLowerCase() === "img";
   const updateImageElement = (d: ImageFieldData) => {
@@ -86,53 +86,55 @@ export const createImageField: ImageFieldFactory = (props, data) => {
     },
   };
 
-  $element.addEventListener("click", async () => {
-    const params = getPromptParams(field.data);
-    const promptResponse = await promptAsync<ImagePromptParams>(params);
+  if (!preview) {
+    $element.addEventListener("click", async () => {
+      const params = getPromptParams(field.data);
+      const promptResponse = await promptAsync<ImagePromptParams>(params);
 
-    if (promptResponse === null) {
-      return;
-    }
+      if (promptResponse === null) {
+        return;
+      }
 
-    // const { file, src, alt } = updated;
-    let updatedData = {
-      ...field.data,
-      alt: promptResponse.alt,
-    };
+      // const { file, src, alt } = updated;
+      let updatedData = {
+        ...field.data,
+        alt: promptResponse.alt,
+      };
 
-    if (promptResponse.file !== undefined) {
-      // todo: add some common handler for image uploading?
-      if (props.onUpload) {
-        props.onUpload(promptResponse.file, src => {
+      if (promptResponse.file !== undefined) {
+        // todo: add some common handler for image uploading?
+        if (props.onUpload) {
+          props.onUpload(promptResponse.file, src => {
+            updatedData = {
+              ...updatedData,
+              src,
+              file: undefined,
+            };
+          });
+        } else {
+          const fileContent = await helpers.readFileAsync(promptResponse.file);
           updatedData = {
             ...updatedData,
-            src,
+            src: fileContent,
             file: undefined,
           };
-        });
-      } else {
-        const fileContent = await helpers.readFileAsync(promptResponse.file);
+        }
+      } else if (promptResponse.src) {
         updatedData = {
           ...updatedData,
-          src: fileContent,
+          src: promptResponse.src,
           file: undefined,
         };
       }
-    } else if (promptResponse.src) {
-      updatedData = {
-        ...updatedData,
-        src: promptResponse.src,
-        file: undefined,
-      };
-    }
 
-    field.data = updatedData;
-    updateImageElement(updatedData);
+      field.data = updatedData;
+      updateImageElement(updatedData);
 
-    if (field.onUpdate) {
-      field.onUpdate(field);
-    }
-  });
+      if (field.onUpdate) {
+        field.onUpdate(field);
+      }
+    });
+  }
 
   return field;
 };

@@ -12,6 +12,7 @@ export type CreateFieldProps<
 > = {
   $element: HTMLElement;
   fields?: bre.core.field.FieldData[];
+  preview: boolean;
   onSelect?: (field: bre.core.field.Field<TData>) => void;
   onUpdate?: (field: bre.core.field.Field<TData>) => void;
   onUpload?: bre.FileUploadHandler;
