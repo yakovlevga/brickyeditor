@@ -18,7 +18,11 @@ export const getTemplate = (
     str.equalsInvariant(x.name, templateName)
   );
 
-  return template || null;
+  if (template === undefined) {
+    throw new Error(`Template is not registred: ${templateName}`);
+  }
+
+  return template;
 };
 
 export const loadTemplatesAsync = async (

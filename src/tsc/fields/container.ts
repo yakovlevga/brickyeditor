@@ -3,6 +3,7 @@ import {
   BlocksContainer,
   getContainerData,
   getContainerHtml,
+  createContainer,
 } from "src/BlocksContainer";
 import { FieldFactory } from "src/fields/field";
 import { helpers } from "src/helpers";
@@ -32,21 +33,23 @@ export const createContainerField: ContainerFieldFactory = (props, data) => {
     // TODO: call update callback
   };
 
-  const container: BlocksContainer = new BlocksContainer(
-    $element,
-    updateBlocks,
-    updateBlocks,
-    (block: Block) => {
-      // this.select();
-    },
-    (block: Block) => {
-      //
-    },
-    updateBlocks,
-    updateBlocks,
-    props.onUpload,
-    true
-  );
+  // const container: BlocksContainer = new BlocksContainer(
+  //   $element,
+  //   updateBlocks,
+  //   updateBlocks,
+  //   (block: Block) => {
+  //     // this.select();
+  //   },
+  //   (block: Block) => {
+  //     //
+  //   },
+  //   updateBlocks,
+  //   updateBlocks,
+  //   props.onUpload,
+  //   true
+  // );
+
+  const container = createContainer($element, true);
 
   const field: bre.core.field.ContainerField = {
     type: "container",

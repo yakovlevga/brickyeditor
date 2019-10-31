@@ -50,10 +50,10 @@ declare namespace bre {
   namespace core {
     interface IBlocksContainer {
       $element: HTMLElement;
-      $placeholder?: HTMLElement;
-      blocks: Block[];
-      selectedBlock?: Block;
-      usePlaceholder: boolean;
+      $placeholder: HTMLElement | null;
+      blocks: block.Block[];
+      // selectedBlock?: Block;
+      // usePlaceholder: boolean;
       // data: () => any;
       // html: () => string;
       // add: (block: Block) => void;
@@ -96,6 +96,11 @@ declare namespace bre {
         template: string;
         html?: string;
         fields: field.FieldData[];
+      };
+
+      type Block = {
+        $element: HTMLElement;
+        data: BlockData;
       };
     }
 

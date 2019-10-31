@@ -6,14 +6,18 @@ import { createField, toggleFieldSelection } from "src/fields/field";
 import { helpers } from "src/helpers";
 import { bre } from "src/types/bre";
 import { Selectors } from "src/ui/Selectors";
+import { getTemplate } from "src/template";
 
-export const createBlock = (
-  template: bre.core.ITemplate,
-  isPreview: boolean,
-  data?: bre.core.field.Field[],
-  events?: bre.core.block.Events
-) =>
+export const createBlockFromData = (
+  blockData: bre.core.block.BlockData
+  // TODO
+  // events?: bre.core.block.Events
+): bre.core.block.Block => {
+  const template = getTemplate(blockData.template);
+
+  const b = createBlock(template, false, block.fields);
   new Block(template.name, template.$html.innerHTML, isPreview, data, events);
+};
 
 export class Block {
   public template: string;

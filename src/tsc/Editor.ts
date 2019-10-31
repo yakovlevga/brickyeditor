@@ -1,7 +1,7 @@
 import { Block, createBlock } from "src/block/Block";
 import {
   addBlockToContainer,
-  BlocksContainer,
+  createContainer,
   getContainerData,
   getContainerHtml,
 } from "src/BlocksContainer";
@@ -38,7 +38,7 @@ export class Editor {
   public $editor: HTMLElement;
   public options: bre.Options;
   private isLoaded: boolean = false;
-  private container: BlocksContainer;
+  private container: bre.core.IBlocksContainer;
 
   constructor($editor: HTMLElement, options: bre.Options) {
     // TODO: register additional field types here
@@ -47,7 +47,7 @@ export class Editor {
     this.$editor = $editor;
     this.$editor.classList.add(Selectors.classEditor);
     this.options = { ...defaultOptions, ...options };
-    this.container = this.createContainer();
+    this.container = createContainer($editor, false);
 
     Editor.UI = new UI(this);
     setUI(Editor.UI);
@@ -108,6 +108,14 @@ export class Editor {
   /// BLOCKS
   public loadBlocks(blocks: Block[]) {
     if (blocks && blocks.length) {
+      // blocks
+      //   .map(block => ({
+      //     block,
+      //     template: getTemplate(block.template),
+      //   }))
+      //   .filter(x => x.template !== null)
+      //   .map(x => createBlock(x.template!, false, x.block.fields));
+
       blocks.forEach(block => {
         const template = getTemplate(block.template);
         if (template) {
@@ -139,64 +147,64 @@ export class Editor {
   private onError = (message: string, code: number = 0) =>
     this.options.onError({ message, code });
 
-  private createContainer(): BlocksContainer {
-    const onAdd = (block: Block, idx: number) => {
-      if (this.isLoaded) {
-        this.trigger("onBlockAdd", { block, idx });
-        this.trigger("onChange", {
-          blocks: this.getData(),
-          html: this.getHtml(),
-        });
-      }
-    };
+  // private createContainer(): BlocksContainer {
+  //   const onAdd = (block: Block, idx: number) => {
+  //     if (this.isLoaded) {
+  //       this.trigger("onBlockAdd", { block, idx });
+  //       this.trigger("onChange", {
+  //         blocks: this.getData(),
+  //         html: this.getHtml(),
+  //       });
+  //     }
+  //   };
 
-    const onDelete = (block: Block, idx: number) => {
-      this.trigger("onBlockDelete", { block, idx });
-      this.trigger("onChange", {
-        blocks: this.getData(),
-        html: this.getHtml(),
-      });
-    };
+  //   const onDelete = (block: Block, idx: number) => {
+  //     this.trigger("onBlockDelete", { block, idx });
+  //     this.trigger("onChange", {
+  //       blocks: this.getData(),
+  //       html: this.getHtml(),
+  //     });
+  //   };
 
-    const onUpdate = (
-      block: Block,
-      property: string,
-      oldValue: any,
-      newValue: any
-    ) => {
-      this.trigger("onBlockUpdate", {
-        block,
-        property,
-        oldValue,
-        newValue,
-      });
-      this.trigger("onChange", {
-        blocks: this.getData(),
-        html: this.getHtml(),
-      });
-    };
+  //   const onUpdate = (
+  //     block: Block,
+  //     property: string,
+  //     oldValue: any,
+  //     newValue: any
+  //   ) => {
+  //     this.trigger("onBlockUpdate", {
+  //       block,
+  //       property,
+  //       oldValue,
+  //       newValue,
+  //     });
+  //     this.trigger("onChange", {
+  //       blocks: this.getData(),
+  //       html: this.getHtml(),
+  //     });
+  //   };
 
-    return new BlocksContainer(
-      this.$editor,
-      onAdd,
-      onDelete,
-      (block: Block) => {
-        this.trigger("onBlockSelect", { block });
-      },
-      (block: Block) => {
-        this.trigger("onBlockDeselect", { block });
-      },
-      (block: Block, from: number, to: number) => {
-        this.trigger("onBlockMove", { block, from, to });
-        this.trigger("onChange", {
-          blocks: this.getData(),
-          html: this.getHtml(),
-        });
-      },
-      onUpdate,
-      this.options.onUpload
-    );
-  }
+  //   // return new BlocksContainer(
+  //   //   this.$editor,
+  //   //   onAdd,
+  //   //   onDelete,
+  //   //   (block: Block) => {
+  //   //     this.trigger("onBlockSelect", { block });
+  //   //   },
+  //   //   (block: Block) => {
+  //   //     this.trigger("onBlockDeselect", { block });
+  //   //   },
+  //   //   (block: Block, from: number, to: number) => {
+  //   //     this.trigger("onBlockMove", { block, from, to });
+  //   //     this.trigger("onChange", {
+  //   //       blocks: this.getData(),
+  //   //       html: this.getHtml(),
+  //   //     });
+  //   //   },
+  //   //   onUpdate,
+  //   //   this.options.onUpload
+  //   // );
+  // }
 
   // load initial blocks
   private async tryLoadInitialBlocksAsync(): Promise<Block[] | null> {

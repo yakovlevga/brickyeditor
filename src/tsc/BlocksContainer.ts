@@ -21,34 +21,26 @@ const getDefaultPlaceholder = () =>
     '<i data-bre-placeholder="true">Click here to select this container...</i>'
   );
 
-const toggleContainerPlaceholderIfNeed = (
-  container: bre.core.IBlocksContainer
-) => {
-  if (container.usePlaceholder !== true) {
+const toggleContainersPlaceholder = (container: bre.core.IBlocksContainer) => {
+  if (container.$placeholder === null) {
     return;
   }
 
-  if (container.$placeholder !== undefined) {
-    container.$placeholder.remove();
-    container.$placeholder = undefined;
-    return;
-  }
-
-  if (container.blocks.length === 0) {
-    const $placeholder = getDefaultPlaceholder();
-    container.$placeholder = $placeholder;
-    container.$element.appendChild($placeholder);
+  if (container.$element.childElementCount === 0) {
+    container.$element.appendChild(container.$placeholder);
+  } else {
+    container.$element.removeChild(container.$placeholder);
   }
 };
 
 export const addBlockToContainer = (
   container: bre.core.IBlocksContainer,
-  block: Block,
+  block: bre.core.block.BlockData,
   idx?: number,
   select: boolean = true
 ) => {
-  const { $editor } = block.ui;
-  if ($editor === undefined) {
+  const { $element } = block;
+  if ($element === undefined) {
     return;
   }
 
@@ -61,10 +53,12 @@ export const addBlockToContainer = (
   ];
 
   // UI
+  toggleContainersPlaceholder(container);
+
   if (idx === 0) {
-    container.$element.append($editor);
+    container.$element.append($element);
   } else {
-    container.$element.children[idx].after($editor);
+    container.$element.children[idx].after($element);
   }
   //
 
@@ -75,35 +69,57 @@ export const addBlockToContainer = (
   // }
 };
 
-export class BlocksContainer implements bre.core.IBlocksContainer {
-  public $element: HTMLElement;
-  public $placeholder?: HTMLElement;
-  public usePlaceholder: boolean;
+// TODO: check this later
+export const getSelectedBlockInContainer = (
+  container: bre.core.IBlocksContainer
+) => container.blocks.find(b => !!b.selectedField);
+
+export const createContainer = (
+  $element: HTMLElement,
+  usePlaceholder: boolean
+): bre.core.IBlocksContainer => {
+  const $placeholder = usePlaceholder ? getDefaultPlaceholder() : null;
+
+  const container = {
+    $element,
+    $placeholder,
+    blocks: [],
+  };
+
+  toggleContainersPlaceholder(container);
+
+  return container;
+};
+
+export class BlocksContainer {
+  // public $element: HTMLElement;
+  // public $placeholder?: HTMLElement;
+  // public usePlaceholder: boolean;
   public blocks: Block[] = [];
   public selectedBlock?: Block;
   public isContainer: boolean = true;
 
-  constructor(
-    $element: HTMLElement,
-    private onAddBlock: (block: Block, idx: number) => any,
-    private onDeleteBlock: (block: Block, idx: number) => any,
-    private onSelectBlock: (block: Block) => any,
-    private onDeselectBlock: (block: Block) => any,
-    private onMoveBlock: (block: Block, from: number, to: number) => any,
-    private onUpdateBlock: (
-      block: Block,
-      property: string,
-      oldValue: any,
-      newValue: any
-    ) => any,
-    private onUpload?: bre.FileUploadHandler,
-    usePlaceholder: boolean = false
-  ) {
-    this.$element = $element;
-    this.usePlaceholder = usePlaceholder;
+  // constructor(
+  //   $element: HTMLElement,
+  //   private onAddBlock: (block: Block, idx: number) => any,
+  //   private onDeleteBlock: (block: Block, idx: number) => any,
+  //   private onSelectBlock: (block: Block) => any,
+  //   private onDeselectBlock: (block: Block) => any,
+  //   private onMoveBlock: (block: Block, from: number, to: number) => any,
+  //   private onUpdateBlock: (
+  //     block: Block,
+  //     property: string,
+  //     oldValue: any,
+  //     newValue: any
+  //   ) => any,
+  //   private onUpload?: bre.FileUploadHandler,
+  //   usePlaceholder: boolean = false
+  // ) {
+  //   this.$element = $element;
+  //   this.usePlaceholder = usePlaceholder;
 
-    toggleContainerPlaceholderIfNeed(this);
-  }
+  //   toggleContainerPlaceholderIfNeed(this);
+  // }
 
   public addBlock(
     name: string,
@@ -148,7 +164,7 @@ export class BlocksContainer implements bre.core.IBlocksContainer {
     this.onAddBlock(block, idx);
     block.select(undefined);
 
-    toggleContainerPlaceholderIfNeed(this);
+    toggleContainersPlaceholder(this);
   }
 
   private deleteBlock(block: Block) {
@@ -167,7 +183,7 @@ export class BlocksContainer implements bre.core.IBlocksContainer {
     // Trigger event
     this.onDeleteBlock(block, idx);
 
-    toggleContainerPlaceholderIfNeed(this);
+    toggleContainersPlaceholder(this);
   }
 
   private moveBlock(block: Block, offset: number) {
