@@ -1,5 +1,6 @@
 import { BlockUIAction } from "src/block/BlockUIAction";
 import { helpers } from "src/helpers";
+import { bre } from "src/types/bre";
 import { UI } from "src/ui/UI";
 
 const renderButton = (action: BlockUIAction): HTMLElement => {
@@ -16,6 +17,46 @@ const renderButton = (action: BlockUIAction): HTMLElement => {
   }
 
   return $el;
+};
+
+/**
+ * Generate block editor wrapper with block tools.
+ */
+const buildEditorUI = ($block: HTMLElement, actions: BlockUIAction[]) => {
+  const $tools = helpers.createElement(
+    '<div class="bre-block-tools bre-btn-deck"></div>'
+  );
+
+  actions.forEach(action => {
+    const $btn = renderButton(action);
+    $tools.appendChild($btn);
+  });
+
+  // UI.initBtnDeck($tools);
+
+  const $editor = helpers.createElement(
+    '<div class="bre-block-wrapper"></div>'
+  );
+  $editor.appendChild($tools);
+  $editor.appendChild($block);
+
+  $editor.addEventListener("mouseover", () => {
+    $editor.classList.add("bre-active");
+  });
+
+  $editor.addEventListener("mouseout", () => {
+    $editor.classList.remove("bre-active");
+  });
+
+  return $editor;
+};
+
+// TODO: events
+export const getBlockUI = ($html: HTMLElement, actions: BlockUIAction[]) => {
+  const $editor = buildEditorUI($html, []);
+  // TODO: Block events binding
+  // $editor.on("click", )
+  return $editor;
 };
 
 export class BlockUI {

@@ -1,4 +1,8 @@
-import { Block } from "src/block/Block";
+import {
+  Block,
+  createBlockFromData,
+  createBlockFromTemplate,
+} from "src/block/Block";
 import { $dom } from "src/common/DOMHelpers";
 import { helpers } from "src/helpers";
 import { bre } from "src/types/bre";
@@ -33,18 +37,27 @@ const toggleContainersPlaceholder = (container: bre.core.IBlocksContainer) => {
   }
 };
 
+type AddBlockToContainerOptions = { idx?: number } & (
+  | {
+      blockTemplate?: undefined;
+      blockData: bre.core.block.BlockData;
+    }
+  | { blockTemplate: bre.core.ITemplate; blockData?: undefined });
+
 export const addBlockToContainer = (
   container: bre.core.IBlocksContainer,
-  block: bre.core.block.BlockData,
-  idx?: number,
-  select: boolean = true
+  options: AddBlockToContainerOptions
 ) => {
-  const { $element } = block;
-  if ($element === undefined) {
-    return;
-  }
+  const { blockData, blockTemplate } = options;
 
-  idx = idx || container.blocks.length;
+  const block =
+    options.blockData !== undefined
+      ? createBlockFromData(options.blockData)
+      : createBlockFromTemplate(options.blockTemplate);
+
+  const $blockElement = block.$element;
+
+  const idx = options.idx || container.blocks.length;
 
   container.blocks = [
     ...container.blocks.slice(0, idx),
@@ -56,11 +69,10 @@ export const addBlockToContainer = (
   toggleContainersPlaceholder(container);
 
   if (idx === 0) {
-    container.$element.append($element);
+    container.$element.append($blockElement);
   } else {
-    container.$element.children[idx].after($element);
+    container.$element.children[idx].after($blockElement);
   }
-  //
 
   // TODO: select block
   // if (select) {

@@ -1097,6 +1097,27 @@ var BrickyEditor = (function (exports) {
         }
         return $el;
     };
+    var buildEditorUI = function ($block, actions) {
+        var $tools = helpers.createElement('<div class="bre-block-tools bre-btn-deck"></div>');
+        actions.forEach(function (action) {
+            var $btn = renderButton(action);
+            $tools.appendChild($btn);
+        });
+        var $editor = helpers.createElement('<div class="bre-block-wrapper"></div>');
+        $editor.appendChild($tools);
+        $editor.appendChild($block);
+        $editor.addEventListener("mouseover", function () {
+            $editor.classList.add("bre-active");
+        });
+        $editor.addEventListener("mouseout", function () {
+            $editor.classList.remove("bre-active");
+        });
+        return $editor;
+    };
+    var getBlockUI = function ($html, actions) {
+        var $editor = buildEditorUI($html, []);
+        return $editor;
+    };
     var BlockUI = (function () {
         function BlockUI($block, preview, actions, onSelect) {
             this.$block = $block;
@@ -1151,156 +1172,6 @@ var BrickyEditor = (function (exports) {
         return BlockUIAction;
     }());
     //# sourceMappingURL=BlockUIAction.js.map
-
-    var getContainerData = function (container, ignoreHtml) { return container.blocks.map(function (block) { return block.getData(ignoreHtml); }); };
-    var getContainerHtml = function (container) {
-        var html = container.blocks.map(function (block) { return block.getHtml(true); }).join("\n");
-        var root = container.$element.cloneNode(false);
-        root.innerHTML = html;
-        return root.outerHTML;
-    };
-    var getDefaultPlaceholder = function () {
-        return helpers.createElement('<i data-bre-placeholder="true">Click here to select this container...</i>');
-    };
-    var toggleContainerPlaceholderIfNeed = function (container) {
-        if (container.usePlaceholder !== true) {
-            return;
-        }
-        if (container.$placeholder !== undefined) {
-            container.$placeholder.remove();
-            container.$placeholder = undefined;
-            return;
-        }
-        if (container.blocks.length === 0) {
-            var $placeholder = getDefaultPlaceholder();
-            container.$placeholder = $placeholder;
-            container.$element.appendChild($placeholder);
-        }
-    };
-    var addBlockToContainer = function (container, block, idx, select) {
-        if (select === void 0) { select = true; }
-        var $editor = block.ui.$editor;
-        if ($editor === undefined) {
-            return;
-        }
-        idx = idx || container.blocks.length;
-        container.blocks = __spreadArrays(container.blocks.slice(0, idx), [
-            block
-        ], container.blocks.slice(idx));
-        if (idx === 0) {
-            container.$element.append($editor);
-        }
-        else {
-            container.$element.children[idx].after($editor);
-        }
-    };
-    var BlocksContainer = (function () {
-        function BlocksContainer($element, onAddBlock, onDeleteBlock, onSelectBlock, onDeselectBlock, onMoveBlock, onUpdateBlock, onUpload, usePlaceholder) {
-            if (usePlaceholder === void 0) { usePlaceholder = false; }
-            this.onAddBlock = onAddBlock;
-            this.onDeleteBlock = onDeleteBlock;
-            this.onSelectBlock = onSelectBlock;
-            this.onDeselectBlock = onDeselectBlock;
-            this.onMoveBlock = onMoveBlock;
-            this.onUpdateBlock = onUpdateBlock;
-            this.onUpload = onUpload;
-            this.blocks = [];
-            this.isContainer = true;
-            this.$element = $element;
-            this.usePlaceholder = usePlaceholder;
-            toggleContainerPlaceholderIfNeed(this);
-        }
-        BlocksContainer.prototype.addBlock = function (name, html, data, idx, select) {
-            var _this = this;
-            if (select === void 0) { select = true; }
-            var block = new Block(name, html, false, data, {
-                onDelete: this.deleteBlock,
-                onSelect: this.selectBlock,
-                onDeselect: this.deselectBlock,
-                onCopy: this.copyBlock,
-                onMove: function (b, offset) { return _this.moveBlock(b, offset); },
-                onUpdate: this.onUpdateBlock,
-                onUpload: this.onUpload,
-            });
-            this.insertBlock(block, idx);
-            if (select) {
-                block.select();
-                block.scrollTo();
-            }
-        };
-        BlocksContainer.prototype.insertBlock = function (block, idx) {
-            idx = idx || this.blocks.length;
-            if (this.selectedBlock) {
-                idx = this.blocks.indexOf(this.selectedBlock) + 1;
-            }
-            this.blocks.splice(idx, 0, block);
-            if (idx === 0) {
-                this.$element.appendChild(block.ui.$editor);
-            }
-            else {
-                $dom.after(this.blocks[idx - 1].ui.$editor, block.ui.$editor);
-            }
-            this.onAddBlock(block, idx);
-            block.select(undefined);
-            toggleContainerPlaceholderIfNeed(this);
-        };
-        BlocksContainer.prototype.deleteBlock = function (block) {
-            var idx = this.blocks.indexOf(block);
-            this.blocks.splice(idx, 1);
-            block = null;
-            if (idx < this.blocks.length) {
-                this.blocks[idx].select();
-            }
-            else if (this.blocks.length > 0) {
-                this.blocks[idx - 1].select();
-            }
-            else {
-                this.selectedBlock = undefined;
-            }
-            this.onDeleteBlock(block, idx);
-            toggleContainerPlaceholderIfNeed(this);
-        };
-        BlocksContainer.prototype.moveBlock = function (block, offset) {
-            var idx = this.blocks.indexOf(block);
-            var new_idx = idx + offset;
-            if (new_idx >= this.blocks.length || new_idx < 0) {
-                return;
-            }
-            var $anchorBlock = this.blocks[new_idx].ui.$editor;
-            if ($anchorBlock) {
-                if (offset > 0) {
-                    $dom.after($anchorBlock, block.ui.$editor);
-                }
-                else if (offset < 0) {
-                    $dom.before($anchorBlock, block.ui.$editor);
-                }
-            }
-            this.blocks.splice(idx, 1);
-            this.blocks.splice(new_idx, 0, block);
-            this.onMoveBlock(block, idx, new_idx);
-            block.scrollTo();
-        };
-        BlocksContainer.prototype.copyBlock = function (block) {
-            var idx = this.blocks.indexOf(block) + 1;
-            this.addBlock(block.template, block.html, block.getData().fields, idx, true);
-        };
-        BlocksContainer.prototype.selectBlock = function (block) {
-            if (this.selectedBlock === block) {
-                return;
-            }
-            if (this.selectedBlock) {
-                this.selectedBlock.deselect();
-            }
-            this.selectedBlock = block;
-            this.onSelectBlock(block);
-        };
-        BlocksContainer.prototype.deselectBlock = function (block) {
-            this.selectedBlock = undefined;
-            this.onDeselectBlock(block);
-        };
-        return BlocksContainer;
-    }());
-    //# sourceMappingURL=BlocksContainer.js.map
 
     var createContainerField = function (props, data) {
         var $element = props.$element;
@@ -1678,8 +1549,75 @@ var BrickyEditor = (function (exports) {
     };
     //# sourceMappingURL=field.js.map
 
-    var createBlock = function (template, isPreview, data, events) {
-        return new Block(template.name, template.$html.innerHTML, isPreview, data, events);
+    var _this = undefined;
+    var findFields = function ($html) {
+        var nodes = $html.querySelectorAll(Selectors.selectorField);
+        var $fields = nodes.length > 0 ? Array.prototype.slice.call(nodes) : [];
+        if ($html.attributes.getNamedItem(Selectors.attrField) !== null) {
+            $fields = __spreadArrays($fields, [$html]);
+        }
+        return $fields;
+    };
+    var deleteBlockFromContainer = function (container, block) {
+        container.blocks = container.blocks.filter(function (b) { return b !== block; });
+        block.$element.remove();
+        block = null;
+    };
+    var cloneBlockInContainer = function (container, block) {
+        var idx = container.blocks.indexOf(block) + 1;
+        addBlockToContainer(container, block, idx, true);
+    };
+    var moveBlockInContainer = function (container, block, offset) {
+        var blocks = container.blocks;
+        var idx = blocks.indexOf(block);
+        var new_idx = idx + offset;
+        if (new_idx >= blocks.length || new_idx < 0) {
+            return;
+        }
+        var $anchorBlock = blocks[new_idx].$element;
+        if ($anchorBlock) {
+            if (offset > 0) {
+                $dom.after($anchorBlock, block.$element);
+            }
+            else if (offset < 0) {
+                $dom.before($anchorBlock, block.$element);
+            }
+        }
+        _this.blocks.splice(idx, 1);
+        _this.blocks.splice(new_idx, 0, block);
+        _this.onMoveBlock(block, idx, new_idx);
+        block.scrollTo();
+    };
+    var createBlockFromData = function (container, blockData) {
+        var template = blockData.template, data = blockData.fields;
+        var blockTemplate = getTemplate(template);
+        if (blockTemplate === null) {
+            throw new Error("Template " + template + " not found");
+        }
+        var $html = blockTemplate.$html.cloneNode(true);
+        var $fields = findFields($html);
+        var fields = $fields.map(function ($field) {
+            return createField({
+                $element: $field,
+                data: data,
+            });
+        });
+        var actions = [
+            new BlockUIAction("ellipsis-h"),
+            new BlockUIAction("trash-o", function (b) { return deleteBlockFromContainer(container, b); }),
+            new BlockUIAction("copy", function (b) { return cloneBlockInContainer(container, b); }),
+            new BlockUIAction("angle-up", function (b) { return moveBlockInContainer(container, b, -1); }),
+            new BlockUIAction("angle-down", function (b) {
+                return moveBlockInContainer(container, b, -1);
+            }),
+        ];
+        var $element = getBlockUI($html, actions);
+        var block = {
+            template: template,
+            fields: fields,
+            $element: $element,
+        };
+        return block;
     };
     var Block = (function () {
         function Block(template, html, preview, data, events) {
@@ -1800,7 +1738,155 @@ var BrickyEditor = (function (exports) {
         };
         return Block;
     }());
-    //# sourceMappingURL=Block.js.map
+
+    var getContainerData = function (container, ignoreHtml) { return container.blocks.map(function (block) { return block.getData(ignoreHtml); }); };
+    var getContainerHtml = function (container) {
+        var html = container.blocks.map(function (block) { return block.getHtml(true); }).join("\n");
+        var root = container.$element.cloneNode(false);
+        root.innerHTML = html;
+        return root.outerHTML;
+    };
+    var getDefaultPlaceholder = function () {
+        return helpers.createElement('<i data-bre-placeholder="true">Click here to select this container...</i>');
+    };
+    var toggleContainerPlaceholderIfNeed = function (container) {
+        if (container.usePlaceholder !== true) {
+            return;
+        }
+        if (container.$placeholder !== undefined) {
+            container.$placeholder.remove();
+            container.$placeholder = undefined;
+            return;
+        }
+        if (container.blocks.length === 0) {
+            var $placeholder = getDefaultPlaceholder();
+            container.$placeholder = $placeholder;
+            container.$element.appendChild($placeholder);
+        }
+    };
+    var addBlockToContainer = function (container, blockData, idx, select) {
+        if (select === void 0) { select = true; }
+        idx = idx || container.blocks.length;
+        debugger;
+        var block = createBlockFromData(container, blockData);
+        container.blocks = __spreadArrays(container.blocks.slice(0, idx), [
+            block
+        ], container.blocks.slice(idx));
+        if (idx === 0) {
+            container.$element.append(block.$element);
+        }
+        else {
+            var prev = container.blocks[idx - 1];
+            prev.$element.after(block.$element);
+        }
+    };
+    var BlocksContainer = (function () {
+        function BlocksContainer($element, onAddBlock, onDeleteBlock, onSelectBlock, onDeselectBlock, onMoveBlock, onUpdateBlock, onUpload, usePlaceholder) {
+            if (usePlaceholder === void 0) { usePlaceholder = false; }
+            this.onAddBlock = onAddBlock;
+            this.onDeleteBlock = onDeleteBlock;
+            this.onSelectBlock = onSelectBlock;
+            this.onDeselectBlock = onDeselectBlock;
+            this.onMoveBlock = onMoveBlock;
+            this.onUpdateBlock = onUpdateBlock;
+            this.onUpload = onUpload;
+            this.blocks = [];
+            this.isContainer = true;
+            this.$element = $element;
+            this.usePlaceholder = usePlaceholder;
+            toggleContainerPlaceholderIfNeed(this);
+        }
+        BlocksContainer.prototype.addBlock = function (name, html, data, idx, select) {
+            var _this = this;
+            if (select === void 0) { select = true; }
+            var block = new Block(name, html, false, data, {
+                onDelete: this.deleteBlock,
+                onSelect: this.selectBlock,
+                onDeselect: this.deselectBlock,
+                onCopy: this.copyBlock,
+                onMove: function (b, offset) { return _this.moveBlock(b, offset); },
+                onUpdate: this.onUpdateBlock,
+                onUpload: this.onUpload,
+            });
+            this.insertBlock(block, idx);
+            if (select) {
+                block.select();
+                block.scrollTo();
+            }
+        };
+        BlocksContainer.prototype.insertBlock = function (block, idx) {
+            idx = idx || this.blocks.length;
+            if (this.selectedBlock) {
+                idx = this.blocks.indexOf(this.selectedBlock) + 1;
+            }
+            this.blocks.splice(idx, 0, block);
+            if (idx === 0) {
+                this.$element.appendChild(block.ui.$editor);
+            }
+            else {
+                $dom.after(this.blocks[idx - 1].ui.$editor, block.ui.$editor);
+            }
+            this.onAddBlock(block, idx);
+            block.select(undefined);
+            toggleContainerPlaceholderIfNeed(this);
+        };
+        BlocksContainer.prototype.deleteBlock = function (block) {
+            var idx = this.blocks.indexOf(block);
+            this.blocks.splice(idx, 1);
+            block = null;
+            if (idx < this.blocks.length) {
+                this.blocks[idx].select();
+            }
+            else if (this.blocks.length > 0) {
+                this.blocks[idx - 1].select();
+            }
+            else {
+                this.selectedBlock = undefined;
+            }
+            this.onDeleteBlock(block, idx);
+            toggleContainerPlaceholderIfNeed(this);
+        };
+        BlocksContainer.prototype.moveBlock = function (block, offset) {
+            var idx = this.blocks.indexOf(block);
+            var new_idx = idx + offset;
+            if (new_idx >= this.blocks.length || new_idx < 0) {
+                return;
+            }
+            var $anchorBlock = this.blocks[new_idx].ui.$editor;
+            if ($anchorBlock) {
+                if (offset > 0) {
+                    $dom.after($anchorBlock, block.ui.$editor);
+                }
+                else if (offset < 0) {
+                    $dom.before($anchorBlock, block.ui.$editor);
+                }
+            }
+            this.blocks.splice(idx, 1);
+            this.blocks.splice(new_idx, 0, block);
+            this.onMoveBlock(block, idx, new_idx);
+            block.scrollTo();
+        };
+        BlocksContainer.prototype.copyBlock = function (block) {
+            var idx = this.blocks.indexOf(block) + 1;
+            this.addBlock(block.template, block.html, block.getData().fields, idx, true);
+        };
+        BlocksContainer.prototype.selectBlock = function (block) {
+            if (this.selectedBlock === block) {
+                return;
+            }
+            if (this.selectedBlock) {
+                this.selectedBlock.deselect();
+            }
+            this.selectedBlock = block;
+            this.onSelectBlock(block);
+        };
+        BlocksContainer.prototype.deselectBlock = function (block) {
+            this.selectedBlock = undefined;
+            this.onDeselectBlock(block);
+        };
+        return BlocksContainer;
+    }());
+    //# sourceMappingURL=BlocksContainer.js.map
 
     var defaultButtons = [
         { icon: "bold", command: "Bold", range: true },
@@ -1905,17 +1991,9 @@ var BrickyEditor = (function (exports) {
         };
         Editor.prototype.loadBlocks = function (blocks) {
             var _this = this;
-            if (blocks && blocks.length) {
-                blocks.forEach(function (block) {
-                    var template = getTemplate(block.template);
-                    if (template) {
-                        var b = createBlock(template, false, block.fields);
-                        addBlockToContainer(_this.container, b);
-                    }
-                    else {
-                        var message = EditorStrings.errorBlockTemplateNotFound(block.template);
-                        _this.onError(message);
-                    }
+            if (blocks !== undefined) {
+                blocks.forEach(function (blockData) {
+                    addBlockToContainer(_this.container, blockData);
                 });
             }
         };

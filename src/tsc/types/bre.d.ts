@@ -1,4 +1,3 @@
-import { Block } from "src/block/Block";
 import { ContainerFieldData } from "src/fields/container";
 
 declare var instgrm: any;
@@ -30,7 +29,7 @@ declare namespace bre {
     /** Url to fetch initial blocks, overrides initial blocks property */
     blocksUrl: string;
     /** Inital block data */
-    blocks: Block[];
+    blocks: bre.core.block.BlockData[];
     /** Show blocks selector in compact mode */
     compactTools?: boolean;
     /** Max screen width to show tools in compact mode */
@@ -82,7 +81,7 @@ declare namespace bre {
         newValue: any
       ) => void;
 
-      type Events = {
+      type BlockEvents = {
         onDelete?: BlockEvent;
         onSelect?: BlockEvent;
         onDeselect?: BlockEvent;
@@ -94,7 +93,6 @@ declare namespace bre {
 
       type BlockData = {
         template: string;
-        html?: string;
         fields: field.FieldData[];
       };
 

@@ -1,23 +1,159 @@
-import { BlockUI } from "src/block/BlockUI";
+import { BlockUI, getBlockUI as getBlockElement } from "src/block/BlockUI";
 import { BlockUIAction } from "src/block/BlockUIAction";
+import { addBlockToContainer } from "src/BlocksContainer";
 import { str } from "src/common/Common";
 import { $dom } from "src/common/DOMHelpers";
 import { createField, toggleFieldSelection } from "src/fields/field";
 import { helpers } from "src/helpers";
+import { getTemplate } from "src/template";
 import { bre } from "src/types/bre";
 import { Selectors } from "src/ui/Selectors";
-import { getTemplate } from "src/template";
+
+const findFields = ($html: HTMLElement) => {
+  const nodes = $html.querySelectorAll(Selectors.selectorField);
+  let $fields = nodes.length > 0 ? Array.prototype.slice.call(nodes) : [];
+
+  if ($html.attributes.getNamedItem(Selectors.attrField) !== null) {
+    $fields = [...$fields, $html];
+  }
+
+  return $fields;
+};
+
+const deleteBlockFromContainer = (
+  container: bre.core.IBlocksContainer,
+  block: bre.core.block.Block
+) => {
+  container.blocks = container.blocks.filter(b => b !== block);
+  block.$element.remove();
+  (block as any) = null;
+};
+
+const cloneBlockInContainer = (
+  container: bre.core.IBlocksContainer,
+  block: bre.core.block.Block
+) => {
+  const idx = container.blocks.indexOf(block) + 1;
+  addBlockToContainer(container, block.data, idx, true);
+};
+
+const moveBlockInContainer = (
+  container: bre.core.IBlocksContainer,
+  block: bre.core.block.Block,
+  offset: number
+) => {
+  const { blocks } = container;
+  const idx = blocks.indexOf(block);
+  const new_idx = idx + offset;
+
+  if (new_idx >= blocks.length || new_idx < 0) {
+    return;
+  }
+
+  const $anchorBlock = blocks[new_idx].$element;
+  if ($anchorBlock) {
+    if (offset > 0) {
+      $dom.after($anchorBlock, block.$element);
+    } else if (offset < 0) {
+      $dom.before($anchorBlock, block.$element);
+    }
+  }
+
+  this.blocks.splice(idx, 1);
+  this.blocks.splice(new_idx, 0, block);
+
+  this.onMoveBlock(block, idx, new_idx);
+
+  // Scroll to block
+  block.scrollTo();
+};
 
 export const createBlockFromData = (
   blockData: bre.core.block.BlockData
-  // TODO
-  // events?: bre.core.block.Events
 ): bre.core.block.Block => {
-  const template = getTemplate(blockData.template);
-
-  const b = createBlock(template, false, block.fields);
-  new Block(template.name, template.$html.innerHTML, isPreview, data, events);
+  const { template, fields } = blockData;
+  const blockTemplate = getTemplate(template);
+  return createBlockFromTemplate(blockTemplate, fields);
 };
+
+export const createBlockFromTemplate = (
+  blockTemplate: bre.core.ITemplate,
+  fields: bre.core.field.FieldData[] = []
+): bre.core.block.Block => {
+  const $element = blockTemplate.$html.cloneNode(true) as HTMLElement;
+  const $fields = findFields($element);
+  $fields.forEach($field =>
+    createField({
+      $element: $field,
+      fields,
+    })
+  );
+
+  // const actions: BlockUIAction[] = [
+  //   new BlockUIAction("ellipsis-h"),
+  //   new BlockUIAction("trash-o", b => deleteBlockFromContainer(container, b)),
+  //   new BlockUIAction("copy", b => cloneBlockInContainer(container, b)),
+  //   new BlockUIAction("angle-up", b => moveBlockInContainer(container, b, -1)),
+  //   new BlockUIAction("angle-down", b =>
+  //     moveBlockInContainer(container, b, -1)
+  //   ),
+  // ];
+
+  // const $element = getBlockElement($html, actions);
+
+  return {
+    $element,
+    data: {
+      template: blockTemplate.name,
+      fields,
+    },
+  };
+
+  // return block;
+
+  // TODO: pass field events
+  // $fields.forEach($element => {
+  //   // const onUpdate = (property: string, oldValue: any, newValue: any) => {
+  //   //   if (block.events!.onUpdate !== undefined) {
+  //   //     block.events!.onUpdate(block, property, oldValue, newValue);
+  //   //   }
+  //   // };
+
+  //   // const onSelect = block.select;
+
+  //   const field = createField({
+  //     $element,
+  //     data,
+  //     onSelect,
+  //     // onUpdate,
+  //     // block.events ? block.events.onUpload : undefined
+  //   });
+
+  //   block.fields.push(field);
+  // });
+};
+
+// export const createBlock = (
+//   template: bre.core.ITemplate,
+//   isPreview: boolean,
+//   data?: bre.core.field.Field[]
+// ): bre.core.block.Block => {
+//   const result = {};
+
+//   // this.template = template;
+//   // this.html = html;
+//   // this.events = events;
+
+//   // const $block = helpers.createElement(html);
+//   // this.bindFields($block, data);
+//   // const actions = this.getActions();
+
+//   // Build block UI
+//   this.ui = new BlockUI($block, preview, actions, () => this.select());
+
+//   return result;
+//   //new Block(template.name, template.$html.innerHTML, isPreview, data, events);
+// };
 
 export class Block {
   public template: string;
@@ -25,14 +161,14 @@ export class Block {
   public fields: bre.core.field.Field[] = [];
   public ui: BlockUI;
   public selectedField?: bre.core.field.Field | null;
-  public events?: bre.core.block.Events;
+  public events?: bre.core.block.BlockEvents;
 
   constructor(
     template: string,
     html: string,
     preview: boolean,
     data?: bre.core.field.Field[],
-    events?: bre.core.block.Events
+    events?: bre.core.block.BlockEvents
   ) {
     this.template = template;
     this.html = html;
@@ -168,7 +304,7 @@ export class Block {
 
       const field = createField({
         $element,
-        data,
+        fields: data,
         onSelect,
         // onUpdate,
         // block.events ? block.events.onUpload : undefined

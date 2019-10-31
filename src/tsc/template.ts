@@ -11,9 +11,7 @@ type onErrorHandler = (message: string, code?: number) => any;
 
 let allTemplates: bre.core.ITemplate[] = [];
 
-export const getTemplate = (
-  templateName: string
-): bre.core.ITemplate | null => {
+export const getTemplate = (templateName: string): bre.core.ITemplate => {
   const template = allTemplates.find(x =>
     str.equalsInvariant(x.name, templateName)
   );

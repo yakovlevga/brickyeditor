@@ -11,7 +11,7 @@ export type CreateFieldProps<
   TData extends bre.core.field.FieldData = bre.core.field.FieldData
 > = {
   $element: HTMLElement;
-  data?: bre.core.field.Data[];
+  fields?: bre.core.field.FieldData[];
   onSelect?: (field: bre.core.field.Field<TData>) => void;
   onUpdate?: (field: bre.core.field.Field<TData>) => void;
   onUpload?: bre.FileUploadHandler;
@@ -52,9 +52,11 @@ const _fields: {
 export const createField = (
   props: CreateFieldProps<bre.core.field.FieldData>
 ): bre.core.field.Field => {
+  const { $element, fields } = props;
+
   // take base field props from data-bre-field attribute
   let fieldData = helpers.parseElementData<bre.core.field.FieldData>(
-    props.$element,
+    $element,
     "breField"
   );
 
@@ -64,17 +66,15 @@ export const createField = (
     fieldData.type === undefined
   ) {
     throw new Error(
-      `There is no data defined in a field: ${props.$element.innerHTML}`
+      `There is no data defined in a field: ${$element.innerHTML}`
     );
   }
 
   const { name, type } = fieldData;
 
   // if data passed from block
-  if (props.data !== undefined) {
-    const addFieldData = props.data.find(f =>
-      str.equalsInvariant(f.name, name)
-    );
+  if (fields !== undefined) {
+    const addFieldData = fields.find(f => str.equalsInvariant(f.name, name));
     if (addFieldData) {
       fieldData = {
         ...fieldData,

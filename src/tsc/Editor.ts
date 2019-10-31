@@ -1,4 +1,4 @@
-import { Block, createBlock } from "src/block/Block";
+import { Block, createBlockFromData } from "src/block/Block";
 import {
   addBlockToContainer,
   createContainer,
@@ -11,7 +11,7 @@ import { defaultOptions } from "src/defaults";
 import { EditorStrings } from "src/EditorStrings";
 import { getRequest } from "src/httpTransport";
 import { setUI } from "src/shared";
-import { getTemplate, loadTemplatesAsync } from "src/template";
+import { loadTemplatesAsync } from "src/template";
 import { bre } from "src/types/bre";
 import { Selectors } from "src/ui/Selectors";
 import { UI } from "src/ui/UI";
@@ -106,8 +106,8 @@ export class Editor {
   public getHtml = () => getContainerHtml(this.container);
 
   /// BLOCKS
-  public loadBlocks(blocks: Block[]) {
-    if (blocks && blocks.length) {
+  public loadBlocks(blocksData: bre.core.block.BlockData[]) {
+    if (blocksData) {
       // blocks
       //   .map(block => ({
       //     block,
@@ -116,32 +116,20 @@ export class Editor {
       //   .filter(x => x.template !== null)
       //   .map(x => createBlock(x.template!, false, x.block.fields));
 
-      blocks.forEach(block => {
-        const template = getTemplate(block.template);
-        if (template) {
-          const b = createBlock(template, false, block.fields);
-          addBlockToContainer(this.container, b);
-          // this.container.addBlock(
-          //   template.name,
-          //   template.$html.innerHTML,
-          //   block.fields,
-          //   undefined,
-          //   false
-          // );
-        } else {
-          const message = EditorStrings.errorBlockTemplateNotFound(
-            block.template
-          );
-          this.onError(message);
-        }
+      blocksData.forEach(blockData => {
+        addBlockToContainer(this.container, {
+          blockData,
+        });
       });
     }
   }
 
-  public addBlock(template: bre.core.ITemplate) {
+  public addBlock(blockTemplate: bre.core.ITemplate) {
     const container = getCurrentContainer(this.container);
-    const block = createBlock(template, false);
-    addBlockToContainer(container, block);
+    // const block = createBlock(template, false);
+    addBlockToContainer(container, {
+      blockTemplate,
+    });
   }
 
   private onError = (message: string, code: number = 0) =>
