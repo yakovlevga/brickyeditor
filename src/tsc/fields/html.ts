@@ -35,10 +35,6 @@ export const createHtmlField: HtmlFieldFactory = (props, data) => {
     },
   };
 
-  SelectionUtils.bindTextSelection($element, rect => {
-    toggleHtmlTools(rect);
-  });
-
   const updateHtmlProp = () => {
     const value = $element.innerHTML.trim();
     if ($element.innerHTML !== value) {
@@ -49,6 +45,10 @@ export const createHtmlField: HtmlFieldFactory = (props, data) => {
 
   if (!preview) {
     $element.setAttribute(Selectors.attrContentEditable, "true");
+
+    SelectionUtils.bindTextSelection($element, rect => {
+      toggleHtmlTools(rect);
+    });
 
     $element.addEventListener("blur", updateHtmlProp);
     $element.addEventListener("keyup", updateHtmlProp);
@@ -66,8 +66,8 @@ export const createHtmlField: HtmlFieldFactory = (props, data) => {
     $element.addEventListener("click", ev => {
       // Prevents the event from bubbling up the DOM tree
       toggleFieldSelection(field, true);
-      ev.stopPropagation();
-      return false;
+      // ev.stopPropagation();
+      // return false;
     });
   }
 

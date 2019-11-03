@@ -104,6 +104,7 @@ export const createBlockFromTemplate = (
       template: blockTemplate.name,
       fields,
     },
+    selectedField: null,
   };
 };
 // return block;

@@ -1,4 +1,3 @@
-import { Block, createBlockFromData } from "src/block/Block";
 import {
   addBlockToContainer,
   createContainer,
@@ -9,6 +8,7 @@ import { Common, str } from "src/common/Common";
 import { $dom } from "src/common/DOMHelpers";
 import { defaultOptions } from "src/defaults";
 import { EditorStrings } from "src/EditorStrings";
+import { helpers } from "src/helpers";
 import { getRequest } from "src/httpTransport";
 import { setUI } from "src/shared";
 import { loadTemplatesAsync } from "src/template";
@@ -16,20 +16,52 @@ import { bre } from "src/types/bre";
 import { Selectors } from "src/ui/Selectors";
 import { UI } from "src/ui/UI";
 
-const getCurrentContainer = (
-  container: bre.core.IBlocksContainer
-): bre.core.IBlocksContainer => {
-  if (container.selectedBlock && container.selectedBlock.isContainer()) {
-    const field = container.selectedBlock.selectedField;
+const setupBlockEvents = (
+  editor: Editor,
+  container: bre.core.IBlocksContainer,
+  block: bre.core.block.Block
+) => {
+  block.$element.addEventListener("click", () =>
+    selectBlock(editor, container, block)
+  );
+};
 
-    if (field && field.type === "container") {
-      return getCurrentContainer(
-        (field as bre.core.field.ContainerField).container
-      );
-    }
+export const selectBlock = (
+  editor: Editor,
+  container: bre.core.IBlocksContainer,
+  block: bre.core.block.Block
+) => {
+  editor.selectedContainer = container;
+  container.selectedBlock = block;
+
+  // TODO: deselect prev block and block field in container
+
+  // UI
+  if (editor.$blockTools === undefined) {
+    const { createElement, px } = helpers;
+    const width = 40;
+    const style: Partial<CSSStyleDeclaration> = {
+      position: "absolute",
+      width: px(width),
+      minHeight: px(width),
+      backgroundColor: "red",
+      zIndex: "1000", // TODO: magic number?
+      transform: `translateX(-${px(width)})`,
+      transition: "all 2s",
+    };
+
+    editor.$blockTools = createElement(
+      `<div>
+        <button>del</button>
+      </div>`
+    );
+
+    Object.assign(editor.$blockTools.style, style);
+  } else {
+    helpers.toggleVisibility(editor.$blockTools, true);
   }
 
-  return container;
+  block.$element.insertAdjacentElement("beforebegin", editor.$blockTools);
 };
 
 export class Editor {
@@ -37,7 +69,12 @@ export class Editor {
 
   public $editor: HTMLElement;
   public options: bre.Options;
+
+  public selectedContainer?: bre.core.IBlocksContainer;
+  public $blockTools?: HTMLElement;
+
   private isLoaded: boolean = false;
+
   private container: bre.core.IBlocksContainer;
 
   constructor($editor: HTMLElement, options: bre.Options) {
@@ -116,19 +153,32 @@ export class Editor {
       //   .filter(x => x.template !== null)
       //   .map(x => createBlock(x.template!, false, x.block.fields));
 
-      blocksData.forEach(blockData => {
+      const blocks = blocksData.map(blockData =>
         addBlockToContainer(this.container, {
           blockData,
-        });
+        })
+      );
+
+      blocks.forEach(block => {
+        setupBlockEvents(this, this.container, block);
       });
+
+      if (blocks.length > 0) {
+        const lastBlock = blocks[blocks.length - 1];
+        selectBlock(this, this.container, lastBlock);
+      }
     }
   }
 
   public addBlock(blockTemplate: bre.core.ITemplate) {
-    const container = getCurrentContainer(this.container);
-    addBlockToContainer(container, {
+    // TODO
+    const container = this.container; // getCurrentContainer(this.container);
+    const block = addBlockToContainer(container, {
       blockTemplate,
     });
+
+    setupBlockEvents(this, container, block);
+    selectBlock(this, container, block);
   }
 
   private onError = (message: string, code: number = 0) =>
@@ -194,24 +244,28 @@ export class Editor {
   // }
 
   // load initial blocks
-  private async tryLoadInitialBlocksAsync(): Promise<Block[] | null> {
+  private async tryLoadInitialBlocksAsync(): Promise<
+    bre.core.block.BlockData[] | null
+  > {
     const url = this.options.blocksUrl;
     const editor = this;
-    return new Promise<Block[] | null>(async (resolve, reject) => {
-      if (url !== undefined) {
-        try {
-          const blocks = await getRequest(url);
-          resolve(blocks);
-        } catch (error) {
-          editor.onError(EditorStrings.errorBlocksFileNotFound(url));
-          reject(error);
+    return new Promise<bre.core.block.BlockData[] | null>(
+      async (resolve, reject) => {
+        if (url !== undefined) {
+          try {
+            const blocks = await getRequest(url);
+            resolve(blocks);
+          } catch (error) {
+            editor.onError(EditorStrings.errorBlocksFileNotFound(url));
+            reject(error);
+          }
+        } else if (this.options.blocks !== undefined) {
+          resolve(this.options.blocks);
+        } else {
+          resolve(null);
         }
-      } else if (this.options.blocks !== undefined) {
-        resolve(this.options.blocks);
-      } else {
-        resolve(null);
       }
-    });
+    );
   }
 
   private trigger(event: bre.Event, data: any) {

@@ -345,6 +345,7 @@ var BrickyEditor = (function (exports) {
         temp.innerHTML = "";
         return result;
     };
+    var px = function (value) { return value + "px"; };
     var toggleVisibility = function (el, visible) {
         if (visible !== undefined) {
             el.style.display = visible ? "initial" : "none";
@@ -424,6 +425,7 @@ var BrickyEditor = (function (exports) {
         });
     }); };
     var helpers = {
+        px: px,
         createElement: createElement,
         parseElementData: parseElementData,
         showModal: showModal,
@@ -1011,9 +1013,6 @@ var BrickyEditor = (function (exports) {
                 return $copy;
             },
         };
-        SelectionUtils.bindTextSelection($element, function (rect) {
-            toggleHtmlTools(rect);
-        });
         var updateHtmlProp = function () {
             var value = $element.innerHTML.trim();
             if ($element.innerHTML !== value) {
@@ -1023,6 +1022,9 @@ var BrickyEditor = (function (exports) {
         };
         if (!preview) {
             $element.setAttribute(Selectors.attrContentEditable, "true");
+            SelectionUtils.bindTextSelection($element, function (rect) {
+                toggleHtmlTools(rect);
+            });
             $element.addEventListener("blur", updateHtmlProp);
             $element.addEventListener("keyup", updateHtmlProp);
             $element.addEventListener("paste", updateHtmlProp);
@@ -1036,8 +1038,6 @@ var BrickyEditor = (function (exports) {
             });
             $element.addEventListener("click", function (ev) {
                 toggleFieldSelection(field, true);
-                ev.stopPropagation();
-                return false;
             });
         }
         return field;
@@ -1371,6 +1371,7 @@ var BrickyEditor = (function (exports) {
                 template: blockTemplate.name,
                 fields: fields,
             },
+            selectedField: null,
         };
     };
     //# sourceMappingURL=Block.js.map
@@ -1397,13 +1398,18 @@ var BrickyEditor = (function (exports) {
         }
     };
     var addBlockToContainer = function (container, options) {
+        var blocks = container.blocks, selectedBlock = container.selectedBlock;
         var block = options.blockData !== undefined
             ? createBlockFromData(options.blockData)
             : createBlockFromTemplate(options.blockTemplate);
-        var idx = options.idx || container.blocks.length;
-        container.blocks = __spreadArrays(container.blocks.slice(0, idx), [
-            block
-        ], container.blocks.slice(idx));
+        var idx = options.idx;
+        if (idx === undefined) {
+            idx =
+                selectedBlock !== null
+                    ? blocks.indexOf(selectedBlock) + 1
+                    : blocks.length;
+        }
+        container.blocks = __spreadArrays(blocks.slice(0, idx), [block], blocks.slice(idx));
         toggleContainersPlaceholder(container);
         var $container = container.$element;
         var $block = block.$element;
@@ -1411,8 +1417,10 @@ var BrickyEditor = (function (exports) {
             $container.append($block);
         }
         else {
-            $container.children[idx].after($block);
+            var $prevBlock = blocks[idx - 1].$element;
+            $prevBlock.after($block);
         }
+        return block;
     };
     var createContainer = function ($element, usePlaceholder) {
         var $placeholder = usePlaceholder ? getDefaultPlaceholder() : null;
@@ -1420,11 +1428,11 @@ var BrickyEditor = (function (exports) {
             $element: $element,
             $placeholder: $placeholder,
             blocks: [],
+            selectedBlock: null,
         };
         toggleContainersPlaceholder(container);
         return container;
     };
-    //# sourceMappingURL=BlocksContainer.js.map
 
     var defaultButtons = [
         { icon: "bold", command: "Bold", range: true },
@@ -1573,14 +1581,33 @@ var BrickyEditor = (function (exports) {
     }());
     //# sourceMappingURL=UI.js.map
 
-    var getCurrentContainer = function (container) {
-        if (container.selectedBlock && container.selectedBlock.isContainer()) {
-            var field = container.selectedBlock.selectedField;
-            if (field && field.type === "container") {
-                return getCurrentContainer(field.container);
-            }
+    var setupBlockEvents = function (editor, container, block) {
+        block.$element.addEventListener("click", function () {
+            return selectBlock(editor, container, block);
+        });
+    };
+    var selectBlock = function (editor, container, block) {
+        editor.selectedContainer = container;
+        container.selectedBlock = block;
+        if (editor.$blockTools === undefined) {
+            var createElement = helpers.createElement, px = helpers.px;
+            var width = 40;
+            var style = {
+                position: "absolute",
+                width: px(width),
+                minHeight: px(width),
+                backgroundColor: "red",
+                zIndex: "1000",
+                transform: "translateX(-" + px(width) + ")",
+                transition: "all 2s",
+            };
+            editor.$blockTools = createElement("<div>\n        <button>del</button>\n      </div>");
+            Object.assign(editor.$blockTools.style, style);
         }
-        return container;
+        else {
+            helpers.toggleVisibility(editor.$blockTools, true);
+        }
+        block.$element.insertAdjacentElement("beforebegin", editor.$blockTools);
     };
     var Editor = (function () {
         function Editor($editor, options) {
@@ -1646,18 +1673,27 @@ var BrickyEditor = (function (exports) {
         Editor.prototype.loadBlocks = function (blocksData) {
             var _this = this;
             if (blocksData) {
-                blocksData.forEach(function (blockData) {
-                    addBlockToContainer(_this.container, {
+                var blocks = blocksData.map(function (blockData) {
+                    return addBlockToContainer(_this.container, {
                         blockData: blockData,
                     });
                 });
+                blocks.forEach(function (block) {
+                    setupBlockEvents(_this, _this.container, block);
+                });
+                if (blocks.length > 0) {
+                    var lastBlock = blocks[blocks.length - 1];
+                    selectBlock(this, this.container, lastBlock);
+                }
             }
         };
         Editor.prototype.addBlock = function (blockTemplate) {
-            var container = getCurrentContainer(this.container);
-            addBlockToContainer(container, {
+            var container = this.container;
+            var block = addBlockToContainer(container, {
                 blockTemplate: blockTemplate,
             });
+            setupBlockEvents(this, container, block);
+            selectBlock(this, container, block);
         };
         Editor.prototype.tryLoadInitialBlocksAsync = function () {
             return __awaiter(this, void 0, Promise, function () {
@@ -1715,6 +1751,7 @@ var BrickyEditor = (function (exports) {
     //# sourceMappingURL=Editor.js.map
 
     exports.Editor = Editor;
+    exports.selectBlock = selectBlock;
 
     return exports;
 

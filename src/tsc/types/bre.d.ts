@@ -51,7 +51,7 @@ declare namespace bre {
       $element: HTMLElement;
       $placeholder: HTMLElement | null;
       blocks: block.Block[];
-      // selectedBlock?: Block;
+      selectedBlock: block.Block | null;
       // usePlaceholder: boolean;
       // data: () => any;
       // html: () => string;
@@ -99,6 +99,7 @@ declare namespace bre {
       type Block = {
         $element: HTMLElement;
         data: BlockData;
+        selectedField: field.Field | null;
       };
     }
 

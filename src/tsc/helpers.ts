@@ -10,6 +10,8 @@ const createElement = <TElement extends HTMLElement>(
   return result;
 };
 
+export const px = (value: number) => `${value}px`;
+
 const toggleVisibility = (el: HTMLElement, visible?: boolean) => {
   if (visible !== undefined) {
     el.style.display = visible ? "initial" : "none";
@@ -121,6 +123,7 @@ const readFileAsync = async (file: File) =>
   });
 
 export const helpers = {
+  px,
   createElement,
   parseElementData,
   showModal,

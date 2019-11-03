@@ -1,9 +1,4 @@
-import {
-  Block,
-  createBlockFromData,
-  createBlockFromTemplate,
-} from "src/block/Block";
-import { $dom } from "src/common/DOMHelpers";
+import { createBlockFromData, createBlockFromTemplate } from "src/block/Block";
 import { helpers } from "src/helpers";
 import { bre } from "src/types/bre";
 
@@ -17,6 +12,25 @@ export const getContainerHtml = (container: bre.core.IBlocksContainer) => {
   const root: HTMLElement = container.$element.cloneNode(false) as HTMLElement;
   root.innerHTML = html;
   return root.outerHTML;
+};
+
+export const getActiveContainer = (
+  container: bre.core.IBlocksContainer
+): bre.core.IBlocksContainer => {
+  if (
+    container.selectedBlock === null ||
+    container.selectedBlock.selectedField === null
+  ) {
+    return container;
+  }
+
+  const { selectedField } = container.selectedBlock;
+  if (selectedField.type === "container") {
+    const containerField = selectedField as bre.core.field.ContainerField;
+    return getActiveContainer(containerField.container);
+  }
+
+  return container;
 };
 
 // TODO: add custom placeholder and localization
@@ -48,18 +62,22 @@ export const addBlockToContainer = (
   container: bre.core.IBlocksContainer,
   options: AddBlockToContainerOptions
 ) => {
+  const { blocks, selectedBlock } = container;
+
   const block =
     options.blockData !== undefined
       ? createBlockFromData(options.blockData)
       : createBlockFromTemplate(options.blockTemplate);
 
-  const idx = options.idx || container.blocks.length;
+  let { idx } = options;
+  if (idx === undefined) {
+    idx =
+      selectedBlock !== null
+        ? blocks.indexOf(selectedBlock) + 1
+        : blocks.length;
+  }
 
-  container.blocks = [
-    ...container.blocks.slice(0, idx),
-    block,
-    ...container.blocks.slice(idx),
-  ];
+  container.blocks = [...blocks.slice(0, idx), block, ...blocks.slice(idx)];
 
   // UI
   toggleContainersPlaceholder(container);
@@ -70,8 +88,11 @@ export const addBlockToContainer = (
   if (idx === 0) {
     $container.append($block);
   } else {
-    $container.children[idx].after($block);
+    const $prevBlock = blocks[idx - 1].$element;
+    $prevBlock.after($block);
   }
+
+  return block;
 
   // TODO: select block
   // if (select) {
@@ -81,9 +102,9 @@ export const addBlockToContainer = (
 };
 
 // TODO: check this later
-export const getSelectedBlockInContainer = (
-  container: bre.core.IBlocksContainer
-) => container.blocks.find(b => !!b.selectedField);
+// export const getSelectedBlockInContainer = (
+//   container: bre.core.IBlocksContainer
+// ) => container.blocks.find(b => !!b.selectedField);
 
 export const createContainer = (
   $element: HTMLElement,
@@ -91,10 +112,11 @@ export const createContainer = (
 ): bre.core.IBlocksContainer => {
   const $placeholder = usePlaceholder ? getDefaultPlaceholder() : null;
 
-  const container = {
+  const container: bre.core.IBlocksContainer = {
     $element,
     $placeholder,
     blocks: [],
+    selectedBlock: null,
   };
 
   toggleContainersPlaceholder(container);
