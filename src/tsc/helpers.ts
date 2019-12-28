@@ -1,4 +1,7 @@
 import { getSelectionRanges, restoreSelection } from "src/ui/SelectionUtils";
+import { bre } from "src/types/bre";
+
+type FieldData = bre.core.field.FieldData;
 
 const createElement = <TElement extends HTMLElement>(
   html: string
@@ -76,16 +79,13 @@ const showModal = (props: {
   document.body.appendChild(element);
 };
 
-const parseElementData = <TData>(
-  el: HTMLElement,
-  prop: string
-): TData | null => {
+const parseElementData = (el: HTMLElement, prop: string): FieldData | null => {
   let json = el.dataset[prop];
   if (json === undefined) {
     return null;
   }
 
-  let data: TData | null = null;
+  let data: FieldData | null = null;
 
   try {
     data = JSON.parse(json);
@@ -93,7 +93,15 @@ const parseElementData = <TData>(
     if (e instanceof SyntaxError) {
       json = json.replace(/'/g, '"');
       try {
-        data = JSON.parse(json) as TData;
+        data = JSON.parse(json) as FieldData;
+
+        if (data.name === undefined || data.type === undefined) {
+          return null;
+          // TODO throw error or return null from one source
+          // throw new Error(
+          //   `There is no data defined in a field: ${el.innerHTML}`
+          // );
+        }
       } catch {
         // TODO: log error
         return null;
@@ -128,5 +136,5 @@ export const helpers = {
   parseElementData,
   showModal,
   toggleVisibility,
-  readFileAsync,
+  readFileAsync
 };

@@ -1,79 +1,96 @@
 import {
   createContainer,
   getContainerData,
-  getContainerHtml,
+  getContainerHtml
 } from "src/BlocksContainer";
-import { FieldFactory } from "src/fields/field";
+import {
+  FieldFactory,
+  toggleFieldSelection,
+  isValidFieldType
+} from "src/fields/field";
 import { helpers } from "src/helpers";
 import { bre } from "src/types/bre";
 import { Selectors } from "src/ui/Selectors";
+import { emmiter } from "src/emmiter";
 
-export type ContainerFieldData = bre.core.field.FieldData & {
-  type: "container";
+export type ContainerFieldData = bre.core.field.FieldData & {};
+
+type ContainerFieldType = "container";
+type ContainerFieldPayload = {
   html: string;
   blocks: bre.core.block.BlockData[];
 };
+type ContainerFieldData = bre.core.field.FieldData<
+  ContainerFieldType,
+  ContainerFieldPayload
+>;
+export type ContainerField = bre.ui.Field<ContainerFieldData> & {
+  container: bre.core.IBlocksContainer;
+};
 
-type ContainerFieldFactory = FieldFactory<ContainerFieldData>;
-
-export const createContainerField: ContainerFieldFactory = (props, data) => {
-  const { $element, preview } = props;
-
-  const updateBlocks = () => {
-    const blocks = getContainerData(container, true);
-    const html = getContainerHtml(container);
-    field.data = {
-      ...field.data,
-      blocks,
-      html,
-    };
-
-    // TODO: call update callback
-  };
-
-  // const container: BlocksContainer = new BlocksContainer(
-  //   $element,
-  //   updateBlocks,
-  //   updateBlocks,
-  //   (block: Block) => {
-  //     // this.select();
-  //   },
-  //   (block: Block) => {
-  //     //
-  //   },
-  //   updateBlocks,
-  //   updateBlocks,
-  //   props.onUpload,
-  //   true
-  // );
+export const container: FieldFactory = ({ $element, preview, data }) => {
+  if (!isValidFieldType<ContainerFieldData>(data, "container")) {
+    return null;
+  }
 
   const container = createContainer($element, !preview);
 
-  const field: bre.core.field.ContainerField = {
-    type: "container",
-    name: data.name,
-    $field: $element,
+  const field: ContainerField = {
+    $element,
     data,
-    container,
-    getElement: () => {
-      const html = getContainerHtml(container);
-      return helpers.createElement(html);
-    },
+    container
   };
 
   $element.classList.add(Selectors.selectorFieldContainer);
 
   if (!preview) {
+    const fireEvent = emmiter(field);
+
+    field.cleanup = () => {
+      const html = getContainerHtml(container);
+      return helpers.createElement(html);
+    };
+
     $element.addEventListener("click", ev => {
       // TODO:
       // field.select();
+      toggleFieldSelection(field, true, fireEvent);
       ev.stopPropagation();
       return false;
     });
+
+    const updateBlocks = () => {
+      const blocks = getContainerData(container, true);
+      const html = getContainerHtml(container);
+
+      const updatedData = {
+        ...field.data,
+        blocks,
+        html
+      };
+
+      // TODO: call update callback
+    };
   }
 
   return field;
 };
+
+// const container: BlocksContainer = new BlocksContainer(
+//   $element,
+//   updateBlocks,
+//   updateBlocks,
+//   (block: Block) => {
+//     // this.select();
+//   },
+//   (block: Block) => {
+//     //
+//   },
+//   updateBlocks,
+//   updateBlocks,
+//   props.onUpload,
+//   true
+// );
 
 // export class ContainerField extends BaseField {
 // public container: BlocksContainer;

@@ -2,48 +2,55 @@ import {
   FieldFactory,
   getFieldElement,
   toggleFieldSelection,
-  updateFieldProperty,
+  updateFieldData,
+  isValidFieldType
 } from "src/fields/field";
 import { bre } from "src/types/bre";
 import { toggleHtmlTools } from "src/ui/htmlTools";
 import { SelectionUtils } from "src/ui/SelectionUtils";
 import { Selectors } from "src/ui/Selectors";
+import { emmiter } from "src/emmiter";
 
-export type HtmlFieldData = bre.core.field.FieldData & {
-  type: "html";
+type HtmlFieldType = "html";
+type HtmlFieldPayload = {
   html: string;
 };
+type HtmlFieldData = bre.core.field.FieldData<HtmlFieldType, HtmlFieldPayload>;
+type HtmlField = bre.ui.Field<HtmlFieldData>;
 
-type HtmlFieldFactory = FieldFactory<HtmlFieldData>;
+export const html: FieldFactory = ({ $element, preview, data }) => {
+  if (!isValidFieldType<HtmlFieldData>(data, "html")) {
+    return null;
+  }
 
-export const createHtmlField: HtmlFieldFactory = (props, data) => {
-  const { $element, preview } = props;
+  let field: HtmlField = {
+    $element,
+    data
+  };
 
   if (data.html) {
     $element.innerHTML = data.html;
   }
 
-  const field: bre.core.field.Field<HtmlFieldData> = {
-    type: "html",
-    name: data.name,
-    $field: $element,
-    data,
-    getElement: () => {
+  if (!preview) {
+    const fireEvent = emmiter(field);
+    field.cleanup = () => {
       const $copy = getFieldElement($element);
       $copy.removeAttribute(Selectors.attrContentEditable);
       return $copy;
-    },
-  };
+    };
 
-  const updateHtmlProp = () => {
-    const value = $element.innerHTML.trim();
-    if ($element.innerHTML !== value) {
-      field.$field.innerHTML = value;
-      updateFieldProperty<HtmlFieldData>(field, "html", value, true);
-    }
-  };
+    const updateHtmlProp = () => {
+      const html = $element.innerHTML.trim();
+      if ($element.innerHTML !== html) {
+        const updatedData = {
+          html
+        };
+        //field.$field.innerHTML = value;
+        updateFieldData(field, updatedData, fireEvent);
+      }
+    };
 
-  if (!preview) {
     $element.setAttribute(Selectors.attrContentEditable, "true");
 
     SelectionUtils.bindTextSelection($element, rect => {
@@ -55,7 +62,7 @@ export const createHtmlField: HtmlFieldFactory = (props, data) => {
     $element.addEventListener("paste", updateHtmlProp);
     $element.addEventListener("input", updateHtmlProp);
 
-    $element.addEventListener("paste", ev => {
+    $element.addEventListener("paste", (ev: ClipboardEvent) => {
       ev.preventDefault();
       if (ev.clipboardData) {
         const text = ev.clipboardData.getData("text/plain");
@@ -63,12 +70,16 @@ export const createHtmlField: HtmlFieldFactory = (props, data) => {
       }
     });
 
-    $element.addEventListener("click", ev => {
+    $element.addEventListener("click", (ev: Event) => {
       // Prevents the event from bubbling up the DOM tree
-      toggleFieldSelection(field, true);
-      // ev.stopPropagation();
-      // return false;
+      toggleFieldSelection(field, true, fireEvent);
+      ev.stopPropagation();
+      return false;
     });
+
+    // $element.addEventListener("blur", () => {
+    //   toggleFieldSelection(field, false, fireEvent);
+    // });
   }
 
   return field;

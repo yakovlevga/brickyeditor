@@ -3,26 +3,19 @@ import {
   getEmbedAsync,
   NoembedResponse,
   postProcessEmbed,
-  preProcessEmbedUrl,
+  preProcessEmbedUrl
 } from "src/embed";
-import { FieldFactory, getFieldElement } from "src/fields/field";
+import {
+  FieldFactory,
+  getFieldElement,
+  isValidFieldType
+} from "src/fields/field";
 import { helpers } from "src/helpers";
 import { loadScriptAsync } from "src/httpTransport";
 import { locales } from "src/locales";
 import { promptAsync } from "src/prompt";
 import { bre } from "src/types/bre";
-
-// const getSettings = (field: BaseField) => {
-//   (field as EmbedField).showEmbedLoaderAsync(field);
-// }
-
-export type EmbedFieldData = bre.core.field.FieldData & {
-  type: "embed";
-  url?: string;
-  embed?: NoembedResponse;
-};
-
-type EmbedFieldFactory = FieldFactory<EmbedFieldData>;
+import { emmiter } from "src/emmiter";
 
 type EmbedPromptParams = {
   url: bre.prompt.PromptParameter;
@@ -32,18 +25,18 @@ const providerScriptsLoaded: {
   [TKey: string]: boolean;
 } = {};
 
-const getPromptParams: (props: EmbedFieldData) => EmbedPromptParams = ({
-  url,
-}) => ({
+const getPromptParams: (
+  props: bre.core.field.EmbedFieldData
+) => EmbedPromptParams = ({ url }) => ({
   url: {
     value: url || "http://instagr.am/p/BO9VX2Vj4fF/",
     title: locales.prompt.embed.url.title,
-    placeholder: locales.prompt.embed.url.placeholder,
-  },
+    placeholder: locales.prompt.embed.url.placeholder
+  }
 });
 
 const renderEmbedFieldSettingsUI = ($field: HTMLElement) => {
-  // TODO: holy sht, thats really terrible!
+  // TODO: rework this
   const $el = helpers.createElement(
     `<div style="
       position: absolute;
@@ -61,18 +54,25 @@ const renderEmbedFieldSettingsUI = ($field: HTMLElement) => {
   return $el;
 };
 
-export const createEmbedField: EmbedFieldFactory = (props, data) => {
-  const { $element, preview } = props;
+type EmbedFieldType = "embed";
+type EmbedFieldPayload = {
+  url?: string;
+  embed?: NoembedResponse;
+};
+type EmbedFieldData = bre.core.field.FieldData<
+  EmbedFieldType,
+  EmbedFieldPayload
+>;
+type EmbedField = bre.ui.Field<EmbedFieldData>;
 
-  const field: bre.core.field.Field<EmbedFieldData> = {
-    type: "embed",
-    name: data.name,
-    $field: $element,
-    data,
-    getElement: () => {
-      const $copy = getFieldElement($element);
-      return $copy;
-    },
+export const embed: FieldFactory = ({ $element, preview, data }) => {
+  if (!isValidFieldType<EmbedFieldData>(data, "embed")) {
+    return null;
+  }
+
+  const field: EmbedField = {
+    $element,
+    data
   };
 
   const updateEmbedMedia = async (url?: string, fireUpdate?: boolean) => {
@@ -85,7 +85,7 @@ export const createEmbedField: EmbedFieldFactory = (props, data) => {
     field.data = {
       ...field.data,
       url,
-      embed,
+      embed
     };
 
     const $embed = helpers.createElement(`<div>${embed.html}</div>`);
@@ -132,6 +132,12 @@ export const createEmbedField: EmbedFieldFactory = (props, data) => {
   };
 
   if (!preview) {
+    const fireEvent = emmiter(field);
+    field.cleanup = () => {
+      const $copy = getFieldElement($element);
+      return $copy;
+    };
+
     $element.addEventListener("click", async () => {
       promptEmbedMediaUrl();
     });

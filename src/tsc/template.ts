@@ -65,7 +65,7 @@ export const loadTemplatesAsync = async (
 
     grouppedTemplates.push({
       name: ungrouppedTemplatesGroupName,
-      templates: ungrouppedTemplates,
+      templates: ungrouppedTemplates
     });
 
     // add to dictionary
@@ -120,6 +120,6 @@ const createTemplate = ($template: HTMLElement): bre.core.ITemplate | null => {
   return {
     name,
     $html: $template,
-    $preview,
+    $preview
   };
 };

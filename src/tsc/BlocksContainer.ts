@@ -36,7 +36,9 @@ export const getActiveContainer = (
 // TODO: add custom placeholder and localization
 const getDefaultPlaceholder = () =>
   helpers.createElement(
-    '<i data-bre-placeholder="true">Click here to select this container...</i>'
+    `<div style="min-height: 100px; display: flex; align-items: center; justify-content: center; font-weight: 700; cursor: pointer;">
+      <div data-bre-placeholder="true">Click here to select this container</div>
+    </div>`
   );
 
 const toggleContainersPlaceholder = (container: bre.core.IBlocksContainer) => {

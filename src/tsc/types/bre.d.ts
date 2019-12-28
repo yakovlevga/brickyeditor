@@ -1,4 +1,5 @@
-import { ContainerFieldData } from "src/fields/container";
+import { NoembedResponse } from "src/embed";
+import { OnOffFunc } from "src/emmiter";
 
 declare var instgrm: any;
 
@@ -44,132 +45,20 @@ declare namespace bre {
     inputSelector: string;
   };
 
-  namespace ui {}
-
-  namespace core {
-    interface IBlocksContainer {
+  namespace ui {
+    type FieldBase = {
       $element: HTMLElement;
-      $placeholder: HTMLElement | null;
-      blocks: block.Block[];
-      selectedBlock: block.Block | null;
-      // usePlaceholder: boolean;
-      // data: () => any;
-      // html: () => string;
-      // add: (block: Block) => void;
-    }
+      // clean up html element from editors data attributes, etc.
+      cleanup?: () => HTMLElement;
+      selected?: boolean;
+      on?: OnOffFunc;
+      off?: OnOffFunc;
+    };
 
-    interface ITemplateGroup {
-      name: string | null;
-      templates: bre.core.ITemplate[];
-    }
-
-    interface ITemplate {
-      $html: HTMLElement;
-      $preview: HTMLElement;
-      name: string;
-    }
-
-    namespace block {
-      type BlockEvent = (block: Block) => void;
-
-      type MoveEvent = (block: Block, offset: number) => void;
-
-      type UpdateEvent = (
-        block: Block,
-        property: string,
-        oldValue: any,
-        newValue: any
-      ) => void;
-
-      type BlockEvents = {
-        onDelete?: BlockEvent;
-        onSelect?: BlockEvent;
-        onDeselect?: BlockEvent;
-        onCopy?: BlockEvent;
-        onMove?: MoveEvent;
-        onUpdate?: UpdateEvent;
-        onUpload?: FileUploadHandler;
-      };
-
-      type BlockData = {
-        template: string;
-        fields: field.FieldData[];
-      };
-
-      type Block = {
-        $element: HTMLElement;
-        data: BlockData;
-        selectedField: field.Field | null;
-      };
-    }
-
-    namespace field {
-      type FieldType = "html" | "container" | "image" | "embed";
-
-      type Data = {
-        name: string;
-        type: FieldType;
-      } & {
-        [TKey: string]: any;
-      };
-
-      type BaseFieldData = {
-        type: FieldType;
-        name: string;
-      };
-
-      type FieldData<
-        TData extends BaseFieldData = BaseFieldData
-      > = BaseFieldData & {
-        data: TData;
-      };
-
-      type Field<
-        TData extends bre.core.field.FieldData = bre.core.field.FieldData
-      > = FieldData<TData> & {
-        $field: HTMLElement;
-        getElement: (field: Field) => HTMLElement;
-
-        onUpdate?: (field: Field) => void;
-        onSelect?: (field: Field) => void;
-        onDeselect?: (field: Field) => void;
-      };
-
-      type ContainerField = Field<ContainerFieldData> & {
-        container: IBlocksContainer;
-      };
-    }
+    type Field<TFieldData extends core.field.FieldData> = FieldBase & {
+      data: TFieldData;
+    };
   }
-
-  type HtmlToolsButtonCommands =
-    | "Bold"
-    | "Italic"
-    | "CreateLink"
-    | "insertOrderedList"
-    | "insertUnorderedList"
-    | "Undo"
-    | "Redo";
-
-  interface IHtmlToolsButton {
-    icon: string;
-    command: HtmlToolsButtonCommands;
-    range: boolean;
-    aValueArgument?: string;
-  }
-
-  // type DataField = {
-  //   name: string;
-  //   value: any;
-  // };
-  //  & {
-  //   [TKey: string]: any;
-  // };
-
-  // namespace field {
-  //   interface IBaseField<TData extends bre.Data> {
-  //     data: TData;
-  //   }
-  // }
 
   namespace prompt {
     type PromptParameterType = "text" | "file" | "select";
@@ -219,5 +108,133 @@ declare namespace bre {
       value: any;
       selected?: boolean;
     }
+  }
+
+  namespace core {
+    interface IBlocksContainer {
+      $element: HTMLElement;
+      $placeholder: HTMLElement | null;
+      blocks: block.Block[];
+      selectedBlock: block.Block | null;
+      // usePlaceholder: boolean;
+      // data: () => any;
+      // html: () => string;
+      // add: (block: Block) => void;
+    }
+
+    interface ITemplateGroup {
+      name: string | null;
+      templates: bre.core.ITemplate[];
+    }
+
+    interface ITemplate {
+      $html: HTMLElement;
+      $preview: HTMLElement;
+      name: string;
+    }
+
+    namespace block {
+      type BlockEvent = (block: Block) => void;
+
+      type MoveEvent = (block: Block, offset: number) => void;
+
+      type UpdateEvent = (
+        block: Block,
+        property: string,
+        oldValue: any,
+        newValue: any
+      ) => void;
+
+      type BlockEvents = {
+        onDelete?: BlockEvent;
+        onSelect?: BlockEvent;
+        onDeselect?: BlockEvent;
+        onCopy?: BlockEvent;
+        onMove?: MoveEvent;
+        onUpdate?: UpdateEvent;
+        onUpload?: FileUploadHandler;
+      };
+
+      type BlockData = {
+        template: string;
+        fields: ui.Field[];
+      };
+
+      type Block = {
+        $element: HTMLElement;
+        data: BlockData;
+        selectedField: ui.Field | null;
+      };
+    }
+
+    namespace field {
+      type FieldType = "html" | "container" | "embed" | "image";
+
+      // type BaseField = {
+      //   $field: HTMLElement;
+      //   getElement: () => HTMLElement;
+      //   onSelect: (f: Field) => void;
+      //   onUpdate?: (f: Field) => void;
+      //   onDeselect?: (f: Field) => void;
+      // };
+
+      type FieldData<TType extends FieldType = any, TData = {}> = {
+        type: TType;
+        name: string;
+      } & TData;
+
+      type ContainerFieldData = FieldData<
+        "container",
+        { blocks: bre.core.block.BlockData[] }
+      >;
+
+      type EmbedFieldData = FieldData<
+        "embed",
+        {
+          url?: string;
+          embed?: NoembedResponse;
+        }
+      >;
+
+      type ImageFieldData = FieldData<
+        "image",
+        {
+          src?: string;
+          alt?: string;
+          file?: File;
+          link?: Pick<HTMLLinkElement, "href" | "title" | "target">;
+        }
+      >;
+    }
+
+    type HtmlToolsButtonCommands =
+      | "Bold"
+      | "Italic"
+      | "CreateLink"
+      | "insertOrderedList"
+      | "insertUnorderedList"
+      | "Undo"
+      | "Redo";
+
+    interface IHtmlToolsButton {
+      icon: string;
+      command: HtmlToolsButtonCommands;
+      range: boolean;
+      aValueArgument?: string;
+    }
+
+    // type DataField = {
+    //   name: string;
+    //   value: any;
+    // };
+    //  & {
+    //   [TKey: string]: any;
+    // };
+
+    // namespace field {
+    //   interface IBaseField<TData extends bre.Data> {
+    //     data: TData;
+    //   }
+    // }
   }
 }

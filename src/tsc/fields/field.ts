@@ -1,132 +1,127 @@
 import { str } from "src/common/Common";
-import { ContainerFieldData, createContainerField } from "src/fields/container";
-import { createEmbedField, EmbedFieldData } from "src/fields/embed";
-import { createHtmlField, HtmlFieldData } from "src/fields/html";
-import { createImageField, ImageFieldData } from "src/fields/image";
+import { html } from "src/fields/html";
 import { helpers } from "src/helpers";
 import { bre } from "src/types/bre";
 import { Selectors } from "src/ui/Selectors";
+import { FireFunc } from "src/emmiter";
 
-export type CreateFieldProps<
-  TData extends bre.core.field.FieldData = bre.core.field.FieldData
-> = {
+export interface ICreateFieldProps {
   $element: HTMLElement;
-  fields?: bre.core.field.FieldData[];
   preview: boolean;
-  onSelect?: (field: bre.core.field.Field<TData>) => void;
-  onUpdate?: (field: bre.core.field.Field<TData>) => void;
-  onUpload?: bre.FileUploadHandler;
-};
+  data: bre.core.field.FieldData;
+}
 
-export type FieldFactory<
-  TData extends bre.core.field.FieldData = bre.core.field.FieldData
-> = (
-  props: CreateFieldProps<TData>,
-  data: TData
-) => bre.core.field.Field<TData>;
+export type FieldFactory = (
+  props: ICreateFieldProps
+) => bre.ui.FieldBase | null;
 
-const _fields: {
-  [TKey in bre.core.field.FieldType]: FieldFactory;
+// interface FieldFactoryMap {
+//   html: HtmlFieldData;
+// }
+
+const Fields: {
+  [TKey in string]: FieldFactory;
 } = {
-  html: (props, data) =>
-    createHtmlField(
-      props as CreateFieldProps<HtmlFieldData>,
-      data as HtmlFieldData
-    ),
-  container: (props, data) =>
-    createContainerField(
-      props as CreateFieldProps<ContainerFieldData>,
-      data as ContainerFieldData
-    ),
-  image: (props, data) =>
-    createImageField(
-      props as CreateFieldProps<ImageFieldData>,
-      data as ImageFieldData
-    ),
-  embed: (props, data) =>
-    createEmbedField(
-      props as CreateFieldProps<EmbedFieldData>,
-      data as EmbedFieldData
-    ),
+  html
 };
 
-export const createField = (
-  props: CreateFieldProps<bre.core.field.FieldData>
-): bre.core.field.Field => {
-  const { $element, fields } = props;
+export const isValidFieldType = <TResult extends bre.core.field.FieldData>(
+  data: bre.core.field.FieldData,
+  type: TResult["type"]
+): data is TResult => {
+  const isValid = data.type === type;
 
+  // throw new Error(
+  //   `Wrong fields type passed. Expected: ${type}, given: ${data.type}.`
+  // );
+
+  return isValid;
+};
+
+export const getFieldByName = (
+  fields: bre.core.field.FieldData[]
+): bre.core.field.FieldData => {
+  return fields.find(f =>
+    str.equalsInvariant(f.name, name)
+  ) as bre.core.field.FieldData;
+};
+
+export const createField = ({
+  $element,
+  preview,
+  data: initialData
+}: ICreateFieldProps): bre.ui.FieldBase | null => {
   // take base field props from data-bre-field attribute
-  let fieldData = helpers.parseElementData<bre.core.field.FieldData>(
-    $element,
-    "breField"
-  );
+  let data = helpers.parseElementData($element, "breField");
 
-  if (
-    fieldData === null ||
-    fieldData.name === undefined ||
-    fieldData.type === undefined
-  ) {
-    throw new Error(
-      `There is no data defined in a field: ${$element.innerHTML}`
-    );
+  if (data === null) {
+    // throw new Error(
+    //   `There is no data defined in a field: ${$element.innerHTML}`
+    // );
+
+    return null;
   }
 
-  const { name, type } = fieldData;
+  const type: keyof typeof Fields = data.type;
 
   // if data passed from block
-  if (fields !== undefined) {
-    const addFieldData = fields.find(f => str.equalsInvariant(f.name, name));
-    if (addFieldData) {
-      fieldData = {
-        ...fieldData,
-        ...addFieldData,
-      };
-    }
+  if (initialData !== undefined) {
+    data = {
+      ...data,
+      ...initialData
+    };
   }
 
-  if (_fields[type] !== undefined) {
-    const createFieldFunc = _fields[type];
-    return createFieldFunc(props, fieldData);
-  } else {
+  const createFieldFunc = Fields[type];
+
+  if (createFieldFunc === undefined) {
     throw new Error(`${type} field not found`);
   }
+
+  return createFieldFunc({
+    $element,
+    preview,
+    data
+  });
 };
 
-export const updateFieldProperty = <TData extends bre.core.field.FieldData>(
-  field: bre.core.field.Field<TData>,
-  prop: keyof TData,
-  value: any,
-  fireUpdate: boolean = true
+export const updateFieldData = <TData extends bre.core.field.FieldData>(
+  field: bre.ui.Field<TData>,
+  changes: {
+    [TProp in keyof TData]?: TData[TProp];
+  },
+  fireEvent?: FireFunc
 ) => {
-  const oldValue = field.data[prop];
-  if (oldValue === value) {
-    return;
-  }
+  const { data } = field;
 
-  field.data = {
-    ...field.data,
-    [prop]: value,
-  };
+  const props = Object.keys(changes) as Array<keyof TData>;
+  const hasChanges = props.some(p => data[p] !== changes[p]);
 
-  if (fireUpdate && field.onUpdate) {
-    field.onUpdate(field);
+  if (hasChanges) {
+    field.data = {
+      ...data,
+      changes
+    };
+
+    if (fireEvent !== undefined) {
+      fireEvent("change", { field });
+    }
   }
 };
 
 export const toggleFieldSelection = (
-  field: bre.core.field.Field,
-  selected: boolean
+  field: bre.ui.FieldBase,
+  selected: boolean,
+  fireEvent?: FireFunc
 ) => {
-  if (selected === true) {
-    field.$field.classList.add(Selectors.selectorFieldSelected);
-    if (field.onSelect !== undefined) {
-      field.onSelect(field);
-    }
-  } else {
-    field.$field.classList.remove(Selectors.selectorFieldSelected);
-    if (field.onDeselect !== undefined) {
-      field.onDeselect(field);
-    }
+  field.selected = selected;
+
+  const { classList } = field.$element;
+  const toggleFunc = selected ? classList.add : classList.remove;
+  toggleFunc(Selectors.selectorFieldSelected);
+
+  if (fireEvent !== undefined) {
+    fireEvent(selected ? "focus" : "blur", { field });
   }
 };
 

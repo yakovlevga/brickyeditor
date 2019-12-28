@@ -71,41 +71,43 @@ const moveBlockInContainer = (
 export const bindFields = (
   $element: HTMLElement,
   preview: boolean,
-  fields: bre.core.field.FieldData[] = []
+  // fields: bre.core.field.FieldData[] = [],
+  block?: bre.core.block.Block
 ) => {
   const $fields = findFields($element);
-  $fields.forEach($field =>
+  $fields.forEach($field => {
     createField({
       $element: $field,
-      fields,
       preview,
-    })
-  );
+      fields: block === undefined ? undefined : block.data.fields,
+      onSelect: block === undefined ? undefined : f => (block.selectedField = f)
+    });
+  });
 };
 
 export const createBlockFromData = (
   blockData: bre.core.block.BlockData
 ): bre.core.block.Block => {
-  const { template, fields } = blockData;
+  const { template } = blockData;
   const blockTemplate = getTemplate(template);
-  return createBlockFromTemplate(blockTemplate, fields);
+  return createBlockFromTemplate(blockTemplate, blockData);
 };
 
 export const createBlockFromTemplate = (
   blockTemplate: bre.core.ITemplate,
-  fields: bre.core.field.FieldData[] = []
+  data: bre.core.block.BlockData
 ): bre.core.block.Block => {
   const $element = blockTemplate.$html.cloneNode(true) as HTMLElement;
-  bindFields($element, false, fields);
 
-  return {
+  const block: bre.core.block.Block = {
     $element,
-    data: {
-      template: blockTemplate.name,
-      fields,
-    },
-    selectedField: null,
+    data,
+    selectedField: null
   };
+
+  bindFields($element, false, block);
+
+  return block;
 };
 // return block;
 

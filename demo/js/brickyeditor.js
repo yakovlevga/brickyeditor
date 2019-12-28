@@ -257,7 +257,6 @@ var BrickyEditor = (function (exports) {
         };
         return $dom;
     }());
-    //# sourceMappingURL=DOMHelpers.js.map
 
     var str = {
         totalTrim: function (s) {
@@ -284,7 +283,6 @@ var BrickyEditor = (function (exports) {
         };
         return Common;
     }());
-    //# sourceMappingURL=Common.js.map
 
     var getSelectionRanges = function () {
         var selection = window.getSelection();
@@ -336,7 +334,6 @@ var BrickyEditor = (function (exports) {
         };
         return SelectionUtils;
     }());
-    //# sourceMappingURL=SelectionUtils.js.map
 
     var createElement = function (html) {
         var temp = document.createElement("div");
@@ -432,7 +429,6 @@ var BrickyEditor = (function (exports) {
         toggleVisibility: toggleVisibility,
         readFileAsync: readFileAsync,
     };
-    //# sourceMappingURL=helpers.js.map
 
     var Selectors = (function () {
         function Selectors() {
@@ -459,10 +455,9 @@ var BrickyEditor = (function (exports) {
         Selectors.selectorHtmlToolsCommandRange = Selectors.attr(Selectors.htmlToolsCommandRange);
         return Selectors;
     }());
-    //# sourceMappingURL=Selectors.js.map
 
     var createContainerField = function (props, data) {
-        var $element = props.$element, preview = props.preview;
+        var $element = props.$element, preview = props.preview, onSelect = props.onSelect;
         var container = createContainer($element, !preview);
         var field = {
             type: "container",
@@ -474,17 +469,18 @@ var BrickyEditor = (function (exports) {
                 var html = getContainerHtml(container);
                 return helpers.createElement(html);
             },
+            onSelect: onSelect,
         };
         $element.classList.add(Selectors.selectorFieldContainer);
         if (!preview) {
             $element.addEventListener("click", function (ev) {
+                toggleFieldSelection(field, true);
                 ev.stopPropagation();
                 return false;
             });
         }
         return field;
     };
-    //# sourceMappingURL=container.js.map
 
     var getRequest = function (url) {
         return new Promise(function (resolve, reject) {
@@ -563,7 +559,6 @@ var BrickyEditor = (function (exports) {
                 document.documentElement).appendChild(script);
         });
     };
-    //# sourceMappingURL=httpTransport.js.map
 
     var preProcessEmbedUrl = function (url) {
         return url.replace("https://www.instagram.com", "http://instagr.am");
@@ -602,7 +597,6 @@ var BrickyEditor = (function (exports) {
             });
         }); });
     };
-    //# sourceMappingURL=embed.js.map
 
     var locales = {
         errorBlocksFileNotFound: function (url) {
@@ -676,7 +670,6 @@ var BrickyEditor = (function (exports) {
         buttonCancel: "Cancel",
         defaultTemplatesGroupName: "Other templates",
     };
-    //# sourceMappingURL=locales.js.map
 
     var textFieldEditor = function (_a) {
         var key = _a.key, p = _a.p, data = _a.data;
@@ -788,7 +781,6 @@ var BrickyEditor = (function (exports) {
             ],
         },
     }); };
-    //# sourceMappingURL=prompt.js.map
 
     var providerScriptsLoaded = {};
     var getPromptParams = function (_a) {
@@ -880,7 +872,6 @@ var BrickyEditor = (function (exports) {
         }
         return field;
     };
-    //# sourceMappingURL=embed.js.map
 
     var promptLinkParamsAsync = function (selection) { return __awaiter(void 0, void 0, void 0, function () {
         var currentLink, promptParams;
@@ -995,16 +986,16 @@ var BrickyEditor = (function (exports) {
             helpers.toggleVisibility(control, false);
         }
     };
-    //# sourceMappingURL=htmlTools.js.map
 
     var createHtmlField = function (props, data) {
-        var $element = props.$element, preview = props.preview;
+        if (data.type !== "html") {
+            throw new Error("Wrong dataType");
+        }
+        var $element = props.$element, preview = props.preview, onSelect = props.onSelect;
         if (data.html) {
             $element.innerHTML = data.html;
         }
         var field = {
-            type: "html",
-            name: data.name,
             $field: $element,
             data: data,
             getElement: function () {
@@ -1012,6 +1003,7 @@ var BrickyEditor = (function (exports) {
                 $copy.removeAttribute(Selectors.attrContentEditable);
                 return $copy;
             },
+            onSelect: onSelect,
         };
         var updateHtmlProp = function () {
             var value = $element.innerHTML.trim();
@@ -1042,7 +1034,6 @@ var BrickyEditor = (function (exports) {
         }
         return field;
     };
-    //# sourceMappingURL=html.js.map
 
     var getPromptParams$1 = function (_a) {
         var src = _a.src, file = _a.file, alt = _a.alt;
@@ -1066,7 +1057,10 @@ var BrickyEditor = (function (exports) {
         });
     };
     var createImageField = function (props, data) {
-        var $element = props.$element, preview = props.preview;
+        if (data.type !== "image") {
+            throw new Error("Wrong dataType");
+        }
+        var $element = props.$element, preview = props.preview, onSelect = props.onSelect;
         var isImageElement = $element.tagName.toLowerCase() === "img";
         var updateImageElement = function (d) {
             if (isImageElement) {
@@ -1083,8 +1077,6 @@ var BrickyEditor = (function (exports) {
             updateImageElement(data);
         }
         var field = {
-            type: "image",
-            name: data.name,
             $field: $element,
             data: data,
             getElement: function () {
@@ -1097,6 +1089,7 @@ var BrickyEditor = (function (exports) {
                 }
                 return $copy;
             },
+            onSelect: onSelect,
         };
         if (!preview) {
             $element.addEventListener("click", function () { return __awaiter(void 0, void 0, void 0, function () {
@@ -1142,21 +1135,12 @@ var BrickyEditor = (function (exports) {
         }
         return field;
     };
-    //# sourceMappingURL=image.js.map
 
     var _fields = {
-        html: function (props, data) {
-            return createHtmlField(props, data);
-        },
-        container: function (props, data) {
-            return createContainerField(props, data);
-        },
-        image: function (props, data) {
-            return createImageField(props, data);
-        },
-        embed: function (props, data) {
-            return createEmbedField(props, data);
-        },
+        html: createHtmlField,
+        container: createContainerField,
+        image: createImageField,
+        embed: createEmbedField
     };
     var createField = function (props) {
         var $element = props.$element, fields = props.fields;
@@ -1196,9 +1180,7 @@ var BrickyEditor = (function (exports) {
     var toggleFieldSelection = function (field, selected) {
         if (selected === true) {
             field.$field.classList.add(Selectors.selectorFieldSelected);
-            if (field.onSelect !== undefined) {
-                field.onSelect(field);
-            }
+            field.onSelect(field);
         }
         else {
             field.$field.classList.remove(Selectors.selectorFieldSelected);
@@ -1212,7 +1194,6 @@ var BrickyEditor = (function (exports) {
         $el.attributes.removeNamedItem(Selectors.attrField);
         return $el;
     };
-    //# sourceMappingURL=field.js.map
 
     var EditorStrings = (function () {
         function EditorStrings() {
@@ -1253,7 +1234,6 @@ var BrickyEditor = (function (exports) {
         };
         return EditorStrings;
     }());
-    //# sourceMappingURL=EditorStrings.js.map
 
     var allTemplates = [];
     var getTemplate = function (templateName) {
@@ -1296,7 +1276,7 @@ var BrickyEditor = (function (exports) {
                         : "";
                     grouppedTemplates.push({
                         name: ungrouppedTemplatesGroupName,
-                        templates: ungrouppedTemplates,
+                        templates: ungrouppedTemplates
                     });
                     allTemplates = __spreadArrays(allTemplates, ungrouppedTemplates);
                     return [2, grouppedTemplates];
@@ -1332,10 +1312,9 @@ var BrickyEditor = (function (exports) {
         return {
             name: name,
             $html: $template,
-            $preview: $preview,
+            $preview: $preview
         };
     };
-    //# sourceMappingURL=template.js.map
 
     var findFields = function ($html) {
         var nodes = $html.querySelectorAll(Selectors.selectorField);
@@ -1345,14 +1324,15 @@ var BrickyEditor = (function (exports) {
         }
         return $fields;
     };
-    var bindFields = function ($element, preview, fields) {
+    var bindFields = function ($element, preview, fields, block) {
         if (fields === void 0) { fields = []; }
         var $fields = findFields($element);
         $fields.forEach(function ($field) {
-            return createField({
+            createField({
                 $element: $field,
                 fields: fields,
                 preview: preview,
+                onSelect: block === undefined ? undefined : function (f) { return (block.selectedField = f); }
             });
         });
     };
@@ -1369,12 +1349,11 @@ var BrickyEditor = (function (exports) {
             $element: $element,
             data: {
                 template: blockTemplate.name,
-                fields: fields,
+                fields: fields
             },
-            selectedField: null,
+            selectedField: null
         };
     };
-    //# sourceMappingURL=Block.js.map
 
     var getContainerData = function (container, ignoreHtml) { return container.blocks.map(function (block) { return block.getData(ignoreHtml); }); };
     var getContainerHtml = function (container) {
@@ -1384,7 +1363,7 @@ var BrickyEditor = (function (exports) {
         return root.outerHTML;
     };
     var getDefaultPlaceholder = function () {
-        return helpers.createElement('<i data-bre-placeholder="true">Click here to select this container...</i>');
+        return helpers.createElement("<div style=\"min-height: 100px; display: flex; align-items: center; justify-content: center; font-weight: 700; cursor: pointer;\">\n      <div data-bre-placeholder=\"true\">Click here to select this container</div>\n    </div>");
     };
     var toggleContainersPlaceholder = function (container) {
         if (container.$placeholder === null) {
@@ -1461,9 +1440,6 @@ var BrickyEditor = (function (exports) {
         },
         htmlToolsButtons: defaultButtons,
     };
-    //# sourceMappingURL=defaults.js.map
-
-    //# sourceMappingURL=shared.js.map
 
     var UI = (function () {
         function UI(editor) {
@@ -1579,7 +1555,6 @@ var BrickyEditor = (function (exports) {
         };
         return UI;
     }());
-    //# sourceMappingURL=UI.js.map
 
     var setupBlockEvents = function (editor, container, block) {
         block.$element.addEventListener("click", function () {
@@ -1748,7 +1723,6 @@ var BrickyEditor = (function (exports) {
         };
         return Editor;
     }());
-    //# sourceMappingURL=Editor.js.map
 
     exports.Editor = Editor;
     exports.selectBlock = selectBlock;
