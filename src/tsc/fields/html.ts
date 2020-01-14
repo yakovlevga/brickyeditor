@@ -9,7 +9,7 @@ import { bre } from "src/types/bre";
 import { toggleHtmlTools } from "src/ui/htmlTools";
 import { SelectionUtils } from "src/ui/SelectionUtils";
 import { Selectors } from "src/ui/Selectors";
-import { emmiter } from "src/emmiter";
+import { emmiter, FieldEventMap } from "src/emmiter";
 
 type HtmlFieldType = "html";
 type HtmlFieldPayload = {
@@ -33,7 +33,8 @@ export const html: FieldFactory = ({ $element, preview, data }) => {
   }
 
   if (!preview) {
-    const fireEvent = emmiter(field);
+    const fireEvent = emmiter<FieldEventMap>(field);
+
     field.cleanup = () => {
       const $copy = getFieldElement($element);
       $copy.removeAttribute(Selectors.attrContentEditable);

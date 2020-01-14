@@ -4,7 +4,7 @@ import { container } from "src/fields/container";
 import { helpers } from "src/helpers";
 import { bre } from "src/types/bre";
 import { Selectors } from "src/ui/Selectors";
-import { FireFunc } from "src/emmiter";
+import { FireFunc, FieldEventMap } from "src/emmiter";
 import { image } from "src/fields/image";
 import { str } from "src/common/Common";
 import { selectField } from "src/block/Block";
@@ -77,7 +77,7 @@ export const updateFieldData = <TData extends bre.core.field.FieldData>(
   changes: {
     [TProp in keyof TData]?: TData[TProp];
   },
-  fireEvent?: FireFunc
+  fireEvent?: FireFunc<FieldEventMap>
 ) => {
   const { data } = field;
 
@@ -99,7 +99,7 @@ export const updateFieldData = <TData extends bre.core.field.FieldData>(
 export const toggleFieldSelection = (
   field: bre.ui.FieldBase,
   selected: boolean,
-  fireEvent?: FireFunc
+  fireEvent?: FireFunc<FieldEventMap>
 ) => {
   field.selected = selected;
 
@@ -162,9 +162,7 @@ export const bindFields = (
     bindField($fieldElement, block)
   );
 
-  if (block !== undefined) {
-    block.fields = helpers.filterNotNull(fields);
-  }
+  return helpers.filterNotNull(fields);
 };
 
 function getFieldDataByName(

@@ -94,6 +94,7 @@ export const image: FieldFactory = ({ $element, preview, data }) => {
     };
 
     $element.addEventListener("click", async () => {
+      fireEvent("focus", { field });
       const params = getPromptParams(field.data);
       const promptResponse = await promptAsync<ImagePromptParams>(params);
 

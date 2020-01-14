@@ -1,5 +1,5 @@
 import { NoembedResponse } from "src/embed";
-import { OnOffFunc } from "src/emmiter";
+import { OnOffFunc, FieldEventMap } from "src/emmiter";
 
 declare var instgrm: any;
 
@@ -51,8 +51,9 @@ declare namespace bre {
       // clean up html element from editors data attributes, etc.
       cleanup?: () => HTMLElement;
       selected?: boolean;
-      on?: OnOffFunc;
-      off?: OnOffFunc;
+
+      on?: OnOffFunc<FieldEventMap>;
+      off?: OnOffFunc<FieldEventMap>;
     };
 
     type Field<TFieldData extends core.field.FieldData> = FieldBase & {
@@ -157,7 +158,7 @@ declare namespace bre {
 
       type BlockData = {
         template: string;
-        fields: ui.FieldBase[];
+        fields: core.field.FieldData[];
       };
 
       type Block = {

@@ -79,8 +79,7 @@ const moveBlockInContainer = (
 export const createBlockFromData = (
   blockData: bre.core.block.BlockData
 ): bre.core.block.Block => {
-  const { template } = blockData;
-  const blockTemplate = getTemplate(template);
+  const blockTemplate = getTemplate(blockData.template);
   return createBlockFromTemplate(blockTemplate, blockData);
 };
 
@@ -96,7 +95,15 @@ export const createBlockFromTemplate = (
     selectedField: null
   };
 
-  bindFields($element, block);
+  block.fields = bindFields($element, block);
+  block.fields.forEach(field => {
+    if (field.on !== undefined) {
+      field.on("focus", f => {
+        console.log({ focused: f });
+        selectField(block, f.field);
+      });
+    }
+  });
 
   return block;
 };
