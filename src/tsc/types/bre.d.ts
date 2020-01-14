@@ -157,13 +157,14 @@ declare namespace bre {
 
       type BlockData = {
         template: string;
-        fields: ui.Field[];
+        fields: ui.FieldBase[];
       };
 
       type Block = {
         $element: HTMLElement;
         data: BlockData;
-        selectedField: ui.Field | null;
+        fields?: ui.FieldBase[];
+        selectedField: ui.FieldBase | null;
       };
     }
 
@@ -183,28 +184,28 @@ declare namespace bre {
         name: string;
       } & TData;
 
-      type ContainerFieldData = FieldData<
-        "container",
-        { blocks: bre.core.block.BlockData[] }
-      >;
+      // type ContainerFieldData = FieldData<
+      //   "container",
+      //   { blocks: bre.core.block.BlockData[] }
+      // >;
 
-      type EmbedFieldData = FieldData<
-        "embed",
-        {
-          url?: string;
-          embed?: NoembedResponse;
-        }
-      >;
+      // type EmbedFieldData = FieldData<
+      //   "embed",
+      //   {
+      //     url?: string;
+      //     embed?: NoembedResponse;
+      //   }
+      // >;
 
-      type ImageFieldData = FieldData<
-        "image",
-        {
-          src?: string;
-          alt?: string;
-          file?: File;
-          link?: Pick<HTMLLinkElement, "href" | "title" | "target">;
-        }
-      >;
+      // type ImageFieldData = FieldData<
+      //   "image",
+      //   {
+      //     src?: string;
+      //     alt?: string;
+      //     file?: File;
+      //     link?: Pick<HTMLLinkElement, "href" | "title" | "target">;
+      //   }
+      // >;
     }
 
     type HtmlToolsButtonCommands =

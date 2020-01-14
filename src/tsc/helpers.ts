@@ -130,11 +130,15 @@ const readFileAsync = async (file: File) =>
     }
   });
 
+const filterNotNull = <TValue>(value: (TValue | null)[]) =>
+  value.filter(x => x !== null) as TValue[];
+
 export const helpers = {
   px,
   createElement,
   parseElementData,
   showModal,
   toggleVisibility,
-  readFileAsync
+  readFileAsync,
+  filterNotNull
 };

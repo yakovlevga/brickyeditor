@@ -8,7 +8,7 @@ export const str = {
 
     return s1.toLowerCase() === s2.toLowerCase();
   },
-  startsWith: (s1: string, s2: string) => s1.indexOf(s2) === 0,
+  startsWith: (s1: string, s2: string) => s1.indexOf(s2) === 0
 };
 
 export class Common {

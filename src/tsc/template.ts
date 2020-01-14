@@ -1,4 +1,3 @@
-import { createBlockFromTemplate, bindFields } from "src/block/Block";
 import { str } from "src/common/Common";
 import { $dom } from "src/common/DOMHelpers";
 import { EditorStrings } from "src/EditorStrings";
@@ -6,6 +5,7 @@ import { helpers } from "src/helpers";
 import { getRequest } from "src/httpTransport";
 import { bre } from "src/types/bre";
 import { Selectors } from "src/ui/Selectors";
+import { bindFields } from "src/fields/field";
 
 type onErrorHandler = (message: string, code?: number) => any;
 
@@ -114,7 +114,7 @@ const createTemplate = ($template: HTMLElement): bre.core.ITemplate | null => {
     $template.removeChild($preview);
   } else {
     $preview = $template.cloneNode(true) as HTMLElement;
-    bindFields($preview, true);
+    bindFields($preview);
   }
 
   return {

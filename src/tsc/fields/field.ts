@@ -1,9 +1,13 @@
-import { str } from "src/common/Common";
 import { html } from "src/fields/html";
+import { embed } from "src/fields/embed";
+import { container } from "src/fields/container";
 import { helpers } from "src/helpers";
 import { bre } from "src/types/bre";
 import { Selectors } from "src/ui/Selectors";
 import { FireFunc } from "src/emmiter";
+import { image } from "src/fields/image";
+import { str } from "src/common/Common";
+import { selectField } from "src/block/Block";
 
 export interface ICreateFieldProps {
   $element: HTMLElement;
@@ -22,29 +26,16 @@ export type FieldFactory = (
 const Fields: {
   [TKey in string]: FieldFactory;
 } = {
-  html
+  html,
+  image,
+  embed,
+  container
 };
 
 export const isValidFieldType = <TResult extends bre.core.field.FieldData>(
   data: bre.core.field.FieldData,
   type: TResult["type"]
-): data is TResult => {
-  const isValid = data.type === type;
-
-  // throw new Error(
-  //   `Wrong fields type passed. Expected: ${type}, given: ${data.type}.`
-  // );
-
-  return isValid;
-};
-
-export const getFieldByName = (
-  fields: bre.core.field.FieldData[]
-): bre.core.field.FieldData => {
-  return fields.find(f =>
-    str.equalsInvariant(f.name, name)
-  ) as bre.core.field.FieldData;
-};
+): data is TResult => data.type === type;
 
 export const createField = ({
   $element,
@@ -55,10 +46,6 @@ export const createField = ({
   let data = helpers.parseElementData($element, "breField");
 
   if (data === null) {
-    // throw new Error(
-    //   `There is no data defined in a field: ${$element.innerHTML}`
-    // );
-
     return null;
   }
 
@@ -117,8 +104,11 @@ export const toggleFieldSelection = (
   field.selected = selected;
 
   const { classList } = field.$element;
-  const toggleFunc = selected ? classList.add : classList.remove;
-  toggleFunc(Selectors.selectorFieldSelected);
+  if (selected) {
+    classList.add(Selectors.selectorFieldSelected);
+  } else {
+    classList.remove(Selectors.selectorFieldSelected);
+  }
 
   if (fireEvent !== undefined) {
     fireEvent(selected ? "focus" : "blur", { field });
@@ -130,3 +120,78 @@ export const getFieldElement = ($field: HTMLElement) => {
   $el.attributes.removeNamedItem(Selectors.attrField);
   return $el;
 };
+
+function bindField($element: HTMLElement, block?: bre.core.block.Block) {
+  let data = helpers.parseElementData($element, "breField");
+
+  if (data === null) {
+    return null;
+  }
+
+  if (block === undefined) {
+    return createField({
+      $element,
+      preview: true,
+      data
+    });
+  }
+
+  data = getFieldDataByName(block, data.name) || data;
+
+  const field = createField({
+    $element,
+    preview: false,
+    data
+  });
+
+  if (field !== null && field.on !== undefined) {
+    field.on("focus", ev => {
+      selectField(block, ev.field);
+    });
+  }
+
+  return field;
+}
+
+export const bindFields = (
+  $element: HTMLElement,
+  block?: bre.core.block.Block
+) => {
+  const $fieldElement = findFieldElements($element);
+  const fields = $fieldElement.map($fieldElement =>
+    bindField($fieldElement, block)
+  );
+
+  if (block !== undefined) {
+    block.fields = helpers.filterNotNull(fields);
+  }
+};
+
+function getFieldDataByName(
+  block: bre.core.block.Block,
+  name: string
+): bre.core.field.FieldData | null {
+  if (!block.data || !block.data.fields) {
+    return null;
+  }
+
+  const field = block.data.fields.find(f => str.equalsInvariant(f.name, name));
+
+  if (field === undefined) {
+    return null;
+  }
+
+  return field as bre.core.field.FieldData;
+}
+
+function findFieldElements($html: HTMLElement) {
+  const nodes = $html.querySelectorAll<HTMLElement>(Selectors.selectorField);
+  let $fields: HTMLElement[] =
+    nodes.length > 0 ? Array.prototype.slice.call(nodes) : [];
+
+  if ($html.attributes.getNamedItem(Selectors.attrField) !== null) {
+    $fields = [...$fields, $html];
+  }
+
+  return $fields;
+}

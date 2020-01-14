@@ -1,13 +1,16 @@
-import { BlockUI, getBlockUI as getBlockElement } from "src/block/BlockUI";
-import { BlockUIAction } from "src/block/BlockUIAction";
 import { addBlockToContainer } from "src/BlocksContainer";
-import { str } from "src/common/Common";
 import { $dom } from "src/common/DOMHelpers";
-import { createField, toggleFieldSelection } from "src/fields/field";
-import { helpers } from "src/helpers";
+import { bindFields } from "src/fields/field";
 import { getTemplate } from "src/template";
 import { bre } from "src/types/bre";
 import { Selectors } from "src/ui/Selectors";
+
+export const selectField = (
+  block: bre.core.block.Block,
+  field: bre.ui.FieldBase
+) => {
+  block.selectedField = field;
+};
 
 const findFields = ($html: HTMLElement) => {
   const nodes = $html.querySelectorAll(Selectors.selectorField);
@@ -34,7 +37,11 @@ const cloneBlockInContainer = (
   block: bre.core.block.Block
 ) => {
   const idx = container.blocks.indexOf(block) + 1;
-  addBlockToContainer(container, block.data, idx, true);
+
+  addBlockToContainer(container, {
+    blockData: block.data,
+    idx
+  });
 };
 
 const moveBlockInContainer = (
@@ -59,30 +66,14 @@ const moveBlockInContainer = (
     }
   }
 
-  this.blocks.splice(idx, 1);
-  this.blocks.splice(new_idx, 0, block);
+  container.blocks.splice(idx, 1);
+  container.blocks.splice(new_idx, 0, block);
 
-  this.onMoveBlock(block, idx, new_idx);
+  // TODO
+  // container.onMoveBlock(block, idx, new_idx);
 
-  // Scroll to block
-  block.scrollTo();
-};
-
-export const bindFields = (
-  $element: HTMLElement,
-  preview: boolean,
-  // fields: bre.core.field.FieldData[] = [],
-  block?: bre.core.block.Block
-) => {
-  const $fields = findFields($element);
-  $fields.forEach($field => {
-    createField({
-      $element: $field,
-      preview,
-      fields: block === undefined ? undefined : block.data.fields,
-      onSelect: block === undefined ? undefined : f => (block.selectedField = f)
-    });
-  });
+  // TODO Scroll to block
+  // block.scrollTo();
 };
 
 export const createBlockFromData = (
@@ -105,7 +96,7 @@ export const createBlockFromTemplate = (
     selectedField: null
   };
 
-  bindFields($element, false, block);
+  bindFields($element, block);
 
   return block;
 };
