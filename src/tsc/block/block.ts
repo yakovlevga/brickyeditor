@@ -1,9 +1,11 @@
 import { addBlockToContainer } from "src/BlocksContainer";
 import { $dom } from "src/common/DOMHelpers";
-import { bindFields } from "src/fields/field";
+import { bindFields, toggleFieldSelection } from "src/fields/field";
 import { getTemplate } from "src/template";
 import { bre } from "src/types/bre";
 import { Selectors } from "src/ui/Selectors";
+import { helpers } from "src/helpers";
+import { showBlockEditor, hideBlockEditor } from "src/block/blockEditor";
 
 export const selectField = (
   block: bre.core.block.Block,
@@ -11,6 +13,48 @@ export const selectField = (
 ) => {
   block.selectedField = field;
 };
+
+export const toggleBlockSelection = (
+  container: bre.core.IBlocksContainer,
+  block: bre.core.block.Block,
+  selected: boolean
+) => {
+  if (!selected && block.selectedField !== null) {
+    toggleFieldSelection(block.selectedField, false);
+  }
+
+  const { classList } = block.$element;
+  if (selected) {
+    classList.add(Selectors.selectorBlockSelected);
+  } else {
+    classList.remove(Selectors.selectorBlockSelected);
+  }
+
+  if (selected) {
+    showBlockEditor(container, block);
+  } else {
+    hideBlockEditor();
+  }
+};
+
+// function toggleUI(block: bre.core.block.Block, selected: boolean) {
+//   // export const selectBlock = (
+//   //   editor: Editor,
+//   //   container: bre.core.IBlocksContainer,
+//   //   block: bre.core.block.Block
+//   // ) => {
+//   //   editor.selectedContainer = container;
+//   //   container.selectedBlock = block;
+//   //   // TODO: deselect prev block and block field in container
+//   //   // UI
+//   //   if (editor.$blockTools === undefined) {
+
+//   //   } else {
+//   //     helpers.toggleVisibility(editor.$blockTools, true);
+//   //   }
+//   //   block.$element.insertAdjacentElement("beforebegin", editor.$blockTools);
+//   // };
+// }
 
 const findFields = ($html: HTMLElement) => {
   const nodes = $html.querySelectorAll(Selectors.selectorField);
@@ -21,15 +65,6 @@ const findFields = ($html: HTMLElement) => {
   }
 
   return $fields;
-};
-
-const deleteBlockFromContainer = (
-  container: bre.core.IBlocksContainer,
-  block: bre.core.block.Block
-) => {
-  container.blocks = container.blocks.filter(b => b !== block);
-  block.$element.remove();
-  (block as any) = null;
 };
 
 const cloneBlockInContainer = (
@@ -85,7 +120,10 @@ export const createBlockFromData = (
 
 export const createBlockFromTemplate = (
   blockTemplate: bre.core.ITemplate,
-  data: bre.core.block.BlockData
+  data: bre.core.block.BlockData = {
+    template: blockTemplate.name,
+    fields: []
+  }
 ): bre.core.block.Block => {
   const $element = blockTemplate.$html.cloneNode(true) as HTMLElement;
 

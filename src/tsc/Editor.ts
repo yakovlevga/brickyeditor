@@ -2,7 +2,7 @@ import {
   addBlockToContainer,
   createContainer,
   getContainerData,
-  getContainerHtml,
+  getContainerHtml
 } from "src/BlocksContainer";
 import { Common, str } from "src/common/Common";
 import { $dom } from "src/common/DOMHelpers";
@@ -21,47 +21,9 @@ const setupBlockEvents = (
   container: bre.core.IBlocksContainer,
   block: bre.core.block.Block
 ) => {
-  block.$element.addEventListener("click", () =>
-    selectBlock(editor, container, block)
-  );
-};
-
-export const selectBlock = (
-  editor: Editor,
-  container: bre.core.IBlocksContainer,
-  block: bre.core.block.Block
-) => {
-  editor.selectedContainer = container;
-  container.selectedBlock = block;
-
-  // TODO: deselect prev block and block field in container
-
-  // UI
-  if (editor.$blockTools === undefined) {
-    const { createElement, px } = helpers;
-    const width = 40;
-    const style: Partial<CSSStyleDeclaration> = {
-      position: "absolute",
-      width: px(width),
-      minHeight: px(width),
-      backgroundColor: "red",
-      zIndex: "1000", // TODO: magic number?
-      transform: `translateX(-${px(width)})`,
-      transition: "all 2s",
-    };
-
-    editor.$blockTools = createElement(
-      `<div>
-        <button>del</button>
-      </div>`
-    );
-
-    Object.assign(editor.$blockTools.style, style);
-  } else {
-    helpers.toggleVisibility(editor.$blockTools, true);
-  }
-
-  block.$element.insertAdjacentElement("beforebegin", editor.$blockTools);
+  // block.$element.addEventListener("click", () =>
+  //   selectBlock(editor, container, block)
+  // );
 };
 
 export class Editor {
@@ -155,7 +117,7 @@ export class Editor {
 
       const blocks = blocksData.map(blockData =>
         addBlockToContainer(this.container, {
-          blockData,
+          blockData
         })
       );
 
@@ -174,7 +136,7 @@ export class Editor {
     // TODO
     const container = this.container; // getCurrentContainer(this.container);
     const block = addBlockToContainer(container, {
-      blockTemplate,
+      blockTemplate
     });
 
     setupBlockEvents(this, container, block);

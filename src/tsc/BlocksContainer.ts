@@ -1,4 +1,8 @@
-import { createBlockFromData, createBlockFromTemplate } from "src/block/Block";
+import {
+  createBlockFromData,
+  createBlockFromTemplate,
+  toggleBlockSelection
+} from "src/block/Block";
 import { helpers } from "src/helpers";
 import { bre } from "src/types/bre";
 
@@ -58,7 +62,8 @@ type AddBlockToContainerOptions = { idx?: number } & (
       blockTemplate?: undefined;
       blockData: bre.core.block.BlockData;
     }
-  | { blockTemplate: bre.core.ITemplate; blockData?: undefined });
+  | { blockTemplate: bre.core.ITemplate; blockData?: undefined }
+);
 
 export const addBlockToContainer = (
   container: bre.core.IBlocksContainer,
@@ -94,6 +99,13 @@ export const addBlockToContainer = (
     $prevBlock.after($block);
   }
 
+  $block.addEventListener("click", () => {
+    selectBlock(container, block);
+  });
+
+  // TODO: select block on add
+  selectBlock(container, block);
+
   return block;
 
   // TODO: select block
@@ -102,6 +114,18 @@ export const addBlockToContainer = (
   //   block.scrollTo();
   // }
 };
+
+function selectBlock(
+  container: bre.core.IBlocksContainer,
+  block: bre.core.block.Block
+) {
+  if (container.selectedBlock !== null) {
+    toggleBlockSelection(container, container.selectedBlock, false);
+  }
+
+  container.selectedBlock = block;
+  toggleBlockSelection(container, container.selectedBlock, true);
+}
 
 // TODO: check this later
 // export const getSelectedBlockInContainer = (
@@ -118,12 +142,25 @@ export const createContainer = (
     $element,
     $placeholder,
     blocks: [],
-    selectedBlock: null,
+    selectedBlock: null
   };
 
   toggleContainersPlaceholder(container);
 
   return container;
+};
+
+export const deleteBlock = (
+  container: bre.core.IBlocksContainer,
+  block: bre.core.block.Block
+) => {
+  if (container.selectedBlock === block) {
+    toggleBlockSelection(container, block, false);
+  }
+
+  container.blocks = container.blocks.filter(b => b !== block);
+  block.$element.remove();
+  (block as any) = null;
 };
 
 // export class BlocksContainer {

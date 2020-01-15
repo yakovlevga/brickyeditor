@@ -101,10 +101,9 @@ export const toggleFieldSelection = (
   selected: boolean,
   fireEvent?: FireFunc<FieldEventMap>
 ) => {
-  field.selected = selected;
-
   const { classList } = field.$element;
   if (selected) {
+    field.selected = selected;
     classList.add(Selectors.selectorFieldSelected);
   } else {
     classList.remove(Selectors.selectorFieldSelected);

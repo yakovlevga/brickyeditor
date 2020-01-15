@@ -4,12 +4,18 @@ import { bre } from "src/types/bre";
 type FieldData = bre.core.field.FieldData;
 
 const createElement = <TElement extends HTMLElement>(
-  html: string
+  html: string,
+  style?: Partial<CSSStyleDeclaration>
 ): TElement => {
   const temp = document.createElement("div");
   temp.innerHTML = html;
   const result = temp.children[0] as TElement;
   temp.innerHTML = "";
+
+  if (style !== undefined) {
+    Object.assign(result.style, style);
+  }
+
   return result;
 };
 

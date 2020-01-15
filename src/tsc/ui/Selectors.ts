@@ -22,6 +22,7 @@ export class Selectors {
 
   public static selectorFieldSelected = "bre-field-selected";
   public static selectorFieldContainer = "bre-field-container";
+  public static selectorBlockSelected = "bre-block-selected";
 
   public static selectorHtmlToolsCommand = Selectors.attr(
     Selectors.htmlToolsCommand

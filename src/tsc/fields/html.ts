@@ -71,10 +71,10 @@ export const html: FieldFactory = ({ $element, preview, data }) => {
       }
     });
 
-    $element.addEventListener("click", (ev: Event) => {
+    $element.addEventListener("click", () => {
       // Prevents the event from bubbling up the DOM tree
       toggleFieldSelection(field, true, fireEvent);
-      ev.stopPropagation();
+      // ev.stopPropagation();
       return false;
     });
 
