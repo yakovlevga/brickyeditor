@@ -5,12 +5,14 @@ export class $dom {
 
     return {
       top: rect.top + $body.scrollTop,
-      left: rect.left + $body.scrollLeft,
+      left: rect.left + $body.scrollLeft
     };
   }
 
   static unwrap(el: HTMLElement) {
-    if (!el.parentElement) { return; }
+    if (!el.parentElement) {
+      return;
+    }
 
     var parentsParent = el.parentElement.parentElement;
     if (parentsParent) {
@@ -49,15 +51,24 @@ export class $dom {
     }
   }
 
-  public static before(el: HTMLElement, elToInsert: HTMLElement | HTMLElement[]) {
+  public static before(
+    el: HTMLElement,
+    elToInsert: HTMLElement | HTMLElement[]
+  ) {
     if (elToInsert instanceof HTMLElement) {
-      el.parentNode.insertBefore(elToInsert, el);
+      if (el.parentNode !== null) {
+        el.parentNode.insertBefore(elToInsert, el);
+      }
     } else {
       elToInsert.forEach($el => this.before(el, $el));
     }
   }
 
   public static after(el: HTMLElement, elToInsert: HTMLElement) {
+    if (el.parentNode === null) {
+      return;
+    }
+
     if (el.nextSibling) {
       el.parentNode.insertBefore(elToInsert, el);
     } else {

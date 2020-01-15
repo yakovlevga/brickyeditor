@@ -5,6 +5,7 @@ import {
 } from "src/block/Block";
 import { helpers } from "src/helpers";
 import { bre } from "src/types/bre";
+import { $dom } from "src/common/DOMHelpers";
 
 export const getContainerData = (
   container: bre.core.IBlocksContainer,
@@ -163,6 +164,47 @@ export const deleteBlock = (
   (block as any) = null;
 };
 
+export const copyBlock = (
+  container: bre.core.IBlocksContainer,
+  block: bre.core.block.Block
+) => {
+  const idx = container.blocks.indexOf(block) + 1;
+  addBlockToContainer(container, {
+    idx,
+    blockData: block.data
+  });
+};
+
+export const moveBlock = (
+  container: bre.core.IBlocksContainer,
+  block: bre.core.block.Block,
+  offset: number
+) => {
+  const idx = container.blocks.indexOf(block) + 1;
+  const new_idx = idx + offset;
+
+  if (new_idx >= container.blocks.length || new_idx < 0) {
+    return;
+  }
+
+  const $anchorBlock = container.blocks[new_idx].$element;
+  if ($anchorBlock) {
+    if (offset > 0) {
+      $dom.after($anchorBlock, block.$element);
+    } else if (offset < 0) {
+      $dom.before($anchorBlock, block.$element);
+    }
+  }
+
+  container.blocks.splice(idx, 1);
+  container.blocks.splice(new_idx, 0, block);
+
+  // this.onMoveBlock(block, idx, new_idx);
+
+  // Scroll to block
+  // block.scrollTo();
+};
+
 // export class BlocksContainer {
 //   // public $element: HTMLElement;
 //   // public $placeholder?: HTMLElement;
@@ -256,32 +298,6 @@ export const deleteBlock = (
 //     this.onDeleteBlock(block, idx);
 
 //     toggleContainersPlaceholder(this);
-//   }
-
-//   private moveBlock(block: Block, offset: number) {
-//     const idx = this.blocks.indexOf(block);
-//     const new_idx = idx + offset;
-
-//     if (new_idx >= this.blocks.length || new_idx < 0) {
-//       return;
-//     }
-
-//     const $anchorBlock = this.blocks[new_idx].ui.$editor;
-//     if ($anchorBlock) {
-//       if (offset > 0) {
-//         $dom.after($anchorBlock, block.ui.$editor!);
-//       } else if (offset < 0) {
-//         $dom.before($anchorBlock, block.ui.$editor!);
-//       }
-//     }
-
-//     this.blocks.splice(idx, 1);
-//     this.blocks.splice(new_idx, 0, block);
-
-//     this.onMoveBlock(block, idx, new_idx);
-
-//     // Scroll to block
-//     block.scrollTo();
 //   }
 
 //   private copyBlock(block: Block) {

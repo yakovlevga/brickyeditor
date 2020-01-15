@@ -4,7 +4,6 @@ import { bindFields, toggleFieldSelection } from "src/fields/field";
 import { getTemplate } from "src/template";
 import { bre } from "src/types/bre";
 import { Selectors } from "src/ui/Selectors";
-import { helpers } from "src/helpers";
 import { showBlockEditor, hideBlockEditor } from "src/block/blockEditor";
 
 export const selectField = (
@@ -36,25 +35,6 @@ export const toggleBlockSelection = (
     hideBlockEditor();
   }
 };
-
-// function toggleUI(block: bre.core.block.Block, selected: boolean) {
-//   // export const selectBlock = (
-//   //   editor: Editor,
-//   //   container: bre.core.IBlocksContainer,
-//   //   block: bre.core.block.Block
-//   // ) => {
-//   //   editor.selectedContainer = container;
-//   //   container.selectedBlock = block;
-//   //   // TODO: deselect prev block and block field in container
-//   //   // UI
-//   //   if (editor.$blockTools === undefined) {
-
-//   //   } else {
-//   //     helpers.toggleVisibility(editor.$blockTools, true);
-//   //   }
-//   //   block.$element.insertAdjacentElement("beforebegin", editor.$blockTools);
-//   // };
-// }
 
 const findFields = ($html: HTMLElement) => {
   const nodes = $html.querySelectorAll(Selectors.selectorField);
@@ -95,7 +75,7 @@ const moveBlockInContainer = (
   const $anchorBlock = blocks[new_idx].$element;
   if ($anchorBlock) {
     if (offset > 0) {
-      $dom.after($anchorBlock, block.$element);
+      $dom.after({ el: $anchorBlock, elToInsert: block.$element });
     } else if (offset < 0) {
       $dom.before($anchorBlock, block.$element);
     }
