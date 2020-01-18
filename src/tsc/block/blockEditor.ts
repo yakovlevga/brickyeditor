@@ -1,13 +1,10 @@
-import { helpers, px } from "src/helpers";
+import { helpers } from "src/helpers";
 import { bre } from "src/types/bre";
 import { deleteBlock, copyBlock, moveBlock } from "src/BlocksContainer";
 
-import * as styles from "./blockEditor.scss";
+import { BlockEditorStyles } from "./blockEditor.scss";
 
-const html = `<div class="bre-block-editor"></div>`;
-
-const $tools = helpers.createElement(html);
-$tools.className = "bre-block-editor";
+const $tools = helpers.div<BlockEditorStyles>("bre-block-editor");
 
 const $delete = helpers.createElement("<button>del</button>");
 const $clone = helpers.createElement("<button>cln</button>");

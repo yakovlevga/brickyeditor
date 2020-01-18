@@ -1,0 +1,11 @@
+$size: 40px;
+
+.bre-block-editor {
+  position: "absolute";
+  width: $size;
+  min-height: $size;
+  background-color: "green";
+  z-index: "1000"; // TODO: magic number?
+  /* transform: `translateX(-${px(width)})`, */
+  transition: "all 2s";
+}

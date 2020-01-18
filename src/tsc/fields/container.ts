@@ -11,7 +11,7 @@ import {
 import { helpers } from "src/helpers";
 import { bre } from "src/types/bre";
 import { Selectors } from "src/ui/Selectors";
-import { emmiter } from "src/emmiter";
+import { emmiter, FieldEventMap } from "src/emmiter";
 
 export type ContainerFieldData = bre.core.field.FieldData & {};
 
@@ -44,7 +44,9 @@ export const container: FieldFactory = ({ $element, preview, data }) => {
   $element.classList.add(Selectors.selectorFieldContainer);
 
   if (!preview) {
-    const fireEvent = emmiter(field);
+    const { fire: fireEvent, on, off } = emmiter<FieldEventMap>();
+    field.on = on;
+    field.off = off;
 
     field.cleanup = () => {
       const html = getContainerHtml(container);

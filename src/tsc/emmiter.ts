@@ -1,25 +1,47 @@
 import { bre } from "src/types/bre";
 
-// FieldEventMap
-export type OnOffFunc<TEventMap> = <K extends keyof TEventMap>(
+interface FieldEvent {
+  field: bre.ui.FieldBase;
+}
+
+export interface FieldEventMap {
+  change: FieldEvent;
+  focus: FieldEvent;
+  blur: FieldEvent;
+}
+
+export interface TemplatesEventMap {
+  templateClick: {
+    template: bre.core.ITemplate;
+  };
+}
+
+type BreEventMaps = FieldEventMap | TemplatesEventMap;
+
+export type OnOffFunc<TEventMap extends BreEventMaps> = <
+  K extends keyof TEventMap
+>(
   type: K,
   listener: (ev: TEventMap[K]) => void
 ) => void;
 
-export type FireFunc<TEventMap> = <K extends keyof TEventMap>(
+export type FireFunc<TEventMap extends BreEventMaps> = <
+  K extends keyof TEventMap
+>(
   type: K,
   ev: TEventMap[K]
 ) => void;
 
-export const emmiter = <TEventMap>(obj: {
-  on?: OnOffFunc<TEventMap>;
-  off?: OnOffFunc<TEventMap>;
-}): FireFunc<TEventMap> => {
+export const emmiter = <TEventMap extends BreEventMaps>(): {
+  fire: FireFunc<TEventMap>;
+  on: OnOffFunc<TEventMap>;
+  off: OnOffFunc<TEventMap>;
+} => {
   const listeners: {
     [K in keyof TEventMap]?: Array<(ev: TEventMap[K]) => void>;
   } = {};
 
-  obj.on = (type, listener) => {
+  const on: OnOffFunc<TEventMap> = (type, listener) => {
     if (listeners[type] === undefined) {
       listeners[type] = [];
     }
@@ -33,7 +55,7 @@ export const emmiter = <TEventMap>(obj: {
     listenersOfType.push(listener);
   };
 
-  obj.off = (type, listener) => {
+  const off: OnOffFunc<TEventMap> = (type, listener) => {
     const listenersOfType = listeners[type];
     if (listenersOfType === undefined) {
       return;
@@ -54,15 +76,5 @@ export const emmiter = <TEventMap>(obj: {
     }
   };
 
-  return fire;
+  return { fire, on, off };
 };
-
-interface FieldEvent {
-  field: bre.ui.FieldBase;
-}
-
-export interface FieldEventMap {
-  change: FieldEvent;
-  focus: FieldEvent;
-  blur: FieldEvent;
-}

@@ -15,41 +15,34 @@ import { loadTemplatesAsync } from "src/template";
 import { bre } from "src/types/bre";
 import { Selectors } from "src/ui/Selectors";
 import { UI } from "src/ui/UI";
+import { getTemplateSelector } from "src/ui/templateSelector";
 
-const setupBlockEvents = (
-  editor: Editor,
-  container: bre.core.IBlocksContainer,
-  block: bre.core.block.Block
-) => {
-  // block.$element.addEventListener("click", () =>
-  //   selectBlock(editor, container, block)
-  // );
-};
-
-export class Editor {
+export class Editor implements bre.core.Editor {
   public static UI: UI;
 
-  public $editor: HTMLElement;
+  public $element: HTMLElement;
   public options: bre.Options;
 
-  public selectedContainer?: bre.core.IBlocksContainer;
   public $blockTools?: HTMLElement;
 
   private isLoaded: boolean = false;
 
   private container: bre.core.IBlocksContainer;
 
+  public selectedContainer: bre.core.IBlocksContainer;
+
   constructor($editor: HTMLElement, options: bre.Options) {
     // TODO: register additional field types here
     // BaseField.registerCommonFields();
 
-    this.$editor = $editor;
-    this.$editor.classList.add(Selectors.classEditor);
+    this.$element = $editor;
+    this.$element.classList.add(Selectors.classEditor);
     this.options = { ...defaultOptions, ...options };
     this.container = createContainer($editor, false);
+    this.selectedContainer = this.container;
 
-    Editor.UI = new UI(this);
-    setUI(Editor.UI);
+    // Editor.UI = new UI(this);
+    // setUI(Editor.UI);
 
     this.tryBindFormSubmit();
   }
@@ -58,16 +51,22 @@ export class Editor {
     const editor = this;
 
     /// Load templates
-    Editor.UI.toggleToolsLoader(true);
+    // Editor.UI.toggleToolsLoader(true);
 
     const templates = await loadTemplatesAsync(
       editor.options.templatesUrl,
-      editor.$editor,
+      editor.$element,
       editor.onError
     );
 
-    Editor.UI.toggleToolsLoader(false);
-    Editor.UI.setTemplates(templates);
+    const templatesUI = getTemplateSelector();
+    templatesUI.setTemplates(templates);
+    templatesUI.on("templateClick", ({ template }) => {
+      addBlockToContainer(this.getCurrentContainer(), {
+        blockTemplate: template
+      });
+    });
+    this.$element.append(templatesUI.$element);
 
     // Load initial blocks
     const blocks = await this.tryLoadInitialBlocksAsync();
@@ -115,33 +114,38 @@ export class Editor {
       //   .filter(x => x.template !== null)
       //   .map(x => createBlock(x.template!, false, x.block.fields));
 
-      const blocks = blocksData.map(blockData =>
-        addBlockToContainer(this.container, {
+      blocksData.map(blockData =>
+        addBlockToContainer(this.getCurrentContainer(), {
           blockData
         })
       );
 
-      blocks.forEach(block => {
-        setupBlockEvents(this, this.container, block);
-      });
+      // blocks.forEach(block => {
+      //   setupBlockEvents(this, this.container, block);
+      // });
 
-      if (blocks.length > 0) {
-        const lastBlock = blocks[blocks.length - 1];
-        selectBlock(this, this.container, lastBlock);
-      }
+      // if (blocks.length > 0) {
+      //   const lastBlock = blocks[blocks.length - 1];
+      //   // selectBlock(this, this.container, lastBlock);
+      // }
     }
   }
 
-  public addBlock(blockTemplate: bre.core.ITemplate) {
-    // TODO
-    const container = this.container; // getCurrentContainer(this.container);
-    const block = addBlockToContainer(container, {
-      blockTemplate
-    });
-
-    setupBlockEvents(this, container, block);
-    selectBlock(this, container, block);
+  private getCurrentContainer() {
+    // TODO: selectedContainer
+    return this.container;
   }
+
+  // public addBlock(blockTemplate: bre.core.ITemplate) {
+  //   // TODO
+  //   const container = this.container; // getCurrentContainer(this.container);
+  //   const block = addBlockToContainer(container, {
+  //     blockTemplate
+  //   });
+
+  //   setupBlockEvents(this, container, block);
+  //   // selectBlock(this, container, block);
+  // }
 
   private onError = (message: string, code: number = 0) =>
     this.options.onError({ message, code });
@@ -232,7 +236,7 @@ export class Editor {
 
   private trigger(event: bre.Event, data: any) {
     const editor = this;
-    $dom.trigger(this.$editor, "bre." + event, data);
+    $dom.trigger(this.$element, "bre." + event, data);
     Common.propsEach(editor.options, (key, value) => {
       if (str.equalsInvariant(key, event) && value) {
         value(data);

@@ -33,7 +33,9 @@ export const html: FieldFactory = ({ $element, preview, data }) => {
   }
 
   if (!preview) {
-    const fireEvent = emmiter<FieldEventMap>(field);
+    const { fire: fireEvent, on, off } = emmiter<FieldEventMap>();
+    field.on = on;
+    field.off = off;
 
     field.cleanup = () => {
       const $copy = getFieldElement($element);

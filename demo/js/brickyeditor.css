@@ -1,0 +1,45 @@
+
+.bre-block-editor {
+  position: "absolute";
+  width: 40px;
+  min-height: 40px;
+  background-color: "green";
+  z-index: "1000";
+  /* transform: `translateX(-${px(width)})`, */
+  -webkit-transition: "all 2s";
+  transition: "all 2s"; }
+
+.bre-templates-root {
+  position: fixed;
+  width: 30%;
+  max-width: 245px;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 101;
+  background: rgba(238, 238, 238, 0.5);
+  -webkit-transition: all 0.15s ease-in 0s;
+  transition: all 0.15s ease-in 0s; }
+
+.bre-templates-loader {
+  /*empty*/ }
+
+.bre-templates-list {
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden; }
+
+.bre-templates-group {
+  padding: 0 1rem 1rem; }
+  .bre-templates-group-name {
+    cursor: pointer;
+    color: #111111;
+    font-size: 1rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    overflow: hidden; }
+  .bre-templates-group-item {
+    background-color: #ffffff;
+    margin-bottom: 1rem;
+    padding: 0.5rem;
+    overflow: hidden; }

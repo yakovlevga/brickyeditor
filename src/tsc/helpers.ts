@@ -3,23 +3,33 @@ import { bre } from "src/types/bre";
 
 type FieldData = bre.core.field.FieldData;
 
+const div = <TClassName extends string>(
+  className: TClassName,
+  innerHTML?: string | null
+) => {
+  const result = document.createElement("div");
+  result.className = className;
+  if (innerHTML !== undefined && innerHTML !== null) {
+    result.innerHTML = innerHTML;
+  }
+  return result;
+};
+
 const createElement = <TElement extends HTMLElement>(
   html: string,
-  style?: Partial<CSSStyleDeclaration>
+  className?: string
 ): TElement => {
   const temp = document.createElement("div");
   temp.innerHTML = html;
   const result = temp.children[0] as TElement;
   temp.innerHTML = "";
 
-  if (style !== undefined) {
-    Object.assign(result.style, style);
+  if (className !== undefined) {
+    result.className = className;
   }
 
   return result;
 };
-
-export const px = (value: number) => `${value}px`;
 
 const toggleVisibility = (el: HTMLElement, visible?: boolean) => {
   if (visible !== undefined) {
@@ -140,8 +150,8 @@ const filterNotNull = <TValue>(value: (TValue | null)[]) =>
   value.filter(x => x !== null) as TValue[];
 
 export const helpers = {
-  px,
   createElement,
+  div,
   parseElementData,
   showModal,
   toggleVisibility,

@@ -9,7 +9,7 @@ import { helpers } from "src/helpers";
 import { locales } from "src/locales";
 import { promptAsync } from "src/prompt";
 import { bre } from "src/types/bre";
-import { emmiter } from "src/emmiter";
+import { emmiter, FieldEventMap } from "src/emmiter";
 
 type ImagePromptParams = {
   src: bre.prompt.PromptParameter;
@@ -77,7 +77,10 @@ export const image: FieldFactory = ({ $element, preview, data }) => {
   };
 
   if (!preview) {
-    const fireEvent = emmiter(field);
+    const { fire: fireEvent, on, off } = emmiter<FieldEventMap>();
+    field.on = on;
+    field.off = off;
+
     field.cleanup = () => {
       const $copy = getFieldElement($element);
       const { link } = field.data;

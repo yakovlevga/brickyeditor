@@ -1,5 +1,5 @@
 import { NoembedResponse } from "src/embed";
-import { OnOffFunc, FieldEventMap } from "src/emmiter";
+import { OnOffFunc, FieldEventMap, TemplatesEventMap } from "src/emmiter";
 
 declare var instgrm: any;
 
@@ -58,6 +58,15 @@ declare namespace bre {
 
     type Field<TFieldData extends core.field.FieldData> = FieldBase & {
       data: TFieldData;
+    };
+
+    type Templates = {
+      $element: HTMLElement;
+
+      setTemplates: (templatesGroupped: bre.core.ITemplateGroup[]) => void;
+
+      on?: OnOffFunc<TemplatesEventMap>;
+      off?: OnOffFunc<TemplatesEventMap>;
     };
   }
 
@@ -132,6 +141,11 @@ declare namespace bre {
       $html: HTMLElement;
       $preview: HTMLElement;
       name: string;
+    }
+
+    interface Editor {
+      $element: HTMLElement;
+      selectedContainer: IBlocksContainer;
     }
 
     namespace block {
