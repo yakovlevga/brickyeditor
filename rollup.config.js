@@ -15,6 +15,7 @@ export default {
       target: "es5",
       declaration: true
     }),
+
     // uglify(),
     browsersync({
       https: true,

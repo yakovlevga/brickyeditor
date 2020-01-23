@@ -1,11 +1,23 @@
-$size: 40px;
+$size: 32px;
+$zIndex: 100;
 
-.bre-block-editor {
-  position: "absolute";
-  width: $size;
-  min-height: $size;
-  background-color: "green";
-  z-index: "1000"; // TODO: magic number?
-  /* transform: `translateX(-${px(width)})`, */
-  transition: "all 2s";
+.bre-block {
+  &-editor {
+    position: absolute;
+    left: -$size;
+    min-width: $size;
+    min-height: $size;
+    z-index: $zIndex;
+    /* transform: `translateX(-${px(width)})`, */
+    transition: "all 2s";
+
+    &-button {
+      width: $size;
+      height: $size;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+    }
+  }
 }

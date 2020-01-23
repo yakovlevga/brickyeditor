@@ -18,6 +18,11 @@ type HtmlFieldPayload = {
 type HtmlFieldData = bre.core.field.FieldData<HtmlFieldType, HtmlFieldPayload>;
 type HtmlField = bre.ui.Field<HtmlFieldData>;
 
+const maxLength = 30;
+function previewText(value: string) {
+  return value.length > 100 ? value.substr(0, maxLength) + "..." : value;
+}
+
 export const html: FieldFactory = ({ $element, preview, data }) => {
   if (!isValidFieldType<HtmlFieldData>(data, "html")) {
     return null;
@@ -29,6 +34,7 @@ export const html: FieldFactory = ({ $element, preview, data }) => {
   };
 
   if (data.html) {
+    debugger;
     $element.innerHTML = data.html;
   }
 

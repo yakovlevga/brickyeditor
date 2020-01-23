@@ -1,42 +1,94 @@
-import { helpers } from "src/helpers";
 import { bre } from "src/types/bre";
-import { deleteBlock, copyBlock, moveBlock } from "src/BlocksContainer";
 
 import { BlockEditorStyles } from "./blockEditor.scss";
+import { FireFunc, BlockEventMap } from "src/emmiter";
+import { helpers } from "src/helpers";
 
-const $tools = helpers.div<BlockEditorStyles>("bre-block-editor");
+type BlockEditorButton = {
+  name: string;
+  icon: string;
+  action: (ff: FireFunc<BlockEventMap>) => void;
+};
 
-const $delete = helpers.createElement("<button>del</button>");
-const $clone = helpers.createElement("<button>cln</button>");
-const $down = helpers.createElement("<button>dwn</button>");
-const $up = helpers.createElement("<button>up</button>");
+const defaultButtons: BlockEditorButton[] = [
+  {
+    name: "delete",
+    icon: "<span>D</span>",
+    action: ff => ff("delete")
+  },
+  {
+    name: "clone",
+    icon: "<span>C</span>",
+    action: ff => ff("clone")
+  },
+  {
+    name: "up",
+    icon: "<span>▲</span>",
+    action: ff => ff("move", { offset: -1 })
+  },
+  {
+    name: "down",
+    icon: "<span>▼</span>",
+    action: ff => ff("move", { offset: 1 })
+  }
+];
 
-$tools.append($delete, $clone, $down, $up);
+type BlockEditor = {
+  $element: HTMLDivElement;
+  btns: {
+    $btn: HTMLDivElement;
+    action: BlockEditorButton["action"];
+  }[];
+};
 
-export const showBlockEditor = (
-  container: bre.core.IBlocksContainer,
-  block: bre.core.block.Block
-) => {
-  $delete.onclick = () => {
-    deleteBlock(container, block);
+let control: BlockEditor;
+
+function createEditor() {
+  const $element = helpers.div<BlockEditorStyles>("bre-block-editor");
+
+  const btns = defaultButtons.map(btn => {
+    const { action, icon, name } = btn;
+    const $btn = helpers.div<BlockEditorStyles>(
+      "bre-block-editor-button",
+      icon
+    );
+    $btn.title = name;
+    $element.append($btn);
+
+    return {
+      $btn,
+      action
+    };
+  });
+
+  return {
+    $element,
+    btns
   };
+}
 
-  $clone.onclick = () => {
-    copyBlock(container, block);
-  };
+export const showBlockEditor = (block: bre.core.block.Block) => {
+  if (control === undefined) {
+    control = createEditor();
+  }
 
-  $up.onclick = () => {
-    moveBlock(container, block, -1);
-  };
+  // control.$element.style.top = top + "px";
+  // control.$element.style.left = left + "px";
 
-  $down.onclick = () => {
-    moveBlock(container, block, 1);
-  };
+  console.log({
+    top: control.$element.style.top,
+    left: control.$element.style.left
+  });
 
-  block.$element.insertAdjacentElement("beforebegin", $tools);
+  control.btns.forEach(({ $btn, action }) => {
+    $btn.onclick = () => action(block.fire);
+  });
+
+  block.$element.insertAdjacentElement("beforebegin", control.$element);
 };
 
 export const hideBlockEditor = () => {
-  $delete.onclick = null;
-  $tools.remove();
+  if (control !== undefined) {
+    control.$element.remove();
+  }
 };

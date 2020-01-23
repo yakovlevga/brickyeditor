@@ -1,13 +1,24 @@
 
 .bre-block-editor {
-  position: "absolute";
-  width: 40px;
-  min-height: 40px;
-  background-color: "green";
-  z-index: "1000";
+  position: absolute;
+  left: -32px;
+  min-width: 32px;
+  min-height: 32px;
+  z-index: 100;
   /* transform: `translateX(-${px(width)})`, */
   -webkit-transition: "all 2s";
   transition: "all 2s"; }
+  .bre-block-editor-button {
+    width: 32px;
+    height: 32px;
+    display: -webkit-box;
+    display: flex;
+    -webkit-box-pack: center;
+            justify-content: center;
+    -webkit-box-align: center;
+            align-items: center;
+    cursor: pointer; }
+
 
 .bre-templates-root {
   position: fixed;

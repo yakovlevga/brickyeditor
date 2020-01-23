@@ -1,5 +1,11 @@
 import { NoembedResponse } from "src/embed";
-import { OnOffFunc, FieldEventMap, TemplatesEventMap } from "src/emmiter";
+import {
+  OnOffFunc,
+  FieldEventMap,
+  TemplatesEventMap,
+  Emitter,
+  BlockEventMap
+} from "src/emmiter";
 
 declare var instgrm: any;
 
@@ -180,7 +186,7 @@ declare namespace bre {
         data: BlockData;
         fields?: ui.FieldBase[];
         selectedField: ui.FieldBase | null;
-      };
+      } & Emitter<BlockEventMap>;
     }
 
     namespace field {

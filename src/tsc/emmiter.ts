@@ -16,29 +16,44 @@ export interface TemplatesEventMap {
   };
 }
 
-type BreEventMaps = FieldEventMap | TemplatesEventMap;
+type BlockEvent<T = {}> = T;
+export interface BlockEventMap {
+  delete: BlockEvent;
+  clone: BlockEvent;
+  move: BlockEvent<{
+    offset: number;
+  }>;
+  // for extensions
+  // [TKey: string]: BlockEvent;
+}
 
-export type OnOffFunc<TEventMap extends BreEventMaps> = <
-  K extends keyof TEventMap
->(
-  type: K,
-  listener: (ev: TEventMap[K]) => void
-) => void;
+type BreEventMap = FieldEventMap | TemplatesEventMap | BlockEventMap;
 
-export type FireFunc<TEventMap extends BreEventMaps> = <
-  K extends keyof TEventMap
->(
-  type: K,
-  ev: TEventMap[K]
-) => void;
-
-export const emmiter = <TEventMap extends BreEventMaps>(): {
+export type Emitter<TEventMap extends BreEventMap> = {
   fire: FireFunc<TEventMap>;
   on: OnOffFunc<TEventMap>;
   off: OnOffFunc<TEventMap>;
-} => {
+};
+
+export type OnOffFunc<TEventMap extends BreEventMap> = <
+  K extends keyof TEventMap
+>(
+  type: K,
+  listener: (ev?: TEventMap[K]) => void
+) => void;
+
+export type FireFunc<TEventMap extends BreEventMap> = <
+  K extends keyof TEventMap
+>(
+  type: K,
+  ev?: TEventMap[K]
+) => void;
+
+export const emmiter = <
+  TEventMap extends BreEventMap
+>(): Emitter<TEventMap> => {
   const listeners: {
-    [K in keyof TEventMap]?: Array<(ev: TEventMap[K]) => void>;
+    [K in keyof TEventMap]?: Array<(ev?: TEventMap[K]) => void>;
   } = {};
 
   const on: OnOffFunc<TEventMap> = (type, listener) => {

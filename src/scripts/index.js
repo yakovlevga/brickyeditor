@@ -43,6 +43,7 @@ fromDir("src/tsc", /\.scss$/, (pathname, file) => {
 
   const rules = root.nodes
     .filter(n => n.type === "rule")
+    .filter(n => n.selector.indexOf(".") === 0)
     .map(n => `"${n.selector.substr(1)}"`);
 
   const typeName = `${file[0].toUpperCase()}${

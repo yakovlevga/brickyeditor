@@ -5,6 +5,7 @@ import { getTemplate } from "src/template";
 import { bre } from "src/types/bre";
 import { Selectors } from "src/ui/Selectors";
 import { showBlockEditor, hideBlockEditor } from "src/block/blockEditor";
+import { emmiter, BlockEventMap } from "src/emmiter";
 
 export const selectField = (
   block: bre.core.block.Block,
@@ -30,7 +31,7 @@ export const toggleBlockSelection = (
   }
 
   if (selected) {
-    showBlockEditor(container, block);
+    showBlockEditor(block);
   } else {
     hideBlockEditor();
   }
@@ -107,7 +108,9 @@ export const createBlockFromTemplate = (
 ): bre.core.block.Block => {
   const $element = blockTemplate.$html.cloneNode(true) as HTMLElement;
 
+  const ee = emmiter<BlockEventMap>();
   const block: bre.core.block.Block = {
+    ...ee,
     $element,
     data,
     selectedField: null
