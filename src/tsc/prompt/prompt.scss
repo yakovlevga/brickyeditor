@@ -1,0 +1,43 @@
+@import "../../scss/media.scss";
+
+.bre {
+  &-modal {
+    display: flex;
+    position: fixed;
+    align-items: center;
+    justify-content: center;
+    z-index: 102;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.4);
+
+    &-placeholder {
+      background-color: #fff;
+      margin: 20px auto;
+      min-width: $phone;
+      max-width: calc("90% - 20px");
+      border-radius: 3px;
+      box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
+      padding: 10px;
+    }
+
+    &-close {
+      text-align: right;
+      padding: 0.5rem 1.5rem 0 0;
+
+      // a {
+      //   text-decoration: none;
+      //   color: #000000;
+      //   font-weight: bold;
+      //   font-size: 0.8rem;
+      // }
+    }
+
+    // form {
+    //   padding: 0rem 1.5rem 1.5rem 1.5rem;
+    // }
+  }
+}

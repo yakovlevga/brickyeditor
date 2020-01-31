@@ -7,37 +7,9 @@ import {
 } from "src/fields/field";
 import { helpers } from "src/helpers";
 import { locales } from "src/locales";
-import { promptAsync } from "src/prompt";
+import { promptAsync } from "src/prompt/prompt";
 import { bre } from "src/types/bre";
 import { emmiter, FieldEventMap } from "src/emmiter";
-
-type ImagePromptParams = {
-  src: bre.prompt.PromptParameter;
-  alt: bre.prompt.PromptParameter;
-  file: bre.prompt.PromptParameter<File>;
-};
-
-const getPromptParams: (
-  props: bre.core.field.ImageFieldData
-) => ImagePromptParams = ({ src, file, alt }) => ({
-  src: {
-    value: src,
-    title: locales.prompt.image.link.title,
-    placeholder: locales.prompt.image.link.placeholder
-  },
-  file: {
-    type: "file",
-    value: file,
-    title: locales.prompt.image.upload.title,
-    placeholder: locales.prompt.image.upload.placeholder
-  },
-  alt: {
-    value: alt,
-    title: locales.prompt.image.alt.title,
-    placeholder: locales.prompt.image.alt.placeholder
-  }
-  // TODO: link params
-});
 
 type ImageFieldPayload = {
   src?: string;
@@ -48,22 +20,54 @@ type ImageFieldPayload = {
 type ImageFieldData = bre.core.field.FieldData<"image", ImageFieldPayload>;
 type ImageField = bre.ui.Field<ImageFieldData>;
 
+type ImagePromptParams = {
+  src: bre.prompt.PromptParameter;
+  alt: bre.prompt.PromptParameter;
+  file: bre.prompt.PromptParameter<File>;
+};
+
+const getPromptParams: (props: ImageFieldData) => ImagePromptParams = ({
+  src,
+  file,
+  alt
+}) => ({
+  src: {
+    value: src,
+    title: locales.prompt.image.link.title,
+    placeholder: locales.prompt.image.link.placeholder,
+    preview: "img"
+  },
+  file: {
+    type: "file",
+    value: file,
+    title: locales.prompt.image.upload.title,
+    placeholder: locales.prompt.image.upload.placeholder,
+    preview: "img"
+  },
+  alt: {
+    value: alt,
+    title: locales.prompt.image.alt.title,
+    placeholder: locales.prompt.image.alt.placeholder
+  }
+  // TODO: link params
+});
+
 export const image: FieldFactory = ({ $element, preview, data }) => {
   if (!isValidFieldType<ImageFieldData>(data, "image")) {
     return null;
   }
 
   const isImageElement = $element.tagName.toLowerCase() === "img";
-  const updateImageElement = (d: bre.core.field.ImageFieldData) => {
+  const updateImageElement = (data: ImageFieldData) => {
     if (isImageElement) {
       const image = $element as HTMLImageElement;
-      image.src = d.src || "";
-      image.alt = d.alt || "";
+      image.src = data.src || "";
+      image.alt = data.alt || "";
     } else {
-      $element.style.backgroundImage = `url(${d.src})`;
+      $element.style.backgroundImage = `url(${data.src})`;
     }
 
-    $element.title = d.alt || "";
+    $element.title = data.alt || "";
   };
 
   // set initial image
@@ -99,6 +103,7 @@ export const image: FieldFactory = ({ $element, preview, data }) => {
     $element.addEventListener("click", async () => {
       fireEvent("focus", { field });
       const params = getPromptParams(field.data);
+      debugger;
       const promptResponse = await promptAsync<ImagePromptParams>(params);
 
       if (promptResponse === null) {

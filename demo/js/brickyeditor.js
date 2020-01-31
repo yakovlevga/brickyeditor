@@ -72,6 +72,33 @@ var BrickyEditor = (function (exports) {
         return r;
     }
 
+    var str = {
+        totalTrim: function (s) {
+            return s !== undefined ? s.replace(/\s\s+/g, " ").trim() : "";
+        },
+        equalsInvariant: function (s1, s2) {
+            if (!s1 || !s2) {
+                return s1 === s2;
+            }
+            return s1.toLowerCase() === s2.toLowerCase();
+        },
+        startsWith: function (s1, s2) { return s1.indexOf(s2) === 0; }
+    };
+    var Common = (function () {
+        function Common() {
+        }
+        Common.propsEach = function (obj, func) {
+            for (var key in obj) {
+                if (obj.hasOwnProperty(key)) {
+                    var value = obj[key];
+                    func(key, value);
+                }
+            }
+        };
+        return Common;
+    }());
+    //# sourceMappingURL=Common.js.map
+
     var $dom = (function () {
         function $dom() {
         }
@@ -264,33 +291,6 @@ var BrickyEditor = (function (exports) {
     }());
     //# sourceMappingURL=DOMHelpers.js.map
 
-    var str = {
-        totalTrim: function (s) {
-            return s !== undefined ? s.replace(/\s\s+/g, " ").trim() : "";
-        },
-        equalsInvariant: function (s1, s2) {
-            if (!s1 || !s2) {
-                return s1 === s2;
-            }
-            return s1.toLowerCase() === s2.toLowerCase();
-        },
-        startsWith: function (s1, s2) { return s1.indexOf(s2) === 0; }
-    };
-    var Common = (function () {
-        function Common() {
-        }
-        Common.propsEach = function (obj, func) {
-            for (var key in obj) {
-                if (obj.hasOwnProperty(key)) {
-                    var value = obj[key];
-                    func(key, value);
-                }
-            }
-        };
-        return Common;
-    }());
-    //# sourceMappingURL=Common.js.map
-
     var getSelectionRanges = function () {
         var selection = window.getSelection();
         if (selection === null) {
@@ -368,7 +368,7 @@ var BrickyEditor = (function (exports) {
         }
         el.style.display = el.style.display !== "none" ? "none" : "initial";
     };
-    var modalTemplate = "\n<div>\n  <div class=\"bre-modal\" style=\"display: block;\">\n    <div class=\"bre-modal-placeholder\">\n    </div>\n  </div>\n</div>";
+    var modalTemplate = "\n<div>\n  <div class=\"bre-modal\">\n    <div class=\"bre-modal-placeholder\">\n    </div>\n  </div>\n</div>";
     var showModal = function (props) {
         var selection = getSelectionRanges();
         var element = createElement(modalTemplate);
@@ -530,7 +530,7 @@ var BrickyEditor = (function (exports) {
     };
     //# sourceMappingURL=locales.js.map
 
-    var textFieldEditor = function (_a) {
+    var text = function (_a) {
         var key = _a.key, p = _a.p, data = _a.data;
         var html = "<input type='text' name='" + key + "' placeholder='" + p.placeholder + "' value='" + (p.value || "") + "' />";
         var input = helpers.createElement(html);
@@ -539,7 +539,9 @@ var BrickyEditor = (function (exports) {
         };
         return input;
     };
-    var fileFieldEditor = function (_a) {
+    //# sourceMappingURL=text.js.map
+
+    var file = function (_a) {
         var key = _a.key, p = _a.p, data = _a.data;
         var file = data[key];
         var filePreview = helpers.createElement("<img src=\"" + p.value + "\"/>");
@@ -575,7 +577,9 @@ var BrickyEditor = (function (exports) {
         editor.append(filePreview, fileInput, fileName);
         return editor;
     };
-    var selectFieldEditor = function (_a) {
+    //# sourceMappingURL=file.js.map
+
+    var select = function (_a) {
         var key = _a.key, p = _a.p, data = _a.data;
         if (p.options === undefined) {
             throw new Error("Empty options");
@@ -592,10 +596,12 @@ var BrickyEditor = (function (exports) {
         };
         return select;
     };
+    //# sourceMappingURL=select.js.map
+
     var parameterEditors = {
-        text: textFieldEditor,
-        file: fileFieldEditor,
-        select: selectFieldEditor,
+        text: text,
+        file: file,
+        select: select
     };
     var promptAsync = function (params) {
         return new Promise(function (resolve) {
@@ -605,18 +611,17 @@ var BrickyEditor = (function (exports) {
                 var editor = parameterEditors[p.type || "text"]({
                     key: key,
                     p: p,
-                    data: result,
+                    data: result
                 });
                 return editor;
             });
             helpers.showModal({
                 content: editors,
                 onOk: function () { return resolve(result); },
-                onCancel: function () { return resolve(null); },
+                onCancel: function () { return resolve(null); }
             });
         });
     };
-    //# sourceMappingURL=prompt.js.map
 
     var Selectors = (function () {
         function Selectors() {
@@ -708,7 +713,6 @@ var BrickyEditor = (function (exports) {
             data: data
         };
         if (data.html) {
-            debugger;
             $element.innerHTML = data.html;
         }
         if (!preview) {
@@ -751,6 +755,7 @@ var BrickyEditor = (function (exports) {
         }
         return field;
     };
+    //# sourceMappingURL=html.js.map
 
     var getRequest = function (url) {
         return new Promise(function (resolve, reject) {
@@ -1002,13 +1007,15 @@ var BrickyEditor = (function (exports) {
             src: {
                 value: src,
                 title: locales.prompt.image.link.title,
-                placeholder: locales.prompt.image.link.placeholder
+                placeholder: locales.prompt.image.link.placeholder,
+                preview: "img"
             },
             file: {
                 type: "file",
                 value: file,
                 title: locales.prompt.image.upload.title,
-                placeholder: locales.prompt.image.upload.placeholder
+                placeholder: locales.prompt.image.upload.placeholder,
+                preview: "img"
             },
             alt: {
                 value: alt,
@@ -1023,16 +1030,16 @@ var BrickyEditor = (function (exports) {
             return null;
         }
         var isImageElement = $element.tagName.toLowerCase() === "img";
-        var updateImageElement = function (d) {
+        var updateImageElement = function (data) {
             if (isImageElement) {
                 var image_1 = $element;
-                image_1.src = d.src || "";
-                image_1.alt = d.alt || "";
+                image_1.src = data.src || "";
+                image_1.alt = data.alt || "";
             }
             else {
-                $element.style.backgroundImage = "url(" + d.src + ")";
+                $element.style.backgroundImage = "url(" + data.src + ")";
             }
-            $element.title = d.alt || "";
+            $element.title = data.alt || "";
         };
         if (data.src) {
             updateImageElement(data);
@@ -1062,6 +1069,7 @@ var BrickyEditor = (function (exports) {
                         case 0:
                             fireEvent_1("focus", { field: field });
                             params = getPromptParams$1(field.data);
+                            debugger;
                             return [4, promptAsync(params)];
                         case 1:
                             promptResponse = _a.sent();
@@ -1170,7 +1178,9 @@ var BrickyEditor = (function (exports) {
         });
         if (field !== null && field.on !== undefined) {
             field.on("focus", function (ev) {
-                selectField(block, ev.field);
+                if (ev !== undefined) {
+                    selectField(block, ev.field);
+                }
             });
         }
         return field;
@@ -1424,8 +1434,9 @@ var BrickyEditor = (function (exports) {
         block.fields.forEach(function (field) {
             if (field.on !== undefined) {
                 field.on("focus", function (f) {
-                    console.log({ focused: f });
-                    selectField(block, f.field);
+                    if (f !== undefined) {
+                        selectField(block, f.field);
+                    }
                 });
             }
         });
@@ -1526,7 +1537,7 @@ var BrickyEditor = (function (exports) {
         });
     };
     var moveBlock = function (container, block, offset) {
-        var idx = container.blocks.indexOf(block) + 1;
+        var idx = container.blocks.indexOf(block);
         var new_idx = idx + offset;
         if (new_idx >= container.blocks.length || new_idx < 0) {
             return;
@@ -1540,6 +1551,7 @@ var BrickyEditor = (function (exports) {
                 $dom.before($anchorBlock, block.$element);
             }
         }
+        showBlockEditor(block);
         container.blocks.splice(idx, 1);
         container.blocks.splice(new_idx, 0, block);
     };

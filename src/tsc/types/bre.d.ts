@@ -88,11 +88,10 @@ declare namespace bre {
         title: string;
         value: string;
       }[];
+      preview?: string;
     };
 
-    type PromptParameters = {
-      [TKey: string]: PromptParameter;
-    };
+    type PromptParams = Record<string, PromptParameter>;
 
     type PromptParameterWithControl = PromptParameter & {
       control: HTMLElement;

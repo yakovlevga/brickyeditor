@@ -1,6 +1,6 @@
 import { str } from "src/common/Common";
 import { helpers } from "src/helpers";
-import { getLinkPromptParams, promptAsync } from "src/prompt";
+import { getLinkPromptParams, promptAsync } from "src/prompt/prompt";
 import { bre } from "src/types/bre";
 import { Selectors } from "src/ui/Selectors";
 
@@ -24,7 +24,7 @@ const renderButtonElement = ({
   icon,
   command,
   range,
-  aValueArgument,
+  aValueArgument
 }: bre.IHtmlToolsButton): HTMLElement => {
   const $btn = helpers.createElement(
     `<button type="button" class="bre-btn"><i class="fa fa-${icon}"></i></button>`

@@ -42,7 +42,7 @@ const toggleVisibility = (el: HTMLElement, visible?: boolean) => {
 
 const modalTemplate = `
 <div>
-  <div class="bre-modal" style="display: block;">
+  <div class="bre-modal">
     <div class="bre-modal-placeholder">
     </div>
   </div>
@@ -91,7 +91,6 @@ const showModal = (props: {
     closeModal();
   });
   placeholder.appendChild(buttonCancel);
-
   document.body.appendChild(element);
 };
 

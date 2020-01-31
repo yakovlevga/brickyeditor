@@ -145,7 +145,9 @@ function bindField($element: HTMLElement, block?: bre.core.block.Block) {
 
   if (field !== null && field.on !== undefined) {
     field.on("focus", ev => {
-      selectField(block, ev.field);
+      if (ev !== undefined) {
+        selectField(block, ev.field);
+      }
     });
   }
 

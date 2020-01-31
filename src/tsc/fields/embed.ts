@@ -13,7 +13,7 @@ import {
 import { helpers } from "src/helpers";
 import { loadScriptAsync } from "src/httpTransport";
 import { locales } from "src/locales";
-import { promptAsync } from "src/prompt";
+import { promptAsync } from "src/prompt/prompt";
 import { bre } from "src/types/bre";
 import { emmiter, FieldEventMap } from "src/emmiter";
 
@@ -25,9 +25,9 @@ const providerScriptsLoaded: {
   [TKey: string]: boolean;
 } = {};
 
-const getPromptParams: (
-  props: bre.core.field.EmbedFieldData
-) => EmbedPromptParams = ({ url }) => ({
+const getPromptParams: (props: EmbedFieldData) => EmbedPromptParams = ({
+  url
+}) => ({
   url: {
     value: url || "http://instagr.am/p/BO9VX2Vj4fF/",
     title: locales.prompt.embed.url.title,
@@ -35,24 +35,24 @@ const getPromptParams: (
   }
 });
 
-const renderEmbedFieldSettingsUI = ($field: HTMLElement) => {
-  // TODO: rework this
-  const $el = helpers.createElement(
-    `<div style="
-      position: absolute;
-      width: 100%; 
-      height: 100px;
-      text-align: center;
-      font-weight: bold;
-      vertical-align: middle;
-      background: #333;
-      opacity: 0.2;">
-      Change embed element link
-    </div>`
-  );
-  $dom.before($field, $el);
-  return $el;
-};
+// const renderEmbedFieldSettingsUI = ($field: HTMLElement) => {
+//   // TODO: rework this
+//   const $el = helpers.createElement(
+//     `<div style="
+//       position: absolute;
+//       width: 100%;
+//       height: 100px;
+//       text-align: center;
+//       font-weight: bold;
+//       vertical-align: middle;
+//       background: #333;
+//       opacity: 0.2;">
+//       Change embed element link
+//     </div>`
+//   );
+//   $dom.before($field, $el);
+//   return $el;
+// };
 
 type EmbedFieldType = "embed";
 type EmbedFieldPayload = {
