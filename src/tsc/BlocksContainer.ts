@@ -6,6 +6,7 @@ import {
 import { helpers } from "src/helpers";
 import { bre } from "src/types/bre";
 import { $dom } from "src/common/DOMHelpers";
+import { showBlockEditor } from "src/block/blockEditor";
 
 export const getContainerData = (
   container: bre.core.IBlocksContainer,
@@ -193,7 +194,7 @@ export const moveBlock = (
   block: bre.core.block.Block,
   offset: number
 ) => {
-  const idx = container.blocks.indexOf(block) + 1;
+  const idx = container.blocks.indexOf(block);
   const new_idx = idx + offset;
 
   if (new_idx >= container.blocks.length || new_idx < 0) {
@@ -208,6 +209,8 @@ export const moveBlock = (
       $dom.before($anchorBlock, block.$element);
     }
   }
+
+  showBlockEditor(block);
 
   container.blocks.splice(idx, 1);
   container.blocks.splice(new_idx, 0, block);

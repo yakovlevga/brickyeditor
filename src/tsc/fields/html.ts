@@ -34,7 +34,6 @@ export const html: FieldFactory = ({ $element, preview, data }) => {
   };
 
   if (data.html) {
-    debugger;
     $element.innerHTML = data.html;
   }
 

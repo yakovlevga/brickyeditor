@@ -37,61 +37,6 @@ export const toggleBlockSelection = (
   }
 };
 
-const findFields = ($html: HTMLElement) => {
-  const nodes = $html.querySelectorAll(Selectors.selectorField);
-  let $fields = nodes.length > 0 ? Array.prototype.slice.call(nodes) : [];
-
-  if ($html.attributes.getNamedItem(Selectors.attrField) !== null) {
-    $fields = [...$fields, $html];
-  }
-
-  return $fields;
-};
-
-const cloneBlockInContainer = (
-  container: bre.core.IBlocksContainer,
-  block: bre.core.block.Block
-) => {
-  const idx = container.blocks.indexOf(block) + 1;
-
-  addBlockToContainer(container, {
-    blockData: block.data,
-    idx
-  });
-};
-
-const moveBlockInContainer = (
-  container: bre.core.IBlocksContainer,
-  block: bre.core.block.Block,
-  offset: number
-) => {
-  const { blocks } = container;
-  const idx = blocks.indexOf(block);
-  const new_idx = idx + offset;
-
-  if (new_idx >= blocks.length || new_idx < 0) {
-    return;
-  }
-
-  const $anchorBlock = blocks[new_idx].$element;
-  if ($anchorBlock) {
-    if (offset > 0) {
-      $dom.after({ el: $anchorBlock, elToInsert: block.$element });
-    } else if (offset < 0) {
-      $dom.before($anchorBlock, block.$element);
-    }
-  }
-
-  container.blocks.splice(idx, 1);
-  container.blocks.splice(new_idx, 0, block);
-
-  // TODO
-  // container.onMoveBlock(block, idx, new_idx);
-
-  // TODO Scroll to block
-  // block.scrollTo();
-};
-
 export const createBlockFromData = (
   blockData: bre.core.block.BlockData
 ): bre.core.block.Block => {
@@ -120,14 +65,16 @@ export const createBlockFromTemplate = (
   block.fields.forEach(field => {
     if (field.on !== undefined) {
       field.on("focus", f => {
-        console.log({ focused: f });
-        selectField(block, f.field);
+        if (f !== undefined) {
+          selectField(block, f.field);
+        }
       });
     }
   });
 
   return block;
 };
+
 // return block;
 
 // TODO: pass field events
