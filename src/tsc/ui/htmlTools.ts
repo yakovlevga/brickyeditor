@@ -1,6 +1,8 @@
 import { str } from "src/common/Common";
 import { helpers } from "src/helpers";
-import { getLinkPromptParams, promptAsync } from "src/prompt/prompt";
+import { promptAsync } from "src/prompt/prompt";
+import { getLinkPromptParams } from "src/prompt/link";
+
 import { bre } from "src/types/bre";
 import { Selectors } from "src/ui/Selectors";
 
@@ -25,7 +27,7 @@ const renderButtonElement = ({
   command,
   range,
   aValueArgument
-}: bre.IHtmlToolsButton): HTMLElement => {
+}: bre.core.IHtmlToolsButton): HTMLElement => {
   const $btn = helpers.createElement(
     `<button type="button" class="bre-btn"><i class="fa fa-${icon}"></i></button>`
   );
@@ -95,7 +97,7 @@ const renderButtonElement = ({
   return $btn;
 };
 
-const renderControl = (buttons: bre.IHtmlToolsButton[]) => {
+const renderControl = (buttons: bre.core.IHtmlToolsButton[]) => {
   const $panel = helpers.createElement(
     '<div class="bre-html-tools-panel"></div>'
   );

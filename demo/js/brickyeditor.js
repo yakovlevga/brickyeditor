@@ -343,13 +343,25 @@ var BrickyEditor = (function (exports) {
     }());
     //# sourceMappingURL=SelectionUtils.js.map
 
-    var div = function (className, innerHTML) {
-        var result = document.createElement("div");
-        result.className = className;
-        if (innerHTML !== undefined && innerHTML !== null) {
+    var el = function (_a) {
+        var _b = _a.tag, tag = _b === void 0 ? "div" : _b, className = _a.className, innerHTML = _a.innerHTML, props = _a.props;
+        var result = document.createElement(tag);
+        if (className !== undefined && className.length > 0) {
+            result.className = className;
+        }
+        if (innerHTML !== undefined) {
             result.innerHTML = innerHTML;
         }
+        if (props !== undefined) {
+            Object.assign(result, props);
+        }
         return result;
+    };
+    var div = function (className, innerHTML) {
+        return el({
+            className: className,
+            innerHTML: innerHTML
+        });
     };
     var createElement = function (html, className) {
         var temp = document.createElement("div");
@@ -442,16 +454,19 @@ var BrickyEditor = (function (exports) {
                 })];
         });
     }); };
+    var objectToArray = function (o) { return Object.keys(o).map(function (x) { return x[o]; }); };
     var filterNotNull = function (value) {
         return value.filter(function (x) { return x !== null; });
     };
     var helpers = {
         createElement: createElement,
         div: div,
+        el: el,
         parseElementData: parseElementData,
         showModal: showModal,
         toggleVisibility: toggleVisibility,
         readFileAsync: readFileAsync,
+        objectToArray: objectToArray,
         filterNotNull: filterNotNull
     };
     //# sourceMappingURL=helpers.js.map
@@ -622,6 +637,7 @@ var BrickyEditor = (function (exports) {
             });
         });
     };
+    //# sourceMappingURL=prompt.js.map
 
     var Selectors = (function () {
         function Selectors() {
@@ -1001,29 +1017,42 @@ var BrickyEditor = (function (exports) {
     };
     //# sourceMappingURL=container.js.map
 
-    var getPromptParams$1 = function (_a) {
-        var src = _a.src, file = _a.file, alt = _a.alt;
-        return ({
-            src: {
-                value: src,
-                title: locales.prompt.image.link.title,
-                placeholder: locales.prompt.image.link.placeholder,
-                preview: "img"
-            },
-            file: {
-                type: "file",
-                value: file,
-                title: locales.prompt.image.upload.title,
-                placeholder: locales.prompt.image.upload.placeholder,
-                preview: "img"
-            },
-            alt: {
-                value: alt,
-                title: locales.prompt.image.alt.title,
-                placeholder: locales.prompt.image.alt.placeholder
+    var renderInput = function (_a) {
+        var value = _a.value, onUpdate = _a.onUpdate, type = _a.type, label = _a.label, placeholder = _a.placeholder;
+        var $element = helpers.div("bre-field-editor-prop");
+        var update = function () {
+            onUpdate($input.value);
+        };
+        var $input = helpers.el({
+            tag: "input",
+            className: "bre-field-editor-input",
+            props: {
+                type: type,
+                value: value || "",
+                placeholder: placeholder || "",
+                onchange: update,
+                onkeyup: update,
+                onpaste: update
             }
         });
+        if (label !== undefined) {
+            var $label = helpers.el({
+                tag: "label",
+                className: "bre-field-editor-label",
+                innerHTML: label,
+                props: {
+                    onclick: function () { return $input.focus(); }
+                }
+            });
+            $element.append($label);
+        }
+        $element.append($input);
+        return $element;
     };
+    var inputTextLine = function (params) {
+        return renderInput(__assign(__assign({}, params), { type: "text" }));
+    };
+
     var image = function (_a) {
         var $element = _a.$element, preview = _a.preview, data = _a.data;
         if (!isValidFieldType(data, "image")) {
@@ -1063,42 +1092,76 @@ var BrickyEditor = (function (exports) {
                 return $copy;
             };
             $element.addEventListener("click", function () { return __awaiter(void 0, void 0, void 0, function () {
-                var params, promptResponse, updatedData, fileContent;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
                             fireEvent_1("focus", { field: field });
-                            params = getPromptParams$1(field.data);
-                            debugger;
-                            return [4, promptAsync(params)];
+                            return [4, propmtEditorAsync(field)];
                         case 1:
-                            promptResponse = _a.sent();
-                            if (promptResponse === null) {
-                                return [2];
+                            if (_a.sent()) {
+                                debugger;
+                                updateImageElement(field.data);
+                                updateFieldData(field, field.data, fireEvent_1);
+                                toggleFieldSelection(field, true);
                             }
-                            updatedData = __assign(__assign({}, field.data), { alt: promptResponse.alt });
-                            if (!(promptResponse.file !== undefined)) return [3, 3];
-                            return [4, helpers.readFileAsync(promptResponse.file)];
-                        case 2:
-                            fileContent = _a.sent();
-                            updatedData = __assign(__assign({}, updatedData), { src: fileContent, file: undefined });
-                            return [3, 4];
-                        case 3:
-                            if (promptResponse.src) {
-                                updatedData = __assign(__assign({}, updatedData), { src: promptResponse.src, file: undefined });
+                            else {
+                                debugger;
                             }
-                            _a.label = 4;
-                        case 4:
-                            field.data = updatedData;
-                            updateImageElement(updatedData);
-                            updateFieldData(field, updatedData, fireEvent_1);
-                            toggleFieldSelection(field, true);
                             return [2];
                     }
                 });
             }); });
         }
         return field;
+    };
+    var propmtEditorAsync = function (f) {
+        return new Promise(function (resolve) {
+            var editor = imageEditor(f.data);
+            helpers.showModal({
+                content: [editor.$element],
+                onOk: function () {
+                    f.data = editor.data;
+                    resolve(true);
+                },
+                onCancel: resolve
+            });
+        });
+    };
+    var imageEditor = function (data) {
+        var d = __assign({}, data);
+        var $element = helpers.div("bre-field-editor-root");
+        var $previewImg = helpers.el({
+            tag: "img",
+            className: "bre-field-editor-preview-img",
+            props: {
+                src: d.src || ""
+            }
+        });
+        var $preview = helpers.div("bre-field-editor-preview");
+        $preview.appendChild($previewImg);
+        var $src = inputTextLine({
+            label: locales.prompt.image.link.title,
+            placeholder: locales.prompt.image.link.placeholder,
+            value: d.src,
+            onUpdate: function (v) {
+                d.src = v;
+                $previewImg.src = v;
+            }
+        });
+        var $alt = inputTextLine({
+            label: locales.prompt.image.alt.title,
+            placeholder: locales.prompt.image.alt.placeholder,
+            value: d.alt,
+            onUpdate: function (v) {
+                d.alt = v;
+                $previewImg.alt = v;
+            }
+        });
+        $element.append($preview, $src, $alt);
+        return {
+            $element: $element,
+            data: d
+        };
     };
     //# sourceMappingURL=image.js.map
 
@@ -1564,15 +1627,15 @@ var BrickyEditor = (function (exports) {
         {
             icon: "list-ul",
             command: "insertUnorderedList",
-            range: true,
+            range: true
         },
         {
             icon: "list-ol",
             command: "insertOrderedList",
-            range: true,
+            range: true
         },
         { icon: "undo", command: "Undo", range: false },
-        { icon: "repeat", command: "Redo", range: false },
+        { icon: "repeat", command: "Redo", range: false }
     ];
     var defaultOptions = {
         templatesUrl: "templates/bootstrap4.html",
@@ -1582,7 +1645,7 @@ var BrickyEditor = (function (exports) {
         onError: function (data) {
             console.log(data.message);
         },
-        htmlToolsButtons: defaultButtons$1,
+        htmlToolsButtons: defaultButtons$1
     };
     //# sourceMappingURL=defaults.js.map
 

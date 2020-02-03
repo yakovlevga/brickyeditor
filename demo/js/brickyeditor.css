@@ -19,6 +19,36 @@
             align-items: center;
     cursor: pointer; }
 
+.bre-field-editor-root {
+  width: 100%; }
+
+.bre-field-editor-preview {
+  display: -webkit-box;
+  display: flex;
+  -webkit-box-pack: center;
+          justify-content: center;
+  width: 100%;
+  height: 50vh; }
+  .bre-field-editor-preview-img {
+    max-width: 100%;
+    height: 100%;
+    -o-object-fit: contain;
+       object-fit: contain; }
+
+.bre-field-editor-prop {
+  width: 100%;
+  margin-top: 0.5rem; }
+  .bre-field-editor-prop:last-of-type {
+    margin-bottom: 0.5rem; }
+
+.bre-field-editor-label {
+  font-size: 1rem;
+  font-weight: 500;
+  margin-bottom: 0rem; }
+
+.bre-field-editor-input {
+  width: 100%; }
+
 .bre-modal {
   display: -webkit-box;
   display: flex;

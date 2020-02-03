@@ -6,10 +6,11 @@ import {
   toggleFieldSelection
 } from "src/fields/field";
 import { helpers } from "src/helpers";
-import { locales } from "src/locales";
-import { promptAsync } from "src/prompt/prompt";
 import { bre } from "src/types/bre";
 import { emmiter, FieldEventMap } from "src/emmiter";
+import { inputTextLine } from "src/fields/inputs";
+import { locales } from "src/locales";
+import { EditorsStyles } from "src/fields/editors.scss";
 
 type ImageFieldPayload = {
   src?: string;
@@ -20,37 +21,33 @@ type ImageFieldPayload = {
 type ImageFieldData = bre.core.field.FieldData<"image", ImageFieldPayload>;
 type ImageField = bre.ui.Field<ImageFieldData>;
 
-type ImagePromptParams = {
-  src: bre.prompt.PromptParameter;
-  alt: bre.prompt.PromptParameter;
-  file: bre.prompt.PromptParameter<File>;
-};
-
-const getPromptParams: (props: ImageFieldData) => ImagePromptParams = ({
-  src,
-  file,
-  alt
-}) => ({
-  src: {
-    value: src,
-    title: locales.prompt.image.link.title,
-    placeholder: locales.prompt.image.link.placeholder,
-    preview: "img"
-  },
-  file: {
-    type: "file",
-    value: file,
-    title: locales.prompt.image.upload.title,
-    placeholder: locales.prompt.image.upload.placeholder,
-    preview: "img"
-  },
-  alt: {
-    value: alt,
-    title: locales.prompt.image.alt.title,
-    placeholder: locales.prompt.image.alt.placeholder
-  }
-  // TODO: link params
-});
+// const getPromptParams: (props: ImageFieldData) => ImagePromptParams = ({
+//   src,
+//   file,
+//   alt
+// }) => ({
+//   src: {
+//     type: "src",
+//     value: src,
+//     title: locales.prompt.image.link.title,
+//     placeholder: locales.prompt.image.link.placeholder,
+//     preview: () => "img"
+//   },
+//   file: {
+//     type: "file",
+//     value: file,
+//     title: locales.prompt.image.upload.title,
+//     placeholder: locales.prompt.image.upload.placeholder,
+//     preview: () => "img"
+//   },
+//   alt: {
+//     type: "text",
+//     value: alt,
+//     title: locales.prompt.image.alt.title,
+//     placeholder: locales.prompt.image.alt.placeholder
+//   }
+//   // TODO: link params
+// });
 
 export const image: FieldFactory = ({ $element, preview, data }) => {
   if (!isValidFieldType<ImageFieldData>(data, "image")) {
@@ -102,54 +99,120 @@ export const image: FieldFactory = ({ $element, preview, data }) => {
 
     $element.addEventListener("click", async () => {
       fireEvent("focus", { field });
-      const params = getPromptParams(field.data);
-      debugger;
-      const promptResponse = await promptAsync<ImagePromptParams>(params);
 
-      if (promptResponse === null) {
-        return;
+      if (await propmtEditorAsync(field)) {
+        debugger;
+
+        updateImageElement(field.data);
+        updateFieldData(field, field.data, fireEvent);
+        toggleFieldSelection(field, true);
+      } else {
+        debugger;
       }
+      // const params = getPromptParams(field.data);
+      // const promptResponse = await promptAsync<ImagePromptParams>(params);
 
-      // const { file, src, alt } = updated;
-      let updatedData = {
-        ...field.data,
-        alt: promptResponse.alt
-      };
+      // if (promptResponse === null) {
+      //   return;
+      // }
 
-      if (promptResponse.file !== undefined) {
-        // todo: add some common handler for image uploading?
-        // if (props.onUpload) {
-        //   props.onUpload(promptResponse.file, src => {
-        //     updatedData = {
-        //       ...updatedData,
-        //       src,
-        //       file: undefined
-        //     };
-        //   });
-        // } else {
-        const fileContent = await helpers.readFileAsync(promptResponse.file);
-        updatedData = {
-          ...updatedData,
-          src: fileContent,
-          file: undefined
-        };
-        //}
-      } else if (promptResponse.src) {
-        updatedData = {
-          ...updatedData,
-          src: promptResponse.src,
-          file: undefined
-        };
-      }
+      // // const { file, src, alt } = updated;
+      // let updatedData = {
+      //   ...field.data,
+      //   alt: promptResponse.alt
+      // };
 
-      field.data = updatedData;
-      updateImageElement(updatedData);
-      updateFieldData(field, updatedData, fireEvent);
-      toggleFieldSelection(field, true);
+      // if (promptResponse.file !== undefined) {
+      //   // todo: add some common handler for image uploading?
+      //   // if (props.onUpload) {
+      //   //   props.onUpload(promptResponse.file, src => {
+      //   //     updatedData = {
+      //   //       ...updatedData,
+      //   //       src,
+      //   //       file: undefined
+      //   //     };
+      //   //   });
+      //   // } else {
+      //   const fileContent = await helpers.readFileAsync(promptResponse.file);
+      //   updatedData = {
+      //     ...updatedData,
+      //     src: fileContent,
+      //     file: undefined
+      //   };
+      //   //}
+      // } else if (promptResponse.src) {
+      //   updatedData = {
+      //     ...updatedData,
+      //     src: promptResponse.src,
+      //     file: undefined
+      //   };
+      // }
+
+      // field.data = updatedData;
     });
   }
 
   return field;
+};
+
+const propmtEditorAsync = (f: ImageField) =>
+  new Promise<boolean>(resolve => {
+    const editor = imageEditor(f.data);
+
+    helpers.showModal({
+      content: [editor.$element],
+
+      onOk: () => {
+        f.data = editor.data;
+        resolve(true);
+      },
+
+      onCancel: resolve
+    });
+  });
+
+export const imageEditor = (data: Readonly<ImageFieldData>) => {
+  const d = { ...data };
+
+  const $element = helpers.div<EditorsStyles>("bre-field-editor-root");
+
+  const $previewImg = helpers.el<HTMLImageElement, EditorsStyles>({
+    tag: "img",
+    className: "bre-field-editor-preview-img",
+    props: {
+      src: d.src || ""
+    }
+  });
+
+  const $preview = helpers.div<EditorsStyles>("bre-field-editor-preview");
+  $preview.appendChild($previewImg);
+
+  const $src = inputTextLine({
+    label: locales.prompt.image.link.title,
+    placeholder: locales.prompt.image.link.placeholder,
+    value: d.src,
+    onUpdate: v => {
+      d.src = v as string;
+      $previewImg.src = v;
+    }
+  });
+
+  const $alt = inputTextLine({
+    label: locales.prompt.image.alt.title,
+    placeholder: locales.prompt.image.alt.placeholder,
+    value: d.alt,
+    onUpdate: v => {
+      d.alt = v as string;
+      $previewImg.alt = v;
+    }
+  });
+
+  $element.append($preview, $src, $alt);
+
+  return {
+    $element,
+    data: d
+  };
 };
 
 // export class ImageField extends BaseField<ImageFieldData> {

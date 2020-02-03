@@ -3,17 +3,45 @@ import { bre } from "src/types/bre";
 
 type FieldData = bre.core.field.FieldData;
 
-const div = <TClassName extends string>(
-  className: TClassName,
-  innerHTML?: string | null
-) => {
-  const result = document.createElement("div");
-  result.className = className;
-  if (innerHTML !== undefined && innerHTML !== null) {
+const el = <
+  THTMLElement extends HTMLElement = HTMLElement,
+  TClassName extends string = ""
+>({
+  tag = "div",
+  className,
+  innerHTML,
+  props
+}: {
+  tag?: string;
+  className?: TClassName;
+  innerHTML?: string;
+  props?: Partial<THTMLElement>;
+}) => {
+  const result = document.createElement(tag) as THTMLElement;
+
+  if (className !== undefined && className.length > 0) {
+    result.className = className;
+  }
+
+  if (innerHTML !== undefined) {
     result.innerHTML = innerHTML;
   }
+
+  if (props !== undefined) {
+    Object.assign(result, props);
+  }
+
   return result;
 };
+
+const div = <TClassName extends string>(
+  className?: TClassName,
+  innerHTML?: string
+) =>
+  el<HTMLDivElement, TClassName>({
+    className,
+    innerHTML
+  });
 
 const createElement = <TElement extends HTMLElement>(
   html: string,
@@ -145,15 +173,19 @@ const readFileAsync = async (file: File) =>
     }
   });
 
+const objectToArray = (o: any) => Object.keys(o).map(x => x[o]);
+
 const filterNotNull = <TValue>(value: (TValue | null)[]) =>
   value.filter(x => x !== null) as TValue[];
 
 export const helpers = {
   createElement,
   div,
+  el,
   parseElementData,
   showModal,
   toggleVisibility,
   readFileAsync,
+  objectToArray,
   filterNotNull
 };

@@ -1,21 +1,21 @@
 import { bre } from "src/types/bre";
 
-const defaultButtons: bre.IHtmlToolsButton[] = [
+const defaultButtons: bre.core.IHtmlToolsButton[] = [
   { icon: "bold", command: "Bold", range: true },
   { icon: "italic", command: "Italic", range: true },
   { icon: "link", command: "CreateLink", range: true },
   {
     icon: "list-ul",
     command: "insertUnorderedList",
-    range: true,
+    range: true
   },
   {
     icon: "list-ol",
     command: "insertOrderedList",
-    range: true,
+    range: true
   },
   { icon: "undo", command: "Undo", range: false },
-  { icon: "repeat", command: "Redo", range: false },
+  { icon: "repeat", command: "Redo", range: false }
 ];
 
 export const defaultOptions: Partial<bre.Options> = {
@@ -27,5 +27,5 @@ export const defaultOptions: Partial<bre.Options> = {
     // tslint:disable-next-line:no-console
     console.log(data.message);
   },
-  htmlToolsButtons: defaultButtons,
+  htmlToolsButtons: defaultButtons
 };

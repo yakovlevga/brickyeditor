@@ -44,7 +44,7 @@ declare namespace bre {
     /** Ignore blocks html field, if you need only json */
     ignoreHtml: boolean;
     /** Custom Html editor buttons */
-    htmlToolsButtons: bre.IHtmlToolsButton[];
+    htmlToolsButtons: bre.core.IHtmlToolsButton[];
     /** Form selector to bind form submit event */
     formSelector: string;
     /** Input selector to put json to on form submit */
@@ -77,10 +77,10 @@ declare namespace bre {
   }
 
   namespace prompt {
-    type PromptParameterType = "text" | "file" | "select";
+    type PromptParameterType = "text" | "src" | "file" | "select";
 
     type PromptParameter<TValue = any> = {
-      type?: PromptParameterType;
+      type: PromptParameterType;
       value?: TValue;
       title: string;
       placeholder?: string;
@@ -88,7 +88,7 @@ declare namespace bre {
         title: string;
         value: string;
       }[];
-      preview?: string;
+      preview?: (p?: PromptParameter<TValue>) => string;
     };
 
     type PromptParams = Record<string, PromptParameter>;
