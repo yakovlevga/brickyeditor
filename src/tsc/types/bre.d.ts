@@ -199,6 +199,10 @@ declare namespace bre {
       //   onDeselect?: (f: Field) => void;
       // };
 
+      type LinkData = Partial<
+        Pick<HTMLLinkElement, "href" | "title" | "target">
+      >;
+
       type FieldData<TType extends FieldType = any, TData = {}> = {
         type: TType;
         name: string;
@@ -227,6 +231,14 @@ declare namespace bre {
       //   }
       // >;
     }
+
+    // TODO: or Exclude 'slice'?
+    type FileInfo = Pick<File, "name" | "size" | "type" | "lastModified">;
+
+    type FileContent = {
+      fileContent: string;
+      fileInfo: bre.core.FileInfo;
+    };
 
     type HtmlToolsButtonCommands =
       | "Bold"

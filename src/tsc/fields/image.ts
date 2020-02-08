@@ -8,46 +8,19 @@ import {
 import { helpers } from "src/helpers";
 import { bre } from "src/types/bre";
 import { emmiter, FieldEventMap } from "src/emmiter";
-import { inputTextLine } from "src/fields/inputs";
+import { renderInput } from "src/fields/inputs";
 import { locales } from "src/locales";
 import { EditorsStyles } from "src/fields/editors.scss";
+import { linkEditor } from "src/fields/linkEditor";
 
 type ImageFieldPayload = {
   src?: string;
   alt?: string;
-  file?: File;
-  link?: Pick<HTMLLinkElement, "href" | "title" | "target">;
+  file?: bre.core.FileContent;
+  link?: bre.core.field.LinkData;
 };
 type ImageFieldData = bre.core.field.FieldData<"image", ImageFieldPayload>;
 type ImageField = bre.ui.Field<ImageFieldData>;
-
-// const getPromptParams: (props: ImageFieldData) => ImagePromptParams = ({
-//   src,
-//   file,
-//   alt
-// }) => ({
-//   src: {
-//     type: "src",
-//     value: src,
-//     title: locales.prompt.image.link.title,
-//     placeholder: locales.prompt.image.link.placeholder,
-//     preview: () => "img"
-//   },
-//   file: {
-//     type: "file",
-//     value: file,
-//     title: locales.prompt.image.upload.title,
-//     placeholder: locales.prompt.image.upload.placeholder,
-//     preview: () => "img"
-//   },
-//   alt: {
-//     type: "text",
-//     value: alt,
-//     title: locales.prompt.image.alt.title,
-//     placeholder: locales.prompt.image.alt.placeholder
-//   }
-//   // TODO: link params
-// });
 
 export const image: FieldFactory = ({ $element, preview, data }) => {
   if (!isValidFieldType<ImageFieldData>(data, "image")) {
@@ -55,20 +28,24 @@ export const image: FieldFactory = ({ $element, preview, data }) => {
   }
 
   const isImageElement = $element.tagName.toLowerCase() === "img";
+
   const updateImageElement = (data: ImageFieldData) => {
+    const src = getSrcOrFile(data);
+    const alt = data.alt || "";
+
     if (isImageElement) {
       const image = $element as HTMLImageElement;
-      image.src = data.src || "";
-      image.alt = data.alt || "";
+      image.src = src;
+      image.alt = alt;
     } else {
-      $element.style.backgroundImage = `url(${data.src})`;
+      $element.style.backgroundImage = `url(${src})`;
     }
 
-    $element.title = data.alt || "";
+    $element.title = alt;
   };
 
   // set initial image
-  if (data.src) {
+  if (data.src || data.file) {
     updateImageElement(data);
   }
 
@@ -83,72 +60,30 @@ export const image: FieldFactory = ({ $element, preview, data }) => {
     field.off = off;
 
     field.cleanup = () => {
-      const $copy = getFieldElement($element);
+      const $elementCopy = getFieldElement($element);
       const { link } = field.data;
 
-      if (link !== undefined && link.href.length) {
-        const $link = helpers.createElement(
-          `<a href='${link.href}' title='${link.title}' target='${link.target}'></a>`
-        );
-        $link.appendChild($copy);
+      if (link !== undefined && link.href !== undefined && link.href.length) {
+        const $link = helpers.el<HTMLLinkElement>({
+          tag: "a",
+          props: link
+        });
+        $link.appendChild($elementCopy);
+
         return $link;
       }
 
-      return $copy;
+      return $elementCopy;
     };
 
     $element.addEventListener("click", async () => {
       fireEvent("focus", { field });
 
       if (await propmtEditorAsync(field)) {
-        debugger;
-
         updateImageElement(field.data);
         updateFieldData(field, field.data, fireEvent);
         toggleFieldSelection(field, true);
-      } else {
-        debugger;
       }
-      // const params = getPromptParams(field.data);
-      // const promptResponse = await promptAsync<ImagePromptParams>(params);
-
-      // if (promptResponse === null) {
-      //   return;
-      // }
-
-      // // const { file, src, alt } = updated;
-      // let updatedData = {
-      //   ...field.data,
-      //   alt: promptResponse.alt
-      // };
-
-      // if (promptResponse.file !== undefined) {
-      //   // todo: add some common handler for image uploading?
-      //   // if (props.onUpload) {
-      //   //   props.onUpload(promptResponse.file, src => {
-      //   //     updatedData = {
-      //   //       ...updatedData,
-      //   //       src,
-      //   //       file: undefined
-      //   //     };
-      //   //   });
-      //   // } else {
-      //   const fileContent = await helpers.readFileAsync(promptResponse.file);
-      //   updatedData = {
-      //     ...updatedData,
-      //     src: fileContent,
-      //     file: undefined
-      //   };
-      //   //}
-      // } else if (promptResponse.src) {
-      //   updatedData = {
-      //     ...updatedData,
-      //     src: promptResponse.src,
-      //     file: undefined
-      //   };
-      // }
-
-      // field.data = updatedData;
     });
   }
 
@@ -157,13 +92,13 @@ export const image: FieldFactory = ({ $element, preview, data }) => {
 
 const propmtEditorAsync = (f: ImageField) =>
   new Promise<boolean>(resolve => {
-    const editor = imageEditor(f.data);
+    const imageEditor = editor(f.data);
 
     helpers.showModal({
-      content: [editor.$element],
+      content: [imageEditor.$element],
 
       onOk: () => {
-        f.data = editor.data;
+        f.data = imageEditor.data;
         resolve(true);
       },
 
@@ -171,8 +106,10 @@ const propmtEditorAsync = (f: ImageField) =>
     });
   });
 
-export const imageEditor = (data: Readonly<ImageFieldData>) => {
-  const d = { ...data };
+const editor = (initialData: Readonly<ImageFieldData>) => {
+  const data: ImageFieldData = {
+    ...initialData
+  };
 
   const $element = helpers.div<EditorsStyles>("bre-field-editor-root");
 
@@ -180,169 +117,67 @@ export const imageEditor = (data: Readonly<ImageFieldData>) => {
     tag: "img",
     className: "bre-field-editor-preview-img",
     props: {
-      src: d.src || ""
+      src: getSrcOrFile(data)
     }
   });
 
   const $preview = helpers.div<EditorsStyles>("bre-field-editor-preview");
   $preview.appendChild($previewImg);
 
-  const $src = inputTextLine({
-    label: locales.prompt.image.link.title,
-    placeholder: locales.prompt.image.link.placeholder,
-    value: d.src,
-    onUpdate: v => {
-      d.src = v as string;
-      $previewImg.src = v;
+  const $src = renderInput({
+    ...locales.prompt.image.link,
+    value: data.src,
+    type: "text",
+    onUpdate: src => {
+      $previewImg.src = src;
+      data.src = src;
+      data.file = undefined;
     }
   });
 
-  const $alt = inputTextLine({
-    label: locales.prompt.image.alt.title,
-    placeholder: locales.prompt.image.alt.placeholder,
-    value: d.alt,
-    onUpdate: v => {
-      d.alt = v as string;
-      $previewImg.alt = v;
+  const $file = renderInput({
+    ...locales.prompt.image.upload,
+    type: "file",
+    value: data.file ? data.file.fileContent : "",
+    onUpdate: async (f, fileContent) => {
+      $previewImg.src = fileContent;
+
+      const fileInfo = {
+        name: f.name,
+        size: f.size,
+        type: f.type,
+        lastModified: f.lastModified
+      };
+
+      // TODO: if we have upload link, than do upload it here
+      // if(uploadLink !== undefined) {
+      //  d.link =  link from upload request
+      // }
+      // otherwise store in content on field data
+      data.src = undefined;
+      data.file = {
+        fileContent,
+        fileInfo
+      };
     }
   });
 
-  $element.append($preview, $src, $alt);
+  const $alt = renderInput({
+    ...locales.prompt.image.alt,
+    value: data.alt,
+    type: "text",
+    onUpdate: v => (data.alt = $previewImg.alt = v)
+  });
+
+  const { $element: $linkEl, data: linkData } = linkEditor(initialData.link);
+  $element.append($preview, $src, $file, $alt, $linkEl);
+  data.link = linkData;
 
   return {
     $element,
-    data: d
+    data
   };
 };
 
-// export class ImageField extends BaseField<ImageFieldData> {
-//   private get isImg(): boolean {
-//     return (this._isImg =
-//       this._isImg || this.$field.tagName.toLowerCase() === "img");
-//   }
-
-//   public _isImg?: boolean;
-//   private $link?: HTMLLinkElement;
-
-//   public bind() {
-//     const field = this;
-
-//     // this.setSrc(this.data.src, false);
-
-//     this.$field.addEventListener("click", async () => {
-//       const params = getPromptParams(this.data);
-//       const updated = await promptAsync<ImagePromptParams>(params);
-
-//       if (updated !== null) {
-//         const { file, src, alt } = updated;
-
-//         if (file !== undefined) {
-//           // todo: add some common handler for image uploading?
-//           if (field.onUpload) {
-//             field.onUpload(file, url => {
-//               field.setSrc(url);
-//               field.setFile(null);
-//             });
-//           } else {
-//             field.setFile(file);
-//             field.setSrc(null);
-//           }
-//         } else if (src) {
-//           field.setSrc(src);
-//           field.setFile(null);
-//         }
-
-//         field.setAlt(alt);
-
-//         // const link = HtmlLinkParams.getLinkFromParams(fields);
-//         // this.setLink(link);
-//       }
-
-//       // const fields = await Editor.UI.modal.promptAsync(field.getPromptParams());
-//       // if (fields != null) {
-//       //   const file = fields.getValue("file");
-//       //   const src = fields.getValue("src");
-//       //   if (file) {
-//       //     if (field.onUpload) {
-//       //       field.onUpload(file, url => {
-//       //         field.setSrc(url);
-//       //         field.setFile(null);
-//       //       });
-//       //     } else {
-//       //       field.setFile(file);
-//       //       field.setSrc(null);
-//       //     }
-//       //   } else if (src) {
-//       //     field.setSrc(src);
-//       //     field.setFile(null);
-//       //   }
-//       //   const alt = fields.getValue("alt");
-//       //   field.setAlt(alt);
-//       //   const link = HtmlLinkParams.getLinkFromParams(fields);
-//       //   this.setLink(link);
-//       // }
-//       // field.select();
-//     });
-//   }
-
-//   // public setSrc(src: string | null, fireUpdate: boolean = true) {
-//   //   if (src) {
-//   //     if (this.isImg) {
-//   //       this.$field.setAttribute("src", src);
-//   //     } else {
-//   //       this.$field.style.backgroundImage = `url(${src}`;
-//   //     }
-//   //   }
-//   //   this.updateProperty("src", src, fireUpdate);
-//   // }
-
-//   // public setAlt(alt?: string) {
-//   //   this.$field.setAttribute(this.isImg ? "alt" : "title", alt || "");
-//   //   this.updateProperty("alt", alt);
-//   // }
-
-//   // public setFile(file: string | null) {
-//   //   if (file !== null) {
-//   //     if (this.isImg) {
-//   //       this.$field.setAttribute("src", file);
-//   //     } else {
-//   //       this.$field.style.backgroundImage = `url(${file})`;
-//   //     }
-//   //   }
-
-//   //   this.updateProperty("file", file);
-//   // }
-
-//   // public setLink(url: LinkPromptParams) {
-//   //   if (url && url.href) {
-//   //     if (!this.$link) {
-//   //       this.$link = helpers.createElement(
-//   //         `<a href='${url.href}' title='${url.title}' target='${url.target}'></a>`
-//   //       ) as HTMLLinkElement;
-//   //       this.$link.addEventListener("click", ev => {
-//   //         ev.stopPropagation();
-//   //         return false;
-//   //       });
-
-//   //       const { parentElement } = this.$field;
-//   //       if (parentElement !== null) {
-//   //         parentElement.insertBefore(this.$link, this.$field);
-//   //         this.$link.appendChild(this.$link);
-//   //       }
-//   //       // this.$field.wrap(this.$link);
-//   //     } else {
-//   //       this.$link.href = url.href.value;
-//   //     }
-//   //   } else if (this.$link) {
-//   //     $dom.unwrap(this.$field);
-//   //     this.$link = undefined;
-//   //     delete this.$link;
-//   //   }
-
-//   //   this.updateProperty("link", url);
-//   // }
-
-//   public getEl(): HTMLElement {
-
-//   }
-// }
+const getSrcOrFile = (data: ImageFieldPayload) =>
+  data.src || (data.file !== undefined ? data.file.fileContent : "");
