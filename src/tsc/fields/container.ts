@@ -13,8 +13,6 @@ import { bre } from "src/types/bre";
 import { Selectors } from "src/ui/Selectors";
 import { emmiter, FieldEventMap } from "src/emmiter";
 
-export type ContainerFieldData = bre.core.field.FieldData & {};
-
 type ContainerFieldType = "container";
 type ContainerFieldPayload = {
   html: string;
@@ -33,50 +31,57 @@ export const container: FieldFactory = ({ $element, preview, data }) => {
     return null;
   }
 
+  if (preview) {
+    return { $element };
+  }
+
   const container = createContainer($element, !preview);
 
+  const { fire: fireEvent, on, off } = emmiter<FieldEventMap>();
   const field: ContainerField = {
     $element,
     data,
+    on,
+    off,
+    html,
+    bind,
     container
   };
 
   $element.classList.add(Selectors.selectorFieldContainer);
 
-  if (!preview) {
-    const { fire: fireEvent, on, off } = emmiter<FieldEventMap>();
-    field.on = on;
-    field.off = off;
+  $element.addEventListener("click", ev => {
+    // TODO:
+    // field.select();
+    toggleFieldSelection(field, true, fireEvent);
+    ev.stopPropagation();
+    return false;
+  });
 
-    field.cleanup = () => {
-      const html = getContainerHtml(container);
-      return helpers.createElement(html);
+  const updateBlocks = () => {
+    const blocks = getContainerData(container, true);
+    const html = getContainerHtml(container);
+
+    const updatedData = {
+      ...field.data,
+      blocks,
+      html
     };
 
-    $element.addEventListener("click", ev => {
-      // TODO:
-      // field.select();
-      toggleFieldSelection(field, true, fireEvent);
-      ev.stopPropagation();
-      return false;
-    });
-
-    const updateBlocks = () => {
-      const blocks = getContainerData(container, true);
-      const html = getContainerHtml(container);
-
-      const updatedData = {
-        ...field.data,
-        blocks,
-        html
-      };
-
-      // TODO: call update callback
-    };
-  }
+    // TODO: call update callback
+  };
 
   return field;
 };
+
+const html = (field: bre.ui.Field<ContainerFieldData>) => {
+  const { container } = field as ContainerField;
+  const html = getContainerHtml(container);
+  // TODO: get blocks html via html method
+  return helpers.createElement(html);
+};
+
+const bind = () => {};
 
 // const container: BlocksContainer = new BlocksContainer(
 //   $element,

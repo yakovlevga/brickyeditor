@@ -54,16 +54,22 @@ declare namespace bre {
   namespace ui {
     type FieldBase = {
       $element: HTMLElement;
-      // clean up html element from editors data attributes, etc.
-      cleanup?: () => HTMLElement;
       selected?: boolean;
-
       on?: OnOffFunc<FieldEventMap>;
       off?: OnOffFunc<FieldEventMap>;
     };
 
     type Field<TFieldData extends core.field.FieldData> = FieldBase & {
       data: TFieldData;
+      bind: ($element: HTMLElement, data: TFieldData) => void;
+      // clean up html element from editors data attributes, etc.
+      html: (field: Field<TFieldData>) => HTMLElement;
+      editor?: (
+        initialData: Readonly<TFieldData>
+      ) => {
+        $element: HTMLElement;
+        data: TFieldData;
+      };
     };
 
     type Templates = {
@@ -207,29 +213,6 @@ declare namespace bre {
         type: TType;
         name: string;
       } & TData;
-
-      // type ContainerFieldData = FieldData<
-      //   "container",
-      //   { blocks: bre.core.block.BlockData[] }
-      // >;
-
-      // type EmbedFieldData = FieldData<
-      //   "embed",
-      //   {
-      //     url?: string;
-      //     embed?: NoembedResponse;
-      //   }
-      // >;
-
-      // type ImageFieldData = FieldData<
-      //   "image",
-      //   {
-      //     src?: string;
-      //     alt?: string;
-      //     file?: File;
-      //     link?: Pick<HTMLLinkElement, "href" | "title" | "target">;
-      //   }
-      // >;
     }
 
     // TODO: or Exclude 'slice'?

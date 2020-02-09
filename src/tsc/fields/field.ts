@@ -81,6 +81,7 @@ export const updateFieldData = <TData extends bre.core.field.FieldData>(
 ) => {
   const { data } = field;
 
+  // TODO: deep compare?
   const props = Object.keys(changes) as Array<keyof TData>;
   const hasChanges = props.some(p => data[p] !== changes[p]);
 
@@ -114,7 +115,7 @@ export const toggleFieldSelection = (
   }
 };
 
-export const getFieldElement = ($field: HTMLElement) => {
+export const getCleanFieldElement = ($field: HTMLElement) => {
   const $el = $field.cloneNode(true) as HTMLElement;
   $el.attributes.removeNamedItem(Selectors.attrField);
   return $el;

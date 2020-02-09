@@ -545,100 +545,6 @@ var BrickyEditor = (function (exports) {
     };
     //# sourceMappingURL=locales.js.map
 
-    var text = function (_a) {
-        var key = _a.key, p = _a.p, data = _a.data;
-        var html = "<input type='text' name='" + key + "' placeholder='" + p.placeholder + "' value='" + (p.value || "") + "' />";
-        var input = helpers.createElement(html);
-        input.onchange = function () {
-            data[key] = input.value;
-        };
-        return input;
-    };
-    //# sourceMappingURL=text.js.map
-
-    var file = function (_a) {
-        var key = _a.key, p = _a.p, data = _a.data;
-        var file = data[key];
-        var filePreview = helpers.createElement("<img src=\"" + p.value + "\"/>");
-        var fileInput = helpers.createElement("<input type=\"file\" id=\"bre-modal-modal-" + key + "\" class=\"bre-input\" placeholder=\"" + p.placeholder + "\">");
-        var fileName = helpers.createElement("<span class='bre-image-input-filename'></span>");
-        var updatePreview = function () { return __awaiter(void 0, void 0, void 0, function () {
-            var fileContent;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        if (!(file === undefined || file === null)) return [3, 1];
-                        fileName.innerText = "";
-                        filePreview.src = "//:0";
-                        return [3, 3];
-                    case 1:
-                        fileName.innerText = file.name;
-                        return [4, helpers.readFileAsync(file)];
-                    case 2:
-                        fileContent = _a.sent();
-                        filePreview.src = fileContent;
-                        _a.label = 3;
-                    case 3: return [2];
-                }
-            });
-        }); };
-        fileInput.onchange = function () {
-            file = fileInput.files && fileInput.files[0];
-            updatePreview();
-            data[key] = file;
-        };
-        updatePreview();
-        var editor = helpers.createElement("<div class='bre-image-input'>\n    <label for=\"bre-modal-modal-" + key + "\">\n      " + p.placeholder + "\n    </label>\n  </div>");
-        editor.append(filePreview, fileInput, fileName);
-        return editor;
-    };
-    //# sourceMappingURL=file.js.map
-
-    var select = function (_a) {
-        var key = _a.key, p = _a.p, data = _a.data;
-        if (p.options === undefined) {
-            throw new Error("Empty options");
-        }
-        var options = p.options
-            .map(function (o) {
-            return "<option value=\"" + o.title + "\" " + (o.value === p.value ? "selected" : "") + ">" + o.title + "</option>";
-        })
-            .join("\n");
-        var html = "<select name='" + key + "' placeholder='" + p.placeholder + "'>" + options + "</select>";
-        var select = helpers.createElement(html);
-        select.onchange = function () {
-            data[key] = select.value;
-        };
-        return select;
-    };
-    //# sourceMappingURL=select.js.map
-
-    var parameterEditors = {
-        text: text,
-        file: file,
-        select: select
-    };
-    var promptAsync = function (params) {
-        return new Promise(function (resolve) {
-            var result = {};
-            var editors = Object.keys(params).map(function (key) {
-                var p = params[key];
-                var editor = parameterEditors[p.type || "text"]({
-                    key: key,
-                    p: p,
-                    data: result
-                });
-                return editor;
-            });
-            helpers.showModal({
-                content: editors,
-                onOk: function () { return resolve(result); },
-                onCancel: function () { return resolve(null); }
-            });
-        });
-    };
-    //# sourceMappingURL=prompt.js.map
-
     var Selectors = (function () {
         function Selectors() {
         }
@@ -724,52 +630,61 @@ var BrickyEditor = (function (exports) {
         if (!isValidFieldType(data, "html")) {
             return null;
         }
+        bind($element, data);
+        if (!preview) {
+            return {
+                $element: $element
+            };
+        }
+        var _b = emmiter(), fireEvent = _b.fire, on = _b.on, off = _b.off;
         var field = {
             $element: $element,
-            data: data
+            data: data,
+            on: on,
+            off: off,
+            bind: bind,
+            html: getHtml
         };
-        if (data.html) {
-            $element.innerHTML = data.html;
-        }
-        if (!preview) {
-            var _b = emmiter(), fireEvent_1 = _b.fire, on = _b.on, off = _b.off;
-            field.on = on;
-            field.off = off;
-            field.cleanup = function () {
-                var $copy = getFieldElement($element);
-                $copy.removeAttribute(Selectors.attrContentEditable);
-                return $copy;
-            };
-            var updateHtmlProp = function () {
-                var html = $element.innerHTML.trim();
-                if ($element.innerHTML !== html) {
-                    var updatedData = {
-                        html: html
-                    };
-                    updateFieldData(field, updatedData, fireEvent_1);
-                }
-            };
-            $element.setAttribute(Selectors.attrContentEditable, "true");
-            SelectionUtils.bindTextSelection($element, function (rect) {
-                toggleHtmlTools(rect);
-            });
-            $element.addEventListener("blur", updateHtmlProp);
-            $element.addEventListener("keyup", updateHtmlProp);
-            $element.addEventListener("paste", updateHtmlProp);
-            $element.addEventListener("input", updateHtmlProp);
-            $element.addEventListener("paste", function (ev) {
-                ev.preventDefault();
-                if (ev.clipboardData) {
-                    var text = ev.clipboardData.getData("text/plain");
-                    document.execCommand("insertHTML", false, text);
-                }
-            });
-            $element.addEventListener("click", function () {
-                toggleFieldSelection(field, true, fireEvent_1);
-                return false;
-            });
-        }
+        var updateHtmlProp = function () {
+            var html = $element.innerHTML.trim();
+            if ($element.innerHTML !== html) {
+                var updatedData = {
+                    html: html
+                };
+                updateFieldData(field, updatedData, fireEvent);
+            }
+        };
+        $element.setAttribute(Selectors.attrContentEditable, "true");
+        SelectionUtils.bindTextSelection($element, function (rect) {
+            toggleHtmlTools(rect);
+        });
+        $element.addEventListener("blur", updateHtmlProp);
+        $element.addEventListener("keyup", updateHtmlProp);
+        $element.addEventListener("paste", updateHtmlProp);
+        $element.addEventListener("input", updateHtmlProp);
+        $element.addEventListener("paste", function (ev) {
+            ev.preventDefault();
+            if (ev.clipboardData) {
+                var text = ev.clipboardData.getData("text/plain");
+                document.execCommand("insertHTML", false, text);
+            }
+        });
+        $element.addEventListener("click", function () {
+            toggleFieldSelection(field, true, fireEvent);
+            return false;
+        });
         return field;
+    };
+    var bind = function ($element, _a) {
+        var html = _a.html;
+        if (html !== undefined) {
+            $element.innerHTML = html;
+        }
+    };
+    var getHtml = function (field) {
+        var $copy = getCleanFieldElement(field.$element);
+        $copy.removeAttribute(Selectors.attrContentEditable);
+        return $copy;
     };
     //# sourceMappingURL=html.js.map
 
@@ -891,131 +806,26 @@ var BrickyEditor = (function (exports) {
     };
     //# sourceMappingURL=embed.js.map
 
-    var providerScriptsLoaded = {};
-    var getPromptParams = function (_a) {
-        var url = _a.url;
-        return ({
-            url: {
-                value: url || "http://instagr.am/p/BO9VX2Vj4fF/",
-                title: locales.prompt.embed.url.title,
-                placeholder: locales.prompt.embed.url.placeholder
+    var propmtFieldEditorAsync = function (_a) {
+        var editor = _a.editor, data = _a.data;
+        return new Promise(function (resolve) {
+            if (editor === undefined) {
+                resolve(null);
+                return;
             }
+            var _a = editor(data), $editor = _a.$element, updatedData = _a.data;
+            helpers.showModal({
+                content: [$editor],
+                onOk: function () {
+                    resolve(updatedData);
+                },
+                onCancel: function () {
+                    resolve(null);
+                }
+            });
         });
     };
-    var embed = function (_a) {
-        var $element = _a.$element, preview = _a.preview, data = _a.data;
-        if (!isValidFieldType(data, "embed")) {
-            return null;
-        }
-        var field = {
-            $element: $element,
-            data: data
-        };
-        var updateEmbedMedia = function (url, fireUpdate) { return __awaiter(void 0, void 0, void 0, function () {
-            var embed, $embed, $script;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        if (url === undefined) {
-                            return [2];
-                        }
-                        return [4, getEmbedAsync(preProcessEmbedUrl(url))];
-                    case 1:
-                        embed = _a.sent();
-                        field.data = __assign(__assign({}, field.data), { url: url,
-                            embed: embed });
-                        $embed = helpers.createElement("<div>" + embed.html + "</div>");
-                        $script = $embed.querySelector("script");
-                        if ($script !== null) {
-                            $script.remove();
-                        }
-                        $element.innerHTML = "";
-                        $element.removeAttribute("class");
-                        $element.removeAttribute("style");
-                        $element.appendChild($embed);
-                        if (!($script !== null)) return [3, 4];
-                        if (!(providerScriptsLoaded[$script.src] === undefined)) return [3, 3];
-                        return [4, loadScriptAsync($script.src)];
-                    case 2:
-                        _a.sent();
-                        providerScriptsLoaded[embed.provider_name] = true;
-                        _a.label = 3;
-                    case 3:
-                        setTimeout(function () { return postProcessEmbed(embed.provider_name); }, 100);
-                        _a.label = 4;
-                    case 4:
-                        return [2];
-                }
-            });
-        }); };
-        updateEmbedMedia(data.url);
-        var promptEmbedMediaUrl = function () { return __awaiter(void 0, void 0, void 0, function () {
-            var params, updated, url;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        params = getPromptParams(field.data);
-                        return [4, promptAsync(params)];
-                    case 1:
-                        updated = _a.sent();
-                        if (updated !== null) {
-                            url = updated.url;
-                            if (url !== undefined) {
-                                updateEmbedMedia(url);
-                            }
-                        }
-                        return [2];
-                }
-            });
-        }); };
-        if (!preview) {
-            var _b = emmiter(), fireEvent = _b.fire, on = _b.on, off = _b.off;
-            field.on = on;
-            field.off = off;
-            field.cleanup = function () {
-                var $copy = getFieldElement($element);
-                return $copy;
-            };
-            $element.addEventListener("click", function () { return __awaiter(void 0, void 0, void 0, function () {
-                return __generator(this, function (_a) {
-                    promptEmbedMediaUrl();
-                    return [2];
-                });
-            }); });
-        }
-        return field;
-    };
-    //# sourceMappingURL=embed.js.map
-
-    var container = function (_a) {
-        var $element = _a.$element, preview = _a.preview, data = _a.data;
-        if (!isValidFieldType(data, "container")) {
-            return null;
-        }
-        var container = createContainer($element, !preview);
-        var field = {
-            $element: $element,
-            data: data,
-            container: container
-        };
-        $element.classList.add(Selectors.selectorFieldContainer);
-        if (!preview) {
-            var _b = emmiter(), fireEvent_1 = _b.fire, on = _b.on, off = _b.off;
-            field.on = on;
-            field.off = off;
-            field.cleanup = function () {
-                var html = getContainerHtml(container);
-                return helpers.createElement(html);
-            };
-            $element.addEventListener("click", function (ev) {
-                toggleFieldSelection(field, true, fireEvent_1);
-                ev.stopPropagation();
-                return false;
-            });
-        }
-        return field;
-    };
-    //# sourceMappingURL=container.js.map
+    //# sourceMappingURL=editors.js.map
 
     var renderLabel = function ($root, $input, _a) {
         var title = _a.title;
@@ -1096,6 +906,134 @@ var BrickyEditor = (function (exports) {
     };
     //# sourceMappingURL=inputs.js.map
 
+    var providerScriptsLoaded = {};
+    var embed = function (_a) {
+        var $element = _a.$element, preview = _a.preview, data = _a.data;
+        if (!isValidFieldType(data, "embed")) {
+            return null;
+        }
+        if (preview) {
+            return { $element: $element };
+        }
+        bind$1($element, data);
+        var _b = emmiter(), fire = _b.fire, on = _b.on, off = _b.off;
+        var field = {
+            $element: $element,
+            data: data,
+            on: on,
+            off: off,
+            bind: bind$1,
+            html: html$1,
+            editor: editor
+        };
+        $element.addEventListener("click", function () { return __awaiter(void 0, void 0, void 0, function () {
+            var updatedData;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        toggleFieldSelection(field, true);
+                        return [4, propmtFieldEditorAsync(field)];
+                    case 1:
+                        updatedData = _a.sent();
+                        if (updatedData !== null) {
+                            bind$1(field.$element, updatedData);
+                            updateFieldData(field, updatedData, fire);
+                        }
+                        return [2];
+                }
+            });
+        }); });
+        return field;
+    };
+    var html$1 = function (field) { return getCleanFieldElement(field.$element); };
+    var editor = function (initialData) {
+        var data = __assign({}, initialData);
+        var $element = helpers.div("bre-field-editor-root");
+        var $preview = helpers.div("bre-field-editor-preview");
+        bind$1($preview, data);
+        var $url = renderInput(__assign(__assign({}, locales.prompt.embed.url), { value: data.url || "", type: "text", onUpdate: function (v) {
+                if (data.url != v) {
+                    data.url = v;
+                    bind$1($preview, data);
+                }
+            } }));
+        $element.append($preview, $url);
+        return {
+            $element: $element,
+            data: data
+        };
+    };
+    var bind$1 = function ($element, _a) {
+        var url = _a.url;
+        return __awaiter(void 0, void 0, void 0, function () {
+            var embed, $embed, $script;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0:
+                        if (url === undefined) {
+                            return [2];
+                        }
+                        return [4, getEmbedAsync(preProcessEmbedUrl(url))];
+                    case 1:
+                        embed = _b.sent();
+                        $embed = helpers.createElement(embed.html);
+                        $script = $embed.querySelector("script");
+                        if ($script !== null) {
+                            $script.remove();
+                        }
+                        $element.innerHTML = "";
+                        $element.appendChild($embed);
+                        if (!($script !== null)) return [3, 4];
+                        if (!(providerScriptsLoaded[$script.src] === undefined)) return [3, 3];
+                        return [4, loadScriptAsync($script.src)];
+                    case 2:
+                        _b.sent();
+                        providerScriptsLoaded[embed.provider_name] = true;
+                        _b.label = 3;
+                    case 3:
+                        setTimeout(function () { return postProcessEmbed(embed.provider_name); }, 100);
+                        _b.label = 4;
+                    case 4: return [2];
+                }
+            });
+        });
+    };
+    //# sourceMappingURL=embed.js.map
+
+    var container = function (_a) {
+        var $element = _a.$element, preview = _a.preview, data = _a.data;
+        if (!isValidFieldType(data, "container")) {
+            return null;
+        }
+        if (preview) {
+            return { $element: $element };
+        }
+        var container = createContainer($element, !preview);
+        var _b = emmiter(), fireEvent = _b.fire, on = _b.on, off = _b.off;
+        var field = {
+            $element: $element,
+            data: data,
+            on: on,
+            off: off,
+            html: html$2,
+            bind: bind$2,
+            container: container
+        };
+        $element.classList.add(Selectors.selectorFieldContainer);
+        $element.addEventListener("click", function (ev) {
+            toggleFieldSelection(field, true, fireEvent);
+            ev.stopPropagation();
+            return false;
+        });
+        return field;
+    };
+    var html$2 = function (field) {
+        var container = field.container;
+        var html = getContainerHtml(container);
+        return helpers.createElement(html);
+    };
+    var bind$2 = function () { };
+
     var linkEditor = function (initialData) {
         var data = initialData ? __assign({}, initialData) : {};
         var $element = helpers.div("bre-field-editor-root");
@@ -1121,77 +1059,56 @@ var BrickyEditor = (function (exports) {
         if (!isValidFieldType(data, "image")) {
             return null;
         }
-        var isImageElement = $element.tagName.toLowerCase() === "img";
-        var updateImageElement = function (data) {
-            var src = getSrcOrFile(data);
-            var alt = data.alt || "";
-            if (isImageElement) {
-                var image_1 = $element;
-                image_1.src = src;
-                image_1.alt = alt;
-            }
-            else {
-                $element.style.backgroundImage = "url(" + src + ")";
-            }
-            $element.title = alt;
-        };
-        if (data.src || data.file) {
-            updateImageElement(data);
+        bind$3($element, data);
+        if (preview) {
+            return {
+                $element: $element
+            };
         }
+        var _b = emmiter(), fireEvent = _b.fire, on = _b.on, off = _b.off;
         var field = {
             $element: $element,
-            data: data
+            data: data,
+            on: on,
+            off: off,
+            bind: bind$3,
+            html: html$3,
+            editor: editor$1
         };
-        if (!preview) {
-            var _b = emmiter(), fireEvent_1 = _b.fire, on = _b.on, off = _b.off;
-            field.on = on;
-            field.off = off;
-            field.cleanup = function () {
-                var $elementCopy = getFieldElement($element);
-                var link = field.data.link;
-                if (link !== undefined && link.href !== undefined && link.href.length) {
-                    var $link = helpers.el({
-                        tag: "a",
-                        props: link
-                    });
-                    $link.appendChild($elementCopy);
-                    return $link;
+        $element.addEventListener("click", function () { return __awaiter(void 0, void 0, void 0, function () {
+            var updatedData;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        toggleFieldSelection(field, true);
+                        return [4, propmtFieldEditorAsync(field)];
+                    case 1:
+                        updatedData = _a.sent();
+                        if (updatedData !== null) {
+                            bind$3(field.$element, updatedData);
+                            updateFieldData(field, updatedData, fireEvent);
+                        }
+                        return [2];
                 }
-                return $elementCopy;
-            };
-            $element.addEventListener("click", function () { return __awaiter(void 0, void 0, void 0, function () {
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0:
-                            fireEvent_1("focus", { field: field });
-                            return [4, propmtEditorAsync(field)];
-                        case 1:
-                            if (_a.sent()) {
-                                updateImageElement(field.data);
-                                updateFieldData(field, field.data, fireEvent_1);
-                                toggleFieldSelection(field, true);
-                            }
-                            return [2];
-                    }
-                });
-            }); });
-        }
+            });
+        }); });
         return field;
     };
-    var propmtEditorAsync = function (f) {
-        return new Promise(function (resolve) {
-            var imageEditor = editor(f.data);
-            helpers.showModal({
-                content: [imageEditor.$element],
-                onOk: function () {
-                    f.data = imageEditor.data;
-                    resolve(true);
-                },
-                onCancel: resolve
-            });
-        });
+    var bind$3 = function ($element, data) {
+        var src = getSrcOrFile(data);
+        var alt = data.alt || "";
+        var isImageElement = $element.tagName.toLowerCase() === "img";
+        if (isImageElement) {
+            var image_1 = $element;
+            image_1.src = src;
+            image_1.alt = alt;
+        }
+        else {
+            $element.style.backgroundImage = "url(" + src + ")";
+        }
+        $element.title = alt;
     };
-    var editor = function (initialData) {
+    var editor$1 = function (initialData) {
         var data = __assign({}, initialData);
         var $element = helpers.div("bre-field-editor-root");
         var $previewImg = helpers.el({
@@ -1227,17 +1144,32 @@ var BrickyEditor = (function (exports) {
                 });
             }); } }));
         var $alt = renderInput(__assign(__assign({}, locales.prompt.image.alt), { value: data.alt, type: "text", onUpdate: function (v) { return (data.alt = $previewImg.alt = v); } }));
-        var _a = linkEditor(initialData.link), $linkEl = _a.$element, linkData = _a.data;
-        $element.append($preview, $src, $file, $alt, $linkEl);
+        var _a = linkEditor(initialData.link), $link = _a.$element, linkData = _a.data;
         data.link = linkData;
+        $element.append($preview, $src, $file, $alt, $link);
         return {
             $element: $element,
             data: data
         };
     };
+    var html$3 = function (field) {
+        var $element = field.$element, data = field.data;
+        var link = data.link;
+        var $result = getCleanFieldElement($element);
+        if (link !== undefined && link.href !== undefined && link.href.length) {
+            var $link = helpers.el({
+                tag: "a",
+                props: link
+            });
+            $link.appendChild($result);
+            return $link;
+        }
+        return $result;
+    };
     var getSrcOrFile = function (data) {
         return data.src || (data.file !== undefined ? data.file.fileContent : "");
     };
+    //# sourceMappingURL=image.js.map
 
     var Fields = {
         html: html,
@@ -1290,7 +1222,7 @@ var BrickyEditor = (function (exports) {
             fireEvent(selected ? "focus" : "blur", { field: field });
         }
     };
-    var getFieldElement = function ($field) {
+    var getCleanFieldElement = function ($field) {
         var $el = $field.cloneNode(true);
         $el.attributes.removeNamedItem(Selectors.attrField);
         return $el;

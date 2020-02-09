@@ -1,6 +1,6 @@
 import {
   FieldFactory,
-  getFieldElement,
+  getCleanFieldElement,
   isValidFieldType,
   updateFieldData,
   toggleFieldSelection
@@ -12,6 +12,7 @@ import { renderInput } from "src/fields/inputs";
 import { locales } from "src/locales";
 import { EditorsStyles } from "src/fields/editors.scss";
 import { linkEditor } from "src/fields/linkEditor";
+import { propmtFieldEditorAsync } from "src/fields/editors";
 
 type ImageFieldPayload = {
   src?: string;
@@ -27,84 +28,54 @@ export const image: FieldFactory = ({ $element, preview, data }) => {
     return null;
   }
 
-  const isImageElement = $element.tagName.toLowerCase() === "img";
+  bind($element, data);
 
-  const updateImageElement = (data: ImageFieldData) => {
-    const src = getSrcOrFile(data);
-    const alt = data.alt || "";
-
-    if (isImageElement) {
-      const image = $element as HTMLImageElement;
-      image.src = src;
-      image.alt = alt;
-    } else {
-      $element.style.backgroundImage = `url(${src})`;
-    }
-
-    $element.title = alt;
-  };
-
-  // set initial image
-  if (data.src || data.file) {
-    updateImageElement(data);
+  if (preview) {
+    return {
+      $element
+    };
   }
+
+  const { fire: fireEvent, on, off } = emmiter<FieldEventMap>();
 
   let field: ImageField = {
     $element,
-    data
+    data,
+    on,
+    off,
+    bind,
+    html,
+    editor
   };
 
-  if (!preview) {
-    const { fire: fireEvent, on, off } = emmiter<FieldEventMap>();
-    field.on = on;
-    field.off = off;
+  $element.addEventListener("click", async () => {
+    toggleFieldSelection(field, true);
 
-    field.cleanup = () => {
-      const $elementCopy = getFieldElement($element);
-      const { link } = field.data;
-
-      if (link !== undefined && link.href !== undefined && link.href.length) {
-        const $link = helpers.el<HTMLLinkElement>({
-          tag: "a",
-          props: link
-        });
-        $link.appendChild($elementCopy);
-
-        return $link;
-      }
-
-      return $elementCopy;
-    };
-
-    $element.addEventListener("click", async () => {
-      fireEvent("focus", { field });
-
-      if (await propmtEditorAsync(field)) {
-        updateImageElement(field.data);
-        updateFieldData(field, field.data, fireEvent);
-        toggleFieldSelection(field, true);
-      }
-    });
-  }
+    const updatedData = await propmtFieldEditorAsync(field);
+    if (updatedData !== null) {
+      bind(field.$element, updatedData);
+      updateFieldData(field, updatedData, fireEvent);
+    }
+  });
 
   return field;
 };
 
-const propmtEditorAsync = (f: ImageField) =>
-  new Promise<boolean>(resolve => {
-    const imageEditor = editor(f.data);
+const bind = ($element: HTMLElement, data: ImageFieldData) => {
+  const src = getSrcOrFile(data);
+  const alt = data.alt || "";
 
-    helpers.showModal({
-      content: [imageEditor.$element],
+  const isImageElement = $element.tagName.toLowerCase() === "img";
+  if (isImageElement) {
+    const image = $element as HTMLImageElement;
+    image.src = src;
+    image.alt = alt;
+  } else {
+    $element.style.backgroundImage = `url(${src})`;
+  }
 
-      onOk: () => {
-        f.data = imageEditor.data;
-        resolve(true);
-      },
-
-      onCancel: resolve
-    });
-  });
+  $element.title = alt;
+};
 
 const editor = (initialData: Readonly<ImageFieldData>) => {
   const data: ImageFieldData = {
@@ -169,14 +140,34 @@ const editor = (initialData: Readonly<ImageFieldData>) => {
     onUpdate: v => (data.alt = $previewImg.alt = v)
   });
 
-  const { $element: $linkEl, data: linkData } = linkEditor(initialData.link);
-  $element.append($preview, $src, $file, $alt, $linkEl);
+  const { $element: $link, data: linkData } = linkEditor(initialData.link);
   data.link = linkData;
+
+  $element.append($preview, $src, $file, $alt, $link);
 
   return {
     $element,
     data
   };
+};
+
+const html = (field: ImageField) => {
+  const { $element, data } = field;
+  const { link } = data;
+
+  const $result = getCleanFieldElement($element);
+
+  if (link !== undefined && link.href !== undefined && link.href.length) {
+    const $link = helpers.el<HTMLLinkElement>({
+      tag: "a",
+      props: link
+    });
+    $link.appendChild($result);
+
+    return $link;
+  }
+
+  return $result;
 };
 
 const getSrcOrFile = (data: ImageFieldPayload) =>
