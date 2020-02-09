@@ -1,26 +1,26 @@
 import { str } from "src/common/Common";
 import { helpers } from "src/helpers";
-import { promptAsync } from "src/prompt/prompt";
-import { getLinkPromptParams } from "src/prompt/link";
 
 import { bre } from "src/types/bre";
 import { Selectors } from "src/ui/Selectors";
+import { linkEditor } from "src/fields/linkEditor";
 
-const promptLinkParamsAsync = async (selection: Selection) => {
-  //  let link: HtmlLinkParams;
+const promptLinkParamsAsync = (
+  initialData: Readonly<bre.core.field.LinkData>
+) =>
+  new Promise<bre.core.field.LinkData | null>(resolve => {
+    const { $element: $editor, data: updatedData } = linkEditor(initialData);
 
-  let currentLink;
-  if (
-    selection.anchorNode !== null &&
-    selection.anchorNode.parentNode !== null &&
-    str.equalsInvariant(selection.anchorNode.parentNode.nodeName, "a")
-  ) {
-    currentLink = selection.anchorNode.parentNode as HTMLLinkElement;
-  }
-  const promptParams = getLinkPromptParams(currentLink);
-
-  return await promptAsync(promptParams);
-};
+    helpers.showModal({
+      content: [$editor],
+      onOk: () => {
+        resolve(updatedData);
+      },
+      onCancel: () => {
+        resolve(null);
+      }
+    });
+  });
 
 const renderButtonElement = ({
   icon,
@@ -46,30 +46,36 @@ const renderButtonElement = ({
     }
 
     if (command === "CreateLink") {
-      const link = await promptLinkParamsAsync(selection);
+      const selectedLink = getSeletedLink(selection);
+      const currentLink =
+        selectedLink !== null
+          ? {
+              href: selectedLink.href,
+              title: selectedLink.title,
+              target: selectedLink.target
+            }
+          : {};
 
-      if (link === null) {
-        return;
-      }
+      const updatedLink = await promptLinkParamsAsync(currentLink);
 
-      if (link.href) {
-        document.execCommand(command, false, link.href);
+      if (updatedLink !== null && updatedLink.href) {
+        document.execCommand(command, false, updatedLink.href);
 
         if (
           selection.anchorNode !== null &&
           selection.anchorNode.parentElement !== null
         ) {
-          if (link.target) {
+          if (updatedLink.target) {
             selection.anchorNode.parentElement.setAttribute(
               "target",
-              link.target
+              updatedLink.target
             );
           }
 
-          if (link.title) {
+          if (updatedLink.title) {
             selection.anchorNode.parentElement.setAttribute(
               "title",
-              link.title
+              updatedLink.title
             );
           }
         }
@@ -95,6 +101,18 @@ const renderButtonElement = ({
   };
 
   return $btn;
+};
+
+const getSeletedLink = (selection: Selection) => {
+  if (
+    selection.anchorNode !== null &&
+    selection.anchorNode.parentNode !== null &&
+    str.equalsInvariant(selection.anchorNode.parentNode.nodeName, "a")
+  ) {
+    return selection.anchorNode.parentNode as HTMLLinkElement;
+  }
+
+  return null;
 };
 
 const renderControl = (buttons: bre.core.IHtmlToolsButton[]) => {

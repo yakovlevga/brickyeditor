@@ -8,14 +8,13 @@ import { Common, str } from "src/common/Common";
 import { $dom } from "src/common/DOMHelpers";
 import { defaultOptions } from "src/defaults";
 import { EditorStrings } from "src/EditorStrings";
-import { helpers } from "src/helpers";
 import { getRequest } from "src/httpTransport";
-import { setUI } from "src/shared";
 import { loadTemplatesAsync } from "src/template";
 import { bre } from "src/types/bre";
 import { Selectors } from "src/ui/Selectors";
 import { UI } from "src/ui/UI";
 import { getTemplateSelector } from "src/ui/templateSelector";
+import { initHtmlTools } from "src/ui/htmlTools";
 
 export class Editor implements bre.core.Editor {
   public static UI: UI;
@@ -41,6 +40,7 @@ export class Editor implements bre.core.Editor {
     this.container = createContainer($editor, false);
     this.selectedContainer = this.container;
 
+    initHtmlTools(this.options);
     // Editor.UI = new UI(this);
     // setUI(Editor.UI);
 
