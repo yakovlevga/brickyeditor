@@ -23,7 +23,7 @@ const getTemplateGroupUI = (
   const $group = helpers.div<TemplateSelectorStyles>("bre-templates-group");
   const $name = helpers.div<TemplateSelectorStyles>(
     "bre-templates-group-name",
-    group.name
+    group.name || ""
   );
 
   $name.onclick = () => {
@@ -38,7 +38,7 @@ const getTemplateGroupUI = (
     $group.append($template);
 
     $template.onclick = () => {
-      fireFunc("templateClick", {
+      fireFunc("select", {
         template
       });
     };

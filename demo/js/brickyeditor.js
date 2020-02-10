@@ -84,19 +84,6 @@ var BrickyEditor = (function (exports) {
         },
         startsWith: function (s1, s2) { return s1.indexOf(s2) === 0; }
     };
-    var Common = (function () {
-        function Common() {
-        }
-        Common.propsEach = function (obj, func) {
-            for (var key in obj) {
-                if (obj.hasOwnProperty(key)) {
-                    var value = obj[key];
-                    func(key, value);
-                }
-            }
-        };
-        return Common;
-    }());
     //# sourceMappingURL=Common.js.map
 
     var $dom = (function () {
@@ -901,6 +888,7 @@ var BrickyEditor = (function (exports) {
         $copy.removeAttribute(Selectors.attrContentEditable);
         return $copy;
     };
+    //# sourceMappingURL=html.js.map
 
     var getRequest = function (url) {
         return new Promise(function (resolve, reject) {
@@ -1448,7 +1436,7 @@ var BrickyEditor = (function (exports) {
         }
         return template;
     };
-    var loadTemplatesAsync = function (url, $editor, onError) { return __awaiter(void 0, void 0, void 0, function () {
+    var loadTemplatesAsync = function (url, $editor) { return __awaiter(void 0, void 0, void 0, function () {
         var grouppedTemplates, data, $data, $style, $groups, ungrouppedTemplates, ungrouppedTemplatesGroupName, err_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
@@ -1485,8 +1473,7 @@ var BrickyEditor = (function (exports) {
                     return [2, grouppedTemplates];
                 case 3:
                     err_1 = _a.sent();
-                    onError(EditorStrings.errorTemplatesFileNotFound(url));
-                    throw err_1;
+                    return [3, 4];
                 case 4: return [2];
             }
         });
@@ -1564,10 +1551,6 @@ var BrickyEditor = (function (exports) {
         if (control$1 === undefined) {
             control$1 = createEditor();
         }
-        console.log({
-            top: control$1.$element.style.top,
-            left: control$1.$element.style.left
-        });
         control$1.btns.forEach(function (_a) {
             var $btn = _a.$btn, action = _a.action;
             $btn.onclick = function () { return action(block.fire); };
@@ -1627,7 +1610,6 @@ var BrickyEditor = (function (exports) {
         });
         return block;
     };
-    //# sourceMappingURL=Block.js.map
 
     var getContainerData = function (container, ignoreHtml) { return container.blocks.map(function (block) { return block.getData(ignoreHtml); }); };
     var getContainerHtml = function (container) {
@@ -1764,9 +1746,6 @@ var BrickyEditor = (function (exports) {
         compactTools: false,
         compactToolsWidth: 768,
         ignoreHtml: true,
-        onError: function (data) {
-            console.log(data.message);
-        },
         htmlToolsButtons: defaultButtons$1
     };
     //# sourceMappingURL=defaults.js.map
@@ -1780,7 +1759,7 @@ var BrickyEditor = (function (exports) {
     };
     var getTemplateGroupUI = function (group, fireFunc) {
         var $group = helpers.div("bre-templates-group");
-        var $name = helpers.div("bre-templates-group-name", group.name);
+        var $name = helpers.div("bre-templates-group-name", group.name || "");
         $name.onclick = function () {
             for (var i = 1; i < $group.children.length; i++) {
                 helpers.toggleVisibility($group.children[i]);
@@ -1791,7 +1770,7 @@ var BrickyEditor = (function (exports) {
             var $template = getTemplateUI(template);
             $group.append($template);
             $template.onclick = function () {
-                fireFunc("templateClick", {
+                fireFunc("select", {
                     template: template
                 });
             };
@@ -1825,142 +1804,117 @@ var BrickyEditor = (function (exports) {
 
     var Editor = (function () {
         function Editor($editor, options) {
-            var _this = this;
-            this.isLoaded = false;
-            this.getData = function () {
-                return getContainerData(_this.container, _this.options.ignoreHtml);
-            };
-            this.getHtml = function () { return getContainerHtml(_this.container); };
-            this.onError = function (message, code) {
-                if (code === void 0) { code = 0; }
-                return _this.options.onError({ message: message, code: code });
-            };
-            this.$element = $editor;
-            this.$element.classList.add(Selectors.classEditor);
-            this.options = __assign(__assign({}, defaultOptions), options);
-            this.container = createContainer($editor, false);
-            this.selectedContainer = this.container;
-            initHtmlTools(this.options);
-            this.tryBindFormSubmit();
+            editor$2($editor, options);
         }
-        Editor.prototype.initAsync = function () {
-            return __awaiter(this, void 0, void 0, function () {
-                var editor, templates, templatesUI, blocks;
-                var _this = this;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0:
-                            editor = this;
-                            return [4, loadTemplatesAsync(editor.options.templatesUrl, editor.$element, editor.onError)];
-                        case 1:
-                            templates = _a.sent();
-                            templatesUI = getTemplateSelector();
-                            templatesUI.setTemplates(templates);
-                            templatesUI.on("templateClick", function (_a) {
-                                var template = _a.template;
-                                addBlockToContainer(_this.getCurrentContainer(), {
-                                    blockTemplate: template
-                                });
-                            });
-                            this.$element.append(templatesUI.$element);
-                            return [4, this.tryLoadInitialBlocksAsync()];
-                        case 2:
-                            blocks = _a.sent();
-                            if (blocks !== null) {
-                                this.loadBlocks(blocks);
-                            }
-                            this.isLoaded = true;
-                            this.trigger("onLoad", this);
-                            return [2];
-                    }
-                });
-            });
-        };
-        Editor.prototype.tryBindFormSubmit = function () {
-            var editor = this;
-            var $form = this.options.formSelector
-                ? $dom.find(this.options.formSelector)
-                : null;
-            var $input = this.options.inputSelector
-                ? $dom.find(this.options.inputSelector)
-                : null;
-            if (!$form || !$input || !($input instanceof HTMLInputElement)) {
-                return;
-            }
-            $form.addEventListener("submit", function () {
-                $input.value = JSON.stringify(editor.getData());
-                return true;
-            });
-        };
-        Editor.prototype.loadBlocks = function (blocksData) {
-            var _this = this;
-            if (blocksData) {
-                blocksData.map(function (blockData) {
-                    return addBlockToContainer(_this.getCurrentContainer(), {
-                        blockData: blockData
-                    });
-                });
-            }
-        };
-        Editor.prototype.getCurrentContainer = function () {
-            return this.container;
-        };
-        Editor.prototype.tryLoadInitialBlocksAsync = function () {
-            return __awaiter(this, void 0, Promise, function () {
-                var url, editor;
-                var _this = this;
-                return __generator(this, function (_a) {
-                    url = this.options.blocksUrl;
-                    editor = this;
-                    return [2, new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
-                            var blocks, error_1;
-                            return __generator(this, function (_a) {
-                                switch (_a.label) {
-                                    case 0:
-                                        if (!(url !== undefined)) return [3, 5];
-                                        _a.label = 1;
-                                    case 1:
-                                        _a.trys.push([1, 3, , 4]);
-                                        return [4, getRequest(url)];
-                                    case 2:
-                                        blocks = _a.sent();
-                                        resolve(blocks);
-                                        return [3, 4];
-                                    case 3:
-                                        error_1 = _a.sent();
-                                        editor.onError(EditorStrings.errorBlocksFileNotFound(url));
-                                        reject(error_1);
-                                        return [3, 4];
-                                    case 4: return [3, 6];
-                                    case 5:
-                                        if (this.options.blocks !== undefined) {
-                                            resolve(this.options.blocks);
-                                        }
-                                        else {
-                                            resolve(null);
-                                        }
-                                        _a.label = 6;
-                                    case 6: return [2];
-                                }
-                            });
-                        }); })];
-                });
-            });
-        };
-        Editor.prototype.trigger = function (event, data) {
-            var editor = this;
-            $dom.trigger(this.$element, "bre." + event, data);
-            Common.propsEach(editor.options, function (key, value) {
-                if (str.equalsInvariant(key, event) && value) {
-                    value(data);
-                }
-            });
-        };
         return Editor;
     }());
+    var editor$2 = function ($element, options) {
+        if (options === void 0) { options = defaultOptions; }
+        return new Promise(function (resolve) { return __awaiter(void 0, void 0, void 0, function () {
+            var optionsWithDefaults, container, getData, getHtml, editor, templates, templatesUI, blocks;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        optionsWithDefaults = __assign(__assign({}, defaultOptions), options);
+                        container = createContainer($element, false);
+                        getData = function () { return getContainerData(container, options.ignoreHtml); };
+                        getHtml = function () { return getContainerHtml(container); };
+                        editor = {
+                            $element: $element,
+                            container: container,
+                            selectedContainer: container,
+                            getData: getData,
+                            getHtml: getHtml
+                        };
+                        $element.classList.add(Selectors.classEditor);
+                        initHtmlTools(optionsWithDefaults);
+                        bindFormSubmit(editor, optionsWithDefaults);
+                        return [4, loadTemplatesAsync(optionsWithDefaults.templatesUrl, editor.$element)];
+                    case 1:
+                        templates = _a.sent();
+                        templatesUI = getTemplateSelector();
+                        if (templates !== undefined) {
+                            templatesUI.setTemplates(templates);
+                            templatesUI.on("select", function (t) {
+                                addBlockToContainer(container, {
+                                    blockTemplate: t.template
+                                });
+                            });
+                            $element.append(templatesUI.$element);
+                        }
+                        return [4, loadInitialBlocks(optionsWithDefaults)];
+                    case 2:
+                        blocks = _a.sent();
+                        if (blocks !== null) {
+                            blocks.map(function (blockData) {
+                                return addBlockToContainer(container, {
+                                    blockData: blockData
+                                });
+                            });
+                        }
+                        resolve(editor);
+                        return [2];
+                }
+            });
+        }); });
+    };
+    var loadInitialBlocks = function (_a) {
+        var blocks = _a.blocks, blocksUrl = _a.blocksUrl;
+        return new Promise(function (resolve, reject) { return __awaiter(void 0, void 0, void 0, function () {
+            var url, blocks_1, error_1;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        url = blocksUrl;
+                        if (!(url !== undefined)) return [3, 5];
+                        _a.label = 1;
+                    case 1:
+                        _a.trys.push([1, 3, , 4]);
+                        return [4, getRequest(url)];
+                    case 2:
+                        blocks_1 = _a.sent();
+                        resolve(blocks_1);
+                        return [3, 4];
+                    case 3:
+                        error_1 = _a.sent();
+                        reject(error_1);
+                        return [3, 4];
+                    case 4: return [2];
+                    case 5:
+                        if (blocks !== undefined) {
+                            resolve(blocks);
+                            return [2];
+                        }
+                        resolve(null);
+                        return [2];
+                }
+            });
+        }); });
+    };
+    var bindFormSubmit = function (editor, _a) {
+        var formSelector = _a.formSelector, inputSelector = _a.inputSelector, ignoreHtml = _a.ignoreHtml;
+        if (formSelector === undefined || inputSelector === undefined) {
+            return;
+        }
+        var $form = document.querySelector(formSelector);
+        if ($form === null) {
+            return;
+        }
+        var $input = document.querySelector(inputSelector);
+        if ($input === null) {
+            return;
+        }
+        if ($input instanceof HTMLInputElement) {
+            $form.addEventListener("submit", function () {
+                var blocks = getContainerData(editor.container, ignoreHtml);
+                $input.value = JSON.stringify(blocks);
+            });
+        }
+    };
     //# sourceMappingURL=Editor.js.map
 
     exports.Editor = Editor;
+    exports.editor = editor$2;
 
     return exports;
 

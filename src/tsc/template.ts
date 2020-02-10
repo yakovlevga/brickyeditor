@@ -7,8 +7,6 @@ import { bre } from "src/types/bre";
 import { Selectors } from "src/ui/Selectors";
 import { bindFields } from "src/fields/field";
 
-type onErrorHandler = (message: string, code?: number) => any;
-
 let allTemplates: bre.core.ITemplate[] = [];
 
 export const getTemplate = (templateName: string): bre.core.ITemplate => {
@@ -23,11 +21,7 @@ export const getTemplate = (templateName: string): bre.core.ITemplate => {
   return template;
 };
 
-export const loadTemplatesAsync = async (
-  url: string,
-  $editor: HTMLElement,
-  onError: onErrorHandler
-) => {
+export const loadTemplatesAsync = async (url: string, $editor: HTMLElement) => {
   const grouppedTemplates: bre.core.ITemplateGroup[] = [];
 
   try {
@@ -73,8 +67,8 @@ export const loadTemplatesAsync = async (
 
     return grouppedTemplates;
   } catch (err) {
-    onError(EditorStrings.errorTemplatesFileNotFound(url));
-    throw err;
+    // onError(EditorStrings.errorTemplatesFileNotFound(url));
+    // throw err;
   }
 };
 

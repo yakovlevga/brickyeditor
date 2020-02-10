@@ -1,5 +1,3 @@
-import { addBlockToContainer } from "src/BlocksContainer";
-import { $dom } from "src/common/DOMHelpers";
 import { bindFields, toggleFieldSelection } from "src/fields/field";
 import { getTemplate } from "src/template";
 import { bre } from "src/types/bre";

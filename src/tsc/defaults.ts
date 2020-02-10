@@ -18,14 +18,10 @@ const defaultButtons: bre.core.IHtmlToolsButton[] = [
   { icon: "repeat", command: "Redo", range: false }
 ];
 
-export const defaultOptions: Partial<bre.Options> = {
+export const defaultOptions: bre.Options = {
   templatesUrl: "templates/bootstrap4.html",
   compactTools: false,
   compactToolsWidth: 768,
   ignoreHtml: true,
-  onError: (data: any) => {
-    // tslint:disable-next-line:no-console
-    console.log(data.message);
-  },
   htmlToolsButtons: defaultButtons
 };

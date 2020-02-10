@@ -11,7 +11,7 @@ export interface FieldEventMap {
 }
 
 export interface TemplatesEventMap {
-  templateClick: {
+  select: {
     template: bre.core.ITemplate;
   };
 }

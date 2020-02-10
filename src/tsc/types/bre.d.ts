@@ -27,28 +27,29 @@ declare namespace bre {
 
   type FileUploadHandler = (file: any, callback: (url: string) => void) => void;
 
-  type Options = Subscriptions & {
+  type Options = {
     /** Url to predifined templates */
     templatesUrl: string;
 
-    onUpload: FileUploadHandler;
+    onUpload?: FileUploadHandler;
 
     /** Url to fetch initial blocks, overrides initial blocks property */
-    blocksUrl: string;
+    blocksUrl?: string;
     /** Inital block data */
-    blocks: bre.core.block.BlockData[];
+    blocks?: bre.core.block.BlockData[];
+
     /** Show blocks selector in compact mode */
     compactTools?: boolean;
     /** Max screen width to show tools in compact mode */
-    compactToolsWidth: number;
+    compactToolsWidth?: number;
     /** Ignore blocks html field, if you need only json */
-    ignoreHtml: boolean;
+    ignoreHtml?: boolean;
     /** Custom Html editor buttons */
-    htmlToolsButtons: bre.core.IHtmlToolsButton[];
+    htmlToolsButtons?: bre.core.IHtmlToolsButton[];
     /** Form selector to bind form submit event */
-    formSelector: string;
+    formSelector?: string;
     /** Input selector to put json to on form submit */
-    inputSelector: string;
+    inputSelector?: string;
   };
 
   namespace ui {
@@ -156,6 +157,7 @@ declare namespace bre {
 
     interface Editor {
       $element: HTMLElement;
+      container: IBlocksContainer;
       selectedContainer: IBlocksContainer;
     }
 

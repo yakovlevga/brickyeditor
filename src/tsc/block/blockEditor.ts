@@ -72,14 +72,6 @@ export const showBlockEditor = (block: bre.core.block.Block) => {
     control = createEditor();
   }
 
-  // control.$element.style.top = top + "px";
-  // control.$element.style.left = left + "px";
-
-  console.log({
-    top: control.$element.style.top,
-    left: control.$element.style.left
-  });
-
   control.btns.forEach(({ $btn, action }) => {
     $btn.onclick = () => action(block.fire);
   });
