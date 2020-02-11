@@ -2,25 +2,21 @@ import { getSelectionRanges, restoreSelection } from "src/ui/selection";
 import { helpers } from "src/helpers";
 import { ModalStyles } from "src/modal.scss";
 
-export const dialog = (props: {
-  content: HTMLElement | HTMLElement[];
-  ok?: () => void;
-  cancel?: () => void;
-}) => {
+export const dialog = (
+  $content: HTMLElement,
+  ok?: () => void,
+  cancel?: () => void
+) => {
   const selection = getSelectionRanges();
 
   const root = helpers.div<ModalStyles>("bre-modal");
 
   const close = () => {
     root.remove();
-    (root as any) = null;
-
     restoreSelection(selection);
   };
 
-  const { content, ok, cancel } = props;
-
-  const buttonOk = helpers.el<HTMLButtonElement>({
+  const $ok = helpers.el<HTMLButtonElement>({
     tag: "button",
     props: {
       type: "button",
@@ -34,7 +30,7 @@ export const dialog = (props: {
     }
   });
 
-  const buttonCancel = helpers.el<HTMLButtonElement>({
+  const $cancel = helpers.el<HTMLButtonElement>({
     tag: "button",
     props: {
       type: "button",
@@ -49,13 +45,7 @@ export const dialog = (props: {
   });
 
   const $placeholder = helpers.div<ModalStyles>("bre-modal-placeholder");
-  if (Array.isArray(content)) {
-    content.forEach(el => $placeholder.append(el));
-  } else {
-    $placeholder.append(content);
-  }
-
-  $placeholder.append(buttonOk, buttonCancel);
+  $placeholder.append($content, $ok, $cancel);
   root.append($placeholder);
 
   document.body.appendChild(root);

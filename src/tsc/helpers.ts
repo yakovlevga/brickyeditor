@@ -123,6 +123,14 @@ const objectToArray = (o: any) => Object.keys(o).map(x => x[o]);
 const filterNotNull = <TValue>(value: (TValue | null)[]) =>
   value.filter(x => x !== null) as TValue[];
 
+export const strEqualsInvariant = (s1: string, s2: string) => {
+  if (!s1 || !s2) {
+    return s1 === s2;
+  }
+
+  return s1.toLowerCase() === s2.toLowerCase();
+};
+
 export const helpers = {
   createElement,
   div,

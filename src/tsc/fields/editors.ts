@@ -15,13 +15,13 @@ export const propmtFieldEditorAsync = <
 
     const { $element: $editor, data: updatedData } = editor(data);
 
-    dialog({
-      content: $editor,
-      ok: () => {
+    dialog(
+      $editor,
+      () => {
         resolve(updatedData);
       },
-      cancel: () => {
+      () => {
         resolve(null);
       }
-    });
+    );
   });

@@ -72,16 +72,6 @@ var BrickyEditor = (function (exports) {
         return r;
     }
 
-    var str = {
-        equalsInvariant: function (s1, s2) {
-            if (!s1 || !s2) {
-                return s1 === s2;
-            }
-            return s1.toLowerCase() === s2.toLowerCase();
-        }
-    };
-    //# sourceMappingURL=Common.js.map
-
     var el = function (_a) {
         var _b = _a.tag, tag = _b === void 0 ? "div" : _b, className = _a.className, innerHTML = _a.innerHTML, props = _a.props;
         var result = document.createElement(tag);
@@ -166,6 +156,12 @@ var BrickyEditor = (function (exports) {
     var objectToArray = function (o) { return Object.keys(o).map(function (x) { return x[o]; }); };
     var filterNotNull = function (value) {
         return value.filter(function (x) { return x !== null; });
+    };
+    var strEqualsInvariant$1 = function (s1, s2) {
+        if (!s1 || !s2) {
+            return s1 === s2;
+        }
+        return s1.toLowerCase() === s2.toLowerCase();
     };
     var helpers = {
         createElement: createElement,
@@ -380,132 +376,6 @@ var BrickyEditor = (function (exports) {
     };
     //# sourceMappingURL=linkEditor.js.map
 
-    var promptLinkParamsAsync = function (initialData) {
-        return new Promise(function (resolve) {
-            var _a = linkEditor(initialData), $editor = _a.$element, updatedData = _a.data;
-            helpers.showModal({
-                content: [$editor],
-                onOk: function () {
-                    resolve(updatedData);
-                },
-                onCancel: function () {
-                    resolve(null);
-                }
-            });
-        });
-    };
-    var renderButtonElement = function (_a) {
-        var icon = _a.icon, command = _a.command, range = _a.range, aValueArgument = _a.aValueArgument;
-        var $btn = helpers.createElement("<button type=\"button\" class=\"bre-btn\"><i class=\"fa fa-" + icon + "\"></i></button>");
-        $btn.onclick = function () { return __awaiter(void 0, void 0, void 0, function () {
-            var selection, selectionRange, selectedLink, currentLink, updatedLink, valueArgument;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        selection = window.getSelection();
-                        if (selection === null) {
-                            return [2];
-                        }
-                        selectionRange = selection.rangeCount > 0 ? selection.getRangeAt(0) : null;
-                        if (range && !selectionRange) {
-                            return [2];
-                        }
-                        if (!(command === "CreateLink")) return [3, 2];
-                        selectedLink = getSeletedLink(selection);
-                        currentLink = selectedLink !== null
-                            ? {
-                                href: selectedLink.href,
-                                title: selectedLink.title,
-                                target: selectedLink.target
-                            }
-                            : {};
-                        return [4, promptLinkParamsAsync(currentLink)];
-                    case 1:
-                        updatedLink = _a.sent();
-                        if (updatedLink !== null && updatedLink.href) {
-                            document.execCommand(command, false, updatedLink.href);
-                            if (selection.anchorNode !== null &&
-                                selection.anchorNode.parentElement !== null) {
-                                if (updatedLink.target) {
-                                    selection.anchorNode.parentElement.setAttribute("target", updatedLink.target);
-                                }
-                                if (updatedLink.title) {
-                                    selection.anchorNode.parentElement.setAttribute("title", updatedLink.title);
-                                }
-                            }
-                        }
-                        return [3, 3];
-                    case 2:
-                        valueArgument = void 0;
-                        if (typeof aValueArgument === "string") {
-                            valueArgument = aValueArgument.replace("%%SELECTION%%", selection.toString());
-                        }
-                        try {
-                            document.execCommand(command, false, valueArgument);
-                        }
-                        catch (_b) {
-                            wrapSelectionToContainer(selection);
-                            document.execCommand(command, false, valueArgument);
-                        }
-                        _a.label = 3;
-                    case 3: return [2, false];
-                }
-            });
-        }); };
-        return $btn;
-    };
-    var getSeletedLink = function (selection) {
-        if (selection.anchorNode !== null &&
-            selection.anchorNode.parentNode !== null &&
-            str.equalsInvariant(selection.anchorNode.parentNode.nodeName, "a")) {
-            return selection.anchorNode.parentNode;
-        }
-        return null;
-    };
-    var renderControl = function (buttons) {
-        var $panel = helpers.createElement('<div class="bre-html-tools-panel"></div>');
-        buttons.map(renderButtonElement).forEach(function ($btn) { return $panel.appendChild($btn); });
-        var $controlRoot = helpers.createElement('<div class="bre-html-tools bre-btn-group"></div>');
-        $controlRoot.appendChild($panel);
-        helpers.toggleVisibility($controlRoot, false);
-        return $controlRoot;
-    };
-    var wrapSelectionToContainer = function (selection) {
-        if (selection.anchorNode === null) {
-            return;
-        }
-        var $container = selection.anchorNode.parentElement;
-        if ($container !== null) {
-            var $wrapper = helpers.createElement("<div class=\"bre-temp-container\" contenteditable=\"true\">" + $container.innerHTML + "</div>");
-            $container.innerHTML = "";
-            $container.removeAttribute(Selectors.attrContentEditable);
-            $container.appendChild($wrapper);
-            var range = document.createRange();
-            range.selectNodeContents($wrapper);
-            selection.removeAllRanges();
-            selection.addRange(range);
-        }
-    };
-    var control;
-    var initHtmlTools = function (_a) {
-        var htmlToolsButtons = _a.htmlToolsButtons;
-        control = renderControl(htmlToolsButtons);
-        document.body.appendChild(control);
-    };
-    var toggleHtmlTools = function (rect) {
-        if (rect !== null && rect.width > 1) {
-            var top = rect.top + rect.height;
-            var left = rect.left;
-            control.style.top = top + "px";
-            control.style.left = left + "px";
-            helpers.toggleVisibility(control, true);
-        }
-        else {
-            helpers.toggleVisibility(control, false);
-        }
-    };
-    //# sourceMappingURL=htmlTools.js.map
-
     var $dom = (function () {
         function $dom() {
         }
@@ -589,6 +459,167 @@ var BrickyEditor = (function (exports) {
         return range.getBoundingClientRect();
     };
     //# sourceMappingURL=selection.js.map
+
+    var dialog = function ($content, ok, cancel) {
+        var selection = getSelectionRanges();
+        var root = helpers.div("bre-modal");
+        var close = function () {
+            root.remove();
+            restoreSelection(selection);
+        };
+        var $ok = helpers.el({
+            tag: "button",
+            props: {
+                type: "button",
+                onclick: function () {
+                    if (ok) {
+                        ok();
+                    }
+                    close();
+                },
+                innerHTML: "Ok"
+            }
+        });
+        var $cancel = helpers.el({
+            tag: "button",
+            props: {
+                type: "button",
+                onclick: function () {
+                    if (cancel) {
+                        cancel();
+                    }
+                    close();
+                },
+                innerHTML: "Cancel"
+            }
+        });
+        var $placeholder = helpers.div("bre-modal-placeholder");
+        $placeholder.append($content, $ok, $cancel);
+        root.append($placeholder);
+        document.body.appendChild(root);
+    };
+
+    var promptLinkParamsAsync = function (initialData) {
+        return new Promise(function (resolve) {
+            var _a = linkEditor(initialData), $editor = _a.$element, updatedData = _a.data;
+            dialog($editor, function () {
+                resolve(updatedData);
+            }, function () {
+                resolve(null);
+            });
+        });
+    };
+    var renderButtonElement = function (_a) {
+        var icon = _a.icon, command = _a.command, range = _a.range, aValueArgument = _a.aValueArgument;
+        var $btn = helpers.createElement("<button type=\"button\" class=\"bre-btn\"><i class=\"fa fa-" + icon + "\"></i></button>");
+        $btn.onclick = function () { return __awaiter(void 0, void 0, void 0, function () {
+            var selection, selectionRange, selectedLink, currentLink, updatedLink, valueArgument;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        selection = window.getSelection();
+                        if (selection === null) {
+                            return [2];
+                        }
+                        selectionRange = selection.rangeCount > 0 ? selection.getRangeAt(0) : null;
+                        if (range && !selectionRange) {
+                            return [2];
+                        }
+                        if (!(command === "CreateLink")) return [3, 2];
+                        selectedLink = getSeletedLink(selection);
+                        currentLink = selectedLink !== null
+                            ? {
+                                href: selectedLink.href,
+                                title: selectedLink.title,
+                                target: selectedLink.target
+                            }
+                            : {};
+                        return [4, promptLinkParamsAsync(currentLink)];
+                    case 1:
+                        updatedLink = _a.sent();
+                        if (updatedLink !== null && updatedLink.href) {
+                            document.execCommand(command, false, updatedLink.href);
+                            if (selection.anchorNode !== null &&
+                                selection.anchorNode.parentElement !== null) {
+                                if (updatedLink.target) {
+                                    selection.anchorNode.parentElement.setAttribute("target", updatedLink.target);
+                                }
+                                if (updatedLink.title) {
+                                    selection.anchorNode.parentElement.setAttribute("title", updatedLink.title);
+                                }
+                            }
+                        }
+                        return [3, 3];
+                    case 2:
+                        valueArgument = void 0;
+                        if (typeof aValueArgument === "string") {
+                            valueArgument = aValueArgument.replace("%%SELECTION%%", selection.toString());
+                        }
+                        try {
+                            document.execCommand(command, false, valueArgument);
+                        }
+                        catch (_b) {
+                            wrapSelectionToContainer(selection);
+                            document.execCommand(command, false, valueArgument);
+                        }
+                        _a.label = 3;
+                    case 3: return [2, false];
+                }
+            });
+        }); };
+        return $btn;
+    };
+    var getSeletedLink = function (selection) {
+        if (selection.anchorNode !== null &&
+            selection.anchorNode.parentNode !== null &&
+            strEqualsInvariant$1(selection.anchorNode.parentNode.nodeName, "a")) {
+            return selection.anchorNode.parentNode;
+        }
+        return null;
+    };
+    var renderControl = function (buttons) {
+        var $panel = helpers.createElement('<div class="bre-html-tools-panel"></div>');
+        buttons.map(renderButtonElement).forEach(function ($btn) { return $panel.appendChild($btn); });
+        var $controlRoot = helpers.createElement('<div class="bre-html-tools bre-btn-group"></div>');
+        $controlRoot.appendChild($panel);
+        helpers.toggleVisibility($controlRoot, false);
+        return $controlRoot;
+    };
+    var wrapSelectionToContainer = function (selection) {
+        if (selection.anchorNode === null) {
+            return;
+        }
+        var $container = selection.anchorNode.parentElement;
+        if ($container !== null) {
+            var $wrapper = helpers.createElement("<div class=\"bre-temp-container\" contenteditable=\"true\">" + $container.innerHTML + "</div>");
+            $container.innerHTML = "";
+            $container.removeAttribute(Selectors.attrContentEditable);
+            $container.appendChild($wrapper);
+            var range = document.createRange();
+            range.selectNodeContents($wrapper);
+            selection.removeAllRanges();
+            selection.addRange(range);
+        }
+    };
+    var control;
+    var initHtmlTools = function (_a) {
+        var htmlToolsButtons = _a.htmlToolsButtons;
+        control = renderControl(htmlToolsButtons);
+        document.body.appendChild(control);
+    };
+    var toggleHtmlTools = function (rect) {
+        if (rect !== null && rect.width > 1) {
+            var top = rect.top + rect.height;
+            var left = rect.left;
+            control.style.top = top + "px";
+            control.style.left = left + "px";
+            helpers.toggleVisibility(control, true);
+        }
+        else {
+            helpers.toggleVisibility(control, false);
+        }
+    };
+    //# sourceMappingURL=htmlTools.js.map
 
     var emmiter = function () {
         var listeners = {};
@@ -811,54 +842,6 @@ var BrickyEditor = (function (exports) {
     };
     //# sourceMappingURL=embed.js.map
 
-    var dialog = function (props) {
-        var selection = getSelectionRanges();
-        var root = helpers.div("bre-modal");
-        var close = function () {
-            root.remove();
-            root = null;
-            restoreSelection(selection);
-        };
-        var content = props.content, ok = props.ok, cancel = props.cancel;
-        var buttonOk = helpers.el({
-            tag: "button",
-            props: {
-                type: "button",
-                onclick: function () {
-                    if (ok) {
-                        ok();
-                    }
-                    close();
-                },
-                innerHTML: "Ok"
-            }
-        });
-        var buttonCancel = helpers.el({
-            tag: "button",
-            props: {
-                type: "button",
-                onclick: function () {
-                    if (cancel) {
-                        cancel();
-                    }
-                    close();
-                },
-                innerHTML: "Cancel"
-            }
-        });
-        var $placeholder = helpers.div("bre-modal-placeholder");
-        if (Array.isArray(content)) {
-            content.forEach(function (el) { return $placeholder.append(el); });
-        }
-        else {
-            $placeholder.append(content);
-        }
-        $placeholder.append(buttonOk, buttonCancel);
-        root.append($placeholder);
-        document.body.appendChild(root);
-    };
-    //# sourceMappingURL=modal.js.map
-
     var propmtFieldEditorAsync = function (_a) {
         var editor = _a.editor, data = _a.data;
         return new Promise(function (resolve) {
@@ -867,14 +850,10 @@ var BrickyEditor = (function (exports) {
                 return;
             }
             var _a = editor(data), $editor = _a.$element, updatedData = _a.data;
-            dialog({
-                content: $editor,
-                ok: function () {
-                    resolve(updatedData);
-                },
-                cancel: function () {
-                    resolve(null);
-                }
+            dialog($editor, function () {
+                resolve(updatedData);
+            }, function () {
+                resolve(null);
             });
         });
     };
@@ -1220,7 +1199,7 @@ var BrickyEditor = (function (exports) {
         if (!block.data || !block.data.fields) {
             return null;
         }
-        var field = block.data.fields.find(function (f) { return str.equalsInvariant(f.name, name); });
+        var field = block.data.fields.find(function (f) { return strEqualsInvariant(f.name, name); });
         if (field === undefined) {
             return null;
         }
@@ -1280,7 +1259,7 @@ var BrickyEditor = (function (exports) {
     var allTemplates = [];
     var getTemplate = function (templateName) {
         var template = allTemplates.find(function (x) {
-            return str.equalsInvariant(x.name, templateName);
+            return strEqualsInvariant$1(x.name, templateName);
         });
         if (template === undefined) {
             throw new Error("Template is not registred: " + templateName);

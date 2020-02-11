@@ -1,7 +1,6 @@
-import { str } from "src/common/Common";
 import { $dom } from "src/common/DOMHelpers";
 import { EditorStrings } from "src/EditorStrings";
-import { helpers } from "src/helpers";
+import { helpers, strEqualsInvariant } from "src/helpers";
 import { getRequest } from "src/httpTransport";
 import { bre } from "src/types/bre";
 import { Selectors } from "src/ui/Selectors";
@@ -11,7 +10,7 @@ let allTemplates: bre.core.ITemplate[] = [];
 
 export const getTemplate = (templateName: string): bre.core.ITemplate => {
   const template = allTemplates.find(x =>
-    str.equalsInvariant(x.name, templateName)
+    strEqualsInvariant(x.name, templateName)
   );
 
   if (template === undefined) {

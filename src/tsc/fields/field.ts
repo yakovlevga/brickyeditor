@@ -6,7 +6,6 @@ import { bre } from "src/types/bre";
 import { Selectors } from "src/ui/Selectors";
 import { FireFunc, FieldEventMap } from "src/emmiter";
 import { image } from "src/fields/image";
-import { str } from "src/common/Common";
 import { selectField } from "src/block/Block";
 
 export interface ICreateFieldProps {
@@ -175,7 +174,7 @@ function getFieldDataByName(
     return null;
   }
 
-  const field = block.data.fields.find(f => str.equalsInvariant(f.name, name));
+  const field = block.data.fields.find(f => strEqualsInvariant(f.name, name));
 
   if (field === undefined) {
     return null;

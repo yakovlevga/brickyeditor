@@ -1,9 +1,9 @@
-import { str } from "src/common/Common";
-import { helpers } from "src/helpers";
+import { helpers, strEqualsInvariant } from "src/helpers";
 
 import { bre } from "src/types/bre";
 import { Selectors } from "src/ui/Selectors";
 import { linkEditor } from "src/fields/linkEditor";
+import { dialog } from "src/modal";
 
 const promptLinkParamsAsync = (
   initialData: Readonly<bre.core.field.LinkData>
@@ -11,15 +11,15 @@ const promptLinkParamsAsync = (
   new Promise<bre.core.field.LinkData | null>(resolve => {
     const { $element: $editor, data: updatedData } = linkEditor(initialData);
 
-    helpers.showModal({
-      content: [$editor],
-      onOk: () => {
+    dialog(
+      $editor,
+      () => {
         resolve(updatedData);
       },
-      onCancel: () => {
+      () => {
         resolve(null);
       }
-    });
+    );
   });
 
 const renderButtonElement = ({
@@ -107,7 +107,7 @@ const getSeletedLink = (selection: Selection) => {
   if (
     selection.anchorNode !== null &&
     selection.anchorNode.parentNode !== null &&
-    str.equalsInvariant(selection.anchorNode.parentNode.nodeName, "a")
+    strEqualsInvariant(selection.anchorNode.parentNode.nodeName, "a")
   ) {
     return selection.anchorNode.parentNode as HTMLLinkElement;
   }
