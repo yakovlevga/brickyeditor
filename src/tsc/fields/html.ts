@@ -7,7 +7,7 @@ import {
 } from "src/fields/field";
 import { bre } from "src/types/bre";
 import { toggleHtmlTools } from "src/ui/htmlTools";
-import { SelectionUtils } from "src/ui/SelectionUtils";
+import { bindTextSelection } from "src/ui/selection";
 import { Selectors } from "src/ui/Selectors";
 import { emmiter, FieldEventMap } from "src/emmiter";
 
@@ -60,7 +60,7 @@ export const html: FieldFactory = ({ $element, preview, data }) => {
 
   $element.setAttribute(Selectors.attrContentEditable, "true");
 
-  SelectionUtils.bindTextSelection($element, rect => {
+  bindTextSelection($element, rect => {
     toggleHtmlTools(rect);
   });
 

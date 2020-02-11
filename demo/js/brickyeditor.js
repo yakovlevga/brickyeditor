@@ -89,45 +89,6 @@ var BrickyEditor = (function (exports) {
     var $dom = (function () {
         function $dom() {
         }
-        $dom.offset = function (el) {
-            var rect = el.getBoundingClientRect();
-            var $body = document.body;
-            return {
-                top: rect.top + $body.scrollTop,
-                left: rect.left + $body.scrollLeft
-            };
-        };
-        $dom.unwrap = function (el) {
-            if (!el.parentElement) {
-                return;
-            }
-            var parentsParent = el.parentElement.parentElement;
-            if (parentsParent) {
-                parentsParent.replaceChild(el, el.parentElement);
-            }
-            else {
-                el.parentElement.innerHTML = el.innerHTML;
-            }
-        };
-        $dom.hide = function (el) {
-            el.style.display = "none";
-        };
-        $dom.show = function (el) {
-            el.style.display = "block";
-        };
-        $dom.isHidden = function (el) {
-            var style = window.getComputedStyle(el);
-            return style.display === "none";
-        };
-        $dom.toggle = function (el, force) {
-            var show = force ? force.valueOf() : this.isHidden(el);
-            if (show) {
-                this.show(el);
-            }
-            else {
-                this.hide(el);
-            }
-        };
         $dom.before = function (el, elToInsert) {
             var _this = this;
             if (elToInsert instanceof HTMLElement) {
@@ -150,104 +111,6 @@ var BrickyEditor = (function (exports) {
                 el.parentNode.appendChild(elToInsert);
             }
         };
-        $dom.hasClass = function (el, className) {
-            if (el.classList) {
-                return el.classList.contains(className);
-            }
-            else {
-                return new RegExp("(^| )" + className + "( |$)", "gi").test(el.className);
-            }
-        };
-        $dom.addClass = function (el, className) {
-            if (this.hasClass(el, className)) {
-                return;
-            }
-            if (el.classList) {
-                el.classList.add(className);
-            }
-            else {
-                el.className += " " + className;
-            }
-        };
-        $dom.removeClass = function (el, className) {
-            if (el.classList) {
-                el.classList.remove(className);
-            }
-            else {
-                el.className = el.className.replace(new RegExp("(^|\\b)" + className.split(" ").join("|") + "(\\b|$)", "gi"), " ");
-            }
-        };
-        $dom.toggleClass = function (el, className, force) {
-            if (force) {
-                if (force.valueOf()) {
-                    this.addClass(el, className);
-                }
-                else {
-                    this.removeClass(el, className);
-                }
-                return;
-            }
-            if (el.classList) {
-                el.classList.toggle(className);
-            }
-            else {
-                var classes = el.className.split(" ");
-                var existingIndex = -1;
-                for (var i = classes.length; i--;) {
-                    if (classes[i] === className) {
-                        existingIndex = i;
-                    }
-                }
-                if (existingIndex >= 0) {
-                    classes.splice(existingIndex, 1);
-                }
-                else {
-                    classes.push(className);
-                }
-                el.className = classes.join(" ");
-            }
-        };
-        $dom.windowScrollTop = function () {
-            return window.pageYOffset !== undefined
-                ? window.pageYOffset
-                : (document.documentElement ||
-                    document.body.parentNode ||
-                    document.body).scrollTop;
-        };
-        $dom.replaceWith = function (from, to) {
-            var parent = from.parentElement;
-            if (parent) {
-                parent.replaceChild(to, from);
-            }
-        };
-        $dom.select = function (el, selector, addBack) {
-            if (addBack === void 0) { addBack = false; }
-            var elements = el.querySelectorAll(selector);
-            var result = Array.prototype.slice.call(elements);
-            if (addBack && addBack.valueOf() && $dom.matches(el, selector)) {
-                result.push(el);
-            }
-            return result;
-        };
-        $dom.find = function (selector) {
-            return document.querySelector(selector);
-        };
-        $dom.first = function (el, selector) {
-            return el.querySelector(selector);
-        };
-        $dom.clone = function (el) {
-            return el.cloneNode(true);
-        };
-        $dom.trigger = function (el, ev, data) {
-            if (window.CustomEvent) {
-                var event = new CustomEvent(ev, { detail: data });
-            }
-            else {
-                var event = document.createEvent("CustomEvent");
-                event.initCustomEvent(ev, true, true, data);
-            }
-            el.dispatchEvent(event);
-        };
         $dom.matches = function (el, selector) {
             var matches = el.matches ||
                 el.matchesSelector ||
@@ -256,23 +119,6 @@ var BrickyEditor = (function (exports) {
                 el.webkitMatchesSelector ||
                 el.oMatchesSelector;
             return matches.call(el, selector);
-        };
-        $dom.data = function (el, prop) {
-            var json = el.dataset[prop];
-            var data = null;
-            try {
-                data = JSON.parse(json);
-            }
-            catch (e) {
-                if (e instanceof SyntaxError) {
-                    json = json.replace(/'/g, '"');
-                    try {
-                        data = JSON.parse(json);
-                    }
-                    catch (_a) { }
-                }
-            }
-            return data;
         };
         return $dom;
     }());
@@ -299,36 +145,29 @@ var BrickyEditor = (function (exports) {
             selectionRanges.forEach(function (range) { return selection.addRange(range); });
         }
     };
-    var SelectionUtils = (function () {
-        function SelectionUtils() {
+    var bindTextSelection = function ($el, handler) {
+        if (!$dom.matches($el, "[contenteditable]")) {
+            return;
         }
-        SelectionUtils.bindTextSelection = function ($el, handler) {
-            var _this = this;
-            if (!$dom.matches($el, "[contenteditable]")) {
-                return;
-            }
-            $el.addEventListener("mouseup", function () {
-                setTimeout(function () {
-                    var rect = _this.getSelectionRect();
-                    handler(rect);
-                }, 0);
-            });
-            $el.addEventListener("keyup", function () {
-                var rect = _this.getSelectionRect();
+        $el.addEventListener("mouseup", function () {
+            setTimeout(function () {
+                var rect = getSelectionRect();
                 handler(rect);
-            });
-        };
-        SelectionUtils.getSelectionRect = function () {
-            var selection = window.getSelection();
-            if (selection === null) {
-                return null;
-            }
-            var range = selection.getRangeAt(0);
-            return range.getBoundingClientRect();
-        };
-        return SelectionUtils;
-    }());
-    //# sourceMappingURL=SelectionUtils.js.map
+            }, 0);
+        });
+        $el.addEventListener("keyup", function () {
+            var rect = getSelectionRect();
+            handler(rect);
+        });
+    };
+    var getSelectionRect = function () {
+        var selection = window.getSelection();
+        if (selection === null) {
+            return null;
+        }
+        var range = selection.getRangeAt(0);
+        return range.getBoundingClientRect();
+    };
 
     var el = function (_a) {
         var _b = _a.tag, tag = _b === void 0 ? "div" : _b, className = _a.className, innerHTML = _a.innerHTML, props = _a.props;
@@ -456,7 +295,6 @@ var BrickyEditor = (function (exports) {
         objectToArray: objectToArray,
         filterNotNull: filterNotNull
     };
-    //# sourceMappingURL=helpers.js.map
 
     var Selectors = (function () {
         function Selectors() {
@@ -857,7 +695,7 @@ var BrickyEditor = (function (exports) {
             }
         };
         $element.setAttribute(Selectors.attrContentEditable, "true");
-        SelectionUtils.bindTextSelection($element, function (rect) {
+        bindTextSelection($element, function (rect) {
             toggleHtmlTools(rect);
         });
         $element.addEventListener("blur", updateHtmlProp);
@@ -888,7 +726,6 @@ var BrickyEditor = (function (exports) {
         $copy.removeAttribute(Selectors.attrContentEditable);
         return $copy;
     };
-    //# sourceMappingURL=html.js.map
 
     var getRequest = function (url) {
         return new Promise(function (resolve, reject) {
@@ -1610,6 +1447,7 @@ var BrickyEditor = (function (exports) {
         });
         return block;
     };
+    //# sourceMappingURL=Block.js.map
 
     var getContainerData = function (container, ignoreHtml) { return container.blocks.map(function (block) { return block.getData(ignoreHtml); }); };
     var getContainerHtml = function (container) {

@@ -1,4 +1,4 @@
-import { getSelectionRanges, restoreSelection } from "src/ui/SelectionUtils";
+import { getSelectionRanges, restoreSelection } from "src/ui/selection";
 import { bre } from "src/types/bre";
 
 type FieldData = bre.core.field.FieldData;
