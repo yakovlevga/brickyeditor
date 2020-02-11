@@ -80,88 +80,7 @@ var BrickyEditor = (function (exports) {
             return s1.toLowerCase() === s2.toLowerCase();
         }
     };
-
-    var $dom = (function () {
-        function $dom() {
-        }
-        $dom.before = function (el, elToInsert) {
-            var _this = this;
-            if (elToInsert instanceof HTMLElement) {
-                if (el.parentNode !== null) {
-                    el.parentNode.insertBefore(elToInsert, el);
-                }
-            }
-            else {
-                elToInsert.forEach(function ($el) { return _this.before(el, $el); });
-            }
-        };
-        $dom.after = function (el, elToInsert) {
-            if (el.parentNode === null) {
-                return;
-            }
-            if (el.nextSibling) {
-                el.parentNode.insertBefore(elToInsert, el);
-            }
-            else {
-                el.parentNode.appendChild(elToInsert);
-            }
-        };
-        $dom.matches = function (el, selector) {
-            var matches = el.matches ||
-                el.matchesSelector ||
-                el.msMatchesSelector ||
-                el.mozMatchesSelector ||
-                el.webkitMatchesSelector ||
-                el.oMatchesSelector;
-            return matches.call(el, selector);
-        };
-        return $dom;
-    }());
-
-    var getSelectionRanges = function () {
-        var selection = window.getSelection();
-        if (selection === null) {
-            return null;
-        }
-        var selectionRanges = [];
-        for (var idx = 0; idx < selection.rangeCount; idx++) {
-            selectionRanges.push(selection.getRangeAt(idx));
-        }
-        return selectionRanges;
-    };
-    var restoreSelection = function (selectionRanges) {
-        if (selectionRanges === null || selectionRanges.length === 0) {
-            return;
-        }
-        var selection = window.getSelection();
-        if (selection !== null) {
-            selection.removeAllRanges();
-            selectionRanges.forEach(function (range) { return selection.addRange(range); });
-        }
-    };
-    var bindTextSelection = function ($el, handler) {
-        if (!$dom.matches($el, "[contenteditable]")) {
-            return;
-        }
-        $el.addEventListener("mouseup", function () {
-            setTimeout(function () {
-                var rect = getSelectionRect();
-                handler(rect);
-            }, 0);
-        });
-        $el.addEventListener("keyup", function () {
-            var rect = getSelectionRect();
-            handler(rect);
-        });
-    };
-    var getSelectionRect = function () {
-        var selection = window.getSelection();
-        if (selection === null) {
-            return null;
-        }
-        var range = selection.getRangeAt(0);
-        return range.getBoundingClientRect();
-    };
+    //# sourceMappingURL=Common.js.map
 
     var el = function (_a) {
         var _b = _a.tag, tag = _b === void 0 ? "div" : _b, className = _a.className, innerHTML = _a.innerHTML, props = _a.props;
@@ -199,36 +118,6 @@ var BrickyEditor = (function (exports) {
             return;
         }
         el.style.display = el.style.display !== "none" ? "none" : "initial";
-    };
-    var modalTemplate = "\n<div>\n  <div class=\"bre-modal\">\n    <div class=\"bre-modal-placeholder\">\n    </div>\n  </div>\n</div>";
-    var showModal = function (props) {
-        var selection = getSelectionRanges();
-        var element = createElement(modalTemplate);
-        var placeholder = element.getElementsByClassName("bre-modal-placeholder")[0];
-        var closeModal = function () {
-            element.remove();
-            element = null;
-            restoreSelection(selection);
-        };
-        var content = props.content, onOk = props.onOk, onCancel = props.onCancel;
-        content.forEach(function (el) { return placeholder.appendChild(el); });
-        if (onOk !== undefined) {
-            var buttonOk = createElement("<button type=\"button\">Save</button>");
-            buttonOk.addEventListener("click", function () {
-                onOk();
-                closeModal();
-            });
-            placeholder.appendChild(buttonOk);
-        }
-        var buttonCancel = createElement("<button type=\"button\">Cancel</button>");
-        buttonCancel.addEventListener("click", function () {
-            if (onCancel) {
-                onCancel();
-            }
-            closeModal();
-        });
-        placeholder.appendChild(buttonCancel);
-        document.body.appendChild(element);
     };
     var parseElementData = function (el, prop) {
         var json = el.dataset[prop];
@@ -283,12 +172,12 @@ var BrickyEditor = (function (exports) {
         div: div,
         el: el,
         parseElementData: parseElementData,
-        showModal: showModal,
         toggleVisibility: toggleVisibility,
         readFileAsync: readFileAsync,
         objectToArray: objectToArray,
         filterNotNull: filterNotNull
     };
+    //# sourceMappingURL=helpers.js.map
 
     var Selectors = (function () {
         function Selectors() {
@@ -316,6 +205,7 @@ var BrickyEditor = (function (exports) {
         Selectors.selectorHtmlToolsCommandRange = Selectors.attr(Selectors.htmlToolsCommandRange);
         return Selectors;
     }());
+    //# sourceMappingURL=Selectors.js.map
 
     var renderLabel = function ($root, $input, _a) {
         var title = _a.title;
@@ -394,6 +284,7 @@ var BrickyEditor = (function (exports) {
         $root.append($select);
         return $root;
     };
+    //# sourceMappingURL=inputs.js.map
 
     var locales = {
         errorBlocksFileNotFound: function (url) {
@@ -467,6 +358,7 @@ var BrickyEditor = (function (exports) {
         buttonCancel: "Cancel",
         defaultTemplatesGroupName: "Other templates",
     };
+    //# sourceMappingURL=locales.js.map
 
     var linkEditor = function (initialData) {
         var data = initialData ? __assign({}, initialData) : {};
@@ -486,6 +378,7 @@ var BrickyEditor = (function (exports) {
             data: data
         };
     };
+    //# sourceMappingURL=linkEditor.js.map
 
     var promptLinkParamsAsync = function (initialData) {
         return new Promise(function (resolve) {
@@ -611,6 +504,91 @@ var BrickyEditor = (function (exports) {
             helpers.toggleVisibility(control, false);
         }
     };
+    //# sourceMappingURL=htmlTools.js.map
+
+    var $dom = (function () {
+        function $dom() {
+        }
+        $dom.before = function (el, elToInsert) {
+            var _this = this;
+            if (elToInsert instanceof HTMLElement) {
+                if (el.parentNode !== null) {
+                    el.parentNode.insertBefore(elToInsert, el);
+                }
+            }
+            else {
+                elToInsert.forEach(function ($el) { return _this.before(el, $el); });
+            }
+        };
+        $dom.after = function (el, elToInsert) {
+            if (el.parentNode === null) {
+                return;
+            }
+            if (el.nextSibling) {
+                el.parentNode.insertBefore(elToInsert, el);
+            }
+            else {
+                el.parentNode.appendChild(elToInsert);
+            }
+        };
+        $dom.matches = function (el, selector) {
+            var matches = el.matches ||
+                el.matchesSelector ||
+                el.msMatchesSelector ||
+                el.mozMatchesSelector ||
+                el.webkitMatchesSelector ||
+                el.oMatchesSelector;
+            return matches.call(el, selector);
+        };
+        return $dom;
+    }());
+    //# sourceMappingURL=DOMHelpers.js.map
+
+    var getSelectionRanges = function () {
+        var selection = window.getSelection();
+        if (selection === null) {
+            return null;
+        }
+        var selectionRanges = [];
+        for (var idx = 0; idx < selection.rangeCount; idx++) {
+            selectionRanges.push(selection.getRangeAt(idx));
+        }
+        return selectionRanges;
+    };
+    var restoreSelection = function (selectionRanges) {
+        if (selectionRanges === null || selectionRanges.length === 0) {
+            return;
+        }
+        var selection = window.getSelection();
+        if (selection !== null) {
+            selection.removeAllRanges();
+            selectionRanges.forEach(function (range) { return selection.addRange(range); });
+        }
+    };
+    var bindTextSelection = function ($el, handler) {
+        if (!$dom.matches($el, "[contenteditable]")) {
+            return;
+        }
+        $el.addEventListener("mouseup", function () {
+            setTimeout(function () {
+                var rect = getSelectionRect();
+                handler(rect);
+            }, 0);
+        });
+        $el.addEventListener("keyup", function () {
+            var rect = getSelectionRect();
+            handler(rect);
+        });
+    };
+    var getSelectionRect = function () {
+        var selection = window.getSelection();
+        if (selection === null) {
+            return null;
+        }
+        var range = selection.getRangeAt(0);
+        return range.getBoundingClientRect();
+    };
+    //# sourceMappingURL=selection.js.map
 
     var emmiter = function () {
         var listeners = {};
@@ -647,6 +625,7 @@ var BrickyEditor = (function (exports) {
         };
         return { fire: fire, on: on, off: off };
     };
+    //# sourceMappingURL=emmiter.js.map
 
     var MaxPreviewLength = 50;
     var html = function (_a) {
@@ -714,6 +693,7 @@ var BrickyEditor = (function (exports) {
         $copy.removeAttribute(Selectors.attrContentEditable);
         return $copy;
     };
+    //# sourceMappingURL=html.js.map
 
     var getRequest = function (url) {
         return new Promise(function (resolve, reject) {
@@ -792,6 +772,7 @@ var BrickyEditor = (function (exports) {
                 document.documentElement).appendChild(script);
         });
     };
+    //# sourceMappingURL=httpTransport.js.map
 
     var preProcessEmbedUrl = function (url) {
         return url.replace("https://www.instagram.com", "http://instagr.am");
@@ -828,6 +809,55 @@ var BrickyEditor = (function (exports) {
             });
         }); });
     };
+    //# sourceMappingURL=embed.js.map
+
+    var dialog = function (props) {
+        var selection = getSelectionRanges();
+        var root = helpers.div("bre-modal");
+        var close = function () {
+            root.remove();
+            root = null;
+            restoreSelection(selection);
+        };
+        var content = props.content, ok = props.ok, cancel = props.cancel;
+        var buttonOk = helpers.el({
+            tag: "button",
+            props: {
+                type: "button",
+                onclick: function () {
+                    if (ok) {
+                        ok();
+                    }
+                    close();
+                },
+                innerHTML: "Ok"
+            }
+        });
+        var buttonCancel = helpers.el({
+            tag: "button",
+            props: {
+                type: "button",
+                onclick: function () {
+                    if (cancel) {
+                        cancel();
+                    }
+                    close();
+                },
+                innerHTML: "Cancel"
+            }
+        });
+        var $placeholder = helpers.div("bre-modal-placeholder");
+        if (Array.isArray(content)) {
+            content.forEach(function (el) { return $placeholder.append(el); });
+        }
+        else {
+            $placeholder.append(content);
+        }
+        $placeholder.append(buttonOk, buttonCancel);
+        root.append($placeholder);
+        document.body.appendChild(root);
+    };
+    //# sourceMappingURL=modal.js.map
 
     var propmtFieldEditorAsync = function (_a) {
         var editor = _a.editor, data = _a.data;
@@ -837,17 +867,18 @@ var BrickyEditor = (function (exports) {
                 return;
             }
             var _a = editor(data), $editor = _a.$element, updatedData = _a.data;
-            helpers.showModal({
-                content: [$editor],
-                onOk: function () {
+            dialog({
+                content: $editor,
+                ok: function () {
                     resolve(updatedData);
                 },
-                onCancel: function () {
+                cancel: function () {
                     resolve(null);
                 }
             });
         });
     };
+    //# sourceMappingURL=editors.js.map
 
     var providerScriptsLoaded = {};
     var embed = function (_a) {
@@ -941,6 +972,7 @@ var BrickyEditor = (function (exports) {
             });
         });
     };
+    //# sourceMappingURL=embed.js.map
 
     var container = function (_a) {
         var $element = _a.$element, preview = _a.preview, data = _a.data;
@@ -975,6 +1007,7 @@ var BrickyEditor = (function (exports) {
         return helpers.createElement(html);
     };
     var bind$2 = function () { };
+    //# sourceMappingURL=container.js.map
 
     var image = function (_a) {
         var $element = _a.$element, preview = _a.preview, data = _a.data;
@@ -1091,6 +1124,7 @@ var BrickyEditor = (function (exports) {
     var getSrcOrFile = function (data) {
         return data.src || (data.file !== undefined ? data.file.fileContent : "");
     };
+    //# sourceMappingURL=image.js.map
 
     var Fields = {
         html: html,
@@ -1200,6 +1234,7 @@ var BrickyEditor = (function (exports) {
         }
         return $fields;
     }
+    //# sourceMappingURL=field.js.map
 
     var EditorStrings = (function () {
         function EditorStrings() {
@@ -1240,6 +1275,7 @@ var BrickyEditor = (function (exports) {
         };
         return EditorStrings;
     }());
+    //# sourceMappingURL=EditorStrings.js.map
 
     var allTemplates = [];
     var getTemplate = function (templateName) {
@@ -1320,6 +1356,7 @@ var BrickyEditor = (function (exports) {
             $preview: $preview
         };
     };
+    //# sourceMappingURL=template.js.map
 
     var defaultButtons = [
         {
@@ -1376,6 +1413,7 @@ var BrickyEditor = (function (exports) {
             control$1.$element.remove();
         }
     };
+    //# sourceMappingURL=blockEditor.js.map
 
     var selectField = function (block, field) {
         block.selectedField = field;
@@ -1423,6 +1461,7 @@ var BrickyEditor = (function (exports) {
         });
         return block;
     };
+    //# sourceMappingURL=Block.js.map
 
     var getContainerData = function (container, ignoreHtml) { return container.blocks.map(function (block) { return block.getData(ignoreHtml); }); };
     var getContainerHtml = function (container) {
@@ -1535,6 +1574,7 @@ var BrickyEditor = (function (exports) {
         container.blocks.splice(idx, 1);
         container.blocks.splice(new_idx, 0, block);
     };
+    //# sourceMappingURL=BlocksContainer.js.map
 
     var defaultButtons$1 = [
         { icon: "bold", command: "Bold", range: true },
@@ -1560,6 +1600,7 @@ var BrickyEditor = (function (exports) {
         ignoreHtml: true,
         htmlToolsButtons: defaultButtons$1
     };
+    //# sourceMappingURL=defaults.js.map
 
     var getTemplateUI = function (template) {
         var $template = helpers.div("bre-templates-group-item");
@@ -1611,6 +1652,7 @@ var BrickyEditor = (function (exports) {
             off: off
         };
     };
+    //# sourceMappingURL=templateSelector.js.map
 
     var Editor = (function () {
         function Editor($editor, options) {
@@ -1721,6 +1763,7 @@ var BrickyEditor = (function (exports) {
             });
         }
     };
+    //# sourceMappingURL=Editor.js.map
 
     exports.Editor = Editor;
     exports.editor = editor$2;

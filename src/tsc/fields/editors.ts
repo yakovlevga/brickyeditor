@@ -1,5 +1,5 @@
 import { bre } from "src/types/bre";
-import { helpers } from "src/helpers";
+import { dialog } from "src/modal";
 
 export const propmtFieldEditorAsync = <
   TFieldData extends bre.core.field.FieldData
@@ -15,12 +15,12 @@ export const propmtFieldEditorAsync = <
 
     const { $element: $editor, data: updatedData } = editor(data);
 
-    helpers.showModal({
-      content: [$editor],
-      onOk: () => {
+    dialog({
+      content: $editor,
+      ok: () => {
         resolve(updatedData);
       },
-      onCancel: () => {
+      cancel: () => {
         resolve(null);
       }
     });

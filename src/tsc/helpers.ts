@@ -1,4 +1,3 @@
-import { getSelectionRanges, restoreSelection } from "src/ui/selection";
 import { bre } from "src/types/bre";
 
 type FieldData = bre.core.field.FieldData;
@@ -68,60 +67,6 @@ const toggleVisibility = (el: HTMLElement, visible?: boolean) => {
   el.style.display = el.style.display !== "none" ? "none" : "initial";
 };
 
-const modalTemplate = `
-<div>
-  <div class="bre-modal">
-    <div class="bre-modal-placeholder">
-    </div>
-  </div>
-</div>`;
-
-const showModal = (props: {
-  content: HTMLElement[];
-  onOk?: () => void;
-  onCancel?: () => void;
-}) => {
-  const selection = getSelectionRanges();
-
-  const element = createElement(modalTemplate);
-  const placeholder = element.getElementsByClassName(
-    "bre-modal-placeholder"
-  )[0];
-
-  const closeModal = () => {
-    element.remove();
-    (element as any) = null;
-
-    restoreSelection(selection);
-  };
-
-  const { content, onOk, onCancel } = props;
-  content.forEach(el => placeholder.appendChild(el));
-
-  if (onOk !== undefined) {
-    const buttonOk = createElement<HTMLButtonElement>(
-      `<button type="button">Save</button>`
-    );
-    buttonOk.addEventListener("click", () => {
-      onOk();
-      closeModal();
-    });
-    placeholder.appendChild(buttonOk);
-  }
-
-  const buttonCancel = createElement<HTMLButtonElement>(
-    `<button type="button">Cancel</button>`
-  );
-  buttonCancel.addEventListener("click", () => {
-    if (onCancel) {
-      onCancel();
-    }
-    closeModal();
-  });
-  placeholder.appendChild(buttonCancel);
-  document.body.appendChild(element);
-};
-
 const parseElementData = (el: HTMLElement, prop: string): FieldData | null => {
   let json = el.dataset[prop];
   if (json === undefined) {
@@ -183,7 +128,6 @@ export const helpers = {
   div,
   el,
   parseElementData,
-  showModal,
   toggleVisibility,
   readFileAsync,
   objectToArray,
