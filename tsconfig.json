@@ -3,7 +3,6 @@
     "strict": true,
     "target": "es5",
     "module": "amd",
-    "lib": ["dom", "es2017"],
     "outFile": "brickyeditor.js",
     "removeComments": true,
     "declaration": false,

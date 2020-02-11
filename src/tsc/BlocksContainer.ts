@@ -8,10 +8,8 @@ import { bre } from "src/types/bre";
 import { $dom } from "src/common/DOMHelpers";
 import { showBlockEditor } from "src/block/blockEditor";
 
-export const getContainerData = (
-  container: bre.core.IBlocksContainer,
-  ignoreHtml?: boolean
-) => container.blocks.map(block => block.getData(ignoreHtml));
+export const getContainerData = (container: bre.core.IBlocksContainer) =>
+  container.blocks.map(block => block.data);
 
 export const getContainerHtml = (container: bre.core.IBlocksContainer) => {
   const html = container.blocks.map(block => block.getHtml(true)).join("\n");

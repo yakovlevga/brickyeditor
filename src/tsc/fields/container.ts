@@ -3,15 +3,12 @@ import {
   getContainerData,
   getContainerHtml
 } from "src/BlocksContainer";
-import {
-  FieldFactory,
-  toggleFieldSelection,
-  isValidFieldType
-} from "src/fields/field";
+import { toggleFieldSelection, isValidFieldType } from "src/fields/field";
 import { helpers } from "src/helpers";
 import { bre } from "src/types/bre";
 import { Selectors } from "src/ui/Selectors";
 import { emmiter, FieldEventMap } from "src/emmiter";
+import { FieldFactory } from "src/fields/fields";
 
 type ContainerFieldType = "container";
 type ContainerFieldPayload = {
@@ -59,7 +56,7 @@ export const container: FieldFactory = ({ $element, preview, data }) => {
   });
 
   const updateBlocks = () => {
-    const blocks = getContainerData(container, true);
+    const blocks = getContainerData(container);
     const html = getContainerHtml(container);
 
     const updatedData = {

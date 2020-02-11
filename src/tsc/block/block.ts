@@ -60,6 +60,7 @@ export const createBlockFromTemplate = (
     selectedField: null
   };
 
+  // TODO: this should be called create fields or smth, should try drop block dependency from args
   block.fields = bindFields($element, block);
   block.fields.forEach(field => {
     if (field.on !== undefined) {
@@ -73,3 +74,12 @@ export const createBlockFromTemplate = (
 
   return block;
 };
+
+// export const getBlockHtml = (block: bre.core.block.Block, trim: boolean) => {
+//   const $element = block.$element.cloneNode(true);
+//   if (block.fields !== undefined) {
+//     block.fields.forEach(f => {
+//       const name = (f as bre.ui.Field<bre.core.field.FieldData>).data.name;
+//     });
+//   }
+// };

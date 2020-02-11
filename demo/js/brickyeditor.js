@@ -130,6 +130,7 @@ var BrickyEditor = (function (exports) {
         $el.attributes.removeNamedItem(Selectors.attrField);
         return $el;
     };
+    //# sourceMappingURL=field.js.map
 
     var $dom = (function () {
         function $dom() {
@@ -1435,9 +1436,10 @@ var BrickyEditor = (function (exports) {
         });
         return block;
     };
-    //# sourceMappingURL=Block.js.map
 
-    var getContainerData = function (container, ignoreHtml) { return container.blocks.map(function (block) { return block.getData(ignoreHtml); }); };
+    var getContainerData = function (container) {
+        return container.blocks.map(function (block) { return block.data; });
+    };
     var getContainerHtml = function (container) {
         var html = container.blocks.map(function (block) { return block.getHtml(true); }).join("\n");
         var root = container.$element.cloneNode(false);
@@ -1732,7 +1734,7 @@ var BrickyEditor = (function (exports) {
         }
         if ($input instanceof HTMLInputElement) {
             $form.addEventListener("submit", function () {
-                var blocks = getContainerData(editor.container, ignoreHtml);
+                var blocks = getContainerData(editor.container);
                 $input.value = JSON.stringify(blocks);
             });
         }
