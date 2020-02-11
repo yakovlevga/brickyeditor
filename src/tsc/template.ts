@@ -4,7 +4,7 @@ import { helpers, strEqualsInvariant } from "src/helpers";
 import { getRequest } from "src/httpTransport";
 import { bre } from "src/types/bre";
 import { Selectors } from "src/ui/Selectors";
-import { bindFields } from "src/fields/field";
+import { bindFields } from "src/fields/fields";
 
 let allTemplates: bre.core.ITemplate[] = [];
 

@@ -72,6 +72,144 @@ var BrickyEditor = (function (exports) {
         return r;
     }
 
+    var Selectors = (function () {
+        function Selectors() {
+        }
+        Selectors.attr = function (attr) {
+            return "[" + attr + "]";
+        };
+        Selectors.attrContentEditable = "contenteditable";
+        Selectors.selectorContentEditable = "contenteditable";
+        Selectors.attrField = "data-bre-field";
+        Selectors.selectorField = "[" + Selectors.attrField + "]";
+        Selectors.classEditor = "bre-editor";
+        Selectors.classTemplate = "bre-template";
+        Selectors.selectorTemplate = "." + Selectors.classTemplate;
+        Selectors.classTemplateGroup = "bre-template-group";
+        Selectors.selectorTemplateGroup = "." + Selectors.classTemplateGroup;
+        Selectors.selectorTemplatePreview = ".bre-template-preview";
+        Selectors.classMobile = "brickyeditor-tools-mobile";
+        Selectors.htmlToolsCommand = "data-bre-doc-command";
+        Selectors.htmlToolsCommandRange = "data-bre-doc-command-range";
+        Selectors.selectorFieldSelected = "bre-field-selected";
+        Selectors.selectorFieldContainer = "bre-field-container";
+        Selectors.selectorBlockSelected = "bre-block-selected";
+        Selectors.selectorHtmlToolsCommand = Selectors.attr(Selectors.htmlToolsCommand);
+        Selectors.selectorHtmlToolsCommandRange = Selectors.attr(Selectors.htmlToolsCommandRange);
+        return Selectors;
+    }());
+    //# sourceMappingURL=Selectors.js.map
+
+    var isValidFieldType = function (data, type) { return data.type === type; };
+    var updateFieldData = function (field, changes, fireEvent) {
+        var data = field.data;
+        var props = Object.keys(changes);
+        var hasChanges = props.some(function (p) { return data[p] !== changes[p]; });
+        if (hasChanges) {
+            field.data = __assign(__assign({}, data), { changes: changes });
+            if (fireEvent !== undefined) {
+                fireEvent("change", { field: field });
+            }
+        }
+    };
+    var toggleFieldSelection = function (field, selected, fireEvent) {
+        var classList = field.$element.classList;
+        if (selected) {
+            field.selected = selected;
+            classList.add(Selectors.selectorFieldSelected);
+        }
+        else {
+            classList.remove(Selectors.selectorFieldSelected);
+        }
+        if (fireEvent !== undefined) {
+            fireEvent(selected ? "focus" : "blur", { field: field });
+        }
+    };
+    var getCleanFieldElement = function ($field) {
+        var $el = $field.cloneNode(true);
+        $el.attributes.removeNamedItem(Selectors.attrField);
+        return $el;
+    };
+
+    var $dom = (function () {
+        function $dom() {
+        }
+        $dom.before = function (el, elToInsert) {
+            var _this = this;
+            if (elToInsert instanceof HTMLElement) {
+                if (el.parentNode !== null) {
+                    el.parentNode.insertBefore(elToInsert, el);
+                }
+            }
+            else {
+                elToInsert.forEach(function ($el) { return _this.before(el, $el); });
+            }
+        };
+        $dom.after = function (el, elToInsert) {
+            if (el.parentNode === null) {
+                return;
+            }
+            if (el.nextSibling) {
+                el.parentNode.insertBefore(elToInsert, el);
+            }
+            else {
+                el.parentNode.appendChild(elToInsert);
+            }
+        };
+        $dom.matches = function (el, selector) {
+            var matches = el.matches ||
+                el.matchesSelector ||
+                el.msMatchesSelector ||
+                el.mozMatchesSelector ||
+                el.webkitMatchesSelector ||
+                el.oMatchesSelector;
+            return matches.call(el, selector);
+        };
+        return $dom;
+    }());
+    //# sourceMappingURL=DOMHelpers.js.map
+
+    var EditorStrings = (function () {
+        function EditorStrings() {
+        }
+        EditorStrings.embedFieldLinkTitle = "Link to embed media";
+        EditorStrings.embedFieldLinkPlaceholder = "Link to instagram, youtube and etc.";
+        EditorStrings.imageFieldLinkTitle = "Image link";
+        EditorStrings.imageFieldLinkPlaceholder = "http://url-to-image.png";
+        EditorStrings.imageFieldUploadTitle = "or Upload a file";
+        EditorStrings.imageFieldUploadButton = "Select file";
+        EditorStrings.imageFieldAltTitle = "Alt";
+        EditorStrings.imageFieldAltPlaceholder = "Image 'alt' attribute value";
+        EditorStrings.imageFieldUrlSubtitle = "Link to open on image click";
+        EditorStrings.htmlEditorLinkUrlTitle = "Url";
+        EditorStrings.htmlEditorLinkUrlPlaceholder = "http://put-your-link.here";
+        EditorStrings.htmlEditorLinkTitleTitle = "Title";
+        EditorStrings.htmlEditorLinkTitlePlaceholder = "Title attribute for link";
+        EditorStrings.htmlEditorLinkTargetTitle = "Target";
+        EditorStrings.htmlEditorLinkTargetBlank = "Blank";
+        EditorStrings.htmlEditorLinkTargetSelf = "Self";
+        EditorStrings.htmlEditorLinkTargetParent = "Parent";
+        EditorStrings.htmlEditorLinkTargetTop = "Top";
+        EditorStrings.buttonClose = "close";
+        EditorStrings.buttonOk = "Ok";
+        EditorStrings.buttonCancel = "Cancel";
+        EditorStrings.defaultTemplatesGroupName = "Other templates";
+        EditorStrings.errorBlocksFileNotFound = function (url) {
+            return "Blocks file not found. Requested file: " + url + ".";
+        };
+        EditorStrings.errorTemplatesFileNotFound = function (url) {
+            return "Templates file not found. Requested file: " + url + ".";
+        };
+        EditorStrings.errorBlockTemplateNotFound = function (templateName) {
+            return "Template \"" + templateName + "\" not found.";
+        };
+        EditorStrings.errorTemplateParsing = function (name) {
+            return "Template parsing error: " + name + ".";
+        };
+        return EditorStrings;
+    }());
+    //# sourceMappingURL=EditorStrings.js.map
+
     var el = function (_a) {
         var _b = _a.tag, tag = _b === void 0 ? "div" : _b, className = _a.className, innerHTML = _a.innerHTML, props = _a.props;
         var result = document.createElement(tag);
@@ -157,7 +295,7 @@ var BrickyEditor = (function (exports) {
     var filterNotNull = function (value) {
         return value.filter(function (x) { return x !== null; });
     };
-    var strEqualsInvariant$1 = function (s1, s2) {
+    var strEqualsInvariant = function (s1, s2) {
         if (!s1 || !s2) {
             return s1 === s2;
         }
@@ -175,33 +313,84 @@ var BrickyEditor = (function (exports) {
     };
     //# sourceMappingURL=helpers.js.map
 
-    var Selectors = (function () {
-        function Selectors() {
-        }
-        Selectors.attr = function (attr) {
-            return "[" + attr + "]";
-        };
-        Selectors.attrContentEditable = "contenteditable";
-        Selectors.selectorContentEditable = "contenteditable";
-        Selectors.attrField = "data-bre-field";
-        Selectors.selectorField = "[" + Selectors.attrField + "]";
-        Selectors.classEditor = "bre-editor";
-        Selectors.classTemplate = "bre-template";
-        Selectors.selectorTemplate = "." + Selectors.classTemplate;
-        Selectors.classTemplateGroup = "bre-template-group";
-        Selectors.selectorTemplateGroup = "." + Selectors.classTemplateGroup;
-        Selectors.selectorTemplatePreview = ".bre-template-preview";
-        Selectors.classMobile = "brickyeditor-tools-mobile";
-        Selectors.htmlToolsCommand = "data-bre-doc-command";
-        Selectors.htmlToolsCommandRange = "data-bre-doc-command-range";
-        Selectors.selectorFieldSelected = "bre-field-selected";
-        Selectors.selectorFieldContainer = "bre-field-container";
-        Selectors.selectorBlockSelected = "bre-block-selected";
-        Selectors.selectorHtmlToolsCommand = Selectors.attr(Selectors.htmlToolsCommand);
-        Selectors.selectorHtmlToolsCommandRange = Selectors.attr(Selectors.htmlToolsCommandRange);
-        return Selectors;
-    }());
-    //# sourceMappingURL=Selectors.js.map
+    var getRequest = function (url) {
+        return new Promise(function (resolve, reject) {
+            var request = new XMLHttpRequest();
+            request.open("GET", url, true);
+            request.onreadystatechange = function () {
+                if (this.readyState === 4) {
+                    if (this.status >= 200 && this.status < 400) {
+                        var data = null;
+                        try {
+                            data = JSON.parse(this.responseText);
+                        }
+                        catch (_a) {
+                            data = this.responseText;
+                        }
+                        try {
+                            resolve(data);
+                        }
+                        catch (ex) {
+                            reject(ex);
+                        }
+                    }
+                    else {
+                        reject();
+                    }
+                }
+            };
+            request.send();
+            request = null;
+        });
+    };
+    var loadScriptAsync = function (url) {
+        return new Promise(function (resolve, reject) {
+            var script = document.createElement("script");
+            var done = false;
+            var scriptDocLoadedHandler = function () {
+                var readyState = script.readyState;
+                if (done === false &&
+                    (readyState === undefined ||
+                        readyState === "loaded" ||
+                        readyState === "complete")) {
+                    done = true;
+                    resolve();
+                }
+                else {
+                    reject();
+                }
+            };
+            script.onload = scriptDocLoadedHandler;
+            if (script.onreadystatechange !== undefined) {
+                script.onreadystatechange = scriptDocLoadedHandler;
+            }
+            script.src = url.indexOf("//") === 0 ? "https:" + url : url;
+            document.head.appendChild(script);
+        });
+    };
+    var jsonp = function (url) {
+        return new Promise(function (resolve, reject) {
+            var id = "_" + Math.round(10000 * Math.random());
+            var callbackName = "jsonp_callback_" + id;
+            window[callbackName] = function (data) {
+                delete window[callbackName];
+                var element = document.getElementById(id);
+                if (element !== null) {
+                    element.remove();
+                }
+                resolve(data);
+            };
+            var src = url + "&callback=" + callbackName;
+            var script = document.createElement("script");
+            script.src = src;
+            script.id = id;
+            script.addEventListener("error", reject);
+            (document.getElementsByTagName("head")[0] ||
+                document.body ||
+                document.documentElement).appendChild(script);
+        });
+    };
+    //# sourceMappingURL=httpTransport.js.map
 
     var renderLabel = function ($root, $input, _a) {
         var title = _a.title;
@@ -376,44 +565,6 @@ var BrickyEditor = (function (exports) {
     };
     //# sourceMappingURL=linkEditor.js.map
 
-    var $dom = (function () {
-        function $dom() {
-        }
-        $dom.before = function (el, elToInsert) {
-            var _this = this;
-            if (elToInsert instanceof HTMLElement) {
-                if (el.parentNode !== null) {
-                    el.parentNode.insertBefore(elToInsert, el);
-                }
-            }
-            else {
-                elToInsert.forEach(function ($el) { return _this.before(el, $el); });
-            }
-        };
-        $dom.after = function (el, elToInsert) {
-            if (el.parentNode === null) {
-                return;
-            }
-            if (el.nextSibling) {
-                el.parentNode.insertBefore(elToInsert, el);
-            }
-            else {
-                el.parentNode.appendChild(elToInsert);
-            }
-        };
-        $dom.matches = function (el, selector) {
-            var matches = el.matches ||
-                el.matchesSelector ||
-                el.msMatchesSelector ||
-                el.mozMatchesSelector ||
-                el.webkitMatchesSelector ||
-                el.oMatchesSelector;
-            return matches.call(el, selector);
-        };
-        return $dom;
-    }());
-    //# sourceMappingURL=DOMHelpers.js.map
-
     var getSelectionRanges = function () {
         var selection = window.getSelection();
         if (selection === null) {
@@ -498,6 +649,7 @@ var BrickyEditor = (function (exports) {
         root.append($placeholder);
         document.body.appendChild(root);
     };
+    //# sourceMappingURL=modal.js.map
 
     var promptLinkParamsAsync = function (initialData) {
         return new Promise(function (resolve) {
@@ -572,7 +724,7 @@ var BrickyEditor = (function (exports) {
     var getSeletedLink = function (selection) {
         if (selection.anchorNode !== null &&
             selection.anchorNode.parentNode !== null &&
-            strEqualsInvariant$1(selection.anchorNode.parentNode.nodeName, "a")) {
+            strEqualsInvariant(selection.anchorNode.parentNode.nodeName, "a")) {
             return selection.anchorNode.parentNode;
         }
         return null;
@@ -725,85 +877,6 @@ var BrickyEditor = (function (exports) {
         return $copy;
     };
     //# sourceMappingURL=html.js.map
-
-    var getRequest = function (url) {
-        return new Promise(function (resolve, reject) {
-            var request = new XMLHttpRequest();
-            request.open("GET", url, true);
-            request.onreadystatechange = function () {
-                if (this.readyState === 4) {
-                    if (this.status >= 200 && this.status < 400) {
-                        var data = null;
-                        try {
-                            data = JSON.parse(this.responseText);
-                        }
-                        catch (_a) {
-                            data = this.responseText;
-                        }
-                        try {
-                            resolve(data);
-                        }
-                        catch (ex) {
-                            reject(ex);
-                        }
-                    }
-                    else {
-                        reject();
-                    }
-                }
-            };
-            request.send();
-            request = null;
-        });
-    };
-    var loadScriptAsync = function (url) {
-        return new Promise(function (resolve, reject) {
-            var script = document.createElement("script");
-            var done = false;
-            var scriptDocLoadedHandler = function () {
-                var readyState = script.readyState;
-                if (done === false &&
-                    (readyState === undefined ||
-                        readyState === "loaded" ||
-                        readyState === "complete")) {
-                    done = true;
-                    resolve();
-                }
-                else {
-                    reject();
-                }
-            };
-            script.onload = scriptDocLoadedHandler;
-            if (script.onreadystatechange !== undefined) {
-                script.onreadystatechange = scriptDocLoadedHandler;
-            }
-            script.src = url.indexOf("//") === 0 ? "https:" + url : url;
-            document.head.appendChild(script);
-        });
-    };
-    var jsonp = function (url) {
-        return new Promise(function (resolve, reject) {
-            var id = "_" + Math.round(10000 * Math.random());
-            var callbackName = "jsonp_callback_" + id;
-            window[callbackName] = function (data) {
-                delete window[callbackName];
-                var element = document.getElementById(id);
-                if (element !== null) {
-                    element.remove();
-                }
-                resolve(data);
-            };
-            var src = url + "&callback=" + callbackName;
-            var script = document.createElement("script");
-            script.src = src;
-            script.id = id;
-            script.addEventListener("error", reject);
-            (document.getElementsByTagName("head")[0] ||
-                document.body ||
-                document.documentElement).appendChild(script);
-        });
-    };
-    //# sourceMappingURL=httpTransport.js.map
 
     var preProcessEmbedUrl = function (url) {
         return url.replace("https://www.instagram.com", "http://instagr.am");
@@ -1105,61 +1178,38 @@ var BrickyEditor = (function (exports) {
     };
     //# sourceMappingURL=image.js.map
 
-    var Fields = {
+    var fields = {
         html: html,
         image: image,
         embed: embed,
         container: container
     };
-    var isValidFieldType = function (data, type) { return data.type === type; };
+    var getFieldFunc = function (type) { return fields[type]; };
     var createField = function (_a) {
         var $element = _a.$element, preview = _a.preview, initialData = _a.data;
         var data = helpers.parseElementData($element, "breField");
         if (data === null) {
             return null;
         }
-        var type = data.type;
         if (initialData !== undefined) {
             data = __assign(__assign({}, data), initialData);
         }
-        var createFieldFunc = Fields[type];
-        if (createFieldFunc === undefined) {
-            throw new Error(type + " field not found");
+        var field = getFieldFunc(data.type);
+        if (field === undefined) {
+            throw new Error(data.type + " field not found");
         }
-        return createFieldFunc({
+        return field({
             $element: $element,
             preview: preview,
             data: data
         });
     };
-    var updateFieldData = function (field, changes, fireEvent) {
-        var data = field.data;
-        var props = Object.keys(changes);
-        var hasChanges = props.some(function (p) { return data[p] !== changes[p]; });
-        if (hasChanges) {
-            field.data = __assign(__assign({}, data), { changes: changes });
-            if (fireEvent !== undefined) {
-                fireEvent("change", { field: field });
-            }
-        }
-    };
-    var toggleFieldSelection = function (field, selected, fireEvent) {
-        var classList = field.$element.classList;
-        if (selected) {
-            field.selected = selected;
-            classList.add(Selectors.selectorFieldSelected);
-        }
-        else {
-            classList.remove(Selectors.selectorFieldSelected);
-        }
-        if (fireEvent !== undefined) {
-            fireEvent(selected ? "focus" : "blur", { field: field });
-        }
-    };
-    var getCleanFieldElement = function ($field) {
-        var $el = $field.cloneNode(true);
-        $el.attributes.removeNamedItem(Selectors.attrField);
-        return $el;
+    var bindFields = function ($element, block) {
+        var $fieldElement = findFieldElements($element);
+        var fields = $fieldElement.map(function ($fieldElement) {
+            return bindField($fieldElement, block);
+        });
+        return helpers.filterNotNull(fields);
     };
     function bindField($element, block) {
         var data = helpers.parseElementData($element, "breField");
@@ -1179,22 +1229,8 @@ var BrickyEditor = (function (exports) {
             preview: false,
             data: data
         });
-        if (field !== null && field.on !== undefined) {
-            field.on("focus", function (ev) {
-                if (ev !== undefined) {
-                    selectField(block, ev.field);
-                }
-            });
-        }
         return field;
     }
-    var bindFields = function ($element, block) {
-        var $fieldElement = findFieldElements($element);
-        var fields = $fieldElement.map(function ($fieldElement) {
-            return bindField($fieldElement, block);
-        });
-        return helpers.filterNotNull(fields);
-    };
     function getFieldDataByName(block, name) {
         if (!block.data || !block.data.fields) {
             return null;
@@ -1213,53 +1249,12 @@ var BrickyEditor = (function (exports) {
         }
         return $fields;
     }
-    //# sourceMappingURL=field.js.map
-
-    var EditorStrings = (function () {
-        function EditorStrings() {
-        }
-        EditorStrings.embedFieldLinkTitle = "Link to embed media";
-        EditorStrings.embedFieldLinkPlaceholder = "Link to instagram, youtube and etc.";
-        EditorStrings.imageFieldLinkTitle = "Image link";
-        EditorStrings.imageFieldLinkPlaceholder = "http://url-to-image.png";
-        EditorStrings.imageFieldUploadTitle = "or Upload a file";
-        EditorStrings.imageFieldUploadButton = "Select file";
-        EditorStrings.imageFieldAltTitle = "Alt";
-        EditorStrings.imageFieldAltPlaceholder = "Image 'alt' attribute value";
-        EditorStrings.imageFieldUrlSubtitle = "Link to open on image click";
-        EditorStrings.htmlEditorLinkUrlTitle = "Url";
-        EditorStrings.htmlEditorLinkUrlPlaceholder = "http://put-your-link.here";
-        EditorStrings.htmlEditorLinkTitleTitle = "Title";
-        EditorStrings.htmlEditorLinkTitlePlaceholder = "Title attribute for link";
-        EditorStrings.htmlEditorLinkTargetTitle = "Target";
-        EditorStrings.htmlEditorLinkTargetBlank = "Blank";
-        EditorStrings.htmlEditorLinkTargetSelf = "Self";
-        EditorStrings.htmlEditorLinkTargetParent = "Parent";
-        EditorStrings.htmlEditorLinkTargetTop = "Top";
-        EditorStrings.buttonClose = "close";
-        EditorStrings.buttonOk = "Ok";
-        EditorStrings.buttonCancel = "Cancel";
-        EditorStrings.defaultTemplatesGroupName = "Other templates";
-        EditorStrings.errorBlocksFileNotFound = function (url) {
-            return "Blocks file not found. Requested file: " + url + ".";
-        };
-        EditorStrings.errorTemplatesFileNotFound = function (url) {
-            return "Templates file not found. Requested file: " + url + ".";
-        };
-        EditorStrings.errorBlockTemplateNotFound = function (templateName) {
-            return "Template \"" + templateName + "\" not found.";
-        };
-        EditorStrings.errorTemplateParsing = function (name) {
-            return "Template parsing error: " + name + ".";
-        };
-        return EditorStrings;
-    }());
-    //# sourceMappingURL=EditorStrings.js.map
+    //# sourceMappingURL=fields.js.map
 
     var allTemplates = [];
     var getTemplate = function (templateName) {
         var template = allTemplates.find(function (x) {
-            return strEqualsInvariant$1(x.name, templateName);
+            return strEqualsInvariant(x.name, templateName);
         });
         if (template === undefined) {
             throw new Error("Template is not registred: " + templateName);
