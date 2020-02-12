@@ -846,8 +846,10 @@ define("ui/htmlTools", ["require", "exports", "helpers", "ui/Selectors", "fields
     var control;
     exports.initHtmlTools = function (_a) {
         var htmlToolsButtons = _a.htmlToolsButtons;
-        control = renderControl(htmlToolsButtons);
-        document.body.appendChild(control);
+        if (htmlToolsButtons) {
+            control = renderControl(htmlToolsButtons);
+            document.body.appendChild(control);
+        }
     };
     exports.toggleHtmlTools = function (rect) {
         if (rect !== null && rect.width > 1) {

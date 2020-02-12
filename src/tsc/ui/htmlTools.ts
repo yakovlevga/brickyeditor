@@ -145,7 +145,7 @@ const wrapSelectionToContainer = (selection: Selection) => {
       `<div class="bre-temp-container" contenteditable="true">${$container.innerHTML}</div>`
     );
     $container.innerHTML = "";
-    $container.removeAttribute(Selectors.attrContentEditable);
+    $container.removeAttribute("contenteditable");
     $container.appendChild($wrapper);
 
     const range = document.createRange();

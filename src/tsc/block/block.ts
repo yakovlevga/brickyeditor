@@ -14,7 +14,6 @@ export const selectField = (
 };
 
 export const toggleBlockSelection = (
-  container: bre.core.IBlocksContainer,
   block: bre.core.block.Block,
   selected: boolean
 ) => {

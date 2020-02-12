@@ -15,6 +15,7 @@ export const getContainerHtml = (
   container: bre.core.IBlocksContainer,
   ignoreHtml?: boolean
 ) => {
+  // TODO: fix it
   const html = container.blocks.map(block => block.getHtml(true)).join("\n");
   const root: HTMLElement = container.$element.cloneNode(false) as HTMLElement;
   root.innerHTML = html;
@@ -136,11 +137,11 @@ function selectBlock(
   block: bre.core.block.Block
 ) {
   if (container.selectedBlock !== null) {
-    toggleBlockSelection(container, container.selectedBlock, false);
+    toggleBlockSelection(container.selectedBlock, false);
   }
 
   container.selectedBlock = block;
-  toggleBlockSelection(container, container.selectedBlock, true);
+  toggleBlockSelection(container.selectedBlock, true);
 }
 
 // TODO: check this later
@@ -171,7 +172,7 @@ export const deleteBlock = (
   block: bre.core.block.Block
 ) => {
   if (container.selectedBlock === block) {
-    toggleBlockSelection(container, block, false);
+    toggleBlockSelection(block, false);
   }
 
   container.blocks = container.blocks.filter(b => b !== block);

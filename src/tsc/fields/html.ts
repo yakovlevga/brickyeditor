@@ -7,7 +7,6 @@ import {
 import { bre } from "@/types/bre";
 import { toggleHtmlTools } from "@/ui/htmlTools";
 import { bindTextSelection } from "@/ui/selection";
-import { Selectors } from "@/ui/Selectors";
 import { emmiter, FieldEventMap } from "@/emmiter";
 import { FieldFactory } from "@/fields/fields";
 
@@ -58,7 +57,7 @@ export const html: FieldFactory = ({ $element, preview, data }) => {
     }
   };
 
-  $element.setAttribute(Selectors.attrContentEditable, "true");
+  $element.setAttribute("contenteditable", "true");
 
   bindTextSelection($element, rect => {
     toggleHtmlTools(rect);
@@ -93,6 +92,6 @@ const bind = ($element: HTMLElement, { html }: HtmlFieldData) => {
 
 const getHtml = (field: HtmlField) => {
   const $copy = getCleanFieldElement(field.$element);
-  $copy.removeAttribute(Selectors.attrContentEditable);
+  $copy.removeAttribute("contenteditable");
   return $copy;
 };
