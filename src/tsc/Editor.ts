@@ -3,14 +3,14 @@ import {
   createContainer,
   getContainerData,
   getContainerHtml
-} from "src/BlocksContainer";
-import { defaultOptions } from "src/defaults";
-import { getRequest } from "src/httpTransport";
-import { loadTemplatesAsync } from "src/template";
-import { bre } from "src/types/bre";
-import { Selectors } from "src/ui/Selectors";
-import { getTemplateSelector } from "src/ui/templateSelector";
-import { initHtmlTools } from "src/ui/htmlTools";
+} from "@/BlocksContainer";
+import { defaultOptions } from "@/defaults";
+import { getRequest } from "@/httpTransport";
+import { loadTemplatesAsync } from "@/template";
+import { bre } from "@/types/bre";
+import { Selectors } from "@/ui/Selectors";
+import { getTemplateSelector } from "@/ui/templateSelector";
+import { initHtmlTools } from "@/ui/htmlTools";
 
 export class Editor {
   constructor($editor: HTMLElement, options: bre.Options) {
@@ -25,8 +25,9 @@ export const editor = (
   new Promise<bre.core.Editor>(async resolve => {
     const optionsWithDefaults = { ...defaultOptions, ...options };
     const container = createContainer($element, false);
-    const getData = () => getContainerData(container, options.ignoreHtml);
-    const getHtml = () => getContainerHtml(container);
+    const getData = () => getContainerData(container);
+    const getHtml = () =>
+      getContainerHtml(container, optionsWithDefaults.ignoreHtml);
 
     const editor = {
       $element,
@@ -41,7 +42,7 @@ export const editor = (
     initHtmlTools(optionsWithDefaults);
 
     // TODO: move it to separate plugin?
-    bindFormSubmit(editor, optionsWithDefaults);
+    // bindFormSubmit(editor, optionsWithDefaults);
 
     const templates = await loadTemplatesAsync(
       optionsWithDefaults.templatesUrl,
@@ -95,28 +96,28 @@ const loadInitialBlocks = ({ blocks, blocksUrl }: bre.Options) =>
     resolve(null);
   });
 
-const bindFormSubmit = (
-  editor: bre.core.Editor,
-  { formSelector, inputSelector, ignoreHtml }: bre.Options
-): void => {
-  if (formSelector === undefined || inputSelector === undefined) {
-    return;
-  }
+// const bindFormSubmit = (
+//   editor: bre.core.Editor,
+//   { formSelector, inputSelector, ignoreHtml }: bre.Options
+// ): void => {
+//   if (formSelector === undefined || inputSelector === undefined) {
+//     return;
+//   }
 
-  const $form = document.querySelector(formSelector);
-  if ($form === null) {
-    return;
-  }
+//   const $form = document.querySelector(formSelector);
+//   if ($form === null) {
+//     return;
+//   }
 
-  const $input = document.querySelector(inputSelector);
-  if ($input === null) {
-    return;
-  }
+//   const $input = document.querySelector(inputSelector);
+//   if ($input === null) {
+//     return;
+//   }
 
-  if ($input instanceof HTMLInputElement) {
-    $form.addEventListener("submit", () => {
-      const blocks = getContainerData(editor.container, ignoreHtml);
-      ($input as HTMLInputElement).value = JSON.stringify(blocks);
-    });
-  }
-};
+//   if ($input instanceof HTMLInputElement) {
+//     $form.addEventListener("submit", () => {
+//       const blocks = getContainerData(editor.container, ignoreHtml);
+//       ($input as HTMLInputElement).value = JSON.stringify(blocks);
+//     });
+//   }
+// };

@@ -1,11 +1,11 @@
-import { NoembedResponse } from "src/embed";
+import { NoembedResponse } from "@/embed";
 import {
   OnOffFunc,
   FieldEventMap,
   TemplatesEventMap,
   Emitter,
   BlockEventMap
-} from "src/emmiter";
+} from "@/emmiter";
 
 declare var instgrm: any;
 

@@ -1,8 +1,8 @@
-import { bre } from "src/types/bre";
-import { helpers } from "src/helpers";
+import { bre } from "@/types/bre";
+import { helpers } from "@/helpers";
 
 import { TemplateSelectorStyles } from "./templateSelector.scss";
-import { TemplatesEventMap, emmiter, FireFunc } from "src/emmiter";
+import { TemplatesEventMap, emmiter, FireFunc } from "@/emmiter";
 
 const getTemplateUI = (template: bre.core.ITemplate) => {
   const $template = helpers.div<TemplateSelectorStyles>(

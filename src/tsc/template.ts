@@ -1,10 +1,10 @@
-import { $dom } from "src/common/DOMHelpers";
-import { EditorStrings } from "src/EditorStrings";
-import { helpers, strEqualsInvariant } from "src/helpers";
-import { getRequest } from "src/httpTransport";
-import { bre } from "src/types/bre";
-import { Selectors } from "src/ui/Selectors";
-import { bindFields } from "src/fields/fields";
+import { $dom } from "@/common/DOMHelpers";
+import { EditorStrings } from "@/EditorStrings";
+import { helpers, strEqualsInvariant } from "@/helpers";
+import { getRequest } from "@/httpTransport";
+import { bre } from "@/types/bre";
+import { Selectors } from "@/ui/Selectors";
+import { bindFields } from "@/fields/fields";
 
 let allTemplates: bre.core.ITemplate[] = [];
 

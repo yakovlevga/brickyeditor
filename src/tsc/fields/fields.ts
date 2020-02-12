@@ -1,10 +1,10 @@
-import { html } from "src/fields/html";
-import { embed } from "src/fields/embed";
-import { container } from "src/fields/container";
-import { image } from "src/fields/image";
-import { bre } from "src/types/bre";
-import { helpers, strEqualsInvariant } from "src/helpers";
-import { Selectors } from "src/ui/Selectors";
+import { html } from "@/fields/html";
+import { embed } from "@/fields/embed";
+import { container } from "@/fields/container";
+import { image } from "@/fields/image";
+import { bre } from "@/types/bre";
+import { helpers, strEqualsInvariant } from "@/helpers";
+import { Selectors } from "@/ui/Selectors";
 
 let fields: {
   [TKey in string]: FieldFactory;

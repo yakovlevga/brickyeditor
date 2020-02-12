@@ -1,8 +1,8 @@
-import { bre } from "src/types/bre";
-import { helpers } from "src/helpers";
-import { EditorsStyles } from "src/fields/editors.scss";
-import { renderInput, renderSelect } from "src/fields/inputs";
-import { locales } from "src/locales";
+import { bre } from "@/types/bre";
+import { helpers } from "@/helpers";
+import { EditorsStyles } from "@/fields/editors.scss";
+import { renderInput, renderSelect } from "@/fields/inputs";
+import { locales } from "@/locales";
 
 export const linkEditor = (initialData?: Readonly<bre.core.field.LinkData>) => {
   const data = initialData ? { ...initialData } : {};

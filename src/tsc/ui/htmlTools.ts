@@ -1,9 +1,9 @@
-import { helpers, strEqualsInvariant } from "src/helpers";
+import { helpers, strEqualsInvariant } from "@/helpers";
 
-import { bre } from "src/types/bre";
-import { Selectors } from "src/ui/Selectors";
-import { linkEditor } from "src/fields/linkEditor";
-import { dialog } from "src/modal";
+import { bre } from "@/types/bre";
+import { Selectors } from "@/ui/Selectors";
+import { linkEditor } from "@/fields/linkEditor";
+import { dialog } from "@/modal";
 
 const promptLinkParamsAsync = (
   initialData: Readonly<bre.core.field.LinkData>
@@ -158,8 +158,10 @@ const wrapSelectionToContainer = (selection: Selection) => {
 let control: HTMLElement;
 
 export const initHtmlTools = ({ htmlToolsButtons }: bre.Options) => {
-  control = renderControl(htmlToolsButtons);
-  document.body.appendChild(control);
+  if (htmlToolsButtons) {
+    control = renderControl(htmlToolsButtons);
+    document.body.appendChild(control);
+  }
 };
 
 export const toggleHtmlTools = (rect: ClientRect | null) => {

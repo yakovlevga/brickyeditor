@@ -1,6 +1,6 @@
-import { getSelectionRanges, restoreSelection } from "src/ui/selection";
-import { helpers } from "src/helpers";
-import { ModalStyles } from "src/modal.scss";
+import { getSelectionRanges, restoreSelection } from "@/ui/selection";
+import { helpers } from "@/helpers";
+import { ModalStyles } from "@/modal.scss";
 
 export const dialog = (
   $content: HTMLElement,

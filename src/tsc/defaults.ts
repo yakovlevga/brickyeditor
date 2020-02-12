@@ -1,4 +1,4 @@
-import { bre } from "src/types/bre";
+import { bre } from "@/types/bre";
 
 const defaultButtons: bre.core.IHtmlToolsButton[] = [
   { icon: "bold", command: "Bold", range: true },

@@ -1,10 +1,10 @@
-import { toggleFieldSelection } from "src/fields/field";
-import { getTemplate } from "src/template";
-import { bre } from "src/types/bre";
-import { Selectors } from "src/ui/Selectors";
-import { showBlockEditor, hideBlockEditor } from "src/block/blockEditor";
-import { emmiter, BlockEventMap } from "src/emmiter";
-import { bindFields } from "src/fields/fields";
+import { toggleFieldSelection } from "@/fields/field";
+import { getTemplate } from "@/template";
+import { bre } from "@/types/bre";
+import { Selectors } from "@/ui/Selectors";
+import { showBlockEditor, hideBlockEditor } from "@/block/blockEditor";
+import { emmiter, BlockEventMap } from "@/emmiter";
+import { bindFields } from "@/fields/fields";
 
 export const selectField = (
   block: bre.core.block.Block,

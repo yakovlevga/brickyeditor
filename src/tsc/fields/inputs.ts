@@ -1,5 +1,5 @@
-import { helpers } from "src/helpers";
-import { EditorsStyles } from "src/fields/editors.scss";
+import { helpers } from "@/helpers";
+import { EditorsStyles } from "@/fields/editors.scss";
 
 type InputParams = {
   title?: string;

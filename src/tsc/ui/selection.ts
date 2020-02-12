@@ -1,4 +1,4 @@
-import { $dom } from "src/common/DOMHelpers";
+import { $dom } from "@/common/DOMHelpers";
 
 export const getSelectionRanges = () => {
   const selection = window.getSelection();

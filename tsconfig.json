@@ -6,13 +6,14 @@
     "outFile": "brickyeditor.js",
     "removeComments": true,
     "declaration": false,
-    "baseUrl": ".",
     "noImplicitAny": true,
     "noImplicitReturns": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
+    "esModuleInterop": true,
+    "baseUrl": "src/tsc",
     "paths": {
-      "src/*": ["src/tsc/*"]
+      "@/*": ["*"] // resolve all modules prefixed with `@/` from `src` directory
     },
     "plugins": [
       {
@@ -20,5 +21,6 @@
       }
     ]
   },
-  "typeRoots": ["types"]
+  "typeRoots": ["types"],
+  "exclude": ["node_modules", "**/*.test.ts"]
 }

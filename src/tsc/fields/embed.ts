@@ -3,22 +3,22 @@ import {
   NoembedResponse,
   postProcessEmbed,
   preProcessEmbedUrl
-} from "src/embed";
+} from "@/embed";
 import {
-  FieldFactory,
   getCleanFieldElement,
   isValidFieldType,
   toggleFieldSelection,
   updateFieldData
-} from "src/fields/field";
-import { helpers } from "src/helpers";
-import { loadScriptAsync } from "src/httpTransport";
-import { locales } from "src/locales";
-import { bre } from "src/types/bre";
-import { emmiter, FieldEventMap } from "src/emmiter";
-import { propmtFieldEditorAsync } from "src/fields/editors";
-import { EditorsStyles } from "src/fields/editors.scss";
-import { renderInput } from "src/fields/inputs";
+} from "@/fields/field";
+import { helpers } from "@/helpers";
+import { loadScriptAsync } from "@/httpTransport";
+import { locales } from "@/locales";
+import { bre } from "@/types/bre";
+import { emmiter, FieldEventMap } from "@/emmiter";
+import { propmtFieldEditorAsync } from "@/fields/editors";
+import { EditorsStyles } from "@/fields/editors.scss";
+import { renderInput } from "@/fields/inputs";
+import { FieldFactory } from "@/fields/fields";
 
 const providerScriptsLoaded: {
   [TKey: string]: boolean;

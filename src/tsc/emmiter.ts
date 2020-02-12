@@ -1,4 +1,4 @@
-import { bre } from "src/types/bre";
+import { bre } from "@/types/bre";
 
 interface FieldEvent {
   field: bre.ui.FieldBase;

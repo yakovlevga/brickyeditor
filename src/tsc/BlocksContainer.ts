@@ -2,16 +2,19 @@ import {
   createBlockFromData,
   createBlockFromTemplate,
   toggleBlockSelection
-} from "src/block/Block";
-import { helpers } from "src/helpers";
-import { bre } from "src/types/bre";
-import { $dom } from "src/common/DOMHelpers";
-import { showBlockEditor } from "src/block/blockEditor";
+} from "@/block/Block";
+import { helpers } from "@/helpers";
+import { bre } from "@/types/bre";
+import { $dom } from "@/common/DOMHelpers";
+import { showBlockEditor } from "@/block/blockEditor";
 
 export const getContainerData = (container: bre.core.IBlocksContainer) =>
   container.blocks.map(block => block.data);
 
-export const getContainerHtml = (container: bre.core.IBlocksContainer) => {
+export const getContainerHtml = (
+  container: bre.core.IBlocksContainer,
+  ignoreHtml?: boolean
+) => {
   const html = container.blocks.map(block => block.getHtml(true)).join("\n");
   const root: HTMLElement = container.$element.cloneNode(false) as HTMLElement;
   root.innerHTML = html;

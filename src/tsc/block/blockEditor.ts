@@ -1,8 +1,8 @@
-import { bre } from "src/types/bre";
+import { bre } from "@/types/bre";
 
 import { BlockEditorStyles } from "./blockEditor.scss";
-import { FireFunc, BlockEventMap } from "src/emmiter";
-import { helpers } from "src/helpers";
+import { FireFunc, BlockEventMap } from "@/emmiter";
+import { helpers } from "@/helpers";
 
 type BlockEditorButton = {
   name: string;

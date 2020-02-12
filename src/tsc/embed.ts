@@ -1,4 +1,4 @@
-import { jsonp } from "src/httpTransport";
+import { jsonp } from "@/httpTransport";
 
 type WindowWithInstgrm = {
   instgrm?: {

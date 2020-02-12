@@ -1,5 +1,5 @@
-import { bre } from "src/types/bre";
-import { dialog } from "src/modal";
+import { bre } from "@/types/bre";
+import { dialog } from "@/modal";
 
 export const propmtFieldEditorAsync = <
   TFieldData extends bre.core.field.FieldData

@@ -1,4 +1,4 @@
-import { bre } from "src/types/bre";
+import { bre } from "@/types/bre";
 
 type FieldData = bre.core.field.FieldData;
 

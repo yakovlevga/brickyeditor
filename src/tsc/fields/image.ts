@@ -1,18 +1,18 @@
 import {
-  FieldFactory,
   getCleanFieldElement,
   isValidFieldType,
   updateFieldData,
   toggleFieldSelection
-} from "src/fields/field";
-import { helpers } from "src/helpers";
-import { bre } from "src/types/bre";
-import { emmiter, FieldEventMap } from "src/emmiter";
-import { renderInput } from "src/fields/inputs";
-import { locales } from "src/locales";
-import { EditorsStyles } from "src/fields/editors.scss";
-import { linkEditor } from "src/fields/linkEditor";
-import { propmtFieldEditorAsync } from "src/fields/editors";
+} from "@/fields/field";
+import { helpers } from "@/helpers";
+import { bre } from "@/types/bre";
+import { emmiter, FieldEventMap } from "@/emmiter";
+import { renderInput } from "@/fields/inputs";
+import { locales } from "@/locales";
+import { EditorsStyles } from "@/fields/editors.scss";
+import { linkEditor } from "@/fields/linkEditor";
+import { propmtFieldEditorAsync } from "@/fields/editors";
+import { FieldFactory } from "@/fields/fields";
 
 type ImageFieldPayload = {
   src?: string;

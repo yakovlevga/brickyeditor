@@ -1,6 +1,6 @@
-import { bre } from "src/types/bre";
-import { Selectors } from "src/ui/Selectors";
-import { FireFunc, FieldEventMap } from "src/emmiter";
+import { bre } from "@/types/bre";
+import { Selectors } from "@/ui/Selectors";
+import { FireFunc, FieldEventMap } from "@/emmiter";
 
 export const isValidFieldType = <TResult extends bre.core.field.FieldData>(
   data: bre.core.field.FieldData,

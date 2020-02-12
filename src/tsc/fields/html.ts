@@ -1,15 +1,15 @@
 import {
-  FieldFactory,
   getCleanFieldElement,
   toggleFieldSelection,
   updateFieldData,
   isValidFieldType
-} from "src/fields/field";
-import { bre } from "src/types/bre";
-import { toggleHtmlTools } from "src/ui/htmlTools";
-import { bindTextSelection } from "src/ui/selection";
-import { Selectors } from "src/ui/Selectors";
-import { emmiter, FieldEventMap } from "src/emmiter";
+} from "@/fields/field";
+import { bre } from "@/types/bre";
+import { toggleHtmlTools } from "@/ui/htmlTools";
+import { bindTextSelection } from "@/ui/selection";
+import { Selectors } from "@/ui/Selectors";
+import { emmiter, FieldEventMap } from "@/emmiter";
+import { FieldFactory } from "@/fields/fields";
 
 type HtmlFieldType = "html";
 type HtmlFieldPayload = {

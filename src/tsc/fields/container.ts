@@ -2,13 +2,13 @@ import {
   createContainer,
   getContainerData,
   getContainerHtml
-} from "src/BlocksContainer";
-import { toggleFieldSelection, isValidFieldType } from "src/fields/field";
-import { helpers } from "src/helpers";
-import { bre } from "src/types/bre";
-import { Selectors } from "src/ui/Selectors";
-import { emmiter, FieldEventMap } from "src/emmiter";
-import { FieldFactory } from "src/fields/fields";
+} from "@/BlocksContainer";
+import { toggleFieldSelection, isValidFieldType } from "@/fields/field";
+import { helpers } from "@/helpers";
+import { bre } from "@/types/bre";
+import { Selectors } from "@/ui/Selectors";
+import { emmiter, FieldEventMap } from "@/emmiter";
+import { FieldFactory } from "@/fields/fields";
 
 type ContainerFieldType = "container";
 type ContainerFieldPayload = {
