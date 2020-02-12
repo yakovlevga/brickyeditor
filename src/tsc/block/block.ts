@@ -39,17 +39,22 @@ export const createBlockFromData = (
   blockData: bre.core.block.BlockData
 ): bre.core.block.Block => {
   const blockTemplate = getTemplate(blockData.template);
-  return createBlockFromTemplate(blockTemplate, blockData);
+  return createBlockFromTemplate(
+    blockTemplate.name,
+    blockTemplate.$html,
+    blockData
+  );
 };
 
 export const createBlockFromTemplate = (
-  blockTemplate: bre.core.ITemplate,
+  name: string,
+  $template: HTMLElement,
   data: bre.core.block.BlockData = {
-    template: blockTemplate.name,
+    template: name,
     fields: []
   }
 ): bre.core.block.Block => {
-  const $element = blockTemplate.$html.cloneNode(true) as HTMLElement;
+  const $element = $template.cloneNode(true) as HTMLElement;
 
   const ee = emmiter<BlockEventMap>();
   const block: bre.core.block.Block = {

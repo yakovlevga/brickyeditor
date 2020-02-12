@@ -25,16 +25,13 @@ export const editor = (
   new Promise<bre.core.Editor>(async resolve => {
     const optionsWithDefaults = { ...defaultOptions, ...options };
     const container = createContainer($element, false);
-    const getData = () => getContainerData(container);
-    const getHtml = () =>
-      getContainerHtml(container, optionsWithDefaults.ignoreHtml);
 
     const editor = {
       $element,
       container,
       selectedContainer: container,
-      getData,
-      getHtml
+      data: () => getContainerData(container),
+      html: () => getContainerHtml(container)
     };
 
     $element.classList.add(Selectors.classEditor);

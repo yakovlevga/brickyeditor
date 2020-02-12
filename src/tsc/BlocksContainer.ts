@@ -11,10 +11,7 @@ import { showBlockEditor } from "@/block/blockEditor";
 export const getContainerData = (container: bre.core.IBlocksContainer) =>
   container.blocks.map(block => block.data);
 
-export const getContainerHtml = (
-  container: bre.core.IBlocksContainer,
-  ignoreHtml?: boolean
-) => {
+export const getContainerHtml = (container: bre.core.IBlocksContainer) => {
   // TODO: fix it
   const html = container.blocks.map(block => block.getHtml(true)).join("\n");
   const root: HTMLElement = container.$element.cloneNode(false) as HTMLElement;
@@ -78,7 +75,10 @@ export const addBlockToContainer = (
   const block =
     options.blockData !== undefined
       ? createBlockFromData(options.blockData)
-      : createBlockFromTemplate(options.blockTemplate);
+      : createBlockFromTemplate(
+          options.blockTemplate.name,
+          options.blockTemplate.$html
+        );
 
   let { idx } = options;
   if (idx === undefined) {
