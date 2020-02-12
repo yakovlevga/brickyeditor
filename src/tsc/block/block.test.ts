@@ -4,10 +4,10 @@ import { Mutable } from "@/types/bre";
 
 const $template = document.createElement("div");
 $template.innerHTML =
-  '<div data-bre-field=\'{ "name" : "test-field", "type": "html" }\'></div>';
+  '<div data-bre-field=\'{ "name" : "bar", "type": "html" }\'></div>';
 
 describe("create block", () => {
-  it("calls getTemplate with the template name", () => {
+  it("calls getTemplate with the right template name", () => {
     (template as Mutable<typeof template>).getTemplate = jest.fn(
       (templateName: string) => ({
         name: templateName,
@@ -17,16 +17,19 @@ describe("create block", () => {
     );
 
     const block = createBlockFromData({
-      template: "mock",
+      template: "foo",
       fields: []
     });
 
     expect(template.getTemplate).toHaveBeenCalledTimes(1);
     expect(template.getTemplate).toHaveBeenCalledWith(block.data.template);
   });
-});
 
-test("should create block from template", () => {
-  const block = createBlockFromTemplate("test-block", $template);
-  expect(block).not.toBeNull();
+  test("from template", () => {
+    const block = createBlockFromTemplate("foo", $template);
+
+    expect(block).not.toBeNull();
+    expect(block.$element).toBeInstanceOf(HTMLDivElement);
+    expect(block.data.template).toEqual("foo");
+  });
 });
