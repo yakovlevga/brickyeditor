@@ -1,6 +1,5 @@
 import { getSelectionRanges, restoreSelection } from "@/ui/selection";
 import { helpers } from "@/helpers";
-import { ModalStyles } from "@/modal.scss";
 
 export const dialog = (
   $content: HTMLElement,
@@ -9,7 +8,7 @@ export const dialog = (
 ) => {
   const selection = getSelectionRanges();
 
-  const root = helpers.div<ModalStyles>("bre-modal");
+  const root = helpers.div("bre-modal");
 
   const close = () => {
     root.remove();
@@ -44,7 +43,7 @@ export const dialog = (
     }
   });
 
-  const $placeholder = helpers.div<ModalStyles>("bre-modal-placeholder");
+  const $placeholder = helpers.div("bre-modal-placeholder");
   $placeholder.append($content, $ok, $cancel);
   root.append($placeholder);
 

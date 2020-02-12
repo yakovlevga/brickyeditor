@@ -1,0 +1,18 @@
+declare type BreStyles =
+  | "bre-block-editor"
+  | "bre-block-editor-button"
+  | "bre-field-editor-root"
+  | "bre-field-editor-preview"
+  | "bre-field-editor-preview-img"
+  | "bre-field-editor-prop"
+  | "bre-field-editor-label"
+  | "bre-field-editor-input"
+  | "bre-modal"
+  | "bre-modal-placeholder"
+  | "bre-modal-close"
+  | "bre-templates-root"
+  | "bre-templates-loader"
+  | "bre-templates-list"
+  | "bre-templates-group"
+  | "bre-templates-group-name"
+  | "bre-templates-group-item";

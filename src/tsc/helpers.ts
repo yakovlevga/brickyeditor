@@ -2,17 +2,14 @@ import { bre } from "@/types/bre";
 
 type FieldData = bre.core.field.FieldData;
 
-const el = <
-  THTMLElement extends HTMLElement = HTMLElement,
-  TClassName extends string = ""
->({
+const el = <THTMLElement extends HTMLElement = HTMLElement>({
   tag = "div",
   className,
   innerHTML,
   props
 }: {
   tag?: string;
-  className?: TClassName;
+  className?: BreStyles;
   innerHTML?: string;
   props?: Partial<THTMLElement>;
 }) => {
@@ -33,11 +30,8 @@ const el = <
   return result;
 };
 
-const div = <TClassName extends string>(
-  className?: TClassName,
-  innerHTML?: string
-) =>
-  el<HTMLDivElement, TClassName>({
+const div = (className?: BreStyles, innerHTML?: string) =>
+  el<HTMLDivElement>({
     className,
     innerHTML
   });

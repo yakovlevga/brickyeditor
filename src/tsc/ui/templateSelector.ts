@@ -1,13 +1,9 @@
 import { bre } from "@/types/bre";
 import { helpers } from "@/helpers";
-
-import { TemplateSelectorStyles } from "./templateSelector.scss";
 import { TemplatesEventMap, emmiter, FireFunc } from "@/emmiter";
 
 const getTemplateUI = (template: bre.core.ITemplate) => {
-  const $template = helpers.div<TemplateSelectorStyles>(
-    "bre-templates-group-item"
-  );
+  const $template = helpers.div("bre-templates-group-item");
 
   const { $preview } = template;
   $preview.setAttribute("title", template.name);
@@ -20,11 +16,8 @@ const getTemplateGroupUI = (
   group: bre.core.ITemplateGroup,
   fireFunc: FireFunc<TemplatesEventMap>
 ) => {
-  const $group = helpers.div<TemplateSelectorStyles>("bre-templates-group");
-  const $name = helpers.div<TemplateSelectorStyles>(
-    "bre-templates-group-name",
-    group.name || ""
-  );
+  const $group = helpers.div("bre-templates-group");
+  const $name = helpers.div("bre-templates-group-name", group.name || "");
 
   $name.onclick = () => {
     for (let i = 1; i < $group.children.length; i++) {
@@ -50,12 +43,9 @@ const getTemplateGroupUI = (
 export const getTemplateSelector = () => {
   const { fire: fireEvent, on, off } = emmiter<TemplatesEventMap>();
 
-  const $element = helpers.div<TemplateSelectorStyles>("bre-templates-root");
-  const $loader = helpers.div<TemplateSelectorStyles>(
-    "bre-templates-loader",
-    "...LOADING..."
-  );
-  const $templates = helpers.div<TemplateSelectorStyles>("bre-templates-list");
+  const $element = helpers.div("bre-templates-root");
+  const $loader = helpers.div("bre-templates-loader", "...LOADING...");
+  const $templates = helpers.div("bre-templates-list");
 
   $element.append($loader, $templates);
 

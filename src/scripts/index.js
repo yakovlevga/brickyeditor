@@ -6,6 +6,7 @@ const parser = require("postcss-selector-parser");
 const autoprefixer = require("autoprefixer");
 
 const cssPath = "demo/js/brickyeditor.css";
+const typingsPath = "src/tsc/types/styles.d.ts";
 
 const processor = postcss([autoprefixer]);
 
@@ -30,6 +31,7 @@ function fromDir(startPath, filter, callback) {
 }
 
 let resultCss = "";
+let resultTypings = "declare type BreStyles =";
 
 fromDir("src/tsc", /\.scss$/, (pathname, file) => {
   console.log("-- found: ", pathname);
@@ -44,26 +46,30 @@ fromDir("src/tsc", /\.scss$/, (pathname, file) => {
   const rules = root.nodes
     .filter(n => n.type === "rule")
     .filter(n => n.selector.indexOf(".") === 0)
+    .filter(n => n.selector.indexOf(":") === -1)
     .map(n => `"${n.selector.substr(1)}"`);
 
-  const typeName = `${file[0].toUpperCase()}${
-    file.substr(1).split(".")[0]
-  }Styles`;
+  // const typeName = `${file[0].toUpperCase()}${
+  //   file.substr(1).split(".")[0]
+  // }Styles`;
 
-  const rulesTypings =
-    rules.length > 1
-      ? `\n${rules.map(r => `  | ${r}`).join("\n")}`
-      : " " + rules[0];
-  const dts = `export type ${typeName} =${rulesTypings};`;
+  if (rules && rules.length > 0) {
+    resultTypings += `\n${rules.map(r => renderRule(r)).join("\n")}`;
+  }
 
-  fs.writeFileSync(`${pathname}.d.ts`, dts, {
-    encoding: "utf8"
-  });
+  if (result && result.css) {
+    resultCss += "\n" + result.css;
+  }
+});
 
-  resultCss += "\n" + result.css;
+function renderRule(rule) {
+  return `  | ${rule}`;
+}
 
-  // result.root //=> AST after plugins (after plugins have transformed all nodes and before nodes have been stringified)
-  // result.css //=> CSS string after plugins
+resultTypings += ";";
+
+fs.writeFileSync(typingsPath, resultTypings, {
+  encoding: "utf8"
 });
 
 fs.writeFileSync(cssPath, resultCss, {

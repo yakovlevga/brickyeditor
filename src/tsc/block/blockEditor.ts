@@ -1,6 +1,4 @@
 import { bre } from "@/types/bre";
-
-import { BlockEditorStyles } from "./blockEditor.scss";
 import { FireFunc, BlockEventMap } from "@/emmiter";
 import { helpers } from "@/helpers";
 
@@ -44,14 +42,11 @@ type BlockEditor = {
 let control: BlockEditor;
 
 function createEditor() {
-  const $element = helpers.div<BlockEditorStyles>("bre-block-editor");
+  const $element = helpers.div("bre-block-editor");
 
   const btns = defaultButtons.map(btn => {
     const { action, icon, name } = btn;
-    const $btn = helpers.div<BlockEditorStyles>(
-      "bre-block-editor-button",
-      icon
-    );
+    const $btn = helpers.div("bre-block-editor-button", icon);
     $btn.title = name;
     $element.append($btn);
 
