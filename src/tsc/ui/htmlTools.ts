@@ -1,7 +1,6 @@
 import { helpers, strEqualsInvariant } from "@/helpers";
 
 import { bre } from "@/types/bre";
-import { Selectors } from "@/ui/Selectors";
 import { linkEditor } from "@/fields/linkEditor";
 import { dialog } from "@/modal";
 

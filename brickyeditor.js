@@ -220,11 +220,6 @@ define("ui/Selectors", ["require", "exports"], function (require, exports) {
     var Selectors = (function () {
         function Selectors() {
         }
-        Selectors.attr = function (attr) {
-            return "[" + attr + "]";
-        };
-        Selectors.attrContentEditable = "contenteditable";
-        Selectors.selectorContentEditable = "contenteditable";
         Selectors.attrField = "data-bre-field";
         Selectors.selectorField = "[" + Selectors.attrField + "]";
         Selectors.classEditor = "bre-editor";
@@ -233,14 +228,9 @@ define("ui/Selectors", ["require", "exports"], function (require, exports) {
         Selectors.classTemplateGroup = "bre-template-group";
         Selectors.selectorTemplateGroup = "." + Selectors.classTemplateGroup;
         Selectors.selectorTemplatePreview = ".bre-template-preview";
-        Selectors.classMobile = "brickyeditor-tools-mobile";
-        Selectors.htmlToolsCommand = "data-bre-doc-command";
-        Selectors.htmlToolsCommandRange = "data-bre-doc-command-range";
         Selectors.selectorFieldSelected = "bre-field-selected";
         Selectors.selectorFieldContainer = "bre-field-container";
         Selectors.selectorBlockSelected = "bre-block-selected";
-        Selectors.selectorHtmlToolsCommand = Selectors.attr(Selectors.htmlToolsCommand);
-        Selectors.selectorHtmlToolsCommandRange = Selectors.attr(Selectors.htmlToolsCommandRange);
         return Selectors;
     }());
     exports.Selectors = Selectors;
@@ -306,15 +296,6 @@ define("common/DOMHelpers", ["require", "exports"], function (require, exports) 
             else {
                 el.parentNode.appendChild(elToInsert);
             }
-        };
-        $dom.matches = function (el, selector) {
-            var matches = el.matches ||
-                el.matchesSelector ||
-                el.msMatchesSelector ||
-                el.mozMatchesSelector ||
-                el.webkitMatchesSelector ||
-                el.oMatchesSelector;
-            return matches.call(el, selector);
         };
         return $dom;
     }());
@@ -648,7 +629,7 @@ define("fields/linkEditor", ["require", "exports", "helpers", "fields/inputs", "
         };
     };
 });
-define("ui/selection", ["require", "exports", "common/DOMHelpers"], function (require, exports, DOMHelpers_1) {
+define("ui/selection", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.getSelectionRanges = function () {
@@ -673,7 +654,7 @@ define("ui/selection", ["require", "exports", "common/DOMHelpers"], function (re
         }
     };
     exports.bindTextSelection = function ($el, handler) {
-        if (!DOMHelpers_1.$dom.matches($el, "[contenteditable]")) {
+        if (!$el.contentEditable) {
             return;
         }
         $el.addEventListener("mouseup", function () {
@@ -738,7 +719,7 @@ define("modal", ["require", "exports", "ui/selection", "helpers"], function (req
         document.body.appendChild(root);
     };
 });
-define("ui/htmlTools", ["require", "exports", "helpers", "ui/Selectors", "fields/linkEditor", "modal"], function (require, exports, helpers_4, Selectors_2, linkEditor_1, modal_1) {
+define("ui/htmlTools", ["require", "exports", "helpers", "fields/linkEditor", "modal"], function (require, exports, helpers_4, linkEditor_1, modal_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var promptLinkParamsAsync = function (initialData) {
@@ -835,7 +816,7 @@ define("ui/htmlTools", ["require", "exports", "helpers", "ui/Selectors", "fields
         if ($container !== null) {
             var $wrapper = helpers_4.helpers.createElement("<div class=\"bre-temp-container\" contenteditable=\"true\">" + $container.innerHTML + "</div>");
             $container.innerHTML = "";
-            $container.removeAttribute(Selectors_2.Selectors.attrContentEditable);
+            $container.removeAttribute("contenteditable");
             $container.appendChild($wrapper);
             var range = document.createRange();
             range.selectNodeContents($wrapper);
@@ -864,7 +845,7 @@ define("ui/htmlTools", ["require", "exports", "helpers", "ui/Selectors", "fields
         }
     };
 });
-define("fields/html", ["require", "exports", "fields/field", "ui/htmlTools", "ui/selection", "ui/Selectors", "emmiter"], function (require, exports, field_1, htmlTools_1, selection_2, Selectors_3, emmiter_1) {
+define("fields/html", ["require", "exports", "fields/field", "ui/htmlTools", "ui/selection", "emmiter"], function (require, exports, field_1, htmlTools_1, selection_2, emmiter_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var MaxPreviewLength = 50;
@@ -901,7 +882,7 @@ define("fields/html", ["require", "exports", "fields/field", "ui/htmlTools", "ui
                 field_1.updateFieldData(field, updatedData, fireEvent);
             }
         };
-        $element.setAttribute(Selectors_3.Selectors.attrContentEditable, "true");
+        $element.setAttribute("contenteditable", "true");
         selection_2.bindTextSelection($element, function (rect) {
             htmlTools_1.toggleHtmlTools(rect);
         });
@@ -930,7 +911,7 @@ define("fields/html", ["require", "exports", "fields/field", "ui/htmlTools", "ui
     };
     var getHtml = function (field) {
         var $copy = field_1.getCleanFieldElement(field.$element);
-        $copy.removeAttribute(Selectors_3.Selectors.attrContentEditable);
+        $copy.removeAttribute("contenteditable");
         return $copy;
     };
 });
@@ -1049,7 +1030,7 @@ define("fields/embed", ["require", "exports", "embed", "fields/field", "helpers"
         });
     };
 });
-define("fields/container", ["require", "exports", "BlocksContainer", "fields/field", "helpers", "ui/Selectors", "emmiter"], function (require, exports, BlocksContainer_1, field_3, helpers_6, Selectors_4, emmiter_3) {
+define("fields/container", ["require", "exports", "BlocksContainer", "fields/field", "helpers", "ui/Selectors", "emmiter"], function (require, exports, BlocksContainer_1, field_3, helpers_6, Selectors_2, emmiter_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.container = function (_a) {
@@ -1071,7 +1052,7 @@ define("fields/container", ["require", "exports", "BlocksContainer", "fields/fie
             bind: bind,
             container: container
         };
-        $element.classList.add(Selectors_4.Selectors.selectorFieldContainer);
+        $element.classList.add(Selectors_2.Selectors.selectorFieldContainer);
         $element.addEventListener("click", function (ev) {
             field_3.toggleFieldSelection(field, true, fireEvent);
             ev.stopPropagation();
@@ -1211,7 +1192,7 @@ define("fields/image", ["require", "exports", "fields/field", "helpers", "emmite
         return data.src || (data.file !== undefined ? data.file.fileContent : "");
     };
 });
-define("fields/fields", ["require", "exports", "fields/html", "fields/embed", "fields/container", "fields/image", "helpers", "ui/Selectors"], function (require, exports, html_1, embed_2, container_1, image_2, helpers_8, Selectors_5) {
+define("fields/fields", ["require", "exports", "fields/html", "fields/embed", "fields/container", "fields/image", "helpers", "ui/Selectors"], function (require, exports, html_1, embed_2, container_1, image_2, helpers_8, Selectors_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var fields = {
@@ -1280,15 +1261,15 @@ define("fields/fields", ["require", "exports", "fields/html", "fields/embed", "f
         return field;
     }
     function findFieldElements($html) {
-        var nodes = $html.querySelectorAll(Selectors_5.Selectors.selectorField);
+        var nodes = $html.querySelectorAll(Selectors_3.Selectors.selectorField);
         var $fields = nodes.length > 0 ? Array.prototype.slice.call(nodes) : [];
-        if ($html.attributes.getNamedItem(Selectors_5.Selectors.attrField) !== null) {
+        if ($html.attributes.getNamedItem(Selectors_3.Selectors.attrField) !== null) {
             $fields = __spreadArrays($fields, [$html]);
         }
         return $fields;
     }
 });
-define("template", ["require", "exports", "common/DOMHelpers", "EditorStrings", "helpers", "httpTransport", "ui/Selectors", "fields/fields"], function (require, exports, DOMHelpers_2, EditorStrings_1, helpers_9, httpTransport_3, Selectors_6, fields_1) {
+define("template", ["require", "exports", "common/DOMHelpers", "EditorStrings", "helpers", "httpTransport", "ui/Selectors", "fields/fields"], function (require, exports, DOMHelpers_1, EditorStrings_1, helpers_9, httpTransport_3, Selectors_4, fields_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var allTemplates = [];
@@ -1316,9 +1297,9 @@ define("template", ["require", "exports", "common/DOMHelpers", "EditorStrings", 
                     $data = helpers_9.helpers.createElement("<div>" + data + "</div>");
                     $style = $data.querySelector("style");
                     if ($style !== null) {
-                        DOMHelpers_2.$dom.before($editor, $style);
+                        DOMHelpers_1.$dom.before($editor, $style);
                     }
-                    $groups = $data.querySelectorAll(Selectors_6.Selectors.selectorTemplateGroup);
+                    $groups = $data.querySelectorAll(Selectors_4.Selectors.selectorTemplateGroup);
                     $groups.forEach(function ($group) {
                         var name = $group.getAttribute("title");
                         var templates = parseTemplates($group);
@@ -1345,7 +1326,7 @@ define("template", ["require", "exports", "common/DOMHelpers", "EditorStrings", 
     }); };
     var parseTemplates = function ($el) {
         var templates = [];
-        var $templates = $el.querySelectorAll(Selectors_6.Selectors.selectorTemplate);
+        var $templates = $el.querySelectorAll(Selectors_4.Selectors.selectorTemplate);
         $templates.forEach(function ($template) {
             var template = createTemplate($template);
             if (template !== null) {
@@ -1355,13 +1336,13 @@ define("template", ["require", "exports", "common/DOMHelpers", "EditorStrings", 
         return templates;
     };
     exports.getTemplatePreview = function (template) {
-        var $template = helpers_9.helpers.createElement("<div class='" + Selectors_6.Selectors.classTemplate + "'></div>");
+        var $template = helpers_9.helpers.createElement("<div class='" + Selectors_4.Selectors.classTemplate + "'></div>");
         $template.appendChild(template.$preview);
         return $template;
     };
     var createTemplate = function ($template) {
         var name = $template.dataset.name || "";
-        var $preview = $template.querySelector(Selectors_6.Selectors.selectorTemplatePreview);
+        var $preview = $template.querySelector(Selectors_4.Selectors.selectorTemplatePreview);
         if ($preview !== null) {
             $template.removeChild($preview);
         }
@@ -1435,22 +1416,22 @@ define("block/blockEditor", ["require", "exports", "helpers"], function (require
         }
     };
 });
-define("block/Block", ["require", "exports", "fields/field", "template", "ui/Selectors", "block/blockEditor", "emmiter", "fields/fields"], function (require, exports, field_5, template_1, Selectors_7, blockEditor_1, emmiter_5, fields_2) {
+define("block/Block", ["require", "exports", "fields/field", "template", "ui/Selectors", "block/blockEditor", "emmiter", "fields/fields"], function (require, exports, field_5, template_1, Selectors_5, blockEditor_1, emmiter_5, fields_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.selectField = function (block, field) {
         block.selectedField = field;
     };
-    exports.toggleBlockSelection = function (container, block, selected) {
+    exports.toggleBlockSelection = function (block, selected) {
         if (!selected && block.selectedField !== null) {
             field_5.toggleFieldSelection(block.selectedField, false);
         }
         var classList = block.$element.classList;
         if (selected) {
-            classList.add(Selectors_7.Selectors.selectorBlockSelected);
+            classList.add(Selectors_5.Selectors.selectorBlockSelected);
         }
         else {
-            classList.remove(Selectors_7.Selectors.selectorBlockSelected);
+            classList.remove(Selectors_5.Selectors.selectorBlockSelected);
         }
         if (selected) {
             blockEditor_1.showBlockEditor(block);
@@ -1485,7 +1466,7 @@ define("block/Block", ["require", "exports", "fields/field", "template", "ui/Sel
         return block;
     };
 });
-define("BlocksContainer", ["require", "exports", "block/Block", "helpers", "common/DOMHelpers", "block/blockEditor"], function (require, exports, Block_1, helpers_11, DOMHelpers_3, blockEditor_2) {
+define("BlocksContainer", ["require", "exports", "block/Block", "helpers", "common/DOMHelpers", "block/blockEditor"], function (require, exports, Block_1, helpers_11, DOMHelpers_2, blockEditor_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.getContainerData = function (container) {
@@ -1563,10 +1544,10 @@ define("BlocksContainer", ["require", "exports", "block/Block", "helpers", "comm
     };
     function selectBlock(container, block) {
         if (container.selectedBlock !== null) {
-            Block_1.toggleBlockSelection(container, container.selectedBlock, false);
+            Block_1.toggleBlockSelection(container.selectedBlock, false);
         }
         container.selectedBlock = block;
-        Block_1.toggleBlockSelection(container, container.selectedBlock, true);
+        Block_1.toggleBlockSelection(container.selectedBlock, true);
     }
     exports.createContainer = function ($element, usePlaceholder) {
         var $placeholder = usePlaceholder ? getDefaultPlaceholder() : null;
@@ -1581,7 +1562,7 @@ define("BlocksContainer", ["require", "exports", "block/Block", "helpers", "comm
     };
     exports.deleteBlock = function (container, block) {
         if (container.selectedBlock === block) {
-            Block_1.toggleBlockSelection(container, block, false);
+            Block_1.toggleBlockSelection(block, false);
         }
         container.blocks = container.blocks.filter(function (b) { return b !== block; });
         block.$element.remove();
@@ -1603,10 +1584,10 @@ define("BlocksContainer", ["require", "exports", "block/Block", "helpers", "comm
         var $anchorBlock = container.blocks[new_idx].$element;
         if ($anchorBlock) {
             if (offset > 0) {
-                DOMHelpers_3.$dom.after($anchorBlock, block.$element);
+                DOMHelpers_2.$dom.after($anchorBlock, block.$element);
             }
             else if (offset < 0) {
-                DOMHelpers_3.$dom.before($anchorBlock, block.$element);
+                DOMHelpers_2.$dom.before($anchorBlock, block.$element);
             }
         }
         blockEditor_2.showBlockEditor(block);
@@ -1696,7 +1677,7 @@ define("ui/templateSelector", ["require", "exports", "helpers", "emmiter"], func
         };
     };
 });
-define("Editor", ["require", "exports", "BlocksContainer", "defaults", "httpTransport", "template", "ui/Selectors", "ui/templateSelector", "ui/htmlTools"], function (require, exports, BlocksContainer_2, defaults_1, httpTransport_4, template_2, Selectors_8, templateSelector_1, htmlTools_2) {
+define("Editor", ["require", "exports", "BlocksContainer", "defaults", "httpTransport", "template", "ui/Selectors", "ui/templateSelector", "ui/htmlTools"], function (require, exports, BlocksContainer_2, defaults_1, httpTransport_4, template_2, Selectors_6, templateSelector_1, htmlTools_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Editor = (function () {
@@ -1726,7 +1707,7 @@ define("Editor", ["require", "exports", "BlocksContainer", "defaults", "httpTran
                             getData: getData,
                             getHtml: getHtml
                         };
-                        $element.classList.add(Selectors_8.Selectors.classEditor);
+                        $element.classList.add(Selectors_6.Selectors.classEditor);
                         htmlTools_2.initHtmlTools(optionsWithDefaults);
                         return [4, template_2.loadTemplatesAsync(optionsWithDefaults.templatesUrl, editor.$element)];
                     case 1:

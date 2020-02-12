@@ -1,5 +1,3 @@
-import { $dom } from "@/common/DOMHelpers";
-
 export const getSelectionRanges = () => {
   const selection = window.getSelection();
   if (selection === null) {
@@ -29,7 +27,7 @@ export const bindTextSelection = (
   $el: HTMLElement,
   handler: (rect: ClientRect | null) => any
 ) => {
-  if (!$dom.matches($el, "[contenteditable]")) {
+  if (!$el.contentEditable) {
     return;
   }
 
