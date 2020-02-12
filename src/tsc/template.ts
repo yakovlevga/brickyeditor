@@ -67,7 +67,7 @@ export const loadTemplatesAsync = async (url: string, $editor: HTMLElement) => {
     return grouppedTemplates;
   } catch (err) {
     // onError(EditorStrings.errorTemplatesFileNotFound(url));
-    // throw err;
+    throw err;
   }
 };
 

@@ -7,7 +7,8 @@ import {
   BlockEventMap
 } from "@/emmiter";
 
-declare var instgrm: any;
+// This types is for mock cases
+declare type Mutable<T> = { -readonly [P in keyof T]: T[P] };
 
 declare namespace bre {
   type Event =
