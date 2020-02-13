@@ -1,34 +1,12 @@
 import { NoembedResponse } from "@/embed";
-import {
-  OnOffFunc,
-  FieldEventMap,
-  TemplatesEventMap,
-  Emitter,
-  BlockEventMap
-} from "@/emmiter";
 
 // This types is for mock cases
 declare type Mutable<T> = { -readonly [P in keyof T]: T[P] };
 
 declare namespace bre {
-  type Event =
-    | "onLoad"
-    | "onChange"
-    | "onBlockAdd"
-    | "onBlockDelete"
-    | "onBlockMove"
-    | "onBlockSelect"
-    | "onBlockDeselect"
-    | "onBlockUpdate"
-    | "onError";
-
-  type Subscriptions = {
-    [TKey in Event]: (params: any) => void;
-  };
-
   type FileUploadHandler = (file: any, callback: (url: string) => void) => void;
 
-  type Options = {
+  type EditorOptions = {
     /** Url to predifined templates */
     templatesUrl: string;
 
@@ -37,7 +15,7 @@ declare namespace bre {
     /** Url to fetch initial blocks, overrides initial blocks property */
     blocksUrl?: string;
     /** Inital block data */
-    blocks?: bre.core.block.BlockData[];
+    blocks?: bre.block.BlockData[];
 
     /** Show blocks selector in compact mode */
     compactTools?: boolean;
@@ -46,22 +24,75 @@ declare namespace bre {
     /** Ignore blocks html field, if you need only json */
     ignoreHtml?: boolean;
     /** Custom Html editor buttons */
-    htmlToolsButtons?: bre.core.IHtmlToolsButton[];
+    htmlToolsButtons?: bre.HtmlToolsButton[];
     /** Form selector to bind form submit event */
     formSelector?: string;
     /** Input selector to put json to on form submit */
     inputSelector?: string;
   };
 
-  namespace ui {
-    type FieldBase = {
-      $element: HTMLElement;
-      selected?: boolean;
-      on?: OnOffFunc<FieldEventMap>;
-      off?: OnOffFunc<FieldEventMap>;
+  type BlocksContainer = {
+    $element: HTMLElement;
+    $placeholder: HTMLElement | null;
+    blocks: block.Block[];
+    selectedBlock: block.Block | null;
+    // usePlaceholder: boolean;
+    // data: () => any;
+    // html: () => string;
+    // add: (block: Block) => void;
+  };
+
+  type Editor = {
+    $element: HTMLElement;
+    container: BlocksContainer;
+    selectedContainer: BlocksContainer;
+  };
+
+  namespace event {
+    type EventMaps =
+      | field.FieldEventMap
+      | template.TemplatesEventMap
+      | block.BlockEventMap;
+
+    type OnOffFunc<TEventMap extends EventMaps> = <K extends keyof TEventMap>(
+      type: K,
+      listener: (ev?: TEventMap[K]) => void
+    ) => void;
+
+    type FireFunc<TEventMap extends EventMaps> = <K extends keyof TEventMap>(
+      type: K,
+      ev?: TEventMap[K]
+    ) => void;
+
+    type Emitter<TEventMap extends EventMaps> = {
+      on: OnOffFunc<TEventMap>;
+      off: OnOffFunc<TEventMap>;
+      fire: FireFunc<TEventMap>;
+    };
+  }
+
+  type ElementContainer = {
+    $element: HTMLElement;
+  };
+
+  namespace field {
+    type FieldEvent = {
+      field: bre.field.FieldBase;
     };
 
-    type Field<TFieldData extends core.field.FieldData> = FieldBase & {
+    type FieldEventMap = {
+      change: FieldEvent;
+      focus: FieldEvent;
+      blur: FieldEvent;
+    };
+
+    type FieldBase = event.Emitter<FieldEventMap> & {
+      $element: HTMLElement;
+      selected?: boolean;
+      data: field.FieldData;
+    };
+
+    type Field<TFieldData extends field.FieldData> = FieldBase & {
       data: TFieldData;
       bind: ($element: HTMLElement, data: TFieldData) => void;
       // clean up html element from editors data attributes, etc.
@@ -73,187 +104,114 @@ declare namespace bre {
         data: TFieldData;
       };
     };
-
-    type Templates = {
-      $element: HTMLElement;
-
-      setTemplates: (templatesGroupped: bre.core.ITemplateGroup[]) => void;
-
-      on?: OnOffFunc<TemplatesEventMap>;
-      off?: OnOffFunc<TemplatesEventMap>;
-    };
   }
 
-  namespace prompt {
-    type PromptParameterType = "text" | "src" | "file" | "select";
-
-    type PromptParameter<TValue = any> = {
-      type: PromptParameterType;
-      value?: TValue;
-      title: string;
-      placeholder?: string;
-      options?: {
-        title: string;
-        value: string;
-      }[];
-      preview?: (p?: PromptParameter<TValue>) => string;
-    };
-
-    type PromptParams = Record<string, PromptParameter>;
-
-    type PromptParameterWithControl = PromptParameter & {
-      control: HTMLElement;
-    };
-
-    interface IPromptParameterImageResult {
-      fileContent: string;
-      fileInfo: IPromptParameterImageResultFile;
-    }
-
-    interface IPromptParameterImageResultFile {
-      lastModified: number;
-      lastModifiedDate: any;
-      name: string;
-      size: number;
-      type: string;
-
-      // constructor(file: File) {
-      //   this.name = file.name;
-      //   this.size = file.size;
-      //   this.type = file.type;
-      //   this.lastModified = (file as any).lastModified;
-      //   this.lastModifiedDate = file.lastModifiedDate;
-      // }
-    }
-
-    interface IPromptParameterOption {
-      title: string;
-      value: any;
-      selected?: boolean;
-    }
-  }
-
-  namespace core {
-    interface IBlocksContainer {
-      $element: HTMLElement;
-      $placeholder: HTMLElement | null;
-      blocks: block.Block[];
-      selectedBlock: block.Block | null;
-      // usePlaceholder: boolean;
-      // data: () => any;
-      // html: () => string;
-      // add: (block: Block) => void;
-    }
-
-    interface ITemplateGroup {
-      name: string | null;
-      templates: bre.core.ITemplate[];
-    }
-
-    interface ITemplate {
+  namespace template {
+    type Template = {
       $html: HTMLElement;
       $preview: HTMLElement;
       name: string;
-    }
-
-    interface Editor {
-      $element: HTMLElement;
-      container: IBlocksContainer;
-      selectedContainer: IBlocksContainer;
-    }
-
-    namespace block {
-      type BlockEvent = (block: Block) => void;
-
-      type MoveEvent = (block: Block, offset: number) => void;
-
-      type UpdateEvent = (
-        block: Block,
-        property: string,
-        oldValue: any,
-        newValue: any
-      ) => void;
-
-      type BlockEvents = {
-        onDelete?: BlockEvent;
-        onSelect?: BlockEvent;
-        onDeselect?: BlockEvent;
-        onCopy?: BlockEvent;
-        onMove?: MoveEvent;
-        onUpdate?: UpdateEvent;
-        onUpload?: FileUploadHandler;
-      };
-
-      type BlockData = {
-        template: string;
-        fields: core.field.FieldData[];
-      };
-
-      type Block = {
-        $element: HTMLElement;
-        data: BlockData;
-        fields?: ui.FieldBase[];
-        selectedField: ui.FieldBase | null;
-      } & Emitter<BlockEventMap>;
-    }
-
-    namespace field {
-      type FieldType = "html" | "container" | "embed" | "image";
-
-      // type BaseField = {
-      //   $field: HTMLElement;
-      //   getElement: () => HTMLElement;
-      //   onSelect: (f: Field) => void;
-      //   onUpdate?: (f: Field) => void;
-      //   onDeselect?: (f: Field) => void;
-      // };
-
-      type LinkData = Partial<
-        Pick<HTMLLinkElement, "href" | "title" | "target">
-      >;
-
-      type FieldData<TType extends FieldType = any, TData = {}> = {
-        type: TType;
-        name: string;
-      } & TData;
-    }
-
-    // TODO: or Exclude 'slice'?
-    type FileInfo = Pick<File, "name" | "size" | "type" | "lastModified">;
-
-    type FileContent = {
-      fileContent: string;
-      fileInfo: bre.core.FileInfo;
     };
 
-    type HtmlToolsButtonCommands =
-      | "Bold"
-      | "Italic"
-      | "CreateLink"
-      | "insertOrderedList"
-      | "insertUnorderedList"
-      | "Undo"
-      | "Redo";
+    type TemplateGroup = {
+      name: string | null;
+      templates: bre.template.Template[];
+    };
 
-    interface IHtmlToolsButton {
-      icon: string;
-      command: HtmlToolsButtonCommands;
-      range: boolean;
-      aValueArgument?: string;
-    }
+    type TemplatesEventMap = {
+      select: {
+        template: bre.template.Template;
+      };
+    };
 
-    // type DataField = {
-    //   name: string;
-    //   value: any;
-    // };
-    //  & {
-    //   [TKey: string]: any;
-    // };
-
-    // namespace field {
-    //   interface IBaseField<TData extends bre.Data> {
-    //     data: TData;
-    //   }
-    // }
+    type Templates = event.Emitter<TemplatesEventMap> & {
+      $element: HTMLElement;
+      setTemplates: (groups: bre.template.TemplateGroup[]) => void;
+    };
   }
+
+  namespace block {
+    type BlockEvent<T = {}> = T;
+    type BlockEventMap = {
+      delete: BlockEvent;
+      clone: BlockEvent;
+      move: BlockEvent<{
+        offset: number;
+      }>;
+    };
+
+    // type MoveEvent = (block: Block, offset: number) => void;
+
+    // type UpdateEvent = (
+    //   block: Block,
+    //   property: string,
+    //   oldValue: any,
+    //   newValue: any
+    // ) => void;
+
+    // type BlockEvents = {
+    //   onDelete?: BlockEvent;
+    //   onSelect?: BlockEvent;
+    //   onDeselect?: BlockEvent;
+    //   onCopy?: BlockEvent;
+    //   onMove?: MoveEvent;
+    //   onUpdate?: UpdateEvent;
+    //   onUpload?: FileUploadHandler;
+    // };
+
+    type BlockData = {
+      template: string;
+      fields: field.FieldData[];
+    };
+
+    type Block = event.Emitter<BlockEventMap> & {
+      $element: HTMLElement;
+      data: BlockData;
+      fields?: field.FieldBase[];
+      selectedField: field.FieldBase | null;
+    };
+  }
+
+  type HtmlToolsButtonCommands =
+    | "Bold"
+    | "Italic"
+    | "CreateLink"
+    | "insertOrderedList"
+    | "insertUnorderedList"
+    | "Undo"
+    | "Redo";
+
+  type HtmlToolsButton = {
+    icon: string;
+    command: HtmlToolsButtonCommands;
+    range: boolean;
+    aValueArgument?: string;
+  };
+
+  type LinkData = Partial<Pick<HTMLLinkElement, "href" | "title" | "target">>;
+
+  namespace field {
+    type FieldType = "html" | "container" | "embed" | "image";
+
+    // type BaseField = {
+    //   $field: HTMLElement;
+    //   getElement: () => HTMLElement;
+    //   onSelect: (f: Field) => void;
+    //   onUpdate?: (f: Field) => void;
+    //   onDeselect?: (f: Field) => void;
+    // };
+
+    type FieldData<TType extends FieldType = any, TData = {}> = {
+      type: TType;
+      name: string;
+    } & TData;
+  }
+
+  // TODO: or Exclude 'slice'?
+  type FileInfo = Pick<File, "name" | "size" | "type" | "lastModified">;
+
+  type FileContent = {
+    fileContent: string;
+    fileInfo: bre.FileInfo;
+  };
 }

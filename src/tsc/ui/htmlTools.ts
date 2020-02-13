@@ -4,10 +4,8 @@ import { bre } from "@/types/bre";
 import { linkEditor } from "@/fields/linkEditor";
 import { dialog } from "@/modal";
 
-const promptLinkParamsAsync = (
-  initialData: Readonly<bre.core.field.LinkData>
-) =>
-  new Promise<bre.core.field.LinkData | null>(resolve => {
+const promptLinkParamsAsync = (initialData: Readonly<bre.field.LinkData>) =>
+  new Promise<bre.field.LinkData | null>(resolve => {
     const { $element: $editor, data: updatedData } = linkEditor(initialData);
 
     dialog(
@@ -26,7 +24,7 @@ const renderButtonElement = ({
   command,
   range,
   aValueArgument
-}: bre.core.IHtmlToolsButton): HTMLElement => {
+}: bre.HtmlToolsButton): HTMLElement => {
   const $btn = helpers.createElement(
     `<button type="button" class="bre-btn"><i class="fa fa-${icon}"></i></button>`
   );
@@ -114,7 +112,7 @@ const getSeletedLink = (selection: Selection) => {
   return null;
 };
 
-const renderControl = (buttons: bre.core.IHtmlToolsButton[]) => {
+const renderControl = (buttons: bre.HtmlToolsButton[]) => {
   const $panel = helpers.createElement(
     '<div class="bre-html-tools-panel"></div>'
   );
@@ -156,7 +154,7 @@ const wrapSelectionToContainer = (selection: Selection) => {
 
 let control: HTMLElement;
 
-export const initHtmlTools = ({ htmlToolsButtons }: bre.Options) => {
+export const initHtmlTools = ({ htmlToolsButtons }: bre.EditorOptions) => {
   if (htmlToolsButtons) {
     control = renderControl(htmlToolsButtons);
     document.body.appendChild(control);

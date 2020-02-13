@@ -6,10 +6,9 @@ import {
 } from "@/fields/field";
 import { helpers } from "@/helpers";
 import { bre } from "@/types/bre";
-import { emmiter, FieldEventMap } from "@/emmiter";
+import { emmiter } from "@/emmiter";
 import { renderInput } from "@/fields/inputs";
 import { locales } from "@/locales";
-import { EditorsStyles } from "@/fields/editors.scss";
 import { linkEditor } from "@/fields/linkEditor";
 import { propmtFieldEditorAsync } from "@/fields/editors";
 import { FieldFactory } from "@/fields/fields";
@@ -17,11 +16,11 @@ import { FieldFactory } from "@/fields/fields";
 type ImageFieldPayload = {
   src?: string;
   alt?: string;
-  file?: bre.core.FileContent;
-  link?: bre.core.field.LinkData;
+  file?: bre.FileContent;
+  link?: bre.field.LinkData;
 };
-type ImageFieldData = bre.core.field.FieldData<"image", ImageFieldPayload>;
-type ImageField = bre.ui.Field<ImageFieldData>;
+type ImageFieldData = bre.field.FieldData<"image", ImageFieldPayload>;
+type ImageField = bre.field.Field<ImageFieldData>;
 
 export const image: FieldFactory = ({ $element, preview, data }) => {
   if (!isValidFieldType<ImageFieldData>(data, "image")) {
@@ -36,7 +35,7 @@ export const image: FieldFactory = ({ $element, preview, data }) => {
     };
   }
 
-  const { fire: fireEvent, on, off } = emmiter<FieldEventMap>();
+  const { fire: fireEvent, on, off } = emmiter<bre.field.FieldEventMap>();
 
   let field: ImageField = {
     $element,
@@ -82,9 +81,9 @@ const editor = (initialData: Readonly<ImageFieldData>) => {
     ...initialData
   };
 
-  const $element = helpers.div<EditorsStyles>("bre-field-editor-root");
+  const $element = helpers.div("bre-field-editor-root");
 
-  const $previewImg = helpers.el<HTMLImageElement, EditorsStyles>({
+  const $previewImg = helpers.el<HTMLImageElement>({
     tag: "img",
     className: "bre-field-editor-preview-img",
     props: {
@@ -92,7 +91,7 @@ const editor = (initialData: Readonly<ImageFieldData>) => {
     }
   });
 
-  const $preview = helpers.div<EditorsStyles>("bre-field-editor-preview");
+  const $preview = helpers.div("bre-field-editor-preview");
   $preview.appendChild($previewImg);
 
   const $src = renderInput({

@@ -5,9 +5,9 @@ import { bre } from "@/types/bre";
 import { Selectors } from "@/ui/Selectors";
 import { bindFields } from "@/fields/fields";
 
-let allTemplates: bre.core.ITemplate[] = [];
+let allTemplates: bre.template.Template[] = [];
 
-export const getTemplate = (templateName: string): bre.core.ITemplate => {
+export const getTemplate = (templateName: string): bre.template.Template => {
   const template = allTemplates.find(x =>
     strEqualsInvariant(x.name, templateName)
   );
@@ -20,7 +20,7 @@ export const getTemplate = (templateName: string): bre.core.ITemplate => {
 };
 
 export const loadTemplatesAsync = async (url: string, $editor: HTMLElement) => {
-  const grouppedTemplates: bre.core.ITemplateGroup[] = [];
+  const grouppedTemplates: bre.template.TemplateGroup[] = [];
 
   try {
     const data = await getRequest(url);
@@ -71,7 +71,7 @@ export const loadTemplatesAsync = async (url: string, $editor: HTMLElement) => {
 };
 
 const parseTemplates = ($el: HTMLElement) => {
-  const templates: bre.core.ITemplate[] = [];
+  const templates: bre.template.Template[] = [];
 
   const $templates = $el.querySelectorAll<HTMLElement>(
     Selectors.selectorTemplate
@@ -87,7 +87,7 @@ const parseTemplates = ($el: HTMLElement) => {
   return templates;
 };
 
-export const getTemplatePreview = (template: bre.core.ITemplate) => {
+export const getTemplatePreview = (template: bre.template.Template) => {
   const $template = helpers.createElement(
     `<div class='${Selectors.classTemplate}'></div>`
   );
@@ -95,7 +95,9 @@ export const getTemplatePreview = (template: bre.core.ITemplate) => {
   return $template;
 };
 
-const createTemplate = ($template: HTMLElement): bre.core.ITemplate | null => {
+const createTemplate = (
+  $template: HTMLElement
+): bre.template.Template | null => {
   const name = $template.dataset.name || "";
 
   let $preview = $template.querySelector<HTMLElement>(

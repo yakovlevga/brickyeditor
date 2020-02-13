@@ -1,12 +1,10 @@
 import { bre } from "@/types/bre";
 import { dialog } from "@/modal";
 
-export const propmtFieldEditorAsync = <
-  TFieldData extends bre.core.field.FieldData
->({
+export const propmtFieldEditorAsync = <TFieldData extends bre.field.FieldData>({
   editor,
   data
-}: bre.ui.Field<TFieldData>) =>
+}: bre.field.Field<TFieldData>) =>
   new Promise<TFieldData | null>(resolve => {
     if (editor === undefined) {
       resolve(null);

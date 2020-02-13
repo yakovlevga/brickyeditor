@@ -1,8 +1,8 @@
 import { bre } from "@/types/bre";
 import { helpers } from "@/helpers";
-import { TemplatesEventMap, emmiter, FireFunc } from "@/emmiter";
+import { emmiter } from "@/emmiter";
 
-const getTemplateUI = (template: bre.core.ITemplate) => {
+const getTemplateUI = (template: bre.template.Template) => {
   const $template = helpers.div("bre-templates-group-item");
 
   const { $preview } = template;
@@ -13,8 +13,8 @@ const getTemplateUI = (template: bre.core.ITemplate) => {
 };
 
 const getTemplateGroupUI = (
-  group: bre.core.ITemplateGroup,
-  fireFunc: FireFunc<TemplatesEventMap>
+  group: bre.template.TemplateGroup,
+  fireFunc: bre.event.FireFunc<bre.template.TemplatesEventMap>
 ) => {
   const $group = helpers.div("bre-templates-group");
   const $name = helpers.div("bre-templates-group-name", group.name || "");
@@ -41,7 +41,9 @@ const getTemplateGroupUI = (
 };
 
 export const getTemplateSelector = () => {
-  const { fire: fireEvent, on, off } = emmiter<TemplatesEventMap>();
+  const { fire: fireEvent, on, off } = emmiter<
+    bre.template.TemplatesEventMap
+  >();
 
   const $element = helpers.div("bre-templates-root");
   const $loader = helpers.div("bre-templates-loader", "...LOADING...");
@@ -49,7 +51,7 @@ export const getTemplateSelector = () => {
 
   $element.append($loader, $templates);
 
-  const setTemplates = (templatesGroupped: bre.core.ITemplateGroup[]) => {
+  const setTemplates = (templatesGroupped: bre.template.TemplateGroup[]) => {
     helpers.toggleVisibility($loader, false);
 
     templatesGroupped.forEach(group => {

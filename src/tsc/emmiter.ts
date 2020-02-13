@@ -1,62 +1,13 @@
 import { bre } from "@/types/bre";
 
-interface FieldEvent {
-  field: bre.ui.FieldBase;
-}
-
-export interface FieldEventMap {
-  change: FieldEvent;
-  focus: FieldEvent;
-  blur: FieldEvent;
-}
-
-export interface TemplatesEventMap {
-  select: {
-    template: bre.core.ITemplate;
-  };
-}
-
-type BlockEvent<T = {}> = T;
-export interface BlockEventMap {
-  delete: BlockEvent;
-  clone: BlockEvent;
-  move: BlockEvent<{
-    offset: number;
-  }>;
-  // for extensions
-  // [TKey: string]: BlockEvent;
-}
-
-type BreEventMap = FieldEventMap | TemplatesEventMap | BlockEventMap;
-
-export type Emitter<TEventMap extends BreEventMap> = {
-  fire: FireFunc<TEventMap>;
-  on: OnOffFunc<TEventMap>;
-  off: OnOffFunc<TEventMap>;
-};
-
-export type OnOffFunc<TEventMap extends BreEventMap> = <
-  K extends keyof TEventMap
->(
-  type: K,
-  listener: (ev?: TEventMap[K]) => void
-) => void;
-
-export type FireFunc<TEventMap extends BreEventMap> = <
-  K extends keyof TEventMap
->(
-  type: K,
-  ev?: TEventMap[K]
-) => void;
-
 export const emmiter = <
-  TEventMap extends BreEventMap
->(): Emitter<TEventMap> => {
+  TEventMap extends bre.event.EventMaps
+>(): bre.event.Emitter<TEventMap> => {
   const listeners: {
     [K in keyof TEventMap]?: Array<(ev?: TEventMap[K]) => void>;
   } = {};
 
-  const on: OnOffFunc<TEventMap> = (type, listener) => {
+  const on: bre.event.OnOffFunc<TEventMap> = (type, listener) => {
     if (listeners[type] === undefined) {
       listeners[type] = [];
     }
@@ -70,7 +21,7 @@ export const emmiter = <
     listenersOfType.push(listener);
   };
 
-  const off: OnOffFunc<TEventMap> = (type, listener) => {
+  const off: bre.event.OnOffFunc<TEventMap> = (type, listener) => {
     const listenersOfType = listeners[type];
     if (listenersOfType === undefined) {
       return;
@@ -82,7 +33,7 @@ export const emmiter = <
     }
   };
 
-  const fire: FireFunc<TEventMap> = (type, ev) => {
+  const fire: bre.event.FireFunc<TEventMap> = (type, ev) => {
     const listenersOfType = listeners[type];
     if (listenersOfType === undefined) {
       return;

@@ -1,18 +1,17 @@
 import { bre } from "@/types/bre";
 import { Selectors } from "@/ui/Selectors";
-import { FireFunc, FieldEventMap } from "@/emmiter";
 
-export const isValidFieldType = <TResult extends bre.core.field.FieldData>(
-  data: bre.core.field.FieldData,
+export const isValidFieldType = <TResult extends bre.field.FieldData>(
+  data: bre.field.FieldData,
   type: string
 ): data is TResult => data.type === type;
 
-export const updateFieldData = <TData extends bre.core.field.FieldData>(
-  field: bre.ui.Field<TData>,
+export const updateFieldData = <TData extends bre.field.FieldData>(
+  field: bre.field.Field<TData>,
   changes: {
     [TProp in keyof TData]?: TData[TProp];
   },
-  fireEvent?: FireFunc<FieldEventMap>
+  fireEvent?: bre.event.FireFunc<bre.field.FieldEventMap>
 ) => {
   const { data } = field;
 
@@ -33,9 +32,9 @@ export const updateFieldData = <TData extends bre.core.field.FieldData>(
 };
 
 export const toggleFieldSelection = (
-  field: bre.ui.FieldBase,
+  field: bre.field.FieldBase,
   selected: boolean,
-  fireEvent?: FireFunc<FieldEventMap>
+  fireEvent?: bre.event.FireFunc<bre.field.FieldEventMap>
 ) => {
   const { classList } = field.$element;
   if (selected) {

@@ -13,16 +13,16 @@ import { getTemplateSelector } from "@/ui/templateSelector";
 import { initHtmlTools } from "@/ui/htmlTools";
 
 export class Editor {
-  constructor($editor: HTMLElement, options: bre.Options) {
+  constructor($editor: HTMLElement, options: bre.EditorOptions) {
     editor($editor, options);
   }
 }
 
 export const editor = (
   $element: HTMLElement,
-  options: bre.Options = defaultOptions
+  options: bre.EditorOptions = defaultOptions
 ) =>
-  new Promise<bre.core.Editor>(async resolve => {
+  new Promise<bre.Editor>(async resolve => {
     const optionsWithDefaults = { ...defaultOptions, ...options };
     const container = createContainer($element, false);
 
@@ -69,8 +69,8 @@ export const editor = (
     resolve(editor);
   });
 
-const loadInitialBlocks = ({ blocks, blocksUrl }: bre.Options) =>
-  new Promise<bre.core.block.BlockData[] | null>(async (resolve, reject) => {
+const loadInitialBlocks = ({ blocks, blocksUrl }: bre.EditorOptions) =>
+  new Promise<bre.block.BlockData[] | null>(async (resolve, reject) => {
     const url = blocksUrl;
     // const editor = this;
 
@@ -94,7 +94,7 @@ const loadInitialBlocks = ({ blocks, blocksUrl }: bre.Options) =>
   });
 
 // const bindFormSubmit = (
-//   editor: bre.core.Editor,
+//   editor: bre.Editor,
 //   { formSelector, inputSelector, ignoreHtml }: bre.Options
 // ): void => {
 //   if (formSelector === undefined || inputSelector === undefined) {

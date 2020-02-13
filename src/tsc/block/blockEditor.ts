@@ -1,11 +1,10 @@
 import { bre } from "@/types/bre";
-import { FireFunc, BlockEventMap } from "@/emmiter";
 import { helpers } from "@/helpers";
 
 type BlockEditorButton = {
   name: string;
   icon: string;
-  action: (ff: FireFunc<BlockEventMap>) => void;
+  action: (ff: bre.event.FireFunc<bre.block.BlockEventMap>) => void;
 };
 
 const defaultButtons: BlockEditorButton[] = [
@@ -62,7 +61,7 @@ function createEditor() {
   };
 }
 
-export const showBlockEditor = (block: bre.core.block.Block) => {
+export const showBlockEditor = (block: bre.block.Block) => {
   if (control === undefined) {
     control = createEditor();
   }

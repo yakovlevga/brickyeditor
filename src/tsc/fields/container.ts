@@ -7,20 +7,20 @@ import { toggleFieldSelection, isValidFieldType } from "@/fields/field";
 import { helpers } from "@/helpers";
 import { bre } from "@/types/bre";
 import { Selectors } from "@/ui/Selectors";
-import { emmiter, FieldEventMap } from "@/emmiter";
+import { emmiter } from "@/emmiter";
 import { FieldFactory } from "@/fields/fields";
 
 type ContainerFieldType = "container";
 type ContainerFieldPayload = {
   html: string;
-  blocks: bre.core.block.BlockData[];
+  blocks: bre.block.BlockData[];
 };
-type ContainerFieldData = bre.core.field.FieldData<
+type ContainerFieldData = bre.field.FieldData<
   ContainerFieldType,
   ContainerFieldPayload
 >;
-export type ContainerField = bre.ui.Field<ContainerFieldData> & {
-  container: bre.core.IBlocksContainer;
+export type ContainerField = bre.field.Field<ContainerFieldData> & {
+  container: bre.BlocksContainer;
 };
 
 export const container: FieldFactory = ({ $element, preview, data }) => {
@@ -34,7 +34,7 @@ export const container: FieldFactory = ({ $element, preview, data }) => {
 
   const container = createContainer($element, !preview);
 
-  const { fire: fireEvent, on, off } = emmiter<FieldEventMap>();
+  const { fire: fireEvent, on, off } = emmiter<bre.field.FieldEventMap>();
   const field: ContainerField = {
     $element,
     data,
@@ -71,7 +71,7 @@ export const container: FieldFactory = ({ $element, preview, data }) => {
   return field;
 };
 
-const html = (field: bre.ui.Field<ContainerFieldData>) => {
+const html = (field: bre.field.Field<ContainerFieldData>) => {
   const { container } = field as ContainerField;
   const html = getContainerHtml(container);
   // TODO: get blocks html via html method

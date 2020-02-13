@@ -7,15 +7,15 @@ import {
 import { bre } from "@/types/bre";
 import { toggleHtmlTools } from "@/ui/htmlTools";
 import { bindTextSelection } from "@/ui/selection";
-import { emmiter, FieldEventMap } from "@/emmiter";
+import { emmiter } from "@/emmiter";
 import { FieldFactory } from "@/fields/fields";
 
 type HtmlFieldType = "html";
 type HtmlFieldPayload = {
   html?: string;
 };
-type HtmlFieldData = bre.core.field.FieldData<HtmlFieldType, HtmlFieldPayload>;
-type HtmlField = bre.ui.Field<HtmlFieldData>;
+type HtmlFieldData = bre.field.FieldData<HtmlFieldType, HtmlFieldPayload>;
+type HtmlField = bre.field.Field<HtmlFieldData>;
 
 const MaxPreviewLength = 50;
 
@@ -37,7 +37,7 @@ export const html: FieldFactory = ({ $element, preview, data }) => {
 
   bind($element, data);
 
-  const { fire: fireEvent, on, off } = emmiter<FieldEventMap>();
+  const { fire: fireEvent, on, off } = emmiter<bre.field.FieldEventMap>();
   let field: HtmlField = {
     $element,
     data,

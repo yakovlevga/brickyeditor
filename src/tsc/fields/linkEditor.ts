@@ -3,7 +3,7 @@ import { helpers } from "@/helpers";
 import { renderInput, renderSelect } from "@/fields/inputs";
 import { locales } from "@/locales";
 
-export const linkEditor = (initialData?: Readonly<bre.core.field.LinkData>) => {
+export const linkEditor = (initialData?: Readonly<bre.LinkData>) => {
   const data = initialData ? { ...initialData } : {};
 
   const $element = helpers.div("bre-field-editor-root");

@@ -14,9 +14,8 @@ import { helpers } from "@/helpers";
 import { loadScriptAsync } from "@/httpTransport";
 import { locales } from "@/locales";
 import { bre } from "@/types/bre";
-import { emmiter, FieldEventMap } from "@/emmiter";
+import { emmiter } from "@/emmiter";
 import { propmtFieldEditorAsync } from "@/fields/editors";
-import { EditorsStyles } from "@/fields/editors.scss";
 import { renderInput } from "@/fields/inputs";
 import { FieldFactory } from "@/fields/fields";
 
@@ -29,11 +28,8 @@ type EmbedFieldPayload = {
   url?: string;
   embed?: NoembedResponse;
 };
-type EmbedFieldData = bre.core.field.FieldData<
-  EmbedFieldType,
-  EmbedFieldPayload
->;
-type EmbedField = bre.ui.Field<EmbedFieldData>;
+type EmbedFieldData = bre.field.FieldData<EmbedFieldType, EmbedFieldPayload>;
+type EmbedField = bre.field.Field<EmbedFieldData>;
 
 export const embed: FieldFactory = ({ $element, preview, data }) => {
   if (!isValidFieldType<EmbedFieldData>(data, "embed")) {
@@ -49,8 +45,7 @@ export const embed: FieldFactory = ({ $element, preview, data }) => {
 
   // updateEmbedMedia(data.url, false);
 
-  const { fire, on, off } = emmiter<FieldEventMap>();
-
+  const { fire, on, off } = emmiter<bre.field.FieldEventMap>();
   const field: EmbedField = {
     $element,
     data,
@@ -81,8 +76,8 @@ const editor = (initialData: Readonly<EmbedFieldData>) => {
     ...initialData
   };
 
-  const $element = helpers.div<EditorsStyles>("bre-field-editor-root");
-  const $preview = helpers.div<EditorsStyles>("bre-field-editor-preview");
+  const $element = helpers.div("bre-field-editor-root");
+  const $preview = helpers.div("bre-field-editor-preview");
 
   bind($preview, data);
 

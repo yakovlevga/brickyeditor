@@ -6,11 +6,12 @@ import {
 import { helpers } from "@/helpers";
 import { bre } from "@/types/bre";
 import { showBlockEditor } from "@/block/blockEditor";
+import { ContainerField } from "@/fields/container";
 
-export const getContainerData = (container: bre.core.IBlocksContainer) =>
+export const getContainerData = (container: bre.BlocksContainer) =>
   container.blocks.map(block => block.data);
 
-export const getContainerHtml = (container: bre.core.IBlocksContainer) => {
+export const getContainerHtml = (container: bre.BlocksContainer) => {
   // TODO: fix it
   const html = container.blocks.map(block => block.getHtml(true)).join("\n");
   const root: HTMLElement = container.$element.cloneNode(false) as HTMLElement;
@@ -19,8 +20,8 @@ export const getContainerHtml = (container: bre.core.IBlocksContainer) => {
 };
 
 export const getActiveContainer = (
-  container: bre.core.IBlocksContainer
-): bre.core.IBlocksContainer => {
+  container: bre.BlocksContainer
+): bre.BlocksContainer => {
   if (
     container.selectedBlock === null ||
     container.selectedBlock.selectedField === null
@@ -29,8 +30,8 @@ export const getActiveContainer = (
   }
 
   const { selectedField } = container.selectedBlock;
-  if (selectedField.type === "container") {
-    const containerField = selectedField as bre.core.field.ContainerField;
+  if (selectedField.data.type === "container") {
+    const containerField = selectedField as ContainerField;
     return getActiveContainer(containerField.container);
   }
 
@@ -45,7 +46,7 @@ const getDefaultPlaceholder = () =>
     </div>`
   );
 
-const toggleContainersPlaceholder = (container: bre.core.IBlocksContainer) => {
+const toggleContainersPlaceholder = (container: bre.BlocksContainer) => {
   if (container.$placeholder === null) {
     return;
   }
@@ -60,13 +61,13 @@ const toggleContainersPlaceholder = (container: bre.core.IBlocksContainer) => {
 type AddBlockToContainerOptions = { idx?: number } & (
   | {
       blockTemplate?: undefined;
-      blockData: bre.core.block.BlockData;
+      blockData: bre.block.BlockData;
     }
-  | { blockTemplate: bre.core.ITemplate; blockData?: undefined }
+  | { blockTemplate: bre.template.Template; blockData?: undefined }
 );
 
 export const addBlockToContainer = (
-  container: bre.core.IBlocksContainer,
+  container: bre.BlocksContainer,
   options: AddBlockToContainerOptions
 ) => {
   const { blocks, selectedBlock } = container;
@@ -131,10 +132,7 @@ export const addBlockToContainer = (
   // }
 };
 
-function selectBlock(
-  container: bre.core.IBlocksContainer,
-  block: bre.core.block.Block
-) {
+function selectBlock(container: bre.BlocksContainer, block: bre.block.Block) {
   if (container.selectedBlock !== null) {
     toggleBlockSelection(container.selectedBlock, false);
   }
@@ -145,16 +143,16 @@ function selectBlock(
 
 // TODO: check this later
 // export const getSelectedBlockInContainer = (
-//   container: bre.core.IBlocksContainer
+//   container: bre.BlocksContainer
 // ) => container.blocks.find(b => !!b.selectedField);
 
 export const createContainer = (
   $element: HTMLElement,
   usePlaceholder: boolean
-): bre.core.IBlocksContainer => {
+): bre.BlocksContainer => {
   const $placeholder = usePlaceholder ? getDefaultPlaceholder() : null;
 
-  const container: bre.core.IBlocksContainer = {
+  const container: bre.BlocksContainer = {
     $element,
     $placeholder,
     blocks: [],
@@ -167,8 +165,8 @@ export const createContainer = (
 };
 
 export const deleteBlock = (
-  container: bre.core.IBlocksContainer,
-  block: bre.core.block.Block
+  container: bre.BlocksContainer,
+  block: bre.block.Block
 ) => {
   if (container.selectedBlock === block) {
     toggleBlockSelection(block, false);
@@ -180,8 +178,8 @@ export const deleteBlock = (
 };
 
 export const copyBlock = (
-  container: bre.core.IBlocksContainer,
-  block: bre.core.block.Block
+  container: bre.BlocksContainer,
+  block: bre.block.Block
 ) => {
   const idx = container.blocks.indexOf(block) + 1;
   addBlockToContainer(container, {
@@ -191,8 +189,8 @@ export const copyBlock = (
 };
 
 export const moveBlock = (
-  container: bre.core.IBlocksContainer,
-  block: bre.core.block.Block,
+  container: bre.BlocksContainer,
+  block: bre.block.Block,
   offset: number
 ) => {
   const idx = container.blocks.indexOf(block);

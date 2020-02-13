@@ -3,18 +3,18 @@ import { getTemplate } from "@/template";
 import { bre } from "@/types/bre";
 import { Selectors } from "@/ui/Selectors";
 import { showBlockEditor, hideBlockEditor } from "@/block/blockEditor";
-import { emmiter, BlockEventMap } from "@/emmiter";
+import { emmiter } from "@/emmiter";
 import { bindFields } from "@/fields/fields";
 
 export const selectField = (
-  block: bre.core.block.Block,
-  field: bre.ui.FieldBase
+  block: bre.block.Block,
+  field: bre.field.FieldBase
 ) => {
   block.selectedField = field;
 };
 
 export const toggleBlockSelection = (
-  block: bre.core.block.Block,
+  block: bre.block.Block,
   selected: boolean
 ) => {
   if (!selected && block.selectedField !== null) {
@@ -36,8 +36,8 @@ export const toggleBlockSelection = (
 };
 
 export const createBlockFromData = (
-  blockData: bre.core.block.BlockData
-): bre.core.block.Block => {
+  blockData: bre.block.BlockData
+): bre.block.Block => {
   const blockTemplate = getTemplate(blockData.template);
   return createBlockFromTemplate(
     blockTemplate.name,
@@ -49,15 +49,15 @@ export const createBlockFromData = (
 export const createBlockFromTemplate = (
   name: string,
   $template: HTMLElement,
-  data: bre.core.block.BlockData = {
+  data: bre.block.BlockData = {
     template: name,
     fields: []
   }
-): bre.core.block.Block => {
+): bre.block.Block => {
   const $element = $template.cloneNode(true) as HTMLElement;
 
-  const ee = emmiter<BlockEventMap>();
-  const block: bre.core.block.Block = {
+  const ee = emmiter<bre.block.BlockEventMap>();
+  const block: bre.block.Block = {
     ...ee,
     $element,
     data,
@@ -78,12 +78,3 @@ export const createBlockFromTemplate = (
 
   return block;
 };
-
-// export const getBlockHtml = (block: bre.core.block.Block, trim: boolean) => {
-//   const $element = block.$element.cloneNode(true);
-//   if (block.fields !== undefined) {
-//     block.fields.forEach(f => {
-//       const name = (f as bre.ui.Field<bre.core.field.FieldData>).data.name;
-//     });
-//   }
-// };

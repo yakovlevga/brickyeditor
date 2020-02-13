@@ -1,6 +1,6 @@
 import { bre } from "@/types/bre";
 
-const defaultButtons: bre.core.IHtmlToolsButton[] = [
+const defaultButtons: bre.HtmlToolsButton[] = [
   { icon: "bold", command: "Bold", range: true },
   { icon: "italic", command: "Italic", range: true },
   { icon: "link", command: "CreateLink", range: true },
@@ -18,7 +18,7 @@ const defaultButtons: bre.core.IHtmlToolsButton[] = [
   { icon: "repeat", command: "Redo", range: false }
 ];
 
-export const defaultOptions: bre.Options = {
+export const defaultOptions: bre.EditorOptions = {
   templatesUrl: "templates/bootstrap4.html",
   compactTools: false,
   compactToolsWidth: 768,

@@ -24,18 +24,18 @@ export const registerField = () => {
 export interface ICreateFieldProps {
   $element: HTMLElement;
   preview: boolean;
-  data: bre.core.field.FieldData;
+  data: bre.field.FieldData;
 }
 
 export type FieldFactory = (
   props: ICreateFieldProps
-) => bre.ui.FieldBase | null;
+) => bre.field.FieldBase | null;
 
 export const createField = ({
   $element,
   preview,
   data: initialData
-}: ICreateFieldProps): bre.ui.FieldBase | null => {
+}: ICreateFieldProps): bre.field.FieldBase | null => {
   // take base field props from data-bre-field attribute
   let data = helpers.parseElementData($element, "breField");
 
@@ -63,10 +63,7 @@ export const createField = ({
   });
 };
 
-export const bindFields = (
-  $element: HTMLElement,
-  block?: bre.core.block.Block
-) => {
+export const bindFields = ($element: HTMLElement, block?: bre.block.Block) => {
   const $fieldElement = findFieldElements($element);
   const fields = $fieldElement.map($fieldElement =>
     bindField($fieldElement, block)
@@ -75,7 +72,7 @@ export const bindFields = (
   return helpers.filterNotNull(fields);
 };
 
-function bindField($element: HTMLElement, block?: bre.core.block.Block) {
+function bindField($element: HTMLElement, block?: bre.block.Block) {
   let data = helpers.parseElementData($element, "breField");
 
   if (data === null) {
@@ -102,9 +99,9 @@ function bindField($element: HTMLElement, block?: bre.core.block.Block) {
 }
 
 function getFieldDataByName(
-  block: bre.core.block.Block,
+  block: bre.block.Block,
   name: string
-): bre.core.field.FieldData | null {
+): bre.field.FieldData | null {
   if (!block.data || !block.data.fields) {
     return null;
   }
@@ -115,7 +112,7 @@ function getFieldDataByName(
     return null;
   }
 
-  return field as bre.core.field.FieldData;
+  return field as bre.field.FieldData;
 }
 
 function findFieldElements($html: HTMLElement) {

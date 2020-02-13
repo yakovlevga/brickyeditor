@@ -1,6 +1,6 @@
 import { bre } from "@/types/bre";
 
-type FieldData = bre.core.field.FieldData;
+type FieldData = bre.field.FieldData;
 
 const el = <THTMLElement extends HTMLElement = HTMLElement>({
   tag = "div",
