@@ -3,7 +3,7 @@ import { helpers, strEqualsInvariant } from "@/helpers";
 import { getRequest } from "@/httpTransport";
 import { bre } from "@/types/bre";
 import { Selectors } from "@/ui/Selectors";
-import { bindFields } from "@/fields/fields";
+import { bindTemplateFields } from "@/fields/fields";
 
 let allTemplates: bre.template.Template[] = [];
 
@@ -108,12 +108,12 @@ const createTemplate = (
     $template.removeChild($preview);
   } else {
     $preview = $template.cloneNode(true) as HTMLElement;
-    bindFields($preview);
+    bindTemplateFields($preview);
   }
 
   return {
     name,
-    $html: $template,
+    $template,
     $preview
   };
 };

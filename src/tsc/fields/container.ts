@@ -7,7 +7,7 @@ import { toggleFieldSelection, isValidFieldType } from "@/fields/field";
 import { helpers } from "@/helpers";
 import { bre } from "@/types/bre";
 import { Selectors } from "@/ui/Selectors";
-import { emmiter } from "@/emmiter";
+import { emitter } from "@/emitter";
 import { FieldFactory } from "@/fields/fields";
 
 type ContainerFieldType = "container";
@@ -34,12 +34,11 @@ export const container: FieldFactory = ({ $element, preview, data }) => {
 
   const container = createContainer($element, !preview);
 
-  const { fire: fireEvent, on, off } = emmiter<bre.field.FieldEventMap>();
+  const eventEmitter = emitter<bre.field.FieldEventMap>();
   const field: ContainerField = {
+    ...eventEmitter,
     $element,
     data,
-    on,
-    off,
     html,
     bind,
     container
@@ -50,7 +49,7 @@ export const container: FieldFactory = ({ $element, preview, data }) => {
   $element.addEventListener("click", ev => {
     // TODO:
     // field.select();
-    toggleFieldSelection(field, true, fireEvent);
+    toggleFieldSelection(field, true);
     ev.stopPropagation();
     return false;
   });

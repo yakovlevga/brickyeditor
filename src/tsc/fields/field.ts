@@ -11,7 +11,7 @@ export const updateFieldData = <TData extends bre.field.FieldData>(
   changes: {
     [TProp in keyof TData]?: TData[TProp];
   },
-  fireEvent?: bre.event.FireFunc<bre.field.FieldEventMap>
+  fireEvent: boolean = true
 ) => {
   const { data } = field;
 
@@ -25,8 +25,8 @@ export const updateFieldData = <TData extends bre.field.FieldData>(
       changes
     };
 
-    if (fireEvent !== undefined) {
-      fireEvent("change", { field });
+    if (fireEvent) {
+      field.fire("change", { field });
     }
   }
 };
@@ -34,7 +34,7 @@ export const updateFieldData = <TData extends bre.field.FieldData>(
 export const toggleFieldSelection = (
   field: bre.field.FieldBase,
   selected: boolean,
-  fireEvent?: bre.event.FireFunc<bre.field.FieldEventMap>
+  fireEvent: boolean = true
 ) => {
   const { classList } = field.$element;
   if (selected) {
@@ -45,7 +45,7 @@ export const toggleFieldSelection = (
   }
 
   if (fireEvent !== undefined) {
-    fireEvent(selected ? "focus" : "blur", { field });
+    field.fire(selected ? "focus" : "blur", { field });
   }
 };
 

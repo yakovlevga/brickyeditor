@@ -7,7 +7,7 @@ import {
 import { bre } from "@/types/bre";
 import { toggleHtmlTools } from "@/ui/htmlTools";
 import { bindTextSelection } from "@/ui/selection";
-import { emmiter } from "@/emmiter";
+import { emitter } from "@/emitter";
 import { FieldFactory } from "@/fields/fields";
 
 type HtmlFieldType = "html";
@@ -37,12 +37,11 @@ export const html: FieldFactory = ({ $element, preview, data }) => {
 
   bind($element, data);
 
-  const { fire: fireEvent, on, off } = emmiter<bre.field.FieldEventMap>();
+  const eventEmiter = emitter<bre.field.FieldEventMap>();
   let field: HtmlField = {
+    ...eventEmiter,
     $element,
     data,
-    on,
-    off,
     bind,
     html: getHtml
   };
@@ -53,7 +52,7 @@ export const html: FieldFactory = ({ $element, preview, data }) => {
       const updatedData = {
         html
       };
-      updateFieldData(field, updatedData, fireEvent);
+      updateFieldData(field, updatedData);
     }
   };
 
@@ -77,7 +76,7 @@ export const html: FieldFactory = ({ $element, preview, data }) => {
   });
 
   $element.addEventListener("click", () => {
-    toggleFieldSelection(field, true, fireEvent);
+    toggleFieldSelection(field, true);
     return false;
   });
 

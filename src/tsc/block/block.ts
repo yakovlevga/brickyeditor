@@ -3,8 +3,8 @@ import { getTemplate } from "@/template";
 import { bre } from "@/types/bre";
 import { Selectors } from "@/ui/Selectors";
 import { showBlockEditor, hideBlockEditor } from "@/block/blockEditor";
-import { emmiter } from "@/emmiter";
-import { bindFields } from "@/fields/fields";
+import { emitter } from "@/emitter";
+import { bindBlockFields } from "@/fields/fields";
 
 export const selectField = (
   block: bre.block.Block,
@@ -39,9 +39,10 @@ export const createBlockFromData = (
   blockData: bre.block.BlockData
 ): bre.block.Block => {
   const blockTemplate = getTemplate(blockData.template);
+  debugger;
   return createBlockFromTemplate(
     blockTemplate.name,
-    blockTemplate.$html,
+    blockTemplate.$template,
     blockData
   );
 };
@@ -56,16 +57,15 @@ export const createBlockFromTemplate = (
 ): bre.block.Block => {
   const $element = $template.cloneNode(true) as HTMLElement;
 
-  const ee = emmiter<bre.block.BlockEventMap>();
+  const eventEmitter = emitter<bre.block.BlockEventMap>();
   const block: bre.block.Block = {
-    ...ee,
+    ...eventEmitter,
     $element,
     data,
     selectedField: null
   };
 
-  // TODO: this should be called create fields or smth, should try drop block dependency from args
-  block.fields = bindFields($element, block);
+  block.fields = bindBlockFields($element, block);
   block.fields.forEach(field => {
     if (field.on !== undefined) {
       field.on("focus", f => {

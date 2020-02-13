@@ -11,7 +11,7 @@ describe("create block", () => {
     (template as Mutable<typeof template>).getTemplate = jest.fn(
       (templateName: string) => ({
         name: templateName,
-        $html: $template,
+        $template,
         $preview: $template
       })
     );

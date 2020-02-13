@@ -108,7 +108,7 @@ declare namespace bre {
 
   namespace template {
     type Template = {
-      $html: HTMLElement;
+      $template: HTMLElement;
       $preview: HTMLElement;
       name: string;
     };

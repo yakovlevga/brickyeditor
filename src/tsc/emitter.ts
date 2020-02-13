@@ -1,6 +1,6 @@
 import { bre } from "@/types/bre";
 
-export const emmiter = <
+export const emitter = <
   TEventMap extends bre.event.EventMaps
 >(): bre.event.Emitter<TEventMap> => {
   const listeners: {

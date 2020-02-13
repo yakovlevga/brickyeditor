@@ -14,7 +14,7 @@ import { helpers } from "@/helpers";
 import { loadScriptAsync } from "@/httpTransport";
 import { locales } from "@/locales";
 import { bre } from "@/types/bre";
-import { emmiter } from "@/emmiter";
+import { emitter } from "@/emitter";
 import { propmtFieldEditorAsync } from "@/fields/editors";
 import { renderInput } from "@/fields/inputs";
 import { FieldFactory } from "@/fields/fields";
@@ -45,12 +45,11 @@ export const embed: FieldFactory = ({ $element, preview, data }) => {
 
   // updateEmbedMedia(data.url, false);
 
-  const { fire, on, off } = emmiter<bre.field.FieldEventMap>();
+  const eventEmitter = emitter<bre.field.FieldEventMap>();
   const field: EmbedField = {
+    ...eventEmitter,
     $element,
     data,
-    on,
-    off,
     bind,
     html,
     editor
@@ -62,7 +61,7 @@ export const embed: FieldFactory = ({ $element, preview, data }) => {
     const updatedData = await propmtFieldEditorAsync(field);
     if (updatedData !== null) {
       bind(field.$element, updatedData);
-      updateFieldData(field, updatedData, fire);
+      updateFieldData(field, updatedData);
     }
   });
 

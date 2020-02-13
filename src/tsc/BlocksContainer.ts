@@ -77,7 +77,7 @@ export const addBlockToContainer = (
       ? createBlockFromData(options.blockData)
       : createBlockFromTemplate(
           options.blockTemplate.name,
-          options.blockTemplate.$html
+          options.blockTemplate.$template
         );
 
   let { idx } = options;

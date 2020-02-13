@@ -1,6 +1,6 @@
 import { bre } from "@/types/bre";
 import { helpers } from "@/helpers";
-import { emmiter } from "@/emmiter";
+import { emitter } from "@/emitter";
 
 const getTemplateUI = (template: bre.template.Template) => {
   const $template = helpers.div("bre-templates-group-item");
@@ -41,7 +41,7 @@ const getTemplateGroupUI = (
 };
 
 export const getTemplateSelector = () => {
-  const { fire: fireEvent, on, off } = emmiter<
+  const { fire: fireEvent, on, off } = emitter<
     bre.template.TemplatesEventMap
   >();
 

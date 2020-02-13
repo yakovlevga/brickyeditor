@@ -4,8 +4,8 @@ import { bre } from "@/types/bre";
 import { linkEditor } from "@/fields/linkEditor";
 import { dialog } from "@/modal";
 
-const promptLinkParamsAsync = (initialData: Readonly<bre.field.LinkData>) =>
-  new Promise<bre.field.LinkData | null>(resolve => {
+const promptLinkParamsAsync = (initialData: Readonly<bre.LinkData>) =>
+  new Promise<bre.LinkData | null>(resolve => {
     const { $element: $editor, data: updatedData } = linkEditor(initialData);
 
     dialog(

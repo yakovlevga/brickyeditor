@@ -6,7 +6,7 @@ import {
 } from "@/fields/field";
 import { helpers } from "@/helpers";
 import { bre } from "@/types/bre";
-import { emmiter } from "@/emmiter";
+import { emitter } from "@/emitter";
 import { renderInput } from "@/fields/inputs";
 import { locales } from "@/locales";
 import { linkEditor } from "@/fields/linkEditor";
@@ -17,7 +17,7 @@ type ImageFieldPayload = {
   src?: string;
   alt?: string;
   file?: bre.FileContent;
-  link?: bre.field.LinkData;
+  link?: bre.LinkData;
 };
 type ImageFieldData = bre.field.FieldData<"image", ImageFieldPayload>;
 type ImageField = bre.field.Field<ImageFieldData>;
@@ -35,13 +35,11 @@ export const image: FieldFactory = ({ $element, preview, data }) => {
     };
   }
 
-  const { fire: fireEvent, on, off } = emmiter<bre.field.FieldEventMap>();
-
+  const eventEmiter = emitter<bre.field.FieldEventMap>();
   let field: ImageField = {
+    ...eventEmiter,
     $element,
     data,
-    on,
-    off,
     bind,
     html,
     editor
@@ -53,7 +51,7 @@ export const image: FieldFactory = ({ $element, preview, data }) => {
     const updatedData = await propmtFieldEditorAsync(field);
     if (updatedData !== null) {
       bind(field.$element, updatedData);
-      updateFieldData(field, updatedData, fireEvent);
+      updateFieldData(field, updatedData);
     }
   });
 

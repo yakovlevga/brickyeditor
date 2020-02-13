@@ -53,6 +53,13 @@ var __spreadArrays = (this && this.__spreadArrays) || function () {
             r[k] = a[j];
     return r;
 };
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
+};
 define("httpTransport", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -175,45 +182,6 @@ define("embed", ["require", "exports", "httpTransport"], function (require, expo
         }); });
     };
 });
-define("emmiter", ["require", "exports"], function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.emmiter = function () {
-        var listeners = {};
-        var on = function (type, listener) {
-            if (listeners[type] === undefined) {
-                listeners[type] = [];
-            }
-            var listenersOfType = listeners[type];
-            if (listenersOfType.indexOf(listener) !== -1) {
-                return;
-            }
-            listenersOfType.push(listener);
-        };
-        var off = function (type, listener) {
-            var listenersOfType = listeners[type];
-            if (listenersOfType === undefined) {
-                return;
-            }
-            else {
-                var idx = listenersOfType.indexOf(listener);
-                if (idx > -1) {
-                    listenersOfType.splice(idx, 1);
-                }
-            }
-        };
-        var fire = function (type, ev) {
-            var listenersOfType = listeners[type];
-            if (listenersOfType === undefined) {
-                return;
-            }
-            else {
-                listenersOfType.forEach(function (listener) { return listener(ev); });
-            }
-        };
-        return { fire: fire, on: on, off: off };
-    };
-});
 define("ui/Selectors", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -240,17 +208,19 @@ define("fields/field", ["require", "exports", "ui/Selectors"], function (require
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.isValidFieldType = function (data, type) { return data.type === type; };
     exports.updateFieldData = function (field, changes, fireEvent) {
+        if (fireEvent === void 0) { fireEvent = true; }
         var data = field.data;
         var props = Object.keys(changes);
         var hasChanges = props.some(function (p) { return data[p] !== changes[p]; });
         if (hasChanges) {
             field.data = __assign(__assign({}, data), { changes: changes });
-            if (fireEvent !== undefined) {
-                fireEvent("change", { field: field });
+            if (fireEvent) {
+                field.fire("change", { field: field });
             }
         }
     };
     exports.toggleFieldSelection = function (field, selected, fireEvent) {
+        if (fireEvent === void 0) { fireEvent = true; }
         var classList = field.$element.classList;
         if (selected) {
             field.selected = selected;
@@ -260,7 +230,7 @@ define("fields/field", ["require", "exports", "ui/Selectors"], function (require
             classList.remove(Selectors_1.Selectors.selectorFieldSelected);
         }
         if (fireEvent !== undefined) {
-            fireEvent(selected ? "focus" : "blur", { field: field });
+            field.fire(selected ? "focus" : "blur", { field: field });
         }
     };
     exports.getCleanFieldElement = function ($field) {
@@ -268,38 +238,6 @@ define("fields/field", ["require", "exports", "ui/Selectors"], function (require
         $el.attributes.removeNamedItem(Selectors_1.Selectors.attrField);
         return $el;
     };
-});
-define("common/DOMHelpers", ["require", "exports"], function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var $dom = (function () {
-        function $dom() {
-        }
-        $dom.before = function (el, elToInsert) {
-            var _this = this;
-            if (elToInsert instanceof HTMLElement) {
-                if (el.parentNode !== null) {
-                    el.parentNode.insertBefore(elToInsert, el);
-                }
-            }
-            else {
-                elToInsert.forEach(function ($el) { return _this.before(el, $el); });
-            }
-        };
-        $dom.after = function (el, elToInsert) {
-            if (el.parentNode === null) {
-                return;
-            }
-            if (el.nextSibling) {
-                el.parentNode.insertBefore(elToInsert, el);
-            }
-            else {
-                el.parentNode.appendChild(elToInsert);
-            }
-        };
-        return $dom;
-    }());
-    exports.$dom = $dom;
 });
 define("EditorStrings", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -439,6 +377,27 @@ define("helpers", ["require", "exports"], function (require, exports) {
         }
         return s1.toLowerCase() === s2.toLowerCase();
     };
+    var insertBefore = function (el, elToInsert) {
+        if (elToInsert instanceof HTMLElement) {
+            if (el.parentNode !== null) {
+                el.parentNode.insertBefore(elToInsert, el);
+            }
+        }
+        else {
+            elToInsert.forEach(function ($el) { return insertBefore(el, $el); });
+        }
+    };
+    var insertAfter = function (el, elToInsert) {
+        if (el.parentNode === null) {
+            return;
+        }
+        if (el.nextSibling) {
+            el.parentNode.insertBefore(elToInsert, el);
+        }
+        else {
+            el.parentNode.appendChild(elToInsert);
+        }
+    };
     exports.helpers = {
         createElement: createElement,
         div: div,
@@ -447,7 +406,9 @@ define("helpers", ["require", "exports"], function (require, exports) {
         toggleVisibility: toggleVisibility,
         readFileAsync: readFileAsync,
         objectToArray: objectToArray,
-        filterNotNull: filterNotNull
+        filterNotNull: filterNotNull,
+        insertBefore: insertBefore,
+        insertAfter: insertAfter
     };
 });
 define("fields/inputs", ["require", "exports", "helpers"], function (require, exports, helpers_1) {
@@ -845,6 +806,45 @@ define("ui/htmlTools", ["require", "exports", "helpers", "fields/linkEditor", "m
         }
     };
 });
+define("emmiter", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.emmiter = function () {
+        var listeners = {};
+        var on = function (type, listener) {
+            if (listeners[type] === undefined) {
+                listeners[type] = [];
+            }
+            var listenersOfType = listeners[type];
+            if (listenersOfType.indexOf(listener) !== -1) {
+                return;
+            }
+            listenersOfType.push(listener);
+        };
+        var off = function (type, listener) {
+            var listenersOfType = listeners[type];
+            if (listenersOfType === undefined) {
+                return;
+            }
+            else {
+                var idx = listenersOfType.indexOf(listener);
+                if (idx > -1) {
+                    listenersOfType.splice(idx, 1);
+                }
+            }
+        };
+        var fire = function (type, ev) {
+            var listenersOfType = listeners[type];
+            if (listenersOfType === undefined) {
+                return;
+            }
+            else {
+                listenersOfType.forEach(function (listener) { return listener(ev); });
+            }
+        };
+        return { fire: fire, on: on, off: off };
+    };
+});
 define("fields/html", ["require", "exports", "fields/field", "ui/htmlTools", "ui/selection", "emmiter"], function (require, exports, field_1, htmlTools_1, selection_2, emmiter_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -864,22 +864,17 @@ define("fields/html", ["require", "exports", "fields/field", "ui/htmlTools", "ui
             };
         }
         bind($element, data);
-        var _b = emmiter_1.emmiter(), fireEvent = _b.fire, on = _b.on, off = _b.off;
-        var field = {
-            $element: $element,
+        var eventEmiter = emmiter_1.emmiter();
+        var field = __assign(__assign({}, eventEmiter), { $element: $element,
             data: data,
-            on: on,
-            off: off,
-            bind: bind,
-            html: getHtml
-        };
+            bind: bind, html: getHtml });
         var updateHtmlProp = function () {
             var html = $element.innerHTML.trim();
             if ($element.innerHTML !== html) {
                 var updatedData = {
                     html: html
                 };
-                field_1.updateFieldData(field, updatedData, fireEvent);
+                field_1.updateFieldData(field, updatedData);
             }
         };
         $element.setAttribute("contenteditable", "true");
@@ -898,7 +893,7 @@ define("fields/html", ["require", "exports", "fields/field", "ui/htmlTools", "ui
             }
         });
         $element.addEventListener("click", function () {
-            field_1.toggleFieldSelection(field, true, fireEvent);
+            field_1.toggleFieldSelection(field, true);
             return false;
         });
         return field;
@@ -947,16 +942,12 @@ define("fields/embed", ["require", "exports", "embed", "fields/field", "helpers"
             return { $element: $element };
         }
         bind($element, data);
-        var _b = emmiter_2.emmiter(), fire = _b.fire, on = _b.on, off = _b.off;
-        var field = {
-            $element: $element,
+        var eventEmmiter = emmiter_2.emmiter();
+        var field = __assign(__assign({}, eventEmmiter), { $element: $element,
             data: data,
-            on: on,
-            off: off,
             bind: bind,
             html: html,
-            editor: editor
-        };
+            editor: editor });
         $element.addEventListener("click", function () { return __awaiter(void 0, void 0, void 0, function () {
             var updatedData;
             return __generator(this, function (_a) {
@@ -968,7 +959,7 @@ define("fields/embed", ["require", "exports", "embed", "fields/field", "helpers"
                         updatedData = _a.sent();
                         if (updatedData !== null) {
                             bind(field.$element, updatedData);
-                            field_2.updateFieldData(field, updatedData, fire);
+                            field_2.updateFieldData(field, updatedData);
                         }
                         return [2];
                 }
@@ -1042,19 +1033,15 @@ define("fields/container", ["require", "exports", "BlocksContainer", "fields/fie
             return { $element: $element };
         }
         var container = BlocksContainer_1.createContainer($element, !preview);
-        var _b = emmiter_3.emmiter(), fireEvent = _b.fire, on = _b.on, off = _b.off;
-        var field = {
-            $element: $element,
+        var eventEmitter = emmiter_3.emmiter();
+        var field = __assign(__assign({}, eventEmitter), { $element: $element,
             data: data,
-            on: on,
-            off: off,
             html: html,
             bind: bind,
-            container: container
-        };
+            container: container });
         $element.classList.add(Selectors_2.Selectors.selectorFieldContainer);
         $element.addEventListener("click", function (ev) {
-            field_3.toggleFieldSelection(field, true, fireEvent);
+            field_3.toggleFieldSelection(field, true);
             ev.stopPropagation();
             return false;
         });
@@ -1087,16 +1074,12 @@ define("fields/image", ["require", "exports", "fields/field", "helpers", "emmite
                 $element: $element
             };
         }
-        var _b = emmiter_4.emmiter(), fireEvent = _b.fire, on = _b.on, off = _b.off;
-        var field = {
-            $element: $element,
+        var eventEmiter = emmiter_4.emmiter();
+        var field = __assign(__assign({}, eventEmiter), { $element: $element,
             data: data,
-            on: on,
-            off: off,
             bind: bind,
             html: html,
-            editor: editor
-        };
+            editor: editor });
         $element.addEventListener("click", function () { return __awaiter(void 0, void 0, void 0, function () {
             var updatedData;
             return __generator(this, function (_a) {
@@ -1108,7 +1091,7 @@ define("fields/image", ["require", "exports", "fields/field", "helpers", "emmite
                         updatedData = _a.sent();
                         if (updatedData !== null) {
                             bind(field.$element, updatedData);
-                            field_4.updateFieldData(field, updatedData, fireEvent);
+                            field_4.updateFieldData(field, updatedData);
                         }
                         return [2];
                 }
@@ -1223,32 +1206,42 @@ define("fields/fields", ["require", "exports", "fields/html", "fields/embed", "f
             data: data
         });
     };
-    exports.bindFields = function ($element, block) {
+    exports.bindBlockFields = function ($element, block) {
         var $fieldElement = findFieldElements($element);
         var fields = $fieldElement.map(function ($fieldElement) {
-            return bindField($fieldElement, block);
+            return bindBlockField($fieldElement, block);
         });
         return helpers_8.helpers.filterNotNull(fields);
     };
-    function bindField($element, block) {
+    exports.bindTemplateFields = function ($element) {
+        var $fieldElement = findFieldElements($element);
+        var fields = $fieldElement.map(function ($fieldElement) {
+            return bindTemplateField($fieldElement);
+        });
+        return helpers_8.helpers.filterNotNull(fields);
+    };
+    function bindBlockField($element, block) {
         var data = helpers_8.helpers.parseElementData($element, "breField");
         if (data === null) {
             return null;
         }
-        if (block === undefined) {
-            return exports.createField({
-                $element: $element,
-                preview: true,
-                data: data
-            });
-        }
         data = getFieldDataByName(block, data.name) || data;
-        var field = exports.createField({
+        return exports.createField({
             $element: $element,
             preview: false,
             data: data
         });
-        return field;
+    }
+    function bindTemplateField($element) {
+        var data = helpers_8.helpers.parseElementData($element, "breField");
+        if (data === null) {
+            return null;
+        }
+        return exports.createField({
+            $element: $element,
+            preview: true,
+            data: data
+        });
     }
     function getFieldDataByName(block, name) {
         if (!block.data || !block.data.fields) {
@@ -1269,7 +1262,7 @@ define("fields/fields", ["require", "exports", "fields/html", "fields/embed", "f
         return $fields;
     }
 });
-define("template", ["require", "exports", "common/DOMHelpers", "EditorStrings", "helpers", "httpTransport", "ui/Selectors", "fields/fields"], function (require, exports, DOMHelpers_1, EditorStrings_1, helpers_9, httpTransport_3, Selectors_4, fields_1) {
+define("template", ["require", "exports", "EditorStrings", "helpers", "httpTransport", "ui/Selectors", "fields/fields"], function (require, exports, EditorStrings_1, helpers_9, httpTransport_3, Selectors_4, fields_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var allTemplates = [];
@@ -1297,7 +1290,7 @@ define("template", ["require", "exports", "common/DOMHelpers", "EditorStrings", 
                     $data = helpers_9.helpers.createElement("<div>" + data + "</div>");
                     $style = $data.querySelector("style");
                     if ($style !== null) {
-                        DOMHelpers_1.$dom.before($editor, $style);
+                        helpers_9.helpers.insertBefore($editor, $style);
                     }
                     $groups = $data.querySelectorAll(Selectors_4.Selectors.selectorTemplateGroup);
                     $groups.forEach(function ($group) {
@@ -1319,7 +1312,7 @@ define("template", ["require", "exports", "common/DOMHelpers", "EditorStrings", 
                     return [2, grouppedTemplates];
                 case 3:
                     err_2 = _a.sent();
-                    return [3, 4];
+                    throw err_2;
                 case 4: return [2];
             }
         });
@@ -1348,11 +1341,11 @@ define("template", ["require", "exports", "common/DOMHelpers", "EditorStrings", 
         }
         else {
             $preview = $template.cloneNode(true);
-            fields_1.bindFields($preview);
+            fields_1.bindTemplateFields($preview);
         }
         return {
             name: name,
-            $html: $template,
+            $template: $template,
             $preview: $preview
         };
     };
@@ -1442,18 +1435,19 @@ define("block/Block", ["require", "exports", "fields/field", "template", "ui/Sel
     };
     exports.createBlockFromData = function (blockData) {
         var blockTemplate = template_1.getTemplate(blockData.template);
-        return exports.createBlockFromTemplate(blockTemplate, blockData);
+        debugger;
+        return exports.createBlockFromTemplate(blockTemplate.name, blockTemplate.$template, blockData);
     };
-    exports.createBlockFromTemplate = function (blockTemplate, data) {
+    exports.createBlockFromTemplate = function (name, $template, data) {
         if (data === void 0) { data = {
-            template: blockTemplate.name,
+            template: name,
             fields: []
         }; }
-        var $element = blockTemplate.$html.cloneNode(true);
-        var ee = emmiter_5.emmiter();
-        var block = __assign(__assign({}, ee), { $element: $element,
+        var $element = $template.cloneNode(true);
+        var eventEmmiter = emmiter_5.emmiter();
+        var block = __assign(__assign({}, eventEmmiter), { $element: $element,
             data: data, selectedField: null });
-        block.fields = fields_2.bindFields($element, block);
+        block.fields = fields_2.bindBlockFields($element, block);
         block.fields.forEach(function (field) {
             if (field.on !== undefined) {
                 field.on("focus", function (f) {
@@ -1466,13 +1460,13 @@ define("block/Block", ["require", "exports", "fields/field", "template", "ui/Sel
         return block;
     };
 });
-define("BlocksContainer", ["require", "exports", "block/Block", "helpers", "common/DOMHelpers", "block/blockEditor"], function (require, exports, Block_1, helpers_11, DOMHelpers_2, blockEditor_2) {
+define("BlocksContainer", ["require", "exports", "block/Block", "helpers", "block/blockEditor"], function (require, exports, Block_1, helpers_11, blockEditor_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.getContainerData = function (container) {
         return container.blocks.map(function (block) { return block.data; });
     };
-    exports.getContainerHtml = function (container, ignoreHtml) {
+    exports.getContainerHtml = function (container) {
         var html = container.blocks.map(function (block) { return block.getHtml(true); }).join("\n");
         var root = container.$element.cloneNode(false);
         root.innerHTML = html;
@@ -1484,7 +1478,7 @@ define("BlocksContainer", ["require", "exports", "block/Block", "helpers", "comm
             return container;
         }
         var selectedField = container.selectedBlock.selectedField;
-        if (selectedField.type === "container") {
+        if (selectedField.data.type === "container") {
             var containerField = selectedField;
             return exports.getActiveContainer(containerField.container);
         }
@@ -1508,7 +1502,7 @@ define("BlocksContainer", ["require", "exports", "block/Block", "helpers", "comm
         var blocks = container.blocks, selectedBlock = container.selectedBlock;
         var block = options.blockData !== undefined
             ? Block_1.createBlockFromData(options.blockData)
-            : Block_1.createBlockFromTemplate(options.blockTemplate);
+            : Block_1.createBlockFromTemplate(options.blockTemplate.name, options.blockTemplate.$html);
         var idx = options.idx;
         if (idx === undefined) {
             idx =
@@ -1584,10 +1578,10 @@ define("BlocksContainer", ["require", "exports", "block/Block", "helpers", "comm
         var $anchorBlock = container.blocks[new_idx].$element;
         if ($anchorBlock) {
             if (offset > 0) {
-                DOMHelpers_2.$dom.after($anchorBlock, block.$element);
+                helpers_11.helpers.insertAfter($anchorBlock, block.$element);
             }
             else if (offset < 0) {
-                DOMHelpers_2.$dom.before($anchorBlock, block.$element);
+                helpers_11.helpers.insertBefore($anchorBlock, block.$element);
             }
         }
         blockEditor_2.showBlockEditor(block);
@@ -1690,22 +1684,18 @@ define("Editor", ["require", "exports", "BlocksContainer", "defaults", "httpTran
     exports.editor = function ($element, options) {
         if (options === void 0) { options = defaults_1.defaultOptions; }
         return new Promise(function (resolve) { return __awaiter(void 0, void 0, void 0, function () {
-            var optionsWithDefaults, container, getData, getHtml, editor, templates, templatesUI, blocks;
+            var optionsWithDefaults, container, editor, templates, templatesUI, blocks;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         optionsWithDefaults = __assign(__assign({}, defaults_1.defaultOptions), options);
                         container = BlocksContainer_2.createContainer($element, false);
-                        getData = function () { return BlocksContainer_2.getContainerData(container); };
-                        getHtml = function () {
-                            return BlocksContainer_2.getContainerHtml(container, optionsWithDefaults.ignoreHtml);
-                        };
                         editor = {
                             $element: $element,
                             container: container,
                             selectedContainer: container,
-                            getData: getData,
-                            getHtml: getHtml
+                            data: function () { return BlocksContainer_2.getContainerData(container); },
+                            html: function () { return BlocksContainer_2.getContainerHtml(container); }
                         };
                         $element.classList.add(Selectors_6.Selectors.classEditor);
                         htmlTools_2.initHtmlTools(optionsWithDefaults);
@@ -1771,4 +1761,33 @@ define("Editor", ["require", "exports", "BlocksContainer", "defaults", "httpTran
             });
         }); });
     };
+});
+define("block/block.test", ["require", "exports", "block/Block", "template"], function (require, exports, block_1, template) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    template = __importStar(template);
+    var $template = document.createElement("div");
+    $template.innerHTML =
+        '<div data-bre-field=\'{ "name" : "bar", "type": "html" }\'></div>';
+    describe("create block", function () {
+        it("calls getTemplate with the right template name", function () {
+            template.getTemplate = jest.fn(function (templateName) { return ({
+                name: templateName,
+                $template: $template,
+                $preview: $template
+            }); });
+            var block = block_1.createBlockFromData({
+                template: "foo",
+                fields: []
+            });
+            expect(template.getTemplate).toHaveBeenCalledTimes(1);
+            expect(template.getTemplate).toHaveBeenCalledWith(block.data.template);
+        });
+        test("from template", function () {
+            var block = block_1.createBlockFromTemplate("foo", $template);
+            expect(block).not.toBeNull();
+            expect(block.$element).toBeInstanceOf(HTMLDivElement);
+            expect(block.data.template).toEqual("foo");
+        });
+    });
 });

@@ -1,5 +1,4 @@
 import { helpers } from "@/helpers";
-import { EditorsStyles } from "@/fields/editors.scss";
 
 type InputParams = {
   title?: string;
@@ -27,7 +26,7 @@ const renderLabel = (
   { title }: InputParams
 ) => {
   if (title !== undefined) {
-    const $label = helpers.el<HTMLLabelElement, EditorsStyles>({
+    const $label = helpers.el<HTMLLabelElement>({
       tag: "label",
       className: "bre-field-editor-label",
       innerHTML: title,
@@ -43,9 +42,9 @@ const renderLabel = (
 export const renderInput = (props: InputParamsWithType) => {
   const { type, placeholder } = props;
 
-  const $root = helpers.div<EditorsStyles>("bre-field-editor-prop");
+  const $root = helpers.div("bre-field-editor-prop");
 
-  const $input = helpers.el<HTMLInputElement, EditorsStyles>({
+  const $input = helpers.el<HTMLInputElement>({
     tag: "input",
     className: "bre-field-editor-input",
     props: {
@@ -90,9 +89,9 @@ type InputSelectParams = InputParams & {
 export const renderSelect = (props: InputSelectParams) => {
   const { placeholder, value, options, onUpdate } = props;
 
-  const $root = helpers.div<EditorsStyles>("bre-field-editor-prop");
+  const $root = helpers.div("bre-field-editor-prop");
 
-  const $select = helpers.el<HTMLInputElement, EditorsStyles>({
+  const $select = helpers.el<HTMLInputElement>({
     tag: "select",
     className: "bre-field-editor-input",
     props: {
