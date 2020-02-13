@@ -45,7 +45,9 @@ declare namespace bre {
   type Editor = {
     $element: HTMLElement;
     container: BlocksContainer;
-    selectedContainer: BlocksContainer;
+
+    data: () => bre.block.BlockData[];
+    html: () => string;
   };
 
   namespace event {

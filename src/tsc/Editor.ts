@@ -2,8 +2,9 @@ import {
   addBlockToContainer,
   createContainer,
   getContainerData,
-  getContainerHtml
-} from "@/BlocksContainer";
+  getContainerHtml,
+  getActiveContainer
+} from "@/blocksContainer";
 import { defaultOptions } from "@/defaults";
 import { getRequest } from "@/httpTransport";
 import { loadTemplatesAsync } from "@/template";
@@ -26,10 +27,9 @@ export const editor = (
     const optionsWithDefaults = { ...defaultOptions, ...options };
     const container = createContainer($element, false);
 
-    const editor = {
+    const editor: bre.Editor = {
       $element,
       container,
-      selectedContainer: container,
       data: () => getContainerData(container),
       html: () => getContainerHtml(container)
     };
@@ -49,9 +49,10 @@ export const editor = (
     const templatesUI = getTemplateSelector();
     if (templates !== undefined) {
       templatesUI.setTemplates(templates);
-      templatesUI.on("select", t => {
-        addBlockToContainer(container, {
-          blockTemplate: t!.template
+      templatesUI.on("select", ev => {
+        const selectedContainer = getActiveContainer(container);
+        addBlockToContainer(selectedContainer, {
+          blockTemplate: ev!.template
         });
       });
       $element.append(templatesUI.$element);

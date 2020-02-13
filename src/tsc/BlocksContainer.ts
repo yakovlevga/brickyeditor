@@ -54,7 +54,7 @@ const toggleContainersPlaceholder = (container: bre.BlocksContainer) => {
   if (container.$element.childElementCount === 0) {
     container.$element.appendChild(container.$placeholder);
   } else {
-    container.$element.removeChild(container.$placeholder);
+    container.$placeholder.remove();
   }
 };
 

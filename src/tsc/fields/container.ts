@@ -2,7 +2,7 @@ import {
   createContainer,
   getContainerData,
   getContainerHtml
-} from "@/BlocksContainer";
+} from "@/blocksContainer";
 import { toggleFieldSelection, isValidFieldType } from "@/fields/field";
 import { helpers } from "@/helpers";
 import { bre } from "@/types/bre";

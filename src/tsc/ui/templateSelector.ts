@@ -41,9 +41,7 @@ const getTemplateGroupUI = (
 };
 
 export const getTemplateSelector = () => {
-  const { fire: fireEvent, on, off } = emitter<
-    bre.template.TemplatesEventMap
-  >();
+  const { fire, on, off } = emitter<bre.template.TemplatesEventMap>();
 
   const $element = helpers.div("bre-templates-root");
   const $loader = helpers.div("bre-templates-loader", "...LOADING...");
@@ -59,7 +57,7 @@ export const getTemplateSelector = () => {
         return;
       }
 
-      const $group = getTemplateGroupUI(group, fireEvent);
+      const $group = getTemplateGroupUI(group, fire);
       $templates.append($group);
     });
   };

@@ -1,4 +1,4 @@
-var BrickyEditor = (function (exports, emitter) {
+var BrickyEditor = (function (exports) {
     'use strict';
 
     /*! *****************************************************************************
@@ -753,6 +753,43 @@ var BrickyEditor = (function (exports, emitter) {
     };
     //# sourceMappingURL=htmlTools.js.map
 
+    var emitter = function () {
+        var listeners = {};
+        var on = function (type, listener) {
+            if (listeners[type] === undefined) {
+                listeners[type] = [];
+            }
+            var listenersOfType = listeners[type];
+            if (listenersOfType.indexOf(listener) !== -1) {
+                return;
+            }
+            listenersOfType.push(listener);
+        };
+        var off = function (type, listener) {
+            var listenersOfType = listeners[type];
+            if (listenersOfType === undefined) {
+                return;
+            }
+            else {
+                var idx = listenersOfType.indexOf(listener);
+                if (idx > -1) {
+                    listenersOfType.splice(idx, 1);
+                }
+            }
+        };
+        var fire = function (type, ev) {
+            var listenersOfType = listeners[type];
+            if (listenersOfType === undefined) {
+                return;
+            }
+            else {
+                listenersOfType.forEach(function (listener) { return listener(ev); });
+            }
+        };
+        return { fire: fire, on: on, off: off };
+    };
+    //# sourceMappingURL=emitter.js.map
+
     var MaxPreviewLength = 50;
     var html = function (_a) {
         var $element = _a.$element, preview = _a.preview, data = _a.data;
@@ -769,7 +806,7 @@ var BrickyEditor = (function (exports, emitter) {
             };
         }
         bind($element, data);
-        var eventEmiter = emitter.emitter();
+        var eventEmiter = emitter();
         var field = __assign(__assign({}, eventEmiter), { $element: $element,
             data: data,
             bind: bind, html: getHtml });
@@ -880,7 +917,7 @@ var BrickyEditor = (function (exports, emitter) {
             return { $element: $element };
         }
         bind$1($element, data);
-        var eventEmitter = emitter.emitter();
+        var eventEmitter = emitter();
         var field = __assign(__assign({}, eventEmitter), { $element: $element,
             data: data,
             bind: bind$1,
@@ -969,7 +1006,7 @@ var BrickyEditor = (function (exports, emitter) {
             return { $element: $element };
         }
         var container = createContainer($element, !preview);
-        var eventEmitter = emitter.emitter();
+        var eventEmitter = emitter();
         var field = __assign(__assign({}, eventEmitter), { $element: $element,
             data: data,
             html: html$2,
@@ -1002,7 +1039,7 @@ var BrickyEditor = (function (exports, emitter) {
                 $element: $element
             };
         }
-        var eventEmiter = emitter.emitter();
+        var eventEmiter = emitter();
         var field = __assign(__assign({}, eventEmiter), { $element: $element,
             data: data,
             bind: bind$3,
@@ -1254,7 +1291,7 @@ var BrickyEditor = (function (exports, emitter) {
         var name = $template.dataset.name || "";
         var $preview = $template.querySelector(Selectors.selectorTemplatePreview);
         if ($preview !== null) {
-            $template.removeChild($preview);
+            $preview.remove();
         }
         else {
             $preview = $template.cloneNode(true);
@@ -1347,9 +1384,8 @@ var BrickyEditor = (function (exports, emitter) {
         }
     };
     var createBlockFromData = function (blockData) {
-        var blockTemplate = getTemplate(blockData.template);
-        debugger;
-        return createBlockFromTemplate(blockTemplate.name, blockTemplate.$template, blockData);
+        var _a = getTemplate(blockData.template), name = _a.name, $template = _a.$template;
+        return createBlockFromTemplate(name, $template, blockData);
     };
     var createBlockFromTemplate = function (name, $template, data) {
         if (data === void 0) { data = {
@@ -1357,7 +1393,7 @@ var BrickyEditor = (function (exports, emitter) {
             fields: []
         }; }
         var $element = $template.cloneNode(true);
-        var eventEmitter = emitter.emitter();
+        var eventEmitter = emitter();
         var block = __assign(__assign({}, eventEmitter), { $element: $element,
             data: data, selectedField: null });
         block.fields = bindBlockFields($element, block);
@@ -1372,7 +1408,6 @@ var BrickyEditor = (function (exports, emitter) {
         });
         return block;
     };
-    //# sourceMappingURL=Block.js.map
 
     var getContainerData = function (container) {
         return container.blocks.map(function (block) { return block.data; });
@@ -1382,6 +1417,18 @@ var BrickyEditor = (function (exports, emitter) {
         var root = container.$element.cloneNode(false);
         root.innerHTML = html;
         return root.outerHTML;
+    };
+    var getActiveContainer = function (container) {
+        if (container.selectedBlock === null ||
+            container.selectedBlock.selectedField === null) {
+            return container;
+        }
+        var selectedField = container.selectedBlock.selectedField;
+        if (selectedField.data.type === "container") {
+            var containerField = selectedField;
+            return getActiveContainer(containerField.container);
+        }
+        return container;
     };
     var getDefaultPlaceholder = function () {
         return helpers.createElement("<div style=\"min-height: 100px; display: flex; align-items: center; justify-content: center; font-weight: 700; cursor: pointer;\">\n      <div data-bre-placeholder=\"true\">Click here to select this container</div>\n    </div>");
@@ -1394,7 +1441,7 @@ var BrickyEditor = (function (exports, emitter) {
             container.$element.appendChild(container.$placeholder);
         }
         else {
-            container.$element.removeChild(container.$placeholder);
+            container.$placeholder.remove();
         }
     };
     var addBlockToContainer = function (container, options) {
@@ -1487,7 +1534,7 @@ var BrickyEditor = (function (exports, emitter) {
         container.blocks.splice(idx, 1);
         container.blocks.splice(new_idx, 0, block);
     };
-    //# sourceMappingURL=BlocksContainer.js.map
+    //# sourceMappingURL=blocksContainer.js.map
 
     var defaultButtons$1 = [
         { icon: "bold", command: "Bold", range: true },
@@ -1543,7 +1590,7 @@ var BrickyEditor = (function (exports, emitter) {
         return $group;
     };
     var getTemplateSelector = function () {
-        var _a = emitter.emitter(), fireEvent = _a.fire, on = _a.on, off = _a.off;
+        var _a = emitter(), fire = _a.fire, on = _a.on, off = _a.off;
         var $element = helpers.div("bre-templates-root");
         var $loader = helpers.div("bre-templates-loader", "...LOADING...");
         var $templates = helpers.div("bre-templates-list");
@@ -1554,7 +1601,7 @@ var BrickyEditor = (function (exports, emitter) {
                 if (group.templates.length === 0) {
                     return;
                 }
-                var $group = getTemplateGroupUI(group, fireEvent);
+                var $group = getTemplateGroupUI(group, fire);
                 $templates.append($group);
             });
         };
@@ -1585,7 +1632,6 @@ var BrickyEditor = (function (exports, emitter) {
                         editor = {
                             $element: $element,
                             container: container,
-                            selectedContainer: container,
                             data: function () { return getContainerData(container); },
                             html: function () { return getContainerHtml(container); }
                         };
@@ -1597,9 +1643,10 @@ var BrickyEditor = (function (exports, emitter) {
                         templatesUI = getTemplateSelector();
                         if (templates !== undefined) {
                             templatesUI.setTemplates(templates);
-                            templatesUI.on("select", function (t) {
-                                addBlockToContainer(container, {
-                                    blockTemplate: t.template
+                            templatesUI.on("select", function (ev) {
+                                var selectedContainer = getActiveContainer(container);
+                                addBlockToContainer(selectedContainer, {
+                                    blockTemplate: ev.template
                                 });
                             });
                             $element.append(templatesUI.$element);
@@ -1660,4 +1707,4 @@ var BrickyEditor = (function (exports, emitter) {
 
     return exports;
 
-}({}, emitter));
+}({}));

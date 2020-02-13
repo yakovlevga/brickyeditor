@@ -38,13 +38,8 @@ export const toggleBlockSelection = (
 export const createBlockFromData = (
   blockData: bre.block.BlockData
 ): bre.block.Block => {
-  const blockTemplate = getTemplate(blockData.template);
-  debugger;
-  return createBlockFromTemplate(
-    blockTemplate.name,
-    blockTemplate.$template,
-    blockData
-  );
+  const { name, $template } = getTemplate(blockData.template);
+  return createBlockFromTemplate(name, $template, blockData);
 };
 
 export const createBlockFromTemplate = (

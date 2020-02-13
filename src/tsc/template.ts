@@ -105,7 +105,7 @@ const createTemplate = (
   );
 
   if ($preview !== null) {
-    $template.removeChild($preview);
+    $preview.remove();
   } else {
     $preview = $template.cloneNode(true) as HTMLElement;
     bindTemplateFields($preview);
