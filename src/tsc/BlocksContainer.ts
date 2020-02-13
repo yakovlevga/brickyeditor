@@ -5,7 +5,6 @@ import {
 } from "@/block/Block";
 import { helpers } from "@/helpers";
 import { bre } from "@/types/bre";
-import { $dom } from "@/common/DOMHelpers";
 import { showBlockEditor } from "@/block/blockEditor";
 
 export const getContainerData = (container: bre.core.IBlocksContainer) =>
@@ -206,9 +205,9 @@ export const moveBlock = (
   const $anchorBlock = container.blocks[new_idx].$element;
   if ($anchorBlock) {
     if (offset > 0) {
-      $dom.after($anchorBlock, block.$element);
+      helpers.insertAfter($anchorBlock, block.$element);
     } else if (offset < 0) {
-      $dom.before($anchorBlock, block.$element);
+      helpers.insertBefore($anchorBlock, block.$element);
     }
   }
 
@@ -222,129 +221,3 @@ export const moveBlock = (
   // Scroll to block
   // block.scrollTo();
 };
-
-// export class BlocksContainer {
-//   // public $element: HTMLElement;
-//   // public $placeholder?: HTMLElement;
-//   // public usePlaceholder: boolean;
-//   public blocks: Block[] = [];
-//   public selectedBlock?: Block;
-//   public isContainer: boolean = true;
-
-//   // constructor(
-//   //   $element: HTMLElement,
-//   //   private onAddBlock: (block: Block, idx: number) => any,
-//   //   private onDeleteBlock: (block: Block, idx: number) => any,
-//   //   private onSelectBlock: (block: Block) => any,
-//   //   private onDeselectBlock: (block: Block) => any,
-//   //   private onMoveBlock: (block: Block, from: number, to: number) => any,
-//   //   private onUpdateBlock: (
-//   //     block: Block,
-//   //     property: string,
-//   //     oldValue: any,
-//   //     newValue: any
-//   //   ) => any,
-//   //   private onUpload?: bre.FileUploadHandler,
-//   //   usePlaceholder: boolean = false
-//   // ) {
-//   //   this.$element = $element;
-//   //   this.usePlaceholder = usePlaceholder;
-
-//   //   toggleContainerPlaceholderIfNeed(this);
-//   // }
-
-//   public addBlock(
-//     name: string,
-//     html: string,
-//     data?: bre.core.field.Field[],
-//     idx?: number,
-//     select: boolean = true
-//   ) {
-//     const block = new Block(name, html, false, data, {
-//       onDelete: this.deleteBlock,
-//       onSelect: this.selectBlock,
-//       onDeselect: this.deselectBlock,
-//       onCopy: this.copyBlock,
-//       onMove: (b, offset) => this.moveBlock(b, offset),
-//       onUpdate: this.onUpdateBlock,
-//       onUpload: this.onUpload,
-//     });
-
-//     this.insertBlock(block, idx);
-
-//     if (select) {
-//       block.select();
-//       block.scrollTo();
-//     }
-//   }
-
-//   public insertBlock(block: Block, idx?: number) {
-//     idx = idx || this.blocks.length;
-//     if (this.selectedBlock) {
-//       idx = this.blocks.indexOf(this.selectedBlock) + 1;
-//     }
-
-//     this.blocks.splice(idx, 0, block);
-//     if (idx === 0) {
-//       // todo: move to block ui
-//       this.$element.appendChild(block.ui.$editor!);
-//     } else {
-//       // todo: move to block ui
-//       $dom.after(this.blocks[idx - 1].ui.$editor!, block.ui.$editor!);
-//     }
-
-//     this.onAddBlock(block, idx);
-//     block.select(undefined);
-
-//     toggleContainersPlaceholder(this);
-//   }
-
-//   private deleteBlock(block: Block) {
-//     const idx = this.blocks.indexOf(block);
-//     this.blocks.splice(idx, 1);
-//     (block as any) = null;
-
-//     if (idx < this.blocks.length) {
-//       this.blocks[idx].select();
-//     } else if (this.blocks.length > 0) {
-//       this.blocks[idx - 1].select();
-//     } else {
-//       this.selectedBlock = undefined;
-//     }
-
-//     // Trigger event
-//     this.onDeleteBlock(block, idx);
-
-//     toggleContainersPlaceholder(this);
-//   }
-
-//   private copyBlock(block: Block) {
-//     const idx = this.blocks.indexOf(block) + 1;
-//     // const copy = this.addBlock(
-//     this.addBlock(
-//       block.template,
-//       block.html,
-//       block.getData().fields,
-//       idx,
-//       true
-//     );
-//   }
-
-//   private selectBlock(block: Block) {
-//     if (this.selectedBlock === block) {
-//       return;
-//     }
-
-//     if (this.selectedBlock) {
-//       this.selectedBlock.deselect();
-//     }
-
-//     this.selectedBlock = block;
-//     this.onSelectBlock(block);
-//   }
-
-//   private deselectBlock(block: Block) {
-//     this.selectedBlock = undefined;
-//     this.onDeselectBlock(block);
-//   }
-// }

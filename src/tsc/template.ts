@@ -1,4 +1,3 @@
-import { $dom } from "@/common/DOMHelpers";
 import { EditorStrings } from "@/EditorStrings";
 import { helpers, strEqualsInvariant } from "@/helpers";
 import { getRequest } from "@/httpTransport";
@@ -32,7 +31,7 @@ export const loadTemplatesAsync = async (url: string, $editor: HTMLElement) => {
 
     const $style = $data.querySelector("style");
     if ($style !== null) {
-      $dom.before($editor, $style);
+      helpers.insertBefore($editor, $style);
     }
 
     const $groups = $data.querySelectorAll<HTMLElement>(
