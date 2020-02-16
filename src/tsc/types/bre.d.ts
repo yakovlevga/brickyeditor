@@ -96,7 +96,6 @@ declare namespace bre {
 
     type Field<TFieldData extends field.FieldData> = FieldBase & {
       data: TFieldData;
-      bind: ($element: HTMLElement, data: TFieldData) => void;
       // clean up html element from editors data attributes, etc.
       html: (field: Field<TFieldData>) => HTMLElement;
       editor?: (

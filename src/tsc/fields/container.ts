@@ -1,7 +1,8 @@
 import {
   createContainer,
   getContainerData,
-  getContainerHtml
+  getContainerHtml,
+  addBlockToContainer
 } from "@/blocksContainer";
 import { toggleFieldSelection, isValidFieldType } from "@/fields/field";
 import { helpers } from "@/helpers";
@@ -34,38 +35,43 @@ export const container: FieldFactory = ({ $element, preview, data }) => {
 
   const container = createContainer($element, !preview);
 
+  if (data.blocks) {
+    data.blocks.forEach(blockData =>
+      addBlockToContainer(container, {
+        blockData
+      })
+    );
+  }
+
   const eventEmitter = emitter<bre.field.FieldEventMap>();
   const field: ContainerField = {
     ...eventEmitter,
     $element,
     data,
     html,
-    bind,
     container
   };
 
   $element.classList.add(Selectors.selectorFieldContainer);
 
-  $element.addEventListener("click", ev => {
-    // TODO:
-    // field.select();
+  $element.addEventListener("click", () => {
+    // ev.stopPropagation();
     toggleFieldSelection(field, true);
-    ev.stopPropagation();
-    return false;
+    // return false;
   });
 
-  const updateBlocks = () => {
-    const blocks = getContainerData(container);
-    const html = getContainerHtml(container);
+  // const updateBlocks = () => {
+  //   const blocks = getContainerData(container);
+  //   const html = getContainerHtml(container);
 
-    const updatedData = {
-      ...field.data,
-      blocks,
-      html
-    };
+  //   const updatedData = {
+  //     ...field.data,
+  //     blocks,
+  //     html
+  //   };
 
-    // TODO: call update callback
-  };
+  //   // TODO: call update callback
+  // };
 
   return field;
 };
@@ -76,5 +82,3 @@ const html = (field: bre.field.Field<ContainerFieldData>) => {
   // TODO: get blocks html via html method
   return helpers.createElement(html);
 };
-
-const bind = () => {};

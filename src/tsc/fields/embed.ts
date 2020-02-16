@@ -50,7 +50,6 @@ export const embed: FieldFactory = ({ $element, preview, data }) => {
     ...eventEmitter,
     $element,
     data,
-    bind,
     html,
     editor
   };
@@ -68,9 +67,11 @@ export const embed: FieldFactory = ({ $element, preview, data }) => {
   return field;
 };
 
-const html = (field: EmbedField) => getCleanFieldElement(field.$element);
+function html(field: EmbedField) {
+  return getCleanFieldElement(field.$element);
+}
 
-const editor = (initialData: Readonly<EmbedFieldData>) => {
+function editor(initialData: Readonly<EmbedFieldData>) {
   const data: EmbedFieldData = {
     ...initialData
   };
@@ -98,9 +99,9 @@ const editor = (initialData: Readonly<EmbedFieldData>) => {
     $element,
     data
   };
-};
+}
 
-const bind = async ($element: HTMLElement, { url }: EmbedFieldData) => {
+async function bind($element: HTMLElement, { url }: EmbedFieldData) {
   if (url === undefined) {
     return;
   }
@@ -121,7 +122,7 @@ const bind = async ($element: HTMLElement, { url }: EmbedFieldData) => {
       providerScriptsLoaded[embed.provider_name] = true;
     }
 
-    // postpone untill for will be DOM updated
+    // wait until DOM will be updated
     setTimeout(() => postProcessEmbed(embed.provider_name), 100);
   }
-};
+}

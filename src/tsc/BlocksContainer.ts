@@ -1,7 +1,8 @@
 import {
   createBlockFromData,
   createBlockFromTemplate,
-  toggleBlockSelection
+  toggleBlockSelection,
+  getBlockHtml
 } from "@/block/Block";
 import { helpers } from "@/helpers";
 import { bre } from "@/types/bre";
@@ -13,7 +14,9 @@ export const getContainerData = (container: bre.BlocksContainer) =>
 
 export const getContainerHtml = (container: bre.BlocksContainer) => {
   // TODO: fix it
-  const html = container.blocks.map(block => block.getHtml(true)).join("\n");
+  const html = container.blocks
+    .map(block => getBlockHtml(block, true))
+    .join("\n");
   const root: HTMLElement = container.$element.cloneNode(false) as HTMLElement;
   root.innerHTML = html;
   return root.outerHTML;

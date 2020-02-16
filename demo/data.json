@@ -1,12 +1,40 @@
 [
   {
-    "template": "Display Heading 1",
+    "template": "Paragraph Lead",
     "fields": [
       {
         "name": "text",
         "type": "html",
-        "html": "Header"
+        "html": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.\n            Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
       }
-    ]
+    ],
+    "html": "<p class=\"lead\">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>"
+  },
+  {
+    "template": "Columns-2",
+    "fields": [
+      {
+        "name": "col1",
+        "type": "container"
+      },
+      {
+        "name": "col2",
+        "type": "container",
+        "blocks": [
+          {
+            "template": "Display Heading 1",
+            "fields": [
+              {
+                "name": "text",
+                "type": "html",
+                "html": "Test"
+              }
+            ]
+          }
+        ],
+        "html": "<div class=\"col-md-6 bre-field-container bre-field-selected\" data-bre-field=\"{ &quot;name&quot; : &quot;col2&quot;, &quot;type&quot;: &quot;container&quot; }\"><h1 class=\"display-2\">Test</h1></div>"
+      }
+    ],
+    "html": "<div class=\"row\"> <div class=\"col-md-6 bre-field-container bre-field-selected\" data-bre-field=\"{ &quot;name&quot; : &quot;col1&quot;, &quot;type&quot;: &quot;container&quot; }\"></div> <div class=\"col-md-6 bre-field-container\" data-bre-field=\"{ &quot;name&quot; : &quot;col2&quot;, &quot;type&quot;: &quot;container&quot; }\"><h1 class=\"display-2\">Test</h1></div> </div>"
   }
 ]

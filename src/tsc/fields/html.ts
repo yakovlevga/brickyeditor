@@ -42,7 +42,6 @@ export const html: FieldFactory = ({ $element, preview, data }) => {
     ...eventEmiter,
     $element,
     data,
-    bind,
     html: getHtml
   };
 
@@ -83,13 +82,13 @@ export const html: FieldFactory = ({ $element, preview, data }) => {
   return field;
 };
 
-const bind = ($element: HTMLElement, { html }: HtmlFieldData) => {
+function bind($element: HTMLElement, { html }: HtmlFieldData) {
   if (html !== undefined) {
     $element.innerHTML = html;
   }
-};
+}
 
-const getHtml = (field: HtmlField) => {
+function getHtml(field: HtmlField) {
   const $copy = getCleanFieldElement(field.$element);
   $copy.removeAttribute("contenteditable");
   return $copy;

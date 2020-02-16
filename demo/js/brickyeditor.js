@@ -808,8 +808,7 @@ var BrickyEditor = (function (exports) {
         bind($element, data);
         var eventEmiter = emitter();
         var field = __assign(__assign({}, eventEmiter), { $element: $element,
-            data: data,
-            bind: bind, html: getHtml });
+            data: data, html: getHtml });
         var updateHtmlProp = function () {
             var html = $element.innerHTML.trim();
             if ($element.innerHTML !== html) {
@@ -840,12 +839,12 @@ var BrickyEditor = (function (exports) {
         });
         return field;
     };
-    var bind = function ($element, _a) {
+    function bind($element, _a) {
         var html = _a.html;
         if (html !== undefined) {
             $element.innerHTML = html;
         }
-    };
+    }
     var getHtml = function (field) {
         var $copy = getCleanFieldElement(field.$element);
         $copy.removeAttribute("contenteditable");
@@ -920,7 +919,6 @@ var BrickyEditor = (function (exports) {
         var eventEmitter = emitter();
         var field = __assign(__assign({}, eventEmitter), { $element: $element,
             data: data,
-            bind: bind$1,
             html: html$1,
             editor: editor });
         $element.addEventListener("click", function () { return __awaiter(void 0, void 0, void 0, function () {
@@ -942,8 +940,10 @@ var BrickyEditor = (function (exports) {
         }); });
         return field;
     };
-    var html$1 = function (field) { return getCleanFieldElement(field.$element); };
-    var editor = function (initialData) {
+    function html$1(field) {
+        return getCleanFieldElement(field.$element);
+    }
+    function editor(initialData) {
         var data = __assign({}, initialData);
         var $element = helpers.div("bre-field-editor-root");
         var $preview = helpers.div("bre-field-editor-preview");
@@ -959,10 +959,10 @@ var BrickyEditor = (function (exports) {
             $element: $element,
             data: data
         };
-    };
-    var bind$1 = function ($element, _a) {
+    }
+    function bind$1($element, _a) {
         var url = _a.url;
-        return __awaiter(void 0, void 0, void 0, function () {
+        return __awaiter(this, void 0, void 0, function () {
             var embed, $embed, $script;
             return __generator(this, function (_b) {
                 switch (_b.label) {
@@ -994,7 +994,7 @@ var BrickyEditor = (function (exports) {
                 }
             });
         });
-    };
+    }
     //# sourceMappingURL=embed.js.map
 
     var container = function (_a) {
@@ -1006,17 +1006,21 @@ var BrickyEditor = (function (exports) {
             return { $element: $element };
         }
         var container = createContainer($element, !preview);
+        if (data.blocks) {
+            data.blocks.forEach(function (blockData) {
+                return addBlockToContainer(container, {
+                    blockData: blockData
+                });
+            });
+        }
         var eventEmitter = emitter();
         var field = __assign(__assign({}, eventEmitter), { $element: $element,
             data: data,
             html: html$2,
-            bind: bind$2,
             container: container });
         $element.classList.add(Selectors.selectorFieldContainer);
-        $element.addEventListener("click", function (ev) {
+        $element.addEventListener("click", function () {
             toggleFieldSelection(field, true);
-            ev.stopPropagation();
-            return false;
         });
         return field;
     };
@@ -1025,15 +1029,13 @@ var BrickyEditor = (function (exports) {
         var html = getContainerHtml(container);
         return helpers.createElement(html);
     };
-    var bind$2 = function () { };
-    //# sourceMappingURL=container.js.map
 
     var image = function (_a) {
         var $element = _a.$element, preview = _a.preview, data = _a.data;
         if (!isValidFieldType(data, "image")) {
             return null;
         }
-        bind$3($element, data);
+        bind$2($element, data);
         if (preview) {
             return {
                 $element: $element
@@ -1042,7 +1044,6 @@ var BrickyEditor = (function (exports) {
         var eventEmiter = emitter();
         var field = __assign(__assign({}, eventEmiter), { $element: $element,
             data: data,
-            bind: bind$3,
             html: html$3,
             editor: editor$1 });
         $element.addEventListener("click", function () { return __awaiter(void 0, void 0, void 0, function () {
@@ -1055,7 +1056,7 @@ var BrickyEditor = (function (exports) {
                     case 1:
                         updatedData = _a.sent();
                         if (updatedData !== null) {
-                            bind$3(field.$element, updatedData);
+                            bind$2(field.$element, updatedData);
                             updateFieldData(field, updatedData);
                         }
                         return [2];
@@ -1064,7 +1065,7 @@ var BrickyEditor = (function (exports) {
         }); });
         return field;
     };
-    var bind$3 = function ($element, data) {
+    function bind$2($element, data) {
         var src = getSrcOrFile(data);
         var alt = data.alt || "";
         var isImageElement = $element.tagName.toLowerCase() === "img";
@@ -1077,8 +1078,9 @@ var BrickyEditor = (function (exports) {
             $element.style.backgroundImage = "url(" + src + ")";
         }
         $element.title = alt;
-    };
-    var editor$1 = function (initialData) {
+    }
+    function editor$1(initialData) {
+        var _this = this;
         var data = __assign({}, initialData);
         var $element = helpers.div("bre-field-editor-root");
         var $previewImg = helpers.el({
@@ -1095,7 +1097,7 @@ var BrickyEditor = (function (exports) {
                 data.src = src;
                 data.file = undefined;
             } }));
-        var $file = renderInput(__assign(__assign({}, locales.prompt.image.upload), { type: "file", value: data.file ? data.file.fileContent : "", onUpdate: function (f, fileContent) { return __awaiter(void 0, void 0, void 0, function () {
+        var $file = renderInput(__assign(__assign({}, locales.prompt.image.upload), { type: "file", value: data.file ? data.file.fileContent : "", onUpdate: function (f, fileContent) { return __awaiter(_this, void 0, void 0, function () {
                 var fileInfo;
                 return __generator(this, function (_a) {
                     $previewImg.src = fileContent;
@@ -1121,8 +1123,8 @@ var BrickyEditor = (function (exports) {
             $element: $element,
             data: data
         };
-    };
-    var html$3 = function (field) {
+    }
+    function html$3(field) {
         var $element = field.$element, data = field.data;
         var link = data.link;
         var $result = getCleanFieldElement($element);
@@ -1135,10 +1137,10 @@ var BrickyEditor = (function (exports) {
             return $link;
         }
         return $result;
-    };
-    var getSrcOrFile = function (data) {
+    }
+    function getSrcOrFile(data) {
         return data.src || (data.file !== undefined ? data.file.fileContent : "");
-    };
+    }
     //# sourceMappingURL=image.js.map
 
     var fields = {
@@ -1408,12 +1410,18 @@ var BrickyEditor = (function (exports) {
         });
         return block;
     };
+    var getBlockHtml = function (block, trim) {
+        return "";
+    };
+    //# sourceMappingURL=Block.js.map
 
     var getContainerData = function (container) {
         return container.blocks.map(function (block) { return block.data; });
     };
     var getContainerHtml = function (container) {
-        var html = container.blocks.map(function (block) { return block.getHtml(true); }).join("\n");
+        var html = container.blocks
+            .map(function (block) { return getBlockHtml(); })
+            .join("\n");
         var root = container.$element.cloneNode(false);
         root.innerHTML = html;
         return root.outerHTML;

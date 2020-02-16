@@ -73,3 +73,38 @@ export const createBlockFromTemplate = (
 
   return block;
 };
+
+// TODO:
+export const getBlockHtml = (block: bre.block.Block, trim: boolean = true) => {
+  return "";
+
+  // let $html = this.template.$html.clone(false, false)
+  // .wrap('<div></div>')
+  // .parent();
+
+  // let fieldsHtml = {};
+  // this.fields.forEach(field => {
+  //   const name = field.name || field.data.name;
+  //   fieldsHtml[name] = field.getEl();
+  // });
+
+  // $html
+  //   .find(Selectors.selectorField)
+  //   .addBack(Selectors.selectorField)
+  //   .each((idx, elem) => {
+  //       let fieldData = $(elem).data().breField;
+  //       if(typeof fieldData === 'string') {
+  //           fieldData = JSON.parse(fieldData.replace(/'/g, '"'));
+  //       }
+  //       const name = fieldData.name;
+  //       const $field = fieldsHtml[name];
+  //       $(elem).replaceWith($field);
+  //   });
+
+  // const html = $html.html();
+  // if(!html) {
+  //   return null;
+  // }
+
+  // return trim ? html.breTotalTrim() : html;
+};

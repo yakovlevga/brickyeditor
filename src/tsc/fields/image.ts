@@ -40,7 +40,6 @@ export const image: FieldFactory = ({ $element, preview, data }) => {
     ...eventEmiter,
     $element,
     data,
-    bind,
     html,
     editor
   };
@@ -58,7 +57,7 @@ export const image: FieldFactory = ({ $element, preview, data }) => {
   return field;
 };
 
-const bind = ($element: HTMLElement, data: ImageFieldData) => {
+function bind($element: HTMLElement, data: ImageFieldData) {
   const src = getSrcOrFile(data);
   const alt = data.alt || "";
 
@@ -72,9 +71,9 @@ const bind = ($element: HTMLElement, data: ImageFieldData) => {
   }
 
   $element.title = alt;
-};
+}
 
-const editor = (initialData: Readonly<ImageFieldData>) => {
+function editor(initialData: Readonly<ImageFieldData>) {
   const data: ImageFieldData = {
     ...initialData
   };
@@ -146,9 +145,9 @@ const editor = (initialData: Readonly<ImageFieldData>) => {
     $element,
     data
   };
-};
+}
 
-const html = (field: ImageField) => {
+function html(field: ImageField) {
   const { $element, data } = field;
   const { link } = data;
 
@@ -165,7 +164,8 @@ const html = (field: ImageField) => {
   }
 
   return $result;
-};
+}
 
-const getSrcOrFile = (data: ImageFieldPayload) =>
-  data.src || (data.file !== undefined ? data.file.fileContent : "");
+function getSrcOrFile(data: ImageFieldPayload) {
+  return data.src || (data.file !== undefined ? data.file.fileContent : "");
+}
