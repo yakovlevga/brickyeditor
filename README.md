@@ -13,7 +13,7 @@ and render it natively, without
 ![demo gif](https://github.com/yakovlevga/brickyeditor/blob/master/readme/1.gif?raw=true)
 
 ## Demo page
-**[see demo for details](http://brickyeditor.info/examples.html)**
+**[see demo for details](https://yakovlevga.github.io/brickyeditor/demo/)**
 
 ## Installation
 ### Bower
