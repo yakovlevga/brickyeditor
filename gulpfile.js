@@ -30,12 +30,18 @@ const srcTypescriptFolder = "./src/tsc",
   taskWatcher = "watch";
 
 // Browser-sync task
-gulp.task(taskBrowserSync, () => {
+gulp.task(taskBrowserSync, done => {
   browserSync({
     server: {
       baseDir: demoFolder
-    }
+    },
+    https: true,
+    port: 3000
   });
+
+  browserSync.watch(demoFolder).on("change", browserSync.reload);
+
+  done();
 });
 
 // Typescript task
@@ -127,8 +133,8 @@ gulp.task(
     taskCompileTypescriptES6,
     taskCopyLocales,
     taskCompileSass,
-    taskWatcher,
-    taskBrowserSync
+    taskBrowserSync,
+    taskWatcher
   ]),
   done => {
     done();
