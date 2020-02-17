@@ -1,0 +1,16 @@
+.bre {
+  &-container {
+    &-placeholder {
+      cursor: pointer;
+      min-height: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+    }
+
+    &-selected {
+      border-left: 1px solid silver;
+    }
+  }
+}

@@ -30,7 +30,8 @@ const getTemplateGroupUI = (
     const $template = getTemplateUI(template);
     $group.append($template);
 
-    $template.onclick = () => {
+    $template.onclick = ev => {
+      ev.stopPropagation();
       fireFunc("select", {
         template
       });

@@ -1,6 +1,8 @@
 declare type BreStyles =
   | "bre-block-editor"
   | "bre-block-editor-button"
+  | "bre-container-placeholder"
+  | "bre-container-selected"
   | "bre-field-editor-root"
   | "bre-field-editor-preview"
   | "bre-field-editor-preview-img"

@@ -52,13 +52,11 @@ export const container: FieldFactory = ({ $element, preview, data }) => {
     container
   };
 
-  $element.classList.add(Selectors.selectorFieldContainer);
-
-  $element.addEventListener("click", () => {
-    // ev.stopPropagation();
-    toggleFieldSelection(field, true);
-    // return false;
-  });
+  // $element.addEventListener("click", () => {
+  //   // ev.stopPropagation();
+  //   toggleFieldSelection(field, true);
+  //   // return false;
+  // });
 
   // const updateBlocks = () => {
   //   const blocks = getContainerData(container);

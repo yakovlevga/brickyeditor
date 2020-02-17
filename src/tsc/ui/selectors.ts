@@ -13,6 +13,5 @@ export class Selectors {
   public static selectorTemplatePreview = ".bre-template-preview";
 
   public static selectorFieldSelected = "bre-field-selected";
-  public static selectorFieldContainer = "bre-field-container";
   public static selectorBlockSelected = "bre-block-selected";
 }

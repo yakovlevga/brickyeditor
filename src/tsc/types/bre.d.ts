@@ -31,7 +31,16 @@ declare namespace bre {
     inputSelector?: string;
   };
 
-  type BlocksContainer = {
+  type BlocksContainerEvent = {
+    container: bre.BlocksContainer;
+  };
+
+  type BlocksContainerEventMap = {
+    change: BlocksContainerEvent;
+    select: BlocksContainerEvent;
+  };
+
+  type BlocksContainer = event.Emitter<BlocksContainerEventMap> & {
     $element: HTMLElement;
     $placeholder: HTMLElement | null;
     blocks: block.Block[];
@@ -52,6 +61,7 @@ declare namespace bre {
 
   namespace event {
     type EventMaps =
+      | BlocksContainerEventMap
       | field.FieldEventMap
       | template.TemplatesEventMap
       | block.BlockEventMap;
@@ -84,8 +94,7 @@ declare namespace bre {
 
     type FieldEventMap = {
       change: FieldEvent;
-      focus: FieldEvent;
-      blur: FieldEvent;
+      select: FieldEvent;
     };
 
     type FieldBase = event.Emitter<FieldEventMap> & {
@@ -136,29 +145,11 @@ declare namespace bre {
     type BlockEventMap = {
       delete: BlockEvent;
       clone: BlockEvent;
+      select: BlockEvent;
       move: BlockEvent<{
         offset: number;
       }>;
     };
-
-    // type MoveEvent = (block: Block, offset: number) => void;
-
-    // type UpdateEvent = (
-    //   block: Block,
-    //   property: string,
-    //   oldValue: any,
-    //   newValue: any
-    // ) => void;
-
-    // type BlockEvents = {
-    //   onDelete?: BlockEvent;
-    //   onSelect?: BlockEvent;
-    //   onDeselect?: BlockEvent;
-    //   onCopy?: BlockEvent;
-    //   onMove?: MoveEvent;
-    //   onUpdate?: UpdateEvent;
-    //   onUpload?: FileUploadHandler;
-    // };
 
     type BlockData = {
       template: string;
@@ -193,14 +184,6 @@ declare namespace bre {
 
   namespace field {
     type FieldType = "html" | "container" | "embed" | "image";
-
-    // type BaseField = {
-    //   $field: HTMLElement;
-    //   getElement: () => HTMLElement;
-    //   onSelect: (f: Field) => void;
-    //   onUpdate?: (f: Field) => void;
-    //   onDeselect?: (f: Field) => void;
-    // };
 
     type FieldData<TType extends FieldType = any, TData = {}> = {
       type: TType;

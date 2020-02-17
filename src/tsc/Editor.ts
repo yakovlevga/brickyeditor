@@ -2,8 +2,7 @@ import {
   addBlockToContainer,
   createContainer,
   getContainerData,
-  getContainerHtml,
-  getActiveContainer
+  getContainerHtml
 } from "@/blocksContainer";
 import { defaultOptions } from "@/defaults";
 import { getRequest } from "@/httpTransport";
@@ -12,6 +11,7 @@ import { bre } from "@/types/bre";
 import { Selectors } from "@/ui/Selectors";
 import { getTemplateSelector } from "@/ui/templateSelector";
 import { initHtmlTools } from "@/ui/htmlTools";
+import { state } from "@/state";
 
 export class Editor {
   constructor($editor: HTMLElement, options: bre.EditorOptions) {
@@ -25,7 +25,9 @@ export const editor = (
 ) =>
   new Promise<bre.Editor>(async resolve => {
     const optionsWithDefaults = { ...defaultOptions, ...options };
+
     const container = createContainer($element, false);
+    state.setSelectedContainer(container);
 
     const editor: bre.Editor = {
       $element,
@@ -35,7 +37,6 @@ export const editor = (
     };
 
     $element.classList.add(Selectors.classEditor);
-
     initHtmlTools(optionsWithDefaults);
 
     // TODO: move it to separate plugin?
@@ -50,10 +51,12 @@ export const editor = (
     if (templates !== undefined) {
       templatesUI.setTemplates(templates);
       templatesUI.on("select", ev => {
-        const selectedContainer = getActiveContainer(container);
-        addBlockToContainer(selectedContainer, {
-          blockTemplate: ev!.template
-        });
+        const selectedContainer = state.getSelectedContainer();
+        if (selectedContainer !== null) {
+          addBlockToContainer(selectedContainer, {
+            blockTemplate: ev!.template
+          });
+        }
       });
       $element.append(templatesUI.$element);
     }

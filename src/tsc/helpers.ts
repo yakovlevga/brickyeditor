@@ -30,7 +30,11 @@ const el = <THTMLElement extends HTMLElement = HTMLElement>({
   return result;
 };
 
-const div = (className?: BreStyles, innerHTML?: string) =>
+const div = (
+  className?: BreStyles,
+  innerHTML?: string,
+  props?: Partial<HTMLElement>
+) =>
   el<HTMLDivElement>({
     className,
     innerHTML

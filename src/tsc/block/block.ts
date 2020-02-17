@@ -11,6 +11,7 @@ export const selectField = (
   field: bre.field.FieldBase
 ) => {
   block.selectedField = field;
+  block.fire("select", { block });
 };
 
 export const toggleBlockSelection = (
@@ -63,7 +64,7 @@ export const createBlockFromTemplate = (
   block.fields = bindBlockFields($element, block);
   block.fields.forEach(field => {
     if (field.on !== undefined) {
-      field.on("focus", f => {
+      field.on("select", f => {
         if (f !== undefined) {
           selectField(block, f.field);
         }

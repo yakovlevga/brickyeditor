@@ -44,8 +44,8 @@ export const toggleFieldSelection = (
     classList.remove(Selectors.selectorFieldSelected);
   }
 
-  if (fireEvent !== undefined) {
-    field.fire(selected ? "focus" : "blur", { field });
+  if (fireEvent !== undefined && selected) {
+    field.fire("select", { field });
   }
 };
 
