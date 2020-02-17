@@ -30,23 +30,23 @@
   "dependencies": {},
   "devDependencies": {
     "babel-cli": "^6.26.0",
-    "babel-core": "^6.26.0",
+    "babel-core": "^6.26.3",
     "babel-preset-es2015": "^6.24.1",
-    "browser-sync": "^2.18.12",
-    "chai": "^4.1.2",
-    "gulp": "^3.9.1",
-    "gulp-clean-css": "^3.4.0",
+    "browser-sync": "^2.26.7",
+    "chai": "^4.2.0",
+    "gulp": "^4.0.2",
+    "gulp-clean-css": "^4.2.0",
     "gulp-mocha": "^4.3.1",
-    "gulp-rename": "^1.2.2",
-    "gulp-sass": "^3.1.0",
+    "gulp-rename": "^1.4.0",
+    "gulp-sass": "^3.2.1",
     "gulp-typescript": "^3.1.7",
     "gulp-uglify": "^2.1.2",
-    "jquery": "^3.2.1",
-    "jsdom": "^11.4.0",
+    "jquery": "^3.4.1",
+    "jsdom": "^11.12.0",
     "mocha": "^4.0.1",
     "rename": "^1.0.4",
     "rewire": "^3.0.2",
-    "typescript": "^2.3.3"
+    "typescript": "^2.9.2"
   },
   "scripts": {
     "test": "mocha --compilers js:babel-core/register --recursive"
