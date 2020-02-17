@@ -1137,7 +1137,7 @@ var BrickyEditor;
                 var $field = this.$field;
                 var data = this.data;
                 this.setSrc(this.data.src, false);
-                $field.on('click', function () { return __awaiter(_this, void 0, void 0, function () {
+                $field.on("click", function () { return __awaiter(_this, void 0, void 0, function () {
                     var fields, file, src, alt, link;
                     return __generator(this, function (_a) {
                         switch (_a.label) {
@@ -1145,8 +1145,8 @@ var BrickyEditor;
                             case 1:
                                 fields = _a.sent();
                                 if (fields != null) {
-                                    file = fields.getValue('file');
-                                    src = fields.getValue('src');
+                                    file = fields.getValue("file");
+                                    src = fields.getValue("src");
                                     if (file) {
                                         if (field.onUpload) {
                                             field.onUpload(file, function (url) {
@@ -1163,7 +1163,7 @@ var BrickyEditor;
                                         field.setSrc(src);
                                         field.setFile(null);
                                     }
-                                    alt = fields.getValue('alt');
+                                    alt = fields.getValue("alt");
                                     field.setAlt(alt);
                                     link = BrickyEditor.HtmlLinkParams.getLinkFromParams(fields);
                                     this.setLink(link);
@@ -1176,12 +1176,14 @@ var BrickyEditor;
             };
             ImageField.prototype.getPromptParams = function () {
                 var params = [
-                    new BrickyEditor.Prompt.PromptParameter('src', BrickyEditor.EditorStrings.imageFieldLinkTitle, this.data.url, BrickyEditor.EditorStrings.imageFieldLinkPlaceholder),
-                    new BrickyEditor.Prompt.PromptParameterImage('file', BrickyEditor.EditorStrings.imageFieldUploadTitle, this.data.file, BrickyEditor.EditorStrings.imageFieldUploadButton),
-                    new BrickyEditor.Prompt.PromptParameter('alt', BrickyEditor.EditorStrings.imageFieldAltTitle, this.data.alt, BrickyEditor.EditorStrings.imageFieldAltPlaceholder),
-                    new BrickyEditor.Prompt.PromptParameter(null, BrickyEditor.EditorStrings.imageFieldUrlSubtitle, null, null),
+                    new BrickyEditor.Prompt.PromptParameter("src", BrickyEditor.EditorStrings.imageFieldLinkTitle, this.data.url, BrickyEditor.EditorStrings.imageFieldLinkPlaceholder),
+                    new BrickyEditor.Prompt.PromptParameterImage("file", BrickyEditor.EditorStrings.imageFieldUploadTitle, this.data.file, BrickyEditor.EditorStrings.imageFieldUploadButton),
+                    new BrickyEditor.Prompt.PromptParameter("alt", BrickyEditor.EditorStrings.imageFieldAltTitle, this.data.alt, BrickyEditor.EditorStrings.imageFieldAltPlaceholder),
+                    new BrickyEditor.Prompt.PromptParameter(null, BrickyEditor.EditorStrings.imageFieldUrlSubtitle, null, null)
                 ];
-                var link = this.data.link ? this.data.link : new BrickyEditor.HtmlLinkParams();
+                var link = this.data.link
+                    ? new BrickyEditor.HtmlLinkParams(this.data.link.href, this.data.link.title, this.data.link.target)
+                    : new BrickyEditor.HtmlLinkParams();
                 var linkParams = link.getLinkPromptParams();
                 return params.concat(linkParams);
             };
@@ -1189,34 +1191,34 @@ var BrickyEditor;
                 if (fireUpdate === void 0) { fireUpdate = true; }
                 if (src) {
                     if (this.isImg) {
-                        this.$field.attr('src', src);
+                        this.$field.attr("src", src);
                     }
                     else {
-                        this.$field.css('background-image', "url(" + src);
+                        this.$field.css("background-image", "url(" + src);
                     }
                 }
-                this.updateProperty('src', src, fireUpdate);
+                this.updateProperty("src", src, fireUpdate);
             };
             ImageField.prototype.setAlt = function (alt) {
-                this.$field.attr(this.isImg ? 'alt' : 'title', alt);
-                this.updateProperty('alt', alt);
+                this.$field.attr(this.isImg ? "alt" : "title", alt);
+                this.updateProperty("alt", alt);
             };
             ImageField.prototype.setFile = function (file) {
                 if (file) {
                     if (this.isImg) {
-                        this.$field.attr('src', file.fileContent);
+                        this.$field.attr("src", file.fileContent);
                     }
                     else {
-                        this.$field.css('background-image', "url(" + file.fileContent + ")");
+                        this.$field.css("background-image", "url(" + file.fileContent + ")");
                     }
                 }
-                this.updateProperty('file', file);
+                this.updateProperty("file", file);
             };
             ImageField.prototype.setLink = function (url) {
                 if (url && url.href) {
                     if (!this.$link) {
                         this.$link = $("<a href='" + url.href + "' title='" + url.title + "' target='" + url.target + "'></a>");
-                        this.$link.on('click', function (ev) {
+                        this.$link.on("click", function (ev) {
                             ev.stopPropagation();
                             return false;
                         });
@@ -1231,11 +1233,12 @@ var BrickyEditor;
                     this.$link = null;
                     delete this.$link;
                 }
-                this.updateProperty('link', url);
+                this.updateProperty("link", url);
             };
             Object.defineProperty(ImageField.prototype, "isImg", {
                 get: function () {
-                    return this._isImg = this._isImg || this.$field.prop('tagName').toLowerCase() === 'img';
+                    return (this._isImg =
+                        this._isImg || this.$field.prop("tagName").toLowerCase() === "img");
                 },
                 enumerable: true,
                 configurable: true
