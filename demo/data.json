@@ -1,10 +1,86 @@
-[{
-    "template": "Container",
+[
+  {
+    "template": "Display Heading 1",
     "fields": [
-        {
-            "name": "text",
-            "type": "html",
-            "html": "Hi! This is bricky editor example."
-        }
+      {
+        "name": "text",
+        "type": "html",
+        "html": "Hi! This is bricky editor example."
+      }
     ]
-}]
+  },
+  {
+    "template": "Columns-2",
+    "fields": [
+      {
+        "name": "col1",
+        "type": "container",
+        "blocks": [
+          {
+            "template": "Image with caption",
+            "fields": [
+              { "name": "image", "type": "image", "src": "assets/photo.jpg" },
+              {
+                "name": "caption",
+                "type": "html",
+                "html": "Lorem ipsum dolor sit amet"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "col2",
+        "type": "container",
+        "blocks": [
+          {
+            "template": "Heading 1",
+            "fields": [
+              { "name": "text", "type": "html", "html": "Container Column" }
+            ]
+          },
+          {
+            "template": "Paragraph Lead",
+            "fields": [
+              {
+                "name": "text",
+                "type": "html",
+                "html": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.\n            Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "template": "Paragraph Lead",
+    "fields": [
+      {
+        "name": "text",
+        "type": "html",
+        "html": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.\n            Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+      }
+    ]
+  },
+  {
+    "template": "Heading 3",
+    "fields": [
+      {
+        "name": "text",
+        "type": "html",
+        "html": "<div><span style=\"color: inherit; font-family: inherit; font-size: 1.75rem;\">Embed example:</span><br></div>"
+      }
+    ]
+  },
+  {
+    "template": "Embed",
+    "fields": [
+      {
+        "name": "embed",
+        "type": "embed",
+        "url": "http://instagr.am/p/BO9VX2Vj4fF/"
+      }
+    ]
+  }
+]
