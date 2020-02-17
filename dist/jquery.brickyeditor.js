@@ -13,8 +13,8 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     function step(op) {
         if (f) throw new TypeError("Generator is already executing.");
         while (_) try {
-            if (f = 1, y && (t = y[op[0] & 2 ? "return" : op[0] ? "throw" : "next"]) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [0, t.value];
+            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [op[0] & 2, t.value];
             switch (op[0]) {
                 case 0: case 1: t = op; break;
                 case 4: _.label++; return { value: op[1], done: false };
@@ -73,22 +73,28 @@ var BrickyEditor;
             this.blocks.forEach(function (block) {
                 blocksHtml.push(block.getHtml(true));
             });
-            var blocksHtmlJoined = blocksHtml.join('\n');
-            var $el = this.$element.clone(false, false).html(blocksHtmlJoined).wrap('<div></div>');
-            var html = $('<div></div>').append($el).html();
+            var blocksHtmlJoined = blocksHtml.join("\n");
+            var $el = this.$element
+                .clone(false, false)
+                .html(blocksHtmlJoined)
+                .wrap("<div></div>");
+            var html = $("<div></div>")
+                .append($el)
+                .html();
             return html;
         };
         BlocksContainer.prototype.addBlock = function (template, data, idx, select) {
             var _this = this;
             if (select === void 0) { select = true; }
             var block = new BrickyEditor.Block(template, false, data, function (block) { return _this.deleteBlock(block); }, function (block) { return _this.selectBlock(block); }, function (block) { return _this.deselectBlock(block); }, function (block) { return _this.copyBlock(block); }, function (block, offset) { return _this.moveBlock(block, offset); }, this.onUpdateBlock, this.onUpload);
-            this.insertBlock(block, idx);
+            this.insertBlock(block, idx, select);
             if (select) {
                 block.select();
                 block.scrollTo();
             }
         };
-        BlocksContainer.prototype.insertBlock = function (block, idx) {
+        BlocksContainer.prototype.insertBlock = function (block, idx, select) {
+            if (select === void 0) { select = true; }
             idx = idx || this.blocks.length;
             if (this.selectedBlock) {
                 idx = this.blocks.indexOf(this.selectedBlock) + 1;
@@ -101,7 +107,9 @@ var BrickyEditor;
                 this.blocks[idx - 1].ui.$editor.after(block.ui.$editor);
             }
             this.onAddBlock(block, idx);
-            block.select(null);
+            if (select) {
+                block.select(null);
+            }
             this.togglePlaceholderIfNeed();
         };
         BlocksContainer.prototype.deleteBlock = function (block) {
@@ -267,12 +275,18 @@ var BrickyEditor;
             var onAdd = function (block, idx) {
                 if (_this.isLoaded) {
                     _this.trigger(BrickyEditor.Events.onBlockAdd, { block: block, idx: idx });
-                    _this.trigger(BrickyEditor.Events.onChange, { blocks: _this.getData(), html: _this.getHtml() });
+                    _this.trigger(BrickyEditor.Events.onChange, {
+                        blocks: _this.getData(),
+                        html: _this.getHtml()
+                    });
                 }
             };
             var onDelete = function (block, idx) {
                 _this.trigger(BrickyEditor.Events.onBlockDelete, { block: block, idx: idx });
-                _this.trigger(BrickyEditor.Events.onChange, { blocks: _this.getData(), html: _this.getHtml() });
+                _this.trigger(BrickyEditor.Events.onChange, {
+                    blocks: _this.getData(),
+                    html: _this.getHtml()
+                });
             };
             var onUpdate = function (block, property, oldValue, newValue) {
                 _this.trigger(BrickyEditor.Events.onBlockUpdate, {
@@ -281,11 +295,25 @@ var BrickyEditor;
                     oldValue: oldValue,
                     newValue: newValue
                 });
-                _this.trigger(BrickyEditor.Events.onChange, { blocks: _this.getData(), html: _this.getHtml() });
+                _this.trigger(BrickyEditor.Events.onChange, {
+                    blocks: _this.getData(),
+                    html: _this.getHtml()
+                });
             };
-            return new BrickyEditor.BlocksContainer(this.$editor, onAdd, onDelete, function (block) { _this.trigger(BrickyEditor.Events.onBlockSelect, { block: block }); }, function (block) { _this.trigger(BrickyEditor.Events.onBlockDeselect, { block: block }); }, function (block, from, to) {
-                _this.trigger(BrickyEditor.Events.onBlockMove, { block: block, from: from, to: to });
-                _this.trigger(BrickyEditor.Events.onChange, { blocks: _this.getData(), html: _this.getHtml() });
+            return new BrickyEditor.BlocksContainer(this.$editor, onAdd, onDelete, function (block) {
+                _this.trigger(BrickyEditor.Events.onBlockSelect, { block: block });
+            }, function (block) {
+                _this.trigger(BrickyEditor.Events.onBlockDeselect, { block: block });
+            }, function (block, from, to) {
+                _this.trigger(BrickyEditor.Events.onBlockMove, {
+                    block: block,
+                    from: from,
+                    to: to
+                });
+                _this.trigger(BrickyEditor.Events.onChange, {
+                    blocks: _this.getData(),
+                    html: _this.getHtml()
+                });
             }, onUpdate, this.options.onUpload);
         };
         Editor.prototype.initAsync = function () {
@@ -314,8 +342,8 @@ var BrickyEditor;
         };
         Editor.prototype.tryLoadInitialBlocksAsync = function () {
             return __awaiter(this, void 0, void 0, function () {
-                var _this = this;
                 var url, editor;
+                var _this = this;
                 return __generator(this, function (_a) {
                     url = this.options.blocksUrl;
                     editor = this;
@@ -356,22 +384,30 @@ var BrickyEditor;
         };
         Editor.prototype.tryBindFormSubmit = function () {
             var editor = this;
-            var $form = this.options.formSelector ? $(this.options.formSelector) : null;
-            var $input = this.options.inputSelector ? $(this.options.inputSelector) : null;
+            var $form = this.options.formSelector
+                ? $(this.options.formSelector)
+                : null;
+            var $input = this.options.inputSelector
+                ? $(this.options.inputSelector)
+                : null;
             if (!$form || !$input || $form.length == 0 || $input.length == 0)
                 return;
-            $form.on('submit', function () {
+            $form.on("submit", function () {
                 $input.val(JSON.stringify(editor.getData()));
                 return true;
             });
         };
         Editor.prototype.bindFormSubmit = function () {
             var editor = this;
-            var $form = this.options.formSelector ? $(this.options.formSelector) : null;
-            var $input = this.options.inputSelector ? $(this.options.inputSelector) : null;
+            var $form = this.options.formSelector
+                ? $(this.options.formSelector)
+                : null;
+            var $input = this.options.inputSelector
+                ? $(this.options.inputSelector)
+                : null;
             if (!$form || !$input || $form.length == 0 || $input.length == 0)
                 return;
-            $form.on('submit', function () {
+            $form.on("submit", function () {
                 $input.val(JSON.stringify(editor.getData()));
                 return true;
             });
@@ -403,7 +439,8 @@ var BrickyEditor;
         };
         Editor.prototype.getContainer = function (container) {
             if (container.selectedBlock && container.selectedBlock.isContainer()) {
-                var field = container.selectedBlock.selectedField;
+                var field = container.selectedBlock
+                    .selectedField;
                 if (field) {
                     return this.getContainer(field.container);
                 }
@@ -413,7 +450,7 @@ var BrickyEditor;
         Editor.prototype.trigger = function (event, data) {
             var editor = this;
             var $editor = this.$editor;
-            $editor.trigger('bre.' + event, data);
+            $editor.trigger("bre." + event, data);
             BrickyEditor.Common.propsEach(editor.options, function (key, value) {
                 if (key.breEqualsInvariant(event) && value) {
                     value(data);
@@ -773,7 +810,7 @@ var BrickyEditor;
             Object.defineProperty(BaseField, "type", {
                 get: function () {
                     var name = this.name;
-                    name = name.replace('Field', '');
+                    name = name.replace("Field", "");
                     name = name.substring(0, 1).toLowerCase() + name.substring(1);
                     return name;
                 },
@@ -789,7 +826,6 @@ var BrickyEditor;
                 Fields.EmbedField.registerField();
                 Fields.ContainerField.registerField();
             };
-            ;
             BaseField.registerField = function () {
                 if (this._fields.hasOwnProperty(this.type)) {
                     delete this._fields[this.type];
@@ -801,7 +837,7 @@ var BrickyEditor;
                 if (!fieldData) {
                     throw "There is no any data in field " + $field.html();
                 }
-                if (typeof fieldData === 'string') {
+                if (typeof fieldData === "string") {
                     fieldData = JSON.parse(fieldData.replace(/'/g, '"'));
                 }
                 if (!fieldData.name) {
@@ -876,20 +912,35 @@ var BrickyEditor;
                 var _this = this;
                 var field = this;
                 var $field = this.$field;
-                this.container = new BrickyEditor.BlocksContainer($field, function (block) {
+                this.container = new BrickyEditor.BlocksContainer($field, function () {
                     field.updateBlocks();
-                }, function (block) { field.updateBlocks(); }, function (block) { _this.select(); }, function (block) { }, function (block) { field.updateBlocks(); }, function (block) { field.updateBlocks(); }, field.onUpload, true);
+                }, function () {
+                    field.updateBlocks();
+                }, function () {
+                    _this.select();
+                }, function () { }, function () {
+                    field.updateBlocks();
+                }, function () {
+                    field.updateBlocks();
+                }, field.onUpload, true);
                 $field.addClass(BrickyEditor.Selectors.selectorFieldContainer);
-                $field
-                    .on('click', function (ev) {
+                $field.on("click", function (ev) {
                     field.select();
                     ev.stopPropagation();
                     return false;
                 });
+                if (this.data.blocks) {
+                    this.data.blocks.forEach(function (block) {
+                        var template = BrickyEditor.Services.TemplateService.getTemplate(block.template);
+                        if (template) {
+                            _this.container.addBlock(template, block.fields, null, false);
+                        }
+                    });
+                }
             };
             ContainerField.prototype.updateBlocks = function () {
-                this.updateProperty('blocks', this.container.getData(true), true);
-                this.updateProperty('html', this.container.getHtml(), true);
+                this.updateProperty("blocks", this.container.getData(true), true);
+                this.updateProperty("html", this.container.getHtml(), true);
             };
             ContainerField.prototype.deselect = function () {
                 this.container.blocks.forEach(function (b) { return b.deselect(); });
@@ -1206,141 +1257,6 @@ var BrickyEditor;
 })(BrickyEditor || (BrickyEditor = {}));
 var BrickyEditor;
 (function (BrickyEditor) {
-    var Services;
-    (function (Services) {
-        var EmbedService = (function () {
-            function EmbedService() {
-            }
-            EmbedService.getEmbedAsync = function (embedUrl) {
-                var _this = this;
-                var url = "https://noembed.com/embed?url=" + embedUrl;
-                return new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
-                    var params, data, err_1;
-                    return __generator(this, function (_a) {
-                        switch (_a.label) {
-                            case 0:
-                                params = { url: url, type: "get", dataType: "jsonp" };
-                                _a.label = 1;
-                            case 1:
-                                _a.trys.push([1, 3, , 4]);
-                                return [4, $.ajax(params)];
-                            case 2:
-                                data = _a.sent();
-                                resolve(data);
-                                return [3, 4];
-                            case 3:
-                                err_1 = _a.sent();
-                                reject(err_1);
-                                return [3, 4];
-                            case 4: return [2];
-                        }
-                    });
-                }); });
-            };
-            EmbedService.processEmbed = function (provider) {
-                switch (provider) {
-                    case EmbedService.Instagram:
-                        if (instgrm) {
-                            instgrm.Embeds.process();
-                        }
-                        break;
-                    default:
-                        break;
-                }
-            };
-            EmbedService.Instagram = 'Instagram';
-            return EmbedService;
-        }());
-        Services.EmbedService = EmbedService;
-    })(Services = BrickyEditor.Services || (BrickyEditor.Services = {}));
-})(BrickyEditor || (BrickyEditor = {}));
-var BrickyEditor;
-(function (BrickyEditor) {
-    var Services;
-    (function (Services) {
-        var TemplateService = (function () {
-            function TemplateService() {
-            }
-            TemplateService.loadTemplatesAsync = function (url, $editor, onError) {
-                return __awaiter(this, void 0, void 0, function () {
-                    var _this = this;
-                    var templates;
-                    return __generator(this, function (_a) {
-                        this.templates = [];
-                        templates = this.templates;
-                        return [2, new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
-                                var _this = this;
-                                var data, $style, $data, $groups, templates_1, defaultGroupName, group, err_2;
-                                return __generator(this, function (_a) {
-                                    switch (_a.label) {
-                                        case 0:
-                                            _a.trys.push([0, 2, , 3]);
-                                            return [4, $.get(url)];
-                                        case 1:
-                                            data = _a.sent();
-                                            $style = $(data).filter('style');
-                                            if ($style && $style.length > 0) {
-                                                $editor.prepend($style);
-                                            }
-                                            $data = $("<div>" + data + "</div>");
-                                            $groups = $(BrickyEditor.Selectors.selectorTemplateGroup, $data);
-                                            $groups.each(function (idx, el) {
-                                                var $group = $(el);
-                                                var templates = _this.getTemplates($group, onError);
-                                                _this.templates.push(new BrickyEditor.TemplateGroup($group.attr('title'), templates));
-                                                $group.remove();
-                                            });
-                                            templates_1 = this.getTemplates($data, onError);
-                                            defaultGroupName = this.templates.length > 0 ? BrickyEditor.EditorStrings.defaultTemplatesGroupName : '';
-                                            group = new BrickyEditor.TemplateGroup(defaultGroupName, templates_1);
-                                            this.templates.push(group);
-                                            resolve(this.templates);
-                                            return [3, 3];
-                                        case 2:
-                                            err_2 = _a.sent();
-                                            onError(BrickyEditor.EditorStrings.errorTemplatesFileNotFound(url));
-                                            reject(err_2);
-                                            return [3, 3];
-                                        case 3: return [2];
-                                    }
-                                });
-                            }); })];
-                    });
-                });
-            };
-            TemplateService.getTemplates = function ($el, onError) {
-                var templates = [];
-                var $templates = $(BrickyEditor.Selectors.selectorTemplate, $el);
-                $templates.each(function (idx, t) {
-                    var template = new BrickyEditor.Template(t);
-                    if (template.loaded) {
-                        templates.push(template);
-                    }
-                    else {
-                        onError(BrickyEditor.EditorStrings.errorTemplateParsing(template.name));
-                    }
-                });
-                return templates;
-            };
-            TemplateService.getTemplate = function (templateName) {
-                for (var gi = 0; gi < this.templates.length; gi++) {
-                    var group = this.templates[gi];
-                    for (var ti = 0; ti < group.templates.length; ti++) {
-                        var template = group.templates[ti];
-                        if (template.name.breEqualsInvariant(templateName)) {
-                            return template;
-                        }
-                    }
-                }
-                return null;
-            };
-            return TemplateService;
-        }());
-        Services.TemplateService = TemplateService;
-    })(Services = BrickyEditor.Services || (BrickyEditor.Services = {}));
-})(BrickyEditor || (BrickyEditor = {}));
-var BrickyEditor;
-(function (BrickyEditor) {
     var Prompt;
     (function (Prompt) {
         var PromptParameter = (function () {
@@ -1522,6 +1438,141 @@ var BrickyEditor;
         }(Prompt.PromptParameter));
         Prompt.PromptParameterOptions = PromptParameterOptions;
     })(Prompt = BrickyEditor.Prompt || (BrickyEditor.Prompt = {}));
+})(BrickyEditor || (BrickyEditor = {}));
+var BrickyEditor;
+(function (BrickyEditor) {
+    var Services;
+    (function (Services) {
+        var EmbedService = (function () {
+            function EmbedService() {
+            }
+            EmbedService.getEmbedAsync = function (embedUrl) {
+                var _this = this;
+                var url = "https://noembed.com/embed?url=" + embedUrl;
+                return new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
+                    var params, data, err_1;
+                    return __generator(this, function (_a) {
+                        switch (_a.label) {
+                            case 0:
+                                params = { url: url, type: "get", dataType: "jsonp" };
+                                _a.label = 1;
+                            case 1:
+                                _a.trys.push([1, 3, , 4]);
+                                return [4, $.ajax(params)];
+                            case 2:
+                                data = _a.sent();
+                                resolve(data);
+                                return [3, 4];
+                            case 3:
+                                err_1 = _a.sent();
+                                reject(err_1);
+                                return [3, 4];
+                            case 4: return [2];
+                        }
+                    });
+                }); });
+            };
+            EmbedService.processEmbed = function (provider) {
+                switch (provider) {
+                    case EmbedService.Instagram:
+                        if (instgrm) {
+                            instgrm.Embeds.process();
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            };
+            EmbedService.Instagram = 'Instagram';
+            return EmbedService;
+        }());
+        Services.EmbedService = EmbedService;
+    })(Services = BrickyEditor.Services || (BrickyEditor.Services = {}));
+})(BrickyEditor || (BrickyEditor = {}));
+var BrickyEditor;
+(function (BrickyEditor) {
+    var Services;
+    (function (Services) {
+        var TemplateService = (function () {
+            function TemplateService() {
+            }
+            TemplateService.loadTemplatesAsync = function (url, $editor, onError) {
+                return __awaiter(this, void 0, void 0, function () {
+                    var templates;
+                    var _this = this;
+                    return __generator(this, function (_a) {
+                        this.templates = [];
+                        templates = this.templates;
+                        return [2, new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
+                                var data, $style, $data, $groups, templates_1, defaultGroupName, group, err_2;
+                                var _this = this;
+                                return __generator(this, function (_a) {
+                                    switch (_a.label) {
+                                        case 0:
+                                            _a.trys.push([0, 2, , 3]);
+                                            return [4, $.get(url)];
+                                        case 1:
+                                            data = _a.sent();
+                                            $style = $(data).filter('style');
+                                            if ($style && $style.length > 0) {
+                                                $editor.prepend($style);
+                                            }
+                                            $data = $("<div>" + data + "</div>");
+                                            $groups = $(BrickyEditor.Selectors.selectorTemplateGroup, $data);
+                                            $groups.each(function (idx, el) {
+                                                var $group = $(el);
+                                                var templates = _this.getTemplates($group, onError);
+                                                _this.templates.push(new BrickyEditor.TemplateGroup($group.attr('title'), templates));
+                                                $group.remove();
+                                            });
+                                            templates_1 = this.getTemplates($data, onError);
+                                            defaultGroupName = this.templates.length > 0 ? BrickyEditor.EditorStrings.defaultTemplatesGroupName : '';
+                                            group = new BrickyEditor.TemplateGroup(defaultGroupName, templates_1);
+                                            this.templates.push(group);
+                                            resolve(this.templates);
+                                            return [3, 3];
+                                        case 2:
+                                            err_2 = _a.sent();
+                                            onError(BrickyEditor.EditorStrings.errorTemplatesFileNotFound(url));
+                                            reject(err_2);
+                                            return [3, 3];
+                                        case 3: return [2];
+                                    }
+                                });
+                            }); })];
+                    });
+                });
+            };
+            TemplateService.getTemplates = function ($el, onError) {
+                var templates = [];
+                var $templates = $(BrickyEditor.Selectors.selectorTemplate, $el);
+                $templates.each(function (idx, t) {
+                    var template = new BrickyEditor.Template(t);
+                    if (template.loaded) {
+                        templates.push(template);
+                    }
+                    else {
+                        onError(BrickyEditor.EditorStrings.errorTemplateParsing(template.name));
+                    }
+                });
+                return templates;
+            };
+            TemplateService.getTemplate = function (templateName) {
+                for (var gi = 0; gi < this.templates.length; gi++) {
+                    var group = this.templates[gi];
+                    for (var ti = 0; ti < group.templates.length; ti++) {
+                        var template = group.templates[ti];
+                        if (template.name.breEqualsInvariant(templateName)) {
+                            return template;
+                        }
+                    }
+                }
+                return null;
+            };
+            return TemplateService;
+        }());
+        Services.TemplateService = TemplateService;
+    })(Services = BrickyEditor.Services || (BrickyEditor.Services = {}));
 })(BrickyEditor || (BrickyEditor = {}));
 var BrickyEditor;
 (function (BrickyEditor) {
