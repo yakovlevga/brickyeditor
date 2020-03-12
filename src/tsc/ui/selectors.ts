@@ -4,9 +4,6 @@ export class Selectors {
 
   public static classEditor = "bre-editor";
 
-  public static classTemplate = "bre-template";
-  public static selectorTemplate = `.${Selectors.classTemplate}`;
-
   public static classTemplateGroup = "bre-template-group";
   public static selectorTemplateGroup = `.${Selectors.classTemplateGroup}`;
 

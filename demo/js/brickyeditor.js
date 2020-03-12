@@ -78,8 +78,6 @@ var BrickyEditor = (function (exports) {
         Selectors.attrField = "data-bre-field";
         Selectors.selectorField = "[" + Selectors.attrField + "]";
         Selectors.classEditor = "bre-editor";
-        Selectors.classTemplate = "bre-template";
-        Selectors.selectorTemplate = "." + Selectors.classTemplate;
         Selectors.classTemplateGroup = "bre-template-group";
         Selectors.selectorTemplateGroup = "." + Selectors.classTemplateGroup;
         Selectors.selectorTemplatePreview = ".bre-template-preview";
@@ -178,7 +176,7 @@ var BrickyEditor = (function (exports) {
         }
         return result;
     };
-    var div = function (className, innerHTML, props) {
+    var div = function (className, innerHTML) {
         return el({
             className: className,
             innerHTML: innerHTML
@@ -276,6 +274,9 @@ var BrickyEditor = (function (exports) {
             el.parentNode.appendChild(elToInsert);
         }
     };
+    var convertNodeListToArray = function (nl) {
+        return Array.prototype.slice.call(nl);
+    };
     var helpers = {
         createElement: createElement,
         div: div,
@@ -285,6 +286,7 @@ var BrickyEditor = (function (exports) {
         readFileAsync: readFileAsync,
         objectToArray: objectToArray,
         filterNotNull: filterNotNull,
+        convertNodeListToArray: convertNodeListToArray,
         insertBefore: insertBefore,
         insertAfter: insertAfter
     };
@@ -1024,6 +1026,7 @@ var BrickyEditor = (function (exports) {
         var html = getContainerHtml(container);
         return helpers.createElement(html);
     };
+    //# sourceMappingURL=container.js.map
 
     var image = function (_a) {
         var $element = _a.$element, preview = _a.preview, data = _a.data;
@@ -1273,16 +1276,14 @@ var BrickyEditor = (function (exports) {
             }
         });
     }); };
+    var templateClassName = "bre-template";
+    var templateSelector = "." + templateClassName;
     var parseTemplates = function ($el) {
-        var templates = [];
-        var $templates = $el.querySelectorAll(Selectors.selectorTemplate);
-        $templates.forEach(function ($template) {
-            var template = createTemplate($template);
-            if (template !== null) {
-                templates.push(template);
-            }
-        });
-        return templates;
+        var $templates = $el.querySelectorAll(templateSelector);
+        var templates = helpers
+            .convertNodeListToArray($templates)
+            .map(createTemplate);
+        return helpers.filterNotNull(templates);
     };
     var createTemplate = function ($template) {
         var name = $template.dataset.name || "";
@@ -1300,7 +1301,6 @@ var BrickyEditor = (function (exports) {
             $preview: $preview
         };
     };
-    //# sourceMappingURL=template.js.map
 
     var defaultButtons = [
         {

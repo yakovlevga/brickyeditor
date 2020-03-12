@@ -2,7 +2,6 @@ const path = require("path");
 const fs = require("fs");
 const nodeSass = require("node-sass");
 const postcss = require("postcss");
-const parser = require("postcss-selector-parser");
 const autoprefixer = require("autoprefixer");
 
 const cssPath = "demo/js/brickyeditor.css";
@@ -43,15 +42,14 @@ fromDir("src/tsc", /\.scss$/, (pathname, file) => {
   const result = processor.process(css);
   const { root } = result;
 
+  console.log({ nodes: root.nodes.map(n => n.selector) });
+
   const rules = root.nodes
     .filter(n => n.type === "rule")
     .filter(n => n.selector.indexOf(".") === 0)
     .filter(n => n.selector.indexOf(":") === -1)
-    .map(n => `"${n.selector.substr(1)}"`);
-
-  // const typeName = `${file[0].toUpperCase()}${
-  //   file.substr(1).split(".")[0]
-  // }Styles`;
+    .map(n => n.selector.split(" ")[0])
+    .map(n => `"${n.substr(1)}"`);
 
   if (rules && rules.length > 0) {
     resultTypings += `\n${rules.map(r => renderRule(r)).join("\n")}`;

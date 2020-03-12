@@ -30,11 +30,7 @@ const el = <THTMLElement extends HTMLElement = HTMLElement>({
   return result;
 };
 
-const div = (
-  className?: BreStyles,
-  innerHTML?: string,
-  props?: Partial<HTMLElement>
-) =>
+const div = (className?: BreStyles, innerHTML?: string) =>
   el<HTMLDivElement>({
     className,
     innerHTML
@@ -154,6 +150,10 @@ const insertAfter = (el: HTMLElement, elToInsert: HTMLElement) => {
   }
 };
 
+const convertNodeListToArray = <TNode extends Node>(nl: NodeListOf<TNode>) => {
+  return Array.prototype.slice.call(nl) as TNode[];
+};
+
 export const helpers = {
   createElement,
   div,
@@ -163,7 +163,7 @@ export const helpers = {
   readFileAsync,
   objectToArray,
   filterNotNull,
-
+  convertNodeListToArray,
   insertBefore,
   insertAfter
 };

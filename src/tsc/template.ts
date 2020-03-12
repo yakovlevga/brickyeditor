@@ -70,27 +70,19 @@ export const loadTemplatesAsync = async (url: string, $editor: HTMLElement) => {
   }
 };
 
-const parseTemplates = ($el: HTMLElement) => {
-  const templates: bre.template.Template[] = [];
+const templateClassName: BreStyles = "bre-template";
+const templateSelector = `.${templateClassName}`;
 
-  const $templates = $el.querySelectorAll<HTMLElement>(
-    Selectors.selectorTemplate
-  );
-
-  $templates.forEach($template => {
-    const template = createTemplate($template);
-    if (template !== null) {
-      templates.push(template);
-    }
-  });
-
-  return templates;
+const parseTemplates = ($el: HTMLElement): bre.template.Template[] => {
+  const $templates = $el.querySelectorAll<HTMLElement>(templateSelector);
+  const templates = helpers
+    .convertNodeListToArray($templates)
+    .map(createTemplate);
+  return helpers.filterNotNull(templates);
 };
 
 export const getTemplatePreview = (template: bre.template.Template) => {
-  const $template = helpers.createElement(
-    `<div class='${Selectors.classTemplate}'></div>`
-  );
+  const $template = helpers.div("bre-template");
   $template.appendChild(template.$preview);
   return $template;
 };
