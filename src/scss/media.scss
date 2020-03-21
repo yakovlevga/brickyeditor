@@ -1,8 +1,0 @@
-$phone: 640px;
-$tablet: 768px;
-
-@mixin for-phones {
-  @media screen and (max-width: $phone) {
-    @content;
-  }
-}

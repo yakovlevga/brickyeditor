@@ -115,11 +115,11 @@
 .bre-templates-root {
   position: fixed;
   width: 30%;
-  max-width: 245px;
+  max-width: 260px;
   top: 0;
   right: 0;
   bottom: 0;
-  z-index: 101;
+  z-index: 100;
   background: rgba(238, 238, 238, 0.5);
   transition: all 0.15s ease-in 0s; }
 

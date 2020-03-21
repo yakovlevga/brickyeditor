@@ -1,4 +1,5 @@
-@import "../../scss/partials/base";
+$tools-width: 260px;
+$fixed-z-index: 100;
 
 .bre-templates {
   &-root {
@@ -9,7 +10,7 @@
     right: 0;
     bottom: 0;
     z-index: $fixed-z-index;
-    background: transparentize($tools-background, 0.5);
+    background: rgba(238, 238, 238, 0.5);
     transition: all 0.15s ease-in 0s;
   }
 
