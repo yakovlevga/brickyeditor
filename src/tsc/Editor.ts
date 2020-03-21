@@ -64,9 +64,13 @@ export const editor = (
     const blocks = await loadInitialBlocks(optionsWithDefaults);
     if (blocks !== null) {
       blocks.map(blockData =>
-        addBlockToContainer(container, {
-          blockData
-        })
+        addBlockToContainer(
+          container,
+          {
+            blockData
+          },
+          false
+        )
       );
     }
 

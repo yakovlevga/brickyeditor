@@ -6,7 +6,7 @@ import {
 } from "@/block/Block";
 import { helpers } from "@/helpers";
 import { bre } from "@/types/bre";
-import { showBlockEditor } from "@/block/blockEditor";
+import { showBlockEditor, hideBlockEditor } from "@/block/blockEditor";
 import { ContainerField } from "@/fields/container";
 import { emitter } from "@/emitter";
 import { state } from "@/state";
@@ -71,7 +71,8 @@ type AddBlockToContainerOptions = { idx?: number } & (
 
 export const addBlockToContainer = (
   container: bre.BlocksContainer,
-  options: AddBlockToContainerOptions
+  options: AddBlockToContainerOptions,
+  select: boolean
 ) => {
   const { blocks, selectedBlock } = container;
 
@@ -123,11 +124,9 @@ export const addBlockToContainer = (
     $prevBlock.after($block);
   }
 
-  // $block.addEventListener("click", () => {
-  //   selectBlock(container, block);
-  // });
-
-  selectBlock(container, block);
+  if (select) {
+    selectBlock(container, block);
+  }
 
   return block;
 };
@@ -171,10 +170,14 @@ function deleteBlock(container: bre.BlocksContainer, block: bre.block.Block) {
 
 function copyBlock(container: bre.BlocksContainer, block: bre.block.Block) {
   const idx = container.blocks.indexOf(block) + 1;
-  addBlockToContainer(container, {
-    idx,
-    blockData: block.data
-  });
+  addBlockToContainer(
+    container,
+    {
+      idx,
+      blockData: block.data
+    },
+    true
+  );
 }
 
 function moveBlock(

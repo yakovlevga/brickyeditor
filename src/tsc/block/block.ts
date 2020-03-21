@@ -27,7 +27,7 @@ export const toggleBlockSelection = (
   if (selected) {
     showBlockEditor(block);
   } else {
-    hideBlockEditor();
+    hideBlockEditor(block);
   }
 };
 
@@ -47,6 +47,8 @@ export const createBlockFromTemplate = (
   }
 ): bre.block.Block => {
   const $element = $template.cloneNode(true) as HTMLElement;
+  helpers.toggleClassName($element, "bre-template", false);
+  helpers.toggleClassName($element, "bre-block", true);
 
   const eventEmitter = emitter<bre.block.BlockEventMap>();
   const block: bre.block.Block = {

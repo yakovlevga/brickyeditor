@@ -161,6 +161,21 @@ declare namespace bre {
       data: BlockData;
       fields?: field.FieldBase[];
       selectedField: field.FieldBase | null;
+      editor?: BlockEditor;
+    };
+
+    type BlockEditorButton = {
+      name: string;
+      icon: string;
+      action: (ff: bre.event.FireFunc<bre.block.BlockEventMap>) => void;
+    };
+
+    type BlockEditor = {
+      $element: HTMLDivElement;
+      btns: {
+        $btn: HTMLDivElement;
+        action: BlockEditorButton["action"];
+      }[];
     };
   }
 

@@ -1,23 +1,47 @@
 $size: 32px;
+$padding: 4px;
 $zIndex: 100;
 
 .bre-block {
   &-editor {
+    display: flex;
     position: absolute;
-    left: -$size;
-    min-width: $size;
-    min-height: $size;
+    top: -($size + $padding);
     z-index: $zIndex;
-    /* transform: `translateX(-${px(width)})`, */
-    transition: "all 2s";
+    padding: $padding;
+    background-color: rgba(0, 0, 0, 0.8);
+    border-radius: 20px;
 
     &-button {
+      cursor: pointer;
       width: $size;
       height: $size;
       display: flex;
       justify-content: center;
       align-items: center;
-      cursor: pointer;
+      padding: 6px;
+      margin-right: $padding;
+      opacity: 0.8;
+
+      &:last-of-type {
+        margin-right: 0;
+      }
+
+      & > svg {
+        width: 100%;
+        height: 100%;
+
+        & > * {
+          fill: none;
+          stroke: #ffffff;
+          stroke-linecap: round;
+          stroke-linejoin: round;
+        }
+      }
+
+      &:hover {
+        opacity: 1;
+      }
     }
   }
 }

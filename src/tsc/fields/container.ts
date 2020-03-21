@@ -4,10 +4,9 @@ import {
   getContainerHtml,
   addBlockToContainer
 } from "@/blocksContainer";
-import { toggleFieldSelection, isValidFieldType } from "@/fields/field";
+import { isValidFieldType } from "@/fields/field";
 import { helpers } from "@/helpers";
 import { bre } from "@/types/bre";
-import { Selectors } from "@/ui/Selectors";
 import { emitter } from "@/emitter";
 import { FieldFactory } from "@/fields/fields";
 
@@ -35,11 +34,16 @@ export const container: FieldFactory = ({ $element, preview, data }) => {
 
   const container = createContainer($element, !preview);
 
-  if (data.blocks) {
-    data.blocks.forEach(blockData =>
-      addBlockToContainer(container, {
-        blockData
-      })
+  // TODO Should data.blocks be nullable?
+  if (data.blocks && data.blocks.length > 0) {
+    data.blocks.map(blockData =>
+      addBlockToContainer(
+        container,
+        {
+          blockData
+        },
+        false
+      )
     );
   }
 
