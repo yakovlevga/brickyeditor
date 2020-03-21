@@ -1,5 +1,6 @@
 import { bre } from "@/types/bre";
-import { Selectors } from "@/ui/Selectors";
+import { helpers } from "@/helpers";
+import { FIELD_DATA_ATTR } from "@/constants";
 
 export const isValidFieldType = <TResult extends bre.field.FieldData>(
   data: bre.field.FieldData,
@@ -36,13 +37,8 @@ export const toggleFieldSelection = (
   selected: boolean,
   fireEvent: boolean = true
 ) => {
-  const { classList } = field.$element;
-  if (selected) {
-    field.selected = selected;
-    classList.add(Selectors.selectorFieldSelected);
-  } else {
-    classList.remove(Selectors.selectorFieldSelected);
-  }
+  field.selected = selected;
+  helpers.toggleClassName(field.$element, "bre-field-selected", selected);
 
   if (fireEvent !== undefined && selected) {
     field.fire("select", { field });
@@ -51,6 +47,6 @@ export const toggleFieldSelection = (
 
 export const getCleanFieldElement = ($field: HTMLElement) => {
   const $el = $field.cloneNode(true) as HTMLElement;
-  $el.attributes.removeNamedItem(Selectors.attrField);
+  $el.attributes.removeNamedItem(FIELD_DATA_ATTR);
   return $el;
 };

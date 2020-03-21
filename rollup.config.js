@@ -2,7 +2,7 @@ import typescript from "rollup-plugin-typescript";
 import browsersync from "rollup-plugin-browsersync";
 
 export default {
-  input: "./src/tsc/Editor.ts",
+  input: "./src/tsc/editor.ts",
   output: {
     format: "iife",
     file: "demo/js/brickyeditor.js",

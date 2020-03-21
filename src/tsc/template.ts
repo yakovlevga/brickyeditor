@@ -2,8 +2,11 @@ import { EditorStrings } from "@/EditorStrings";
 import { helpers, strEqualsInvariant } from "@/helpers";
 import { getRequest } from "@/httpTransport";
 import { bre } from "@/types/bre";
-import { Selectors } from "@/ui/Selectors";
 import { bindTemplateFields } from "@/fields/fields";
+import {
+  TEMPLATE_GROUP_SELECTOR,
+  TEMPLATE_PREVIEW_SELECTOR
+} from "./constants";
 
 let allTemplates: bre.template.Template[] = [];
 
@@ -35,7 +38,7 @@ export const loadTemplatesAsync = async (url: string, $editor: HTMLElement) => {
     }
 
     const $groups = $data.querySelectorAll<HTMLElement>(
-      Selectors.selectorTemplateGroup
+      TEMPLATE_GROUP_SELECTOR
     );
 
     $groups.forEach($group => {
@@ -93,7 +96,7 @@ const createTemplate = (
   const name = $template.dataset.name || "";
 
   let $preview = $template.querySelector<HTMLElement>(
-    Selectors.selectorTemplatePreview
+    TEMPLATE_PREVIEW_SELECTOR
   );
 
   if ($preview !== null) {

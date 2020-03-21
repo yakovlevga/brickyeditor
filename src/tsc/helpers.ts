@@ -61,6 +61,12 @@ const toggleVisibility = (el: HTMLElement, visible?: boolean) => {
   el.style.display = el.style.display !== "none" ? "none" : "initial";
 };
 
+const toggleClassName = (
+  el: HTMLElement,
+  className: BreStyles,
+  force?: boolean
+) => el.classList.toggle(className, force);
+
 const parseElementData = (el: HTMLElement, prop: string): FieldData | null => {
   let json = el.dataset[prop];
   if (json === undefined) {
@@ -160,6 +166,7 @@ export const helpers = {
   el,
   parseElementData,
   toggleVisibility,
+  toggleClassName,
   readFileAsync,
   objectToArray,
   filterNotNull,

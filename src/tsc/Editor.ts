@@ -8,10 +8,10 @@ import { defaultOptions } from "@/defaults";
 import { getRequest } from "@/httpTransport";
 import { loadTemplatesAsync } from "@/template";
 import { bre } from "@/types/bre";
-import { Selectors } from "@/ui/Selectors";
 import { getTemplateSelector } from "@/ui/templateSelector";
 import { initHtmlTools } from "@/ui/htmlTools";
 import { state } from "@/state";
+import { helpers } from "@/helpers";
 
 export class Editor {
   constructor($editor: HTMLElement, options: bre.EditorOptions) {
@@ -36,7 +36,7 @@ export const editor = (
       html: () => getContainerHtml(container)
     };
 
-    $element.classList.add(Selectors.classEditor);
+    helpers.toggleClassName($element, "bre-editor", true);
     initHtmlTools(optionsWithDefaults);
 
     // TODO: move it to separate plugin?

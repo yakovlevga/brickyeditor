@@ -4,7 +4,7 @@ import { container } from "@/fields/container";
 import { image } from "@/fields/image";
 import { bre } from "@/types/bre";
 import { helpers, strEqualsInvariant } from "@/helpers";
-import { Selectors } from "@/ui/Selectors";
+import { FIELD_SELECTOR, FIELD_DATA_ATTR } from "@/constants";
 
 let fields: {
   [TKey in string]: FieldFactory;
@@ -129,11 +129,11 @@ function getFieldDataByName(
 }
 
 function findFieldElements($html: HTMLElement) {
-  const nodes = $html.querySelectorAll<HTMLElement>(Selectors.selectorField);
+  const nodes = $html.querySelectorAll<HTMLElement>(FIELD_SELECTOR);
   let $fields: HTMLElement[] =
     nodes.length > 0 ? Array.prototype.slice.call(nodes) : [];
 
-  if ($html.attributes.getNamedItem(Selectors.attrField) !== null) {
+  if ($html.attributes.getNamedItem(FIELD_DATA_ATTR) !== null) {
     $fields = [...$fields, $html];
   }
 

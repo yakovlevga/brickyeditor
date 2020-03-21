@@ -1,10 +1,10 @@
 import { toggleFieldSelection } from "@/fields/field";
 import { getTemplate } from "@/template";
 import { bre } from "@/types/bre";
-import { Selectors } from "@/ui/Selectors";
 import { showBlockEditor, hideBlockEditor } from "@/block/blockEditor";
 import { emitter } from "@/emitter";
 import { bindBlockFields } from "@/fields/fields";
+import { helpers } from "@/helpers";
 
 export const selectField = (
   block: bre.block.Block,
@@ -22,12 +22,7 @@ export const toggleBlockSelection = (
     toggleFieldSelection(block.selectedField, false);
   }
 
-  const { classList } = block.$element;
-  if (selected) {
-    classList.add(Selectors.selectorBlockSelected);
-  } else {
-    classList.remove(Selectors.selectorBlockSelected);
-  }
+  helpers.toggleClassName(block.$element, "bre-block-selected", selected);
 
   if (selected) {
     showBlockEditor(block);

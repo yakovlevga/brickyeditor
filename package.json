@@ -60,7 +60,8 @@
   },
   "scripts": {
     "test": "jest",
-    "start": "node src/scripts/index.js && rollup -c --watch"
+    "start": "node src/scripts/index.js && rollup -c --watch",
+    "styles": "node src/scripts/index.js"
   },
   "babel": {
     "presets": [
