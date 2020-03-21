@@ -72,93 +72,6 @@ var BrickyEditor = (function (exports) {
         return r;
     }
 
-    var Selectors = (function () {
-        function Selectors() {
-        }
-        Selectors.attrField = "data-bre-field";
-        Selectors.selectorField = "[" + Selectors.attrField + "]";
-        Selectors.classEditor = "bre-editor";
-        Selectors.classTemplateGroup = "bre-template-group";
-        Selectors.selectorTemplateGroup = "." + Selectors.classTemplateGroup;
-        Selectors.selectorTemplatePreview = ".bre-template-preview";
-        Selectors.selectorFieldSelected = "bre-field-selected";
-        Selectors.selectorBlockSelected = "bre-block-selected";
-        return Selectors;
-    }());
-
-    var isValidFieldType = function (data, type) { return data.type === type; };
-    var updateFieldData = function (field, changes, fireEvent) {
-        if (fireEvent === void 0) { fireEvent = true; }
-        var data = field.data;
-        var props = Object.keys(changes);
-        var hasChanges = props.some(function (p) { return data[p] !== changes[p]; });
-        if (hasChanges) {
-            field.data = __assign(__assign({}, data), { changes: changes });
-            if (fireEvent) {
-                field.fire("change", { field: field });
-            }
-        }
-    };
-    var toggleFieldSelection = function (field, selected, fireEvent) {
-        if (fireEvent === void 0) { fireEvent = true; }
-        var classList = field.$element.classList;
-        if (selected) {
-            field.selected = selected;
-            classList.add(Selectors.selectorFieldSelected);
-        }
-        else {
-            classList.remove(Selectors.selectorFieldSelected);
-        }
-        if (fireEvent !== undefined && selected) {
-            field.fire("select", { field: field });
-        }
-    };
-    var getCleanFieldElement = function ($field) {
-        var $el = $field.cloneNode(true);
-        $el.attributes.removeNamedItem(Selectors.attrField);
-        return $el;
-    };
-
-    var EditorStrings = (function () {
-        function EditorStrings() {
-        }
-        EditorStrings.embedFieldLinkTitle = "Link to embed media";
-        EditorStrings.embedFieldLinkPlaceholder = "Link to instagram, youtube and etc.";
-        EditorStrings.imageFieldLinkTitle = "Image link";
-        EditorStrings.imageFieldLinkPlaceholder = "http://url-to-image.png";
-        EditorStrings.imageFieldUploadTitle = "or Upload a file";
-        EditorStrings.imageFieldUploadButton = "Select file";
-        EditorStrings.imageFieldAltTitle = "Alt";
-        EditorStrings.imageFieldAltPlaceholder = "Image 'alt' attribute value";
-        EditorStrings.imageFieldUrlSubtitle = "Link to open on image click";
-        EditorStrings.htmlEditorLinkUrlTitle = "Url";
-        EditorStrings.htmlEditorLinkUrlPlaceholder = "http://put-your-link.here";
-        EditorStrings.htmlEditorLinkTitleTitle = "Title";
-        EditorStrings.htmlEditorLinkTitlePlaceholder = "Title attribute for link";
-        EditorStrings.htmlEditorLinkTargetTitle = "Target";
-        EditorStrings.htmlEditorLinkTargetBlank = "Blank";
-        EditorStrings.htmlEditorLinkTargetSelf = "Self";
-        EditorStrings.htmlEditorLinkTargetParent = "Parent";
-        EditorStrings.htmlEditorLinkTargetTop = "Top";
-        EditorStrings.buttonClose = "close";
-        EditorStrings.buttonOk = "Ok";
-        EditorStrings.buttonCancel = "Cancel";
-        EditorStrings.defaultTemplatesGroupName = "Other templates";
-        EditorStrings.errorBlocksFileNotFound = function (url) {
-            return "Blocks file not found. Requested file: " + url + ".";
-        };
-        EditorStrings.errorTemplatesFileNotFound = function (url) {
-            return "Templates file not found. Requested file: " + url + ".";
-        };
-        EditorStrings.errorBlockTemplateNotFound = function (templateName) {
-            return "Template \"" + templateName + "\" not found.";
-        };
-        EditorStrings.errorTemplateParsing = function (name) {
-            return "Template parsing error: " + name + ".";
-        };
-        return EditorStrings;
-    }());
-
     var el = function (_a) {
         var _b = _a.tag, tag = _b === void 0 ? "div" : _b, className = _a.className, innerHTML = _a.innerHTML, props = _a.props;
         var result = document.createElement(tag);
@@ -196,6 +109,7 @@ var BrickyEditor = (function (exports) {
         }
         el.style.display = el.style.display !== "none" ? "none" : "initial";
     };
+    var toggleClassName = function (el, className, force) { return el.classList.toggle(className, force); };
     var parseElementData = function (el, prop) {
         var json = el.dataset[prop];
         if (json === undefined) {
@@ -280,6 +194,7 @@ var BrickyEditor = (function (exports) {
         el: el,
         parseElementData: parseElementData,
         toggleVisibility: toggleVisibility,
+        toggleClassName: toggleClassName,
         readFileAsync: readFileAsync,
         objectToArray: objectToArray,
         filterNotNull: filterNotNull,
@@ -287,6 +202,82 @@ var BrickyEditor = (function (exports) {
         insertBefore: insertBefore,
         insertAfter: insertAfter
     };
+    //# sourceMappingURL=helpers.js.map
+
+    var FIELD_DATA_ATTR = "data-bre-field";
+    var FIELD_SELECTOR = "[" + FIELD_DATA_ATTR + "]";
+    var TEMPLATE_GROUP_SELECTOR = ".bre-template-group";
+    var TEMPLATE_PREVIEW_SELECTOR = ".bre-template-preview";
+    //# sourceMappingURL=constants.js.map
+
+    var isValidFieldType = function (data, type) { return data.type === type; };
+    var updateFieldData = function (field, changes, fireEvent) {
+        if (fireEvent === void 0) { fireEvent = true; }
+        var data = field.data;
+        var props = Object.keys(changes);
+        var hasChanges = props.some(function (p) { return data[p] !== changes[p]; });
+        if (hasChanges) {
+            field.data = __assign(__assign({}, data), { changes: changes });
+            if (fireEvent) {
+                field.fire("change", { field: field });
+            }
+        }
+    };
+    var toggleFieldSelection = function (field, selected, fireEvent) {
+        if (fireEvent === void 0) { fireEvent = true; }
+        field.selected = selected;
+        helpers.toggleClassName(field.$element, "bre-field-selected", selected);
+        if (fireEvent !== undefined && selected) {
+            field.fire("select", { field: field });
+        }
+    };
+    var getCleanFieldElement = function ($field) {
+        var $el = $field.cloneNode(true);
+        $el.attributes.removeNamedItem(FIELD_DATA_ATTR);
+        return $el;
+    };
+    //# sourceMappingURL=field.js.map
+
+    var EditorStrings = (function () {
+        function EditorStrings() {
+        }
+        EditorStrings.embedFieldLinkTitle = "Link to embed media";
+        EditorStrings.embedFieldLinkPlaceholder = "Link to instagram, youtube and etc.";
+        EditorStrings.imageFieldLinkTitle = "Image link";
+        EditorStrings.imageFieldLinkPlaceholder = "http://url-to-image.png";
+        EditorStrings.imageFieldUploadTitle = "or Upload a file";
+        EditorStrings.imageFieldUploadButton = "Select file";
+        EditorStrings.imageFieldAltTitle = "Alt";
+        EditorStrings.imageFieldAltPlaceholder = "Image 'alt' attribute value";
+        EditorStrings.imageFieldUrlSubtitle = "Link to open on image click";
+        EditorStrings.htmlEditorLinkUrlTitle = "Url";
+        EditorStrings.htmlEditorLinkUrlPlaceholder = "http://put-your-link.here";
+        EditorStrings.htmlEditorLinkTitleTitle = "Title";
+        EditorStrings.htmlEditorLinkTitlePlaceholder = "Title attribute for link";
+        EditorStrings.htmlEditorLinkTargetTitle = "Target";
+        EditorStrings.htmlEditorLinkTargetBlank = "Blank";
+        EditorStrings.htmlEditorLinkTargetSelf = "Self";
+        EditorStrings.htmlEditorLinkTargetParent = "Parent";
+        EditorStrings.htmlEditorLinkTargetTop = "Top";
+        EditorStrings.buttonClose = "close";
+        EditorStrings.buttonOk = "Ok";
+        EditorStrings.buttonCancel = "Cancel";
+        EditorStrings.defaultTemplatesGroupName = "Other templates";
+        EditorStrings.errorBlocksFileNotFound = function (url) {
+            return "Blocks file not found. Requested file: " + url + ".";
+        };
+        EditorStrings.errorTemplatesFileNotFound = function (url) {
+            return "Templates file not found. Requested file: " + url + ".";
+        };
+        EditorStrings.errorBlockTemplateNotFound = function (templateName) {
+            return "Template \"" + templateName + "\" not found.";
+        };
+        EditorStrings.errorTemplateParsing = function (name) {
+            return "Template parsing error: " + name + ".";
+        };
+        return EditorStrings;
+    }());
+    //# sourceMappingURL=EditorStrings.js.map
 
     var getRequest = function (url) {
         return new Promise(function (resolve, reject) {
@@ -365,6 +356,7 @@ var BrickyEditor = (function (exports) {
                 document.documentElement).appendChild(script);
         });
     };
+    //# sourceMappingURL=httpTransport.js.map
 
     var renderLabel = function ($root, $input, _a) {
         var title = _a.title;
@@ -443,6 +435,7 @@ var BrickyEditor = (function (exports) {
         $root.append($select);
         return $root;
     };
+    //# sourceMappingURL=inputs.js.map
 
     var locales = {
         errorBlocksFileNotFound: function (url) {
@@ -516,6 +509,7 @@ var BrickyEditor = (function (exports) {
         buttonCancel: "Cancel",
         defaultTemplatesGroupName: "Other templates",
     };
+    //# sourceMappingURL=locales.js.map
 
     var linkEditor = function (initialData) {
         var data = initialData ? __assign({}, initialData) : {};
@@ -535,6 +529,7 @@ var BrickyEditor = (function (exports) {
             data: data
         };
     };
+    //# sourceMappingURL=linkEditor.js.map
 
     var getSelectionRanges = function () {
         var selection = window.getSelection();
@@ -580,6 +575,7 @@ var BrickyEditor = (function (exports) {
         var range = selection.getRangeAt(0);
         return range.getBoundingClientRect();
     };
+    //# sourceMappingURL=selection.js.map
 
     var dialog = function ($content, ok, cancel) {
         var selection = getSelectionRanges();
@@ -619,6 +615,7 @@ var BrickyEditor = (function (exports) {
         root.append($placeholder);
         document.body.appendChild(root);
     };
+    //# sourceMappingURL=modal.js.map
 
     var promptLinkParamsAsync = function (initialData) {
         return new Promise(function (resolve) {
@@ -742,6 +739,7 @@ var BrickyEditor = (function (exports) {
             helpers.toggleVisibility(control, false);
         }
     };
+    //# sourceMappingURL=htmlTools.js.map
 
     var emitter = function () {
         var listeners = {};
@@ -778,6 +776,7 @@ var BrickyEditor = (function (exports) {
         };
         return { fire: fire, on: on, off: off };
     };
+    //# sourceMappingURL=emitter.js.map
 
     var MaxPreviewLength = 50;
     var html = function (_a) {
@@ -839,6 +838,7 @@ var BrickyEditor = (function (exports) {
         $copy.removeAttribute("contenteditable");
         return $copy;
     }
+    //# sourceMappingURL=html.js.map
 
     var preProcessEmbedUrl = function (url) {
         return url.replace("https://www.instagram.com", "http://instagr.am");
@@ -875,6 +875,7 @@ var BrickyEditor = (function (exports) {
             });
         }); });
     };
+    //# sourceMappingURL=embed.js.map
 
     var propmtFieldEditorAsync = function (_a) {
         var editor = _a.editor, data = _a.data;
@@ -891,6 +892,7 @@ var BrickyEditor = (function (exports) {
             });
         });
     };
+    //# sourceMappingURL=editors.js.map
 
     var providerScriptsLoaded = {};
     var embed = function (_a) {
@@ -981,6 +983,7 @@ var BrickyEditor = (function (exports) {
             });
         });
     }
+    //# sourceMappingURL=embed.js.map
 
     var container = function (_a) {
         var $element = _a.$element, preview = _a.preview, data = _a.data;
@@ -1010,6 +1013,7 @@ var BrickyEditor = (function (exports) {
         var html = getContainerHtml(container);
         return helpers.createElement(html);
     };
+    //# sourceMappingURL=container.js.map
 
     var image = function (_a) {
         var $element = _a.$element, preview = _a.preview, data = _a.data;
@@ -1122,6 +1126,7 @@ var BrickyEditor = (function (exports) {
     function getSrcOrFile(data) {
         return data.src || (data.file !== undefined ? data.file.fileContent : "");
     }
+    //# sourceMappingURL=image.js.map
 
     var fields = {
         html: html,
@@ -1197,13 +1202,14 @@ var BrickyEditor = (function (exports) {
         return field;
     }
     function findFieldElements($html) {
-        var nodes = $html.querySelectorAll(Selectors.selectorField);
+        var nodes = $html.querySelectorAll(FIELD_SELECTOR);
         var $fields = nodes.length > 0 ? Array.prototype.slice.call(nodes) : [];
-        if ($html.attributes.getNamedItem(Selectors.attrField) !== null) {
+        if ($html.attributes.getNamedItem(FIELD_DATA_ATTR) !== null) {
             $fields = __spreadArrays($fields, [$html]);
         }
         return $fields;
     }
+    //# sourceMappingURL=fields.js.map
 
     var allTemplates = [];
     var getTemplate = function (templateName) {
@@ -1232,7 +1238,7 @@ var BrickyEditor = (function (exports) {
                     if ($style !== null) {
                         helpers.insertBefore($editor, $style);
                     }
-                    $groups = $data.querySelectorAll(Selectors.selectorTemplateGroup);
+                    $groups = $data.querySelectorAll(TEMPLATE_GROUP_SELECTOR);
                     $groups.forEach(function ($group) {
                         var name = $group.getAttribute("title");
                         var templates = parseTemplates($group);
@@ -1268,7 +1274,7 @@ var BrickyEditor = (function (exports) {
     };
     var createTemplate = function ($template) {
         var name = $template.dataset.name || "";
-        var $preview = $template.querySelector(Selectors.selectorTemplatePreview);
+        var $preview = $template.querySelector(TEMPLATE_PREVIEW_SELECTOR);
         if ($preview !== null) {
             $preview.remove();
         }
@@ -1282,6 +1288,7 @@ var BrickyEditor = (function (exports) {
             $preview: $preview
         };
     };
+    //# sourceMappingURL=template.js.map
 
     var defaultButtons = [
         {
@@ -1338,6 +1345,7 @@ var BrickyEditor = (function (exports) {
             control$1.$element.remove();
         }
     };
+    //# sourceMappingURL=blockEditor.js.map
 
     var selectField = function (block, field) {
         block.selectedField = field;
@@ -1347,13 +1355,7 @@ var BrickyEditor = (function (exports) {
         if (!selected && block.selectedField !== null) {
             toggleFieldSelection(block.selectedField, false);
         }
-        var classList = block.$element.classList;
-        if (selected) {
-            classList.add(Selectors.selectorBlockSelected);
-        }
-        else {
-            classList.remove(Selectors.selectorBlockSelected);
-        }
+        helpers.toggleClassName(block.$element, "bre-block-selected", selected);
         if (selected) {
             showBlockEditor(block);
         }
@@ -1399,6 +1401,7 @@ var BrickyEditor = (function (exports) {
             data.container = container;
         }
     };
+    //# sourceMappingURL=state.js.map
 
     var getContainerData = function (container) {
         return container.blocks.map(function (block) { return block.data; });
@@ -1510,12 +1513,18 @@ var BrickyEditor = (function (exports) {
         container.blocks.splice(new_idx, 0, block);
     }
     function selectBlock(container, block) {
+        if (container.selectedBlock === block) {
+            return;
+        }
+        if (container.selectedBlock !== null) {
+            toggleBlockSelection(container.selectedBlock, false);
+        }
         container.selectedBlock = block;
         toggleBlockSelection(container.selectedBlock, true);
         selectContainer(container);
     }
     function deselectBlock(container) {
-        if (container.selectedBlock) {
+        if (container.selectedBlock !== null) {
             toggleBlockSelection(container.selectedBlock, false);
             container.selectedBlock = null;
         }
@@ -1533,6 +1542,7 @@ var BrickyEditor = (function (exports) {
         state.setSelectedContainer(container);
         container.$element.classList.add(selectedClassName);
     }
+    //# sourceMappingURL=blocksContainer.js.map
 
     var defaultButtons$1 = [
         { icon: "bold", command: "Bold", range: true },
@@ -1558,6 +1568,7 @@ var BrickyEditor = (function (exports) {
         ignoreHtml: true,
         htmlToolsButtons: defaultButtons$1
     };
+    //# sourceMappingURL=defaults.js.map
 
     var getTemplateUI = function (template) {
         var $template = helpers.div("bre-templates-group-item");
@@ -1610,6 +1621,7 @@ var BrickyEditor = (function (exports) {
             off: off
         };
     };
+    //# sourceMappingURL=templateSelector.js.map
 
     var Editor = (function () {
         function Editor($editor, options) {
@@ -1633,7 +1645,7 @@ var BrickyEditor = (function (exports) {
                             data: function () { return getContainerData(container); },
                             html: function () { return getContainerHtml(container); }
                         };
-                        $element.classList.add(Selectors.classEditor);
+                        helpers.toggleClassName($element, "bre-editor", true);
                         initHtmlTools(optionsWithDefaults);
                         return [4, loadTemplatesAsync(optionsWithDefaults.templatesUrl, editor.$element)];
                     case 1:
@@ -1700,6 +1712,7 @@ var BrickyEditor = (function (exports) {
             });
         }); });
     };
+    //# sourceMappingURL=editor.js.map
 
     exports.Editor = Editor;
     exports.editor = editor$2;

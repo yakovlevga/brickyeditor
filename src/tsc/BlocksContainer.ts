@@ -210,13 +210,21 @@ function moveBlock(
 }
 
 function selectBlock(container: bre.BlocksContainer, block: bre.block.Block) {
+  if (container.selectedBlock === block) {
+    return;
+  }
+
+  if (container.selectedBlock !== null) {
+    toggleBlockSelection(container.selectedBlock, false);
+  }
+
   container.selectedBlock = block;
   toggleBlockSelection(container.selectedBlock, true);
   selectContainer(container);
 }
 
 function deselectBlock(container: bre.BlocksContainer) {
-  if (container.selectedBlock) {
+  if (container.selectedBlock !== null) {
     toggleBlockSelection(container.selectedBlock, false);
     container.selectedBlock = null;
   }
