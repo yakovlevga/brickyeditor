@@ -5,6 +5,7 @@ import { showBlockEditor, hideBlockEditor } from "@/block/blockEditor";
 import { emitter } from "@/emitter";
 import { bindBlockFields } from "@/fields/fields";
 import { helpers } from "@/helpers";
+import { isContainerField } from "@/fields/container";
 
 export const selectField = (
   block: bre.block.Block,
@@ -24,21 +25,27 @@ export const toggleBlockSelection = (
 
   helpers.toggleClassName(block.$element, "bre-block-selected", selected);
 
+  const parentBlocks = getParentBlocks(block);
+
   if (selected) {
-    showBlockEditor(block);
+    showBlockEditor(block, false);
+    parentBlocks.forEach(parent => showBlockEditor(parent, true));
   } else {
     hideBlockEditor(block);
+    parentBlocks.forEach(parent => hideBlockEditor(parent));
   }
 };
 
 export const createBlockFromData = (
+  parentContainer: bre.BlocksContainer,
   blockData: bre.block.BlockData
 ): bre.block.Block => {
   const { name, $template } = getTemplate(blockData.template);
-  return createBlockFromTemplate(name, $template, blockData);
+  return createBlockFromTemplate(parentContainer, name, $template, blockData);
 };
 
 export const createBlockFromTemplate = (
+  parentContainer: bre.BlocksContainer,
   name: string,
   $template: HTMLElement,
   data: bre.block.BlockData = {
@@ -55,7 +62,8 @@ export const createBlockFromTemplate = (
     ...eventEmitter,
     $element,
     data,
-    selectedField: null
+    selectedField: null,
+    parentContainer
   };
 
   block.fields = bindBlockFields($element, block);
@@ -106,3 +114,19 @@ export const getBlockHtml = (block: bre.block.Block, trim: boolean = true) => {
 
   // return trim ? html.breTotalTrim() : html;
 };
+
+function getParentBlocks(block: bre.block.Block): bre.block.Block[] {
+  const parentBlocks: bre.block.Block[] = [];
+
+  let { parentContainerField } = block.parentContainer;
+  while (
+    parentContainerField !== null &&
+    parentContainerField.parentBlock !== null
+  ) {
+    const { parentBlock } = parentContainerField;
+    parentBlocks.push(parentBlock);
+    parentContainerField = parentBlock.parentContainer.parentContainerField;
+  }
+
+  return parentBlocks;
+}

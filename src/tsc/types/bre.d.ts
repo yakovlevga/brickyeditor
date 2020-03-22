@@ -1,4 +1,5 @@
 import { NoembedResponse } from "@/embed";
+import { ContainerField } from "@/fields/container";
 
 // This types is for mock cases
 declare type Mutable<T> = { -readonly [P in keyof T]: T[P] };
@@ -45,6 +46,7 @@ declare namespace bre {
     $placeholder: HTMLElement | null;
     blocks: block.Block[];
     selectedBlock: block.Block | null;
+    parentContainerField: ContainerField | null;
     // usePlaceholder: boolean;
     // data: () => any;
     // html: () => string;
@@ -101,6 +103,7 @@ declare namespace bre {
       $element: HTMLElement;
       selected?: boolean;
       data: field.FieldData;
+      parentBlock: bre.block.Block | null;
     };
 
     type Field<TFieldData extends field.FieldData> = FieldBase & {
@@ -162,6 +165,7 @@ declare namespace bre {
       fields?: field.FieldBase[];
       selectedField: field.FieldBase | null;
       editor?: BlockEditor;
+      parentContainer: BlocksContainer;
     };
 
     type BlockEditorButton = {

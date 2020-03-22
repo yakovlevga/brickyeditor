@@ -23,7 +23,7 @@ export type ContainerField = bre.field.Field<ContainerFieldData> & {
   container: bre.BlocksContainer;
 };
 
-export const container: FieldFactory = ({ $element, preview, data }) => {
+export const container: FieldFactory = ({ $element, preview, data, block }) => {
   if (!isValidFieldType<ContainerFieldData>(data, "container")) {
     return null;
   }
@@ -47,14 +47,16 @@ export const container: FieldFactory = ({ $element, preview, data }) => {
     );
   }
 
-  const eventEmitter = emitter<bre.field.FieldEventMap>();
   const field: ContainerField = {
-    ...eventEmitter,
+    ...emitter<bre.field.FieldEventMap>(),
     $element,
     data,
     html,
-    container
+    container,
+    parentBlock: block
   };
+
+  container.parentContainerField = field;
 
   // $element.addEventListener("click", () => {
   //   // ev.stopPropagation();
@@ -76,6 +78,12 @@ export const container: FieldFactory = ({ $element, preview, data }) => {
   // };
 
   return field;
+};
+
+export const isContainerField = (
+  field: bre.field.FieldBase
+): field is ContainerField => {
+  return field.data.type === "container";
 };
 
 const html = (field: bre.field.Field<ContainerFieldData>) => {

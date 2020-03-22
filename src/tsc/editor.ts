@@ -53,9 +53,13 @@ export const editor = (
       templatesUI.on("select", ev => {
         const selectedContainer = state.getSelectedContainer();
         if (selectedContainer !== null) {
-          addBlockToContainer(selectedContainer, {
-            blockTemplate: ev!.template
-          });
+          addBlockToContainer(
+            selectedContainer,
+            {
+              blockTemplate: ev!.template
+            },
+            true
+          );
         }
       });
       $element.append(templatesUI.$element);

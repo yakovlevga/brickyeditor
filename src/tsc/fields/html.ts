@@ -19,7 +19,7 @@ type HtmlField = bre.field.Field<HtmlFieldData>;
 
 const MaxPreviewLength = 50;
 
-export const html: FieldFactory = ({ $element, preview, data }) => {
+export const html: FieldFactory = ({ $element, preview, data, block }) => {
   if (!isValidFieldType<HtmlFieldData>(data, "html")) {
     return null;
   }
@@ -42,7 +42,8 @@ export const html: FieldFactory = ({ $element, preview, data }) => {
     ...eventEmiter,
     $element,
     data,
-    html: getHtml
+    html: getHtml,
+    parentBlock: block
   };
 
   const updateHtmlProp = () => {
@@ -92,4 +93,4 @@ function getHtml(field: HtmlField) {
   const $copy = getCleanFieldElement(field.$element);
   $copy.removeAttribute("contenteditable");
   return $copy;
-};
+}

@@ -6,7 +6,7 @@ $zIndex: 100;
   &-editor {
     display: flex;
     position: absolute;
-    top: -($size + $padding);
+    top: -($size + 4 * $padding);
     z-index: $zIndex;
     padding: $padding;
     background-color: rgba(0, 0, 0, 0.8);
@@ -42,6 +42,12 @@ $zIndex: 100;
       &:hover {
         opacity: 1;
       }
+    }
+
+    &-vertical {
+      top: 0;
+      left: -($size + 4 * $padding);
+      flex-direction: column;
     }
   }
 }

@@ -7,7 +7,7 @@ import {
 import { helpers } from "@/helpers";
 import { bre } from "@/types/bre";
 import { showBlockEditor } from "@/block/blockEditor";
-import { ContainerField } from "@/fields/container";
+import { ContainerField, isContainerField } from "@/fields/container";
 import { emitter } from "@/emitter";
 import { state } from "@/state";
 
@@ -35,12 +35,31 @@ export const getActiveContainer = (
   }
 
   const { selectedField } = container.selectedBlock;
-  if (selectedField.data.type === "container") {
-    const containerField = selectedField as ContainerField;
-    return getActiveContainer(containerField.container);
+  if (isContainerField(selectedField)) {
+    return getActiveContainer(selectedField.container);
   }
 
   return container;
+};
+
+export const getSelectedBlocksChain = (
+  container: bre.BlocksContainer,
+  chain: bre.block.Block[] = []
+): bre.block.Block[] => {
+  const { selectedBlock } = container;
+  if (selectedBlock === null || selectedBlock.selectedField === null) {
+    return chain;
+  }
+
+  const { selectedField } = selectedBlock;
+  if (isContainerField(selectedField)) {
+    return getSelectedBlocksChain(selectedField.container, [
+      ...chain,
+      selectedBlock
+    ]);
+  }
+
+  return chain;
 };
 
 // TODO: add custom placeholder and localization
@@ -78,8 +97,9 @@ export const addBlockToContainer = (
 
   const block =
     options.blockData !== undefined
-      ? createBlockFromData(options.blockData)
+      ? createBlockFromData(container, options.blockData)
       : createBlockFromTemplate(
+          container,
           options.blockTemplate.name,
           options.blockTemplate.$template
         );
@@ -145,7 +165,8 @@ export const createContainer = (
     $element,
     $placeholder,
     blocks: [],
-    selectedBlock: null
+    selectedBlock: null,
+    parentContainerField: null
   };
 
   toggleContainersPlaceholder(container);

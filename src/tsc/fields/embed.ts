@@ -31,7 +31,7 @@ type EmbedFieldPayload = {
 type EmbedFieldData = bre.field.FieldData<EmbedFieldType, EmbedFieldPayload>;
 type EmbedField = bre.field.Field<EmbedFieldData>;
 
-export const embed: FieldFactory = ({ $element, preview, data }) => {
+export const embed: FieldFactory = ({ $element, preview, data, block }) => {
   if (!isValidFieldType<EmbedFieldData>(data, "embed")) {
     return null;
   }
@@ -51,7 +51,8 @@ export const embed: FieldFactory = ({ $element, preview, data }) => {
     $element,
     data,
     html,
-    editor
+    editor,
+    parentBlock: block
   };
 
   $element.addEventListener("click", async () => {

@@ -23,6 +23,7 @@ export const registerField = () => {
 
 export interface ICreateFieldProps {
   $element: HTMLElement;
+  block: bre.block.Block | null;
   preview: boolean;
   data: bre.field.FieldData;
 }
@@ -32,6 +33,7 @@ export type FieldFactory = (
 ) => bre.field.FieldBase | Pick<bre.field.FieldBase, "$element"> | null;
 
 export const createField: FieldFactory = ({
+  block,
   $element,
   preview,
   data: initialData
@@ -59,7 +61,8 @@ export const createField: FieldFactory = ({
   return field({
     $element,
     preview,
-    data
+    data,
+    block
   });
 };
 
@@ -91,6 +94,7 @@ function bindBlockField($element: HTMLElement, block: bre.block.Block) {
   data = getFieldDataByName(block, data.name) || data;
 
   return createField({
+    block,
     $element,
     preview: false,
     data
@@ -105,6 +109,7 @@ function bindTemplateField($element: HTMLElement) {
   }
 
   return createField({
+    block: null,
     $element,
     preview: true,
     data

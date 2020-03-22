@@ -49,7 +49,7 @@ const createEditor = (): bre.block.BlockEditor => {
   };
 };
 
-export const showBlockEditor = (block: bre.block.Block) => {
+const initBlockEditor = (block: bre.block.Block) => {
   if (block.editor === undefined) {
     block.editor = createEditor();
 
@@ -60,11 +60,24 @@ export const showBlockEditor = (block: bre.block.Block) => {
     block.$element.prepend(block.editor.$element);
   }
 
-  helpers.toggleVisibility(block.editor.$element, true);
+  return block.editor;
+};
+
+export const showBlockEditor = (block: bre.block.Block, parent: boolean) => {
+  const editor = initBlockEditor(block);
+  helpers.toggleVisibility(editor.$element, true);
+  helpers.toggleClassName(editor.$element, "bre-block-editor-vertical", parent);
+  return editor;
 };
 
 export const hideBlockEditor = (block: bre.block.Block) => {
-  if (block.editor !== undefined) {
-    helpers.toggleVisibility(block.editor.$element, false);
+  const { editor } = block;
+  if (editor !== undefined) {
+    helpers.toggleVisibility(editor.$element, false);
+    helpers.toggleClassName(
+      editor.$element,
+      "bre-block-editor-vertical",
+      false
+    );
   }
 };
