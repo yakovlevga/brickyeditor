@@ -6,7 +6,7 @@ import {
 } from "@/block/Block";
 import { helpers } from "@/helpers";
 import { bre } from "@/types/bre";
-import { showBlockEditor, hideBlockEditor } from "@/block/blockEditor";
+import { showBlockEditor } from "@/block/blockEditor";
 import { ContainerField } from "@/fields/container";
 import { emitter } from "@/emitter";
 import { state } from "@/state";
