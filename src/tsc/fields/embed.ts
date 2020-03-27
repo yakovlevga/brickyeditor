@@ -31,13 +31,15 @@ type EmbedFieldPayload = {
 type EmbedFieldData = bre.field.FieldData<EmbedFieldType, EmbedFieldPayload>;
 type EmbedField = bre.field.Field<EmbedFieldData>;
 
-export const embed: FieldFactory = ({ $element, preview, data, block }) => {
+export const embed: FieldFactory = props => {
+  const { $element, data } = props;
+
   if (!isValidFieldType<EmbedFieldData>(data, "embed")) {
     return null;
   }
 
   // No need to update embed data for templates
-  if (preview) {
+  if (props.preview) {
     return { $element };
   }
 
@@ -52,7 +54,7 @@ export const embed: FieldFactory = ({ $element, preview, data, block }) => {
     data,
     html,
     editor,
-    parentBlock: block
+    parentBlock: props.parentBlock
   };
 
   $element.addEventListener("click", async () => {

@@ -2,14 +2,13 @@ import {
   createBlockFromData,
   createBlockFromTemplate,
   toggleBlockSelection,
-  getBlockHtml
+  getBlockHtml,
+  getParentBlocks
 } from "@/block/Block";
 import { helpers } from "@/helpers";
 import { bre } from "@/types/bre";
-import { showBlockEditor } from "@/block/blockEditor";
-import { ContainerField, isContainerField } from "@/fields/container";
+import { isContainerField, ContainerField } from "@/fields/container";
 import { emitter } from "@/emitter";
-import { state } from "@/state";
 
 export const getContainerData = (container: bre.BlocksContainer) =>
   container.blocks.map(block => block.data);
@@ -27,39 +26,17 @@ export const getContainerHtml = (container: bre.BlocksContainer) => {
 export const getActiveContainer = (
   container: bre.BlocksContainer
 ): bre.BlocksContainer => {
-  if (
-    container.selectedBlock === null ||
-    container.selectedBlock.selectedField === null
-  ) {
+  const { selectedBlock } = container;
+  if (selectedBlock === null || selectedBlock.selectedField === null) {
     return container;
   }
 
-  const { selectedField } = container.selectedBlock;
+  const { selectedField } = selectedBlock;
   if (isContainerField(selectedField)) {
     return getActiveContainer(selectedField.container);
   }
 
   return container;
-};
-
-export const getSelectedBlocksChain = (
-  container: bre.BlocksContainer,
-  chain: bre.block.Block[] = []
-): bre.block.Block[] => {
-  const { selectedBlock } = container;
-  if (selectedBlock === null || selectedBlock.selectedField === null) {
-    return chain;
-  }
-
-  const { selectedField } = selectedBlock;
-  if (isContainerField(selectedField)) {
-    return getSelectedBlocksChain(selectedField.container, [
-      ...chain,
-      selectedBlock
-    ]);
-  }
-
-  return chain;
 };
 
 // TODO: add custom placeholder and localization
@@ -151,22 +128,27 @@ export const addBlockToContainer = (
   return block;
 };
 
-export const createContainer = (
+export const createRootContainer = (editor: bre.Editor) =>
+  createContainer(editor.$element, null, editor);
+export const createFieldContainer = (field: ContainerField) =>
+  createContainer(field.$element, field, null);
+
+const createContainer = (
   $element: HTMLElement,
-  usePlaceholder: boolean
+  parentContainerField: ContainerField | null,
+  parentEditor: bre.Editor | null
 ): bre.BlocksContainer => {
-  const $placeholder = usePlaceholder
-    ? (defaultPlaceholder.cloneNode(true) as HTMLElement)
-    : null;
+  const $placeholder = defaultPlaceholder.cloneNode(true) as HTMLElement;
 
   const eventEmitter = emitter<bre.BlocksContainerEventMap>();
   const container: bre.BlocksContainer = {
-    ...eventEmitter,
     $element,
     $placeholder,
     blocks: [],
     selectedBlock: null,
-    parentContainerField: null
+    parentContainerField,
+    parentEditor,
+    ...eventEmitter
   };
 
   toggleContainersPlaceholder(container);
@@ -222,7 +204,8 @@ function moveBlock(
     }
   }
 
-  showBlockEditor(block);
+  selectBlock(container, block);
+  // showBlockEditor(block);
 
   container.blocks.splice(idx, 1);
   container.blocks.splice(new_idx, 0, block);
@@ -238,7 +221,11 @@ function selectBlock(container: bre.BlocksContainer, block: bre.block.Block) {
     return;
   }
 
-  if (container.selectedBlock !== null) {
+  const parentBlocks = getParentBlocks(block);
+  if (
+    container.selectedBlock !== null &&
+    parentBlocks.indexOf(container.selectedBlock) === -1
+  ) {
     toggleBlockSelection(container.selectedBlock, false);
   }
 
@@ -254,18 +241,16 @@ function deselectBlock(container: bre.BlocksContainer) {
   }
 }
 
-const selectedClassName: BreStyles = "bre-container-selected";
 function selectContainer(container: bre.BlocksContainer) {
-  const current = state.getSelectedContainer();
+  const current = getActiveContainer(container);
   if (container === current) {
     return;
   }
 
   if (current !== null) {
-    current.$element.classList.remove(selectedClassName);
+    helpers.toggleClassName(current.$element, "bre-container-selected", false);
     deselectBlock(current);
   }
 
-  state.setSelectedContainer(container);
-  container.$element.classList.add(selectedClassName);
+  helpers.toggleClassName(container.$element, "bre-container-selected", true);
 }

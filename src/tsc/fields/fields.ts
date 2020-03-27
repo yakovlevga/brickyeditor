@@ -21,23 +21,24 @@ export const registerField = () => {
   // TODO:
 };
 
-export interface ICreateFieldProps {
+export type CreateFieldProps = {
   $element: HTMLElement;
-  block: bre.block.Block | null;
-  preview: boolean;
   data: bre.field.FieldData;
-}
+} & (
+  | {
+      preview: false;
+      parentBlock: bre.block.Block;
+    }
+  | { preview: true; parentBlock?: undefined }
+);
 
 export type FieldFactory = (
-  props: ICreateFieldProps
+  props: CreateFieldProps
 ) => bre.field.FieldBase | Pick<bre.field.FieldBase, "$element"> | null;
 
-export const createField: FieldFactory = ({
-  block,
-  $element,
-  preview,
-  data: initialData
-}) => {
+export const createField: FieldFactory = props => {
+  const { $element, data: initialData } = props;
+
   // take base field props from data-bre-field attribute
   let data = helpers.parseElementData($element, "breField");
 
@@ -58,12 +59,7 @@ export const createField: FieldFactory = ({
     throw new Error(`${data.type} field not found`);
   }
 
-  return field({
-    $element,
-    preview,
-    data,
-    block
-  });
+  return field(props);
 };
 
 export const bindBlockFields = (
@@ -74,6 +70,7 @@ export const bindBlockFields = (
   const fields = $fieldElement.map($fieldElement =>
     bindBlockField($fieldElement, block)
   );
+
   return helpers.filterNotNull(fields);
 };
 
@@ -85,16 +82,16 @@ export const bindTemplateFields = ($element: HTMLElement) => {
   return helpers.filterNotNull(fields);
 };
 
-function bindBlockField($element: HTMLElement, block: bre.block.Block) {
+function bindBlockField($element: HTMLElement, parentBlock: bre.block.Block) {
   let data = helpers.parseElementData($element, "breField");
   if (data === null) {
     return null;
   }
 
-  data = getFieldDataByName(block, data.name) || data;
+  data = getFieldDataByName(parentBlock, data.name) || data;
 
   return createField({
-    block,
+    parentBlock,
     $element,
     preview: false,
     data
@@ -109,10 +106,9 @@ function bindTemplateField($element: HTMLElement) {
   }
 
   return createField({
-    block: null,
     $element,
-    preview: true,
-    data
+    data,
+    preview: true
   }) as Pick<bre.field.FieldBase, "$element">;
 }
 

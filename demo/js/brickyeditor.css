@@ -9,7 +9,7 @@
 .bre-block-editor {
   display: flex;
   position: absolute;
-  top: -40px;
+  top: -48px;
   z-index: 100;
   padding: 4px;
   background-color: rgba(0, 0, 0, 0.8);
@@ -38,7 +38,7 @@
       opacity: 1; }
   .bre-block-editor-vertical {
     top: 0;
-    left: -40px;
+    left: -48px;
     flex-direction: column; }
 
 .bre-container-placeholder {

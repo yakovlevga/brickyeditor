@@ -47,6 +47,7 @@ declare namespace bre {
     blocks: block.Block[];
     selectedBlock: block.Block | null;
     parentContainerField: ContainerField | null;
+    parentEditor: bre.Editor | null;
     // usePlaceholder: boolean;
     // data: () => any;
     // html: () => string;
@@ -55,13 +56,16 @@ declare namespace bre {
 
   type Editor = {
     $element: HTMLElement;
-    container: BlocksContainer;
-
+    rootContainer: BlocksContainer;
     data: () => bre.block.BlockData[];
     html: () => string;
   };
 
   namespace event {
+    type BaseEvent<TSender> = {
+      sender: TSender;
+    };
+
     type EventMaps =
       | BlocksContainerEventMap
       | field.FieldEventMap
@@ -90,9 +94,7 @@ declare namespace bre {
   };
 
   namespace field {
-    type FieldEvent = {
-      field: bre.field.FieldBase;
-    };
+    type FieldEvent = bre.event.BaseEvent<bre.field.FieldBase>;
 
     type FieldEventMap = {
       change: FieldEvent;
@@ -100,10 +102,10 @@ declare namespace bre {
     };
 
     type FieldBase = event.Emitter<FieldEventMap> & {
+      parentBlock: bre.block.Block;
       $element: HTMLElement;
       selected?: boolean;
       data: field.FieldData;
-      parentBlock: bre.block.Block | null;
     };
 
     type Field<TFieldData extends field.FieldData> = FieldBase & {
@@ -164,7 +166,7 @@ declare namespace bre {
       data: BlockData;
       fields?: field.FieldBase[];
       selectedField: field.FieldBase | null;
-      editor?: BlockEditor;
+      blockEditor?: BlockEditor;
       parentContainer: BlocksContainer;
     };
 

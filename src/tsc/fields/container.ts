@@ -1,8 +1,7 @@
 import {
-  createContainer,
-  getContainerData,
   getContainerHtml,
-  addBlockToContainer
+  addBlockToContainer,
+  createFieldContainer
 } from "@/blocksContainer";
 import { isValidFieldType } from "@/fields/field";
 import { helpers } from "@/helpers";
@@ -23,22 +22,34 @@ export type ContainerField = bre.field.Field<ContainerFieldData> & {
   container: bre.BlocksContainer;
 };
 
-export const container: FieldFactory = ({ $element, preview, data, block }) => {
+export const container: FieldFactory = props => {
+  const { $element, data } = props;
+
   if (!isValidFieldType<ContainerFieldData>(data, "container")) {
     return null;
   }
 
-  if (preview) {
+  if (props.preview) {
+    // TODO: return
     return { $element };
   }
 
-  const container = createContainer($element, !preview);
+  const field = {
+    ...emitter<bre.field.FieldEventMap>(),
+    $element,
+    data,
+    html,
+    parentBlock: props.parentBlock
+  } as ContainerField;
+
+  const fieldContainer = createFieldContainer(field);
+  field.container = fieldContainer;
 
   // TODO Should data.blocks be nullable?
   if (data.blocks && data.blocks.length > 0) {
     data.blocks.map(blockData =>
       addBlockToContainer(
-        container,
+        fieldContainer,
         {
           blockData
         },
@@ -46,36 +57,6 @@ export const container: FieldFactory = ({ $element, preview, data, block }) => {
       )
     );
   }
-
-  const field: ContainerField = {
-    ...emitter<bre.field.FieldEventMap>(),
-    $element,
-    data,
-    html,
-    container,
-    parentBlock: block
-  };
-
-  container.parentContainerField = field;
-
-  // $element.addEventListener("click", () => {
-  //   // ev.stopPropagation();
-  //   toggleFieldSelection(field, true);
-  //   // return false;
-  // });
-
-  // const updateBlocks = () => {
-  //   const blocks = getContainerData(container);
-  //   const html = getContainerHtml(container);
-
-  //   const updatedData = {
-  //     ...field.data,
-  //     blocks,
-  //     html
-  //   };
-
-  //   // TODO: call update callback
-  // };
 
   return field;
 };

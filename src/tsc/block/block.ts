@@ -5,7 +5,6 @@ import { showBlockEditor, hideBlockEditor } from "@/block/blockEditor";
 import { emitter } from "@/emitter";
 import { bindBlockFields } from "@/fields/fields";
 import { helpers } from "@/helpers";
-import { isContainerField } from "@/fields/container";
 
 export const selectField = (
   block: bre.block.Block,
@@ -25,14 +24,14 @@ export const toggleBlockSelection = (
 
   helpers.toggleClassName(block.$element, "bre-block-selected", selected);
 
-  const parentBlocks = getParentBlocks(block);
+  // const parentBlocks = getParentBlocks(block);
 
   if (selected) {
     showBlockEditor(block, false);
-    parentBlocks.forEach(parent => showBlockEditor(parent, true));
+    // parentBlocks.forEach(parent => showBlockEditor(parent, true));
   } else {
     hideBlockEditor(block);
-    parentBlocks.forEach(parent => hideBlockEditor(parent));
+    // parentBlocks.forEach(parent => hideBlockEditor(parent));
   }
 };
 
@@ -59,20 +58,18 @@ export const createBlockFromTemplate = (
 
   const eventEmitter = emitter<bre.block.BlockEventMap>();
   const block: bre.block.Block = {
-    ...eventEmitter,
+    parentContainer,
     $element,
     data,
     selectedField: null,
-    parentContainer
+    ...eventEmitter
   };
 
   block.fields = bindBlockFields($element, block);
   block.fields.forEach(field => {
     if (field.on !== undefined) {
-      field.on("select", f => {
-        if (f !== undefined) {
-          selectField(block, f.field);
-        }
+      field.on("select", () => {
+        selectField(block, field);
       });
     }
   });
@@ -115,7 +112,7 @@ export const getBlockHtml = (block: bre.block.Block, trim: boolean = true) => {
   // return trim ? html.breTotalTrim() : html;
 };
 
-function getParentBlocks(block: bre.block.Block): bre.block.Block[] {
+export const getParentBlocks = (block: bre.block.Block): bre.block.Block[] => {
   const parentBlocks: bre.block.Block[] = [];
 
   let { parentContainerField } = block.parentContainer;
@@ -129,4 +126,9 @@ function getParentBlocks(block: bre.block.Block): bre.block.Block[] {
   }
 
   return parentBlocks;
-}
+};
+
+const getBlockChain = (field: bre.field.FieldBase) => {
+  const block = field.parentBlock;
+  block.parentContainer;
+};

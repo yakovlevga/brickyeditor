@@ -50,17 +50,17 @@ const createEditor = (): bre.block.BlockEditor => {
 };
 
 const initBlockEditor = (block: bre.block.Block) => {
-  if (block.editor === undefined) {
-    block.editor = createEditor();
+  if (block.blockEditor === undefined) {
+    block.blockEditor = createEditor();
 
-    block.editor.btns.forEach(({ $btn, action }) => {
+    block.blockEditor.btns.forEach(({ $btn, action }) => {
       $btn.onclick = () => action(block.fire);
     });
 
-    block.$element.prepend(block.editor.$element);
+    block.$element.prepend(block.blockEditor.$element);
   }
 
-  return block.editor;
+  return block.blockEditor;
 };
 
 export const showBlockEditor = (block: bre.block.Block, parent: boolean) => {
@@ -71,7 +71,7 @@ export const showBlockEditor = (block: bre.block.Block, parent: boolean) => {
 };
 
 export const hideBlockEditor = (block: bre.block.Block) => {
-  const { editor } = block;
+  const { blockEditor: editor } = block;
   if (editor !== undefined) {
     helpers.toggleVisibility(editor.$element, false);
     helpers.toggleClassName(

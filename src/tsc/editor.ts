@@ -1,8 +1,9 @@
 import {
   addBlockToContainer,
-  createContainer,
   getContainerData,
-  getContainerHtml
+  getContainerHtml,
+  getActiveContainer,
+  createRootContainer
 } from "@/blocksContainer";
 import { defaultOptions } from "@/defaults";
 import { getRequest } from "@/httpTransport";
@@ -10,7 +11,6 @@ import { loadTemplatesAsync } from "@/template";
 import { bre } from "@/types/bre";
 import { getTemplateSelector } from "@/ui/templateSelector";
 import { initHtmlTools } from "@/ui/htmlTools";
-import { state } from "@/state";
 import { helpers } from "@/helpers";
 
 export class Editor {
@@ -26,15 +26,15 @@ export const editor = (
   new Promise<bre.Editor>(async resolve => {
     const optionsWithDefaults = { ...defaultOptions, ...options };
 
-    const container = createContainer($element, false);
-    state.setSelectedContainer(container);
+    const editor = {
+      $element
+    } as bre.Editor;
 
-    const editor: bre.Editor = {
-      $element,
-      container,
-      data: () => getContainerData(container),
-      html: () => getContainerHtml(container)
-    };
+    const rootContainer = createRootContainer(editor);
+
+    editor.rootContainer = rootContainer;
+    editor.data = () => getContainerData(rootContainer);
+    editor.html = () => getContainerHtml(rootContainer);
 
     helpers.toggleClassName($element, "bre-editor", true);
     initHtmlTools(optionsWithDefaults);
@@ -51,7 +51,7 @@ export const editor = (
     if (templates !== undefined) {
       templatesUI.setTemplates(templates);
       templatesUI.on("select", ev => {
-        const selectedContainer = state.getSelectedContainer();
+        const selectedContainer = getActiveContainer(rootContainer);
         if (selectedContainer !== null) {
           addBlockToContainer(
             selectedContainer,
@@ -69,7 +69,7 @@ export const editor = (
     if (blocks !== null) {
       blocks.map(blockData =>
         addBlockToContainer(
-          container,
+          rootContainer,
           {
             blockData
           },

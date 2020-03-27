@@ -22,14 +22,16 @@ type ImageFieldPayload = {
 type ImageFieldData = bre.field.FieldData<"image", ImageFieldPayload>;
 type ImageField = bre.field.Field<ImageFieldData>;
 
-export const image: FieldFactory = ({ $element, preview, data, block }) => {
+export const image: FieldFactory = props => {
+  const { $element, data } = props;
+
   if (!isValidFieldType<ImageFieldData>(data, "image")) {
     return null;
   }
 
   bind($element, data);
 
-  if (preview) {
+  if (props.preview) {
     return {
       $element
     };
@@ -42,7 +44,7 @@ export const image: FieldFactory = ({ $element, preview, data, block }) => {
     data,
     html,
     editor,
-    parentBlock: block
+    parentBlock: props.parentBlock
   };
 
   $element.addEventListener("click", async () => {
