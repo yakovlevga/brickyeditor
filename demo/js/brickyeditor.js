@@ -1003,9 +1003,6 @@ var BrickyEditor = (function (exports) {
         }
         return field;
     };
-    var isContainerField = function (field) {
-        return field.data.type === "container";
-    };
     var html$2 = function (field) {
         var container = field.container;
         var html = getContainerHtml(container);
@@ -1204,6 +1201,7 @@ var BrickyEditor = (function (exports) {
         }
         return $fields;
     }
+    //# sourceMappingURL=fields.js.map
 
     var allTemplates = [];
     var getTemplate = function (templateName) {
@@ -1361,14 +1359,55 @@ var BrickyEditor = (function (exports) {
     };
     //# sourceMappingURL=blockEditor.js.map
 
-    var selectField = function (block, field) {
-        block.selectedField = field;
-        block.fire("select", { block: block });
+    var getInitialState = function () { return ({
+        selectedField: null,
+        selectedBlocks: []
+    }); };
+    var selectField = function (selectedField) {
+        var state = selectedField.parentBlock.state;
+        if (state.selectedField === selectedField) {
+            return;
+        }
+        var prevSelectedBlocks = state.selectedBlocks;
+        var prevSelectedField = state.selectedField;
+        var selectedBlocks = getParentBlocks(selectedField);
+        state.selectedField = selectedField;
+        state.selectedBlocks = selectedBlocks;
+        if (prevSelectedBlocks !== null) {
+            prevSelectedBlocks.forEach(function (x) {
+                if (selectedBlocks.indexOf(x) === -1) {
+                    deselectBlock(x);
+                }
+            });
+        }
+        selectedBlocks.forEach(function (x) {
+            if (!x.selected) {
+                selectBlock(x);
+            }
+        });
+        if (prevSelectedField !== null) {
+            prevSelectedField.parentBlock.selectedField = null;
+        }
+        selectedField.parentBlock.fire("select");
+        selectedField.parentBlock.selectedField = selectedField;
     };
+    var getParentBlocks = function (field, blocks) {
+        if (blocks === void 0) { blocks = []; }
+        var block = field.parentBlock;
+        blocks.push(block);
+        var parentContainerField = block.parentContainer.parentContainerField;
+        if (parentContainerField !== null) {
+            return getParentBlocks(parentContainerField, blocks);
+        }
+        return blocks;
+    };
+    //# sourceMappingURL=editorState.js.map
+
     var toggleBlockSelection = function (block, selected) {
         if (!selected && block.selectedField !== null) {
             toggleFieldSelection(block.selectedField, false);
         }
+        block.selected = selected;
         helpers.toggleClassName(block.$element, "bre-block-selected", selected);
         if (selected) {
             showBlockEditor(block, false);
@@ -1390,14 +1429,13 @@ var BrickyEditor = (function (exports) {
         helpers.toggleClassName($element, "bre-template", false);
         helpers.toggleClassName($element, "bre-block", true);
         var eventEmitter = emitter();
-        var block = __assign({ parentContainer: parentContainer,
-            $element: $element,
-            data: data, selectedField: null }, eventEmitter);
+        var block = __assign(__assign({}, eventEmitter), { parentContainer: parentContainer, state: parentContainer.state, $element: $element,
+            data: data, selectedField: null, selected: false });
         block.fields = bindBlockFields($element, block);
         block.fields.forEach(function (field) {
             if (field.on !== undefined) {
                 field.on("select", function () {
-                    selectField(block, field);
+                    selectField(field);
                 });
             }
         });
@@ -1406,7 +1444,7 @@ var BrickyEditor = (function (exports) {
     var getBlockHtml = function (block, trim) {
         return "";
     };
-    var getParentBlocks = function (block) {
+    var getParentBlocks$1 = function (block) {
         var parentBlocks = [];
         var parentContainerField = block.parentContainer.parentContainerField;
         while (parentContainerField !== null &&
@@ -1429,17 +1467,6 @@ var BrickyEditor = (function (exports) {
         var root = container.$element.cloneNode(false);
         root.innerHTML = html;
         return root.outerHTML;
-    };
-    var getActiveContainer = function (container) {
-        var selectedBlock = container.selectedBlock;
-        if (selectedBlock === null || selectedBlock.selectedField === null) {
-            return container;
-        }
-        var selectedField = selectedBlock.selectedField;
-        if (isContainerField(selectedField)) {
-            return getActiveContainer(selectedField.container);
-        }
-        return container;
     };
     var defaultPlaceholder = helpers.div("bre-container-placeholder", "Click here to select this container");
     var toggleContainersPlaceholder = function (container) {
@@ -1476,7 +1503,7 @@ var BrickyEditor = (function (exports) {
             moveBlock(container, block, ev !== undefined ? ev.offset : 0);
         });
         block.on("select", function () {
-            selectBlock(container, block);
+            selectBlock(block);
         });
         toggleContainersPlaceholder(container);
         var $container = container.$element;
@@ -1489,20 +1516,21 @@ var BrickyEditor = (function (exports) {
             $prevBlock.after($block);
         }
         if (select) {
-            selectBlock(container, block);
+            selectBlock(block);
         }
         return block;
     };
     var createRootContainer = function (editor) {
-        return createContainer(editor.$element, null, editor);
+        return createContainer(editor.$element, editor.state, null, editor);
     };
     var createFieldContainer = function (field) {
-        return createContainer(field.$element, field, null);
+        return createContainer(field.$element, field.parentBlock.state, field, null);
     };
-    var createContainer = function ($element, parentContainerField, parentEditor) {
+    var createContainer = function ($element, state, parentContainerField, parentEditor) {
         var $placeholder = defaultPlaceholder.cloneNode(true);
         var eventEmitter = emitter();
-        var container = __assign({ $element: $element,
+        var container = __assign({ state: state,
+            $element: $element,
             $placeholder: $placeholder, blocks: [], selectedBlock: null, parentContainerField: parentContainerField,
             parentEditor: parentEditor }, eventEmitter);
         toggleContainersPlaceholder(container);
@@ -1542,40 +1570,28 @@ var BrickyEditor = (function (exports) {
                 helpers.insertBefore($anchorBlock, block.$element);
             }
         }
-        selectBlock(container, block);
+        selectBlock(block);
         container.blocks.splice(idx, 1);
         container.blocks.splice(new_idx, 0, block);
     }
-    function selectBlock(container, block) {
+    var selectBlock = function (block) {
+        var container = block.parentContainer;
         if (container.selectedBlock === block) {
             return;
         }
-        var parentBlocks = getParentBlocks(block);
+        var parentBlocks = getParentBlocks$1(block);
         if (container.selectedBlock !== null &&
             parentBlocks.indexOf(container.selectedBlock) === -1) {
             toggleBlockSelection(container.selectedBlock, false);
         }
         container.selectedBlock = block;
         toggleBlockSelection(container.selectedBlock, true);
-        selectContainer(container);
-    }
-    function deselectBlock(container) {
-        if (container.selectedBlock !== null) {
-            toggleBlockSelection(container.selectedBlock, false);
-            container.selectedBlock = null;
-        }
-    }
-    function selectContainer(container) {
-        var current = getActiveContainer(container);
-        if (container === current) {
-            return;
-        }
-        if (current !== null) {
-            helpers.toggleClassName(current.$element, "bre-container-selected", false);
-            deselectBlock(current);
-        }
-        helpers.toggleClassName(container.$element, "bre-container-selected", true);
-    }
+    };
+    var deselectBlock = function (block) {
+        var container = block.parentContainer;
+        toggleBlockSelection(block, false);
+        container.selectedBlock = null;
+    };
     //# sourceMappingURL=blocksContainer.js.map
 
     var defaultButtons$1 = [
@@ -1672,7 +1688,8 @@ var BrickyEditor = (function (exports) {
                     case 0:
                         optionsWithDefaults = __assign(__assign({}, defaultOptions), options);
                         editor = {
-                            $element: $element
+                            $element: $element,
+                            state: getInitialState()
                         };
                         rootContainer = createRootContainer(editor);
                         editor.rootContainer = rootContainer;
@@ -1687,7 +1704,7 @@ var BrickyEditor = (function (exports) {
                         if (templates !== undefined) {
                             templatesUI.setTemplates(templates);
                             templatesUI.on("select", function (ev) {
-                                var selectedContainer = getActiveContainer(rootContainer);
+                                var selectedContainer = getActiveContainer(editor);
                                 if (selectedContainer !== null) {
                                     addBlockToContainer(selectedContainer, {
                                         blockTemplate: ev.template
@@ -1745,7 +1762,14 @@ var BrickyEditor = (function (exports) {
             });
         }); });
     };
-    //# sourceMappingURL=editor.js.map
+    var getActiveContainer = function (_a) {
+        var state = _a.state, rootContainer = _a.rootContainer;
+        var selectedBlock = state.selectedBlocks[0];
+        if (selectedBlock !== undefined) {
+            return selectedBlock.parentContainer;
+        }
+        return rootContainer;
+    };
 
     exports.Editor = Editor;
     exports.editor = editor$2;

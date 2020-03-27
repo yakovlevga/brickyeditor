@@ -5,14 +5,7 @@ import { showBlockEditor, hideBlockEditor } from "@/block/blockEditor";
 import { emitter } from "@/emitter";
 import { bindBlockFields } from "@/fields/fields";
 import { helpers } from "@/helpers";
-
-export const selectField = (
-  block: bre.block.Block,
-  field: bre.field.FieldBase
-) => {
-  block.selectedField = field;
-  block.fire("select", { block });
-};
+import { selectField } from "@/editorState";
 
 export const toggleBlockSelection = (
   block: bre.block.Block,
@@ -22,6 +15,7 @@ export const toggleBlockSelection = (
     toggleFieldSelection(block.selectedField, false);
   }
 
+  block.selected = selected;
   helpers.toggleClassName(block.$element, "bre-block-selected", selected);
 
   // const parentBlocks = getParentBlocks(block);
@@ -58,18 +52,20 @@ export const createBlockFromTemplate = (
 
   const eventEmitter = emitter<bre.block.BlockEventMap>();
   const block: bre.block.Block = {
+    ...eventEmitter,
     parentContainer,
+    state: parentContainer.state,
     $element,
     data,
     selectedField: null,
-    ...eventEmitter
+    selected: false
   };
 
   block.fields = bindBlockFields($element, block);
   block.fields.forEach(field => {
     if (field.on !== undefined) {
       field.on("select", () => {
-        selectField(block, field);
+        selectField(field);
       });
     }
   });

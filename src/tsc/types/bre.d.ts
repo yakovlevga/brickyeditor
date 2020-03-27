@@ -42,6 +42,7 @@ declare namespace bre {
   };
 
   type BlocksContainer = event.Emitter<BlocksContainerEventMap> & {
+    state: bre.EditorState;
     $element: HTMLElement;
     $placeholder: HTMLElement | null;
     blocks: block.Block[];
@@ -54,17 +55,22 @@ declare namespace bre {
     // add: (block: Block) => void;
   };
 
+  type EditorState = {
+    selectedField: bre.field.FieldBase | null;
+    selectedBlocks: bre.block.Block[];
+  };
+
   type Editor = {
     $element: HTMLElement;
     rootContainer: BlocksContainer;
     data: () => bre.block.BlockData[];
     html: () => string;
+
+    state: EditorState;
   };
 
   namespace event {
-    type BaseEvent<TSender> = {
-      sender: TSender;
-    };
+    type BaseEvent<TSender> = {};
 
     type EventMaps =
       | BlocksContainerEventMap
@@ -162,12 +168,14 @@ declare namespace bre {
     };
 
     type Block = event.Emitter<BlockEventMap> & {
+      state: bre.EditorState;
       $element: HTMLElement;
       data: BlockData;
       fields?: field.FieldBase[];
       selectedField: field.FieldBase | null;
       blockEditor?: BlockEditor;
       parentContainer: BlocksContainer;
+      selected: boolean;
     };
 
     type BlockEditorButton = {

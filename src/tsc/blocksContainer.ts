@@ -23,22 +23,6 @@ export const getContainerHtml = (container: bre.BlocksContainer) => {
   return root.outerHTML;
 };
 
-export const getActiveContainer = (
-  container: bre.BlocksContainer
-): bre.BlocksContainer => {
-  const { selectedBlock } = container;
-  if (selectedBlock === null || selectedBlock.selectedField === null) {
-    return container;
-  }
-
-  const { selectedField } = selectedBlock;
-  if (isContainerField(selectedField)) {
-    return getActiveContainer(selectedField.container);
-  }
-
-  return container;
-};
-
 // TODO: add custom placeholder and localization
 const defaultPlaceholder = helpers.div(
   "bre-container-placeholder",
@@ -105,7 +89,7 @@ export const addBlockToContainer = (
   });
 
   block.on("select", () => {
-    selectBlock(container, block);
+    selectBlock(block);
   });
 
   // UI
@@ -122,19 +106,20 @@ export const addBlockToContainer = (
   }
 
   if (select) {
-    selectBlock(container, block);
+    selectBlock(block);
   }
 
   return block;
 };
 
 export const createRootContainer = (editor: bre.Editor) =>
-  createContainer(editor.$element, null, editor);
+  createContainer(editor.$element, editor.state, null, editor);
 export const createFieldContainer = (field: ContainerField) =>
-  createContainer(field.$element, field, null);
+  createContainer(field.$element, field.parentBlock.state, field, null);
 
 const createContainer = (
   $element: HTMLElement,
+  state: bre.EditorState,
   parentContainerField: ContainerField | null,
   parentEditor: bre.Editor | null
 ): bre.BlocksContainer => {
@@ -142,6 +127,7 @@ const createContainer = (
 
   const eventEmitter = emitter<bre.BlocksContainerEventMap>();
   const container: bre.BlocksContainer = {
+    state,
     $element,
     $placeholder,
     blocks: [],
@@ -204,7 +190,7 @@ function moveBlock(
     }
   }
 
-  selectBlock(container, block);
+  selectBlock(block);
   // showBlockEditor(block);
 
   container.blocks.splice(idx, 1);
@@ -216,7 +202,9 @@ function moveBlock(
   // block.scrollTo();
 }
 
-function selectBlock(container: bre.BlocksContainer, block: bre.block.Block) {
+// TODO: container is a block.parentContainer now
+export const selectBlock = (block: bre.block.Block) => {
+  const container = block.parentContainer;
   if (container.selectedBlock === block) {
     return;
   }
@@ -231,26 +219,28 @@ function selectBlock(container: bre.BlocksContainer, block: bre.block.Block) {
 
   container.selectedBlock = block;
   toggleBlockSelection(container.selectedBlock, true);
-  selectContainer(container);
-}
+  // selectContainer(container);
+};
 
-function deselectBlock(container: bre.BlocksContainer) {
-  if (container.selectedBlock !== null) {
-    toggleBlockSelection(container.selectedBlock, false);
-    container.selectedBlock = null;
-  }
-}
+export const deselectBlock = (block: bre.block.Block) => {
+  const container = block.parentContainer;
+  toggleBlockSelection(block, false);
+  container.selectedBlock = null;
+};
 
-function selectContainer(container: bre.BlocksContainer) {
-  const current = getActiveContainer(container);
-  if (container === current) {
-    return;
-  }
+// function selectContainer(container: bre.BlocksContainer) {
+//   const current = getActiveContainer(container);
+//   if (container === current) {
+//     return;
+//   }
 
-  if (current !== null) {
-    helpers.toggleClassName(current.$element, "bre-container-selected", false);
-    deselectBlock(current);
-  }
+//   if (current !== null) {
+//     helpers.toggleClassName(current.$element, "bre-container-selected", false);
 
-  helpers.toggleClassName(container.$element, "bre-container-selected", true);
-}
+//     if (current.selectedBlock !== null) {
+//       deselectBlock(current.selectedBlock);
+//     }
+//   }
+
+//   helpers.toggleClassName(container.$element, "bre-container-selected", true);
+// }
