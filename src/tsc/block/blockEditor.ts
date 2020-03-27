@@ -63,10 +63,14 @@ const initBlockEditor = (block: bre.block.Block) => {
   return block.blockEditor;
 };
 
-export const showBlockEditor = (block: bre.block.Block, parent: boolean) => {
+export const showBlockEditor = (block: bre.block.Block, active: boolean) => {
   const editor = initBlockEditor(block);
   helpers.toggleVisibility(editor.$element, true);
-  helpers.toggleClassName(editor.$element, "bre-block-editor-vertical", parent);
+  helpers.toggleClassName(
+    editor.$element,
+    "bre-block-editor-vertical",
+    !active
+  );
   return editor;
 };
 

@@ -58,6 +58,7 @@ declare namespace bre {
   type EditorState = {
     selectedField: bre.field.FieldBase | null;
     selectedBlocks: bre.block.Block[];
+    selectedContainers: bre.BlocksContainer[];
   };
 
   type Editor = {

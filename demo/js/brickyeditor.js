@@ -1344,10 +1344,10 @@ var BrickyEditor = (function (exports) {
         }
         return block.blockEditor;
     };
-    var showBlockEditor = function (block, parent) {
+    var showBlockEditor = function (block, active) {
         var editor = initBlockEditor(block);
         helpers.toggleVisibility(editor.$element, true);
-        helpers.toggleClassName(editor.$element, "bre-block-editor-vertical", parent);
+        helpers.toggleClassName(editor.$element, "bre-block-editor-vertical", !active);
         return editor;
     };
     var hideBlockEditor = function (block) {
@@ -1361,56 +1361,75 @@ var BrickyEditor = (function (exports) {
 
     var getInitialState = function () { return ({
         selectedField: null,
-        selectedBlocks: []
+        selectedBlocks: [],
+        selectedContainers: []
     }); };
     var selectField = function (selectedField) {
         var state = selectedField.parentBlock.state;
         if (state.selectedField === selectedField) {
             return;
         }
-        var prevSelectedBlocks = state.selectedBlocks;
         var prevSelectedField = state.selectedField;
-        var selectedBlocks = getParentBlocks(selectedField);
-        state.selectedField = selectedField;
-        state.selectedBlocks = selectedBlocks;
-        if (prevSelectedBlocks !== null) {
-            prevSelectedBlocks.forEach(function (x) {
-                if (selectedBlocks.indexOf(x) === -1) {
-                    deselectBlock(x);
-                }
-            });
-        }
-        selectedBlocks.forEach(function (x) {
-            if (!x.selected) {
-                selectBlock(x);
-            }
-        });
         if (prevSelectedField !== null) {
             prevSelectedField.parentBlock.selectedField = null;
         }
-        selectedField.parentBlock.fire("select");
+        state.selectedField = selectedField;
         selectedField.parentBlock.selectedField = selectedField;
+        selectBlock(selectedField.parentBlock);
     };
-    var getParentBlocks = function (field, blocks) {
+    var selectBlock = function (selectedBlock) {
+        var state = selectedBlock.state;
+        if (state.selectedBlocks[0] === selectedBlock) {
+            return;
+        }
+        var prevSelectedBlocks = state.selectedBlocks;
+        var selectedBlocks = getParentBlocks(selectedBlock);
+        state.selectedBlocks = selectedBlocks;
+        if (prevSelectedBlocks.length > 0) {
+            prevSelectedBlocks.forEach(function (block, idx) {
+                if (selectedBlocks.indexOf(block) === -1) {
+                    toggleBlockSelection(block, false, idx === 0);
+                }
+            });
+        }
+        selectedBlocks.forEach(function (block, idx) {
+            if (!block.selected) {
+                toggleBlockSelection(block, true, idx === 0);
+            }
+        });
+        selectContainer(selectedBlock.parentContainer);
+    };
+    var getParentBlocks = function (block, blocks) {
         if (blocks === void 0) { blocks = []; }
-        var block = field.parentBlock;
         blocks.push(block);
         var parentContainerField = block.parentContainer.parentContainerField;
         if (parentContainerField !== null) {
-            return getParentBlocks(parentContainerField, blocks);
+            return getParentBlocks(parentContainerField.parentBlock, blocks);
         }
         return blocks;
     };
+    var selectContainer = function (selectedContainer) {
+        var state = selectedContainer.state;
+        var selectedContainers = getParentContainers(selectedContainer);
+        state.selectedContainers = selectedContainers;
+    };
+    var getParentContainers = function (container) {
+        if (container.parentContainerField !== null) {
+            var blocks = getParentBlocks(container.parentContainerField.parentBlock);
+            return __spreadArrays([container], blocks.map(function (block) { return block.parentContainer; }));
+        }
+        return [container];
+    };
     //# sourceMappingURL=editorState.js.map
 
-    var toggleBlockSelection = function (block, selected) {
+    var toggleBlockSelection = function (block, selected, active) {
         if (!selected && block.selectedField !== null) {
             toggleFieldSelection(block.selectedField, false);
         }
         block.selected = selected;
         helpers.toggleClassName(block.$element, "bre-block-selected", selected);
         if (selected) {
-            showBlockEditor(block, false);
+            showBlockEditor(block, active);
         }
         else {
             hideBlockEditor(block);
@@ -1443,17 +1462,6 @@ var BrickyEditor = (function (exports) {
     };
     var getBlockHtml = function (block, trim) {
         return "";
-    };
-    var getParentBlocks$1 = function (block) {
-        var parentBlocks = [];
-        var parentContainerField = block.parentContainer.parentContainerField;
-        while (parentContainerField !== null &&
-            parentContainerField.parentBlock !== null) {
-            var parentBlock = parentContainerField.parentBlock;
-            parentBlocks.push(parentBlock);
-            parentContainerField = parentBlock.parentContainer.parentContainerField;
-        }
-        return parentBlocks;
     };
     //# sourceMappingURL=Block.js.map
 
@@ -1536,14 +1544,10 @@ var BrickyEditor = (function (exports) {
         toggleContainersPlaceholder(container);
         $element.onclick = function (ev) {
             ev.stopPropagation();
-            selectContainer(container);
         };
         return container;
     };
     function deleteBlock(container, block) {
-        if (container.selectedBlock === block) {
-            toggleBlockSelection(block, false);
-        }
         container.blocks = container.blocks.filter(function (b) { return b !== block; });
         block.$element.remove();
         block = null;
@@ -1574,24 +1578,6 @@ var BrickyEditor = (function (exports) {
         container.blocks.splice(idx, 1);
         container.blocks.splice(new_idx, 0, block);
     }
-    var selectBlock = function (block) {
-        var container = block.parentContainer;
-        if (container.selectedBlock === block) {
-            return;
-        }
-        var parentBlocks = getParentBlocks$1(block);
-        if (container.selectedBlock !== null &&
-            parentBlocks.indexOf(container.selectedBlock) === -1) {
-            toggleBlockSelection(container.selectedBlock, false);
-        }
-        container.selectedBlock = block;
-        toggleBlockSelection(container.selectedBlock, true);
-    };
-    var deselectBlock = function (block) {
-        var container = block.parentContainer;
-        toggleBlockSelection(block, false);
-        container.selectedBlock = null;
-    };
     //# sourceMappingURL=blocksContainer.js.map
 
     var defaultButtons$1 = [
@@ -1693,6 +1679,7 @@ var BrickyEditor = (function (exports) {
                         };
                         rootContainer = createRootContainer(editor);
                         editor.rootContainer = rootContainer;
+                        editor.state.selectedContainers = [rootContainer];
                         editor.data = function () { return getContainerData(rootContainer); };
                         editor.html = function () { return getContainerHtml(rootContainer); };
                         helpers.toggleClassName($element, "bre-editor", true);
@@ -1704,7 +1691,7 @@ var BrickyEditor = (function (exports) {
                         if (templates !== undefined) {
                             templatesUI.setTemplates(templates);
                             templatesUI.on("select", function (ev) {
-                                var selectedContainer = getActiveContainer(editor);
+                                var selectedContainer = editor.state.selectedContainers[0];
                                 if (selectedContainer !== null) {
                                     addBlockToContainer(selectedContainer, {
                                         blockTemplate: ev.template
@@ -1762,14 +1749,7 @@ var BrickyEditor = (function (exports) {
             });
         }); });
     };
-    var getActiveContainer = function (_a) {
-        var state = _a.state, rootContainer = _a.rootContainer;
-        var selectedBlock = state.selectedBlocks[0];
-        if (selectedBlock !== undefined) {
-            return selectedBlock.parentContainer;
-        }
-        return rootContainer;
-    };
+    //# sourceMappingURL=editor.js.map
 
     exports.Editor = Editor;
     exports.editor = editor$2;

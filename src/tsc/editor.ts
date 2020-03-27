@@ -12,7 +12,6 @@ import { getTemplateSelector } from "@/ui/templateSelector";
 import { initHtmlTools } from "@/ui/htmlTools";
 import { helpers } from "@/helpers";
 import { getInitialState } from "./editorState";
-import { isContainerField } from "./fields/container";
 
 export class Editor {
   constructor($editor: HTMLElement, options: bre.EditorOptions) {
@@ -35,6 +34,7 @@ export const editor = (
     const rootContainer = createRootContainer(editor);
 
     editor.rootContainer = rootContainer;
+    editor.state.selectedContainers = [rootContainer];
     editor.data = () => getContainerData(rootContainer);
     editor.html = () => getContainerHtml(rootContainer);
 
@@ -53,7 +53,7 @@ export const editor = (
     if (templates !== undefined) {
       templatesUI.setTemplates(templates);
       templatesUI.on("select", ev => {
-        const selectedContainer = getActiveContainer(editor);
+        const selectedContainer = editor.state.selectedContainers[0];
         if (selectedContainer !== null) {
           addBlockToContainer(
             selectedContainer,
@@ -132,15 +132,3 @@ const loadInitialBlocks = ({ blocks, blocksUrl }: bre.EditorOptions) =>
 //     });
 //   }
 // };
-
-const getActiveContainer = ({
-  state,
-  rootContainer
-}: bre.Editor): bre.BlocksContainer => {
-  const selectedBlock = state.selectedBlocks[0];
-  if (selectedBlock !== undefined) {
-    return selectedBlock.parentContainer;
-  }
-
-  return rootContainer;
-};

@@ -9,7 +9,8 @@ import { selectField } from "@/editorState";
 
 export const toggleBlockSelection = (
   block: bre.block.Block,
-  selected: boolean
+  selected: boolean,
+  active: boolean
 ) => {
   if (!selected && block.selectedField !== null) {
     toggleFieldSelection(block.selectedField, false);
@@ -18,14 +19,10 @@ export const toggleBlockSelection = (
   block.selected = selected;
   helpers.toggleClassName(block.$element, "bre-block-selected", selected);
 
-  // const parentBlocks = getParentBlocks(block);
-
   if (selected) {
-    showBlockEditor(block, false);
-    // parentBlocks.forEach(parent => showBlockEditor(parent, true));
+    showBlockEditor(block, active);
   } else {
     hideBlockEditor(block);
-    // parentBlocks.forEach(parent => hideBlockEditor(parent));
   }
 };
 
@@ -108,23 +105,23 @@ export const getBlockHtml = (block: bre.block.Block, trim: boolean = true) => {
   // return trim ? html.breTotalTrim() : html;
 };
 
-export const getParentBlocks = (block: bre.block.Block): bre.block.Block[] => {
-  const parentBlocks: bre.block.Block[] = [];
+// export const getParentBlocks = (block: bre.block.Block): bre.block.Block[] => {
+//   const parentBlocks: bre.block.Block[] = [];
 
-  let { parentContainerField } = block.parentContainer;
-  while (
-    parentContainerField !== null &&
-    parentContainerField.parentBlock !== null
-  ) {
-    const { parentBlock } = parentContainerField;
-    parentBlocks.push(parentBlock);
-    parentContainerField = parentBlock.parentContainer.parentContainerField;
-  }
+//   let { parentContainerField } = block.parentContainer;
+//   while (
+//     parentContainerField !== null &&
+//     parentContainerField.parentBlock !== null
+//   ) {
+//     const { parentBlock } = parentContainerField;
+//     parentBlocks.push(parentBlock);
+//     parentContainerField = parentBlock.parentContainer.parentContainerField;
+//   }
 
-  return parentBlocks;
-};
+//   return parentBlocks;
+// };
 
-const getBlockChain = (field: bre.field.FieldBase) => {
-  const block = field.parentBlock;
-  block.parentContainer;
-};
+// const getBlockChain = (field: bre.field.FieldBase) => {
+//   const block = field.parentBlock;
+//   block.parentContainer;
+// };

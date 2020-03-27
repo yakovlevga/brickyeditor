@@ -1,14 +1,13 @@
 import {
   createBlockFromData,
   createBlockFromTemplate,
-  toggleBlockSelection,
-  getBlockHtml,
-  getParentBlocks
+  getBlockHtml
 } from "@/block/Block";
 import { helpers } from "@/helpers";
 import { bre } from "@/types/bre";
-import { isContainerField, ContainerField } from "@/fields/container";
+import { ContainerField } from "@/fields/container";
 import { emitter } from "@/emitter";
+import { selectBlock } from "./editorState";
 
 export const getContainerData = (container: bre.BlocksContainer) =>
   container.blocks.map(block => block.data);
@@ -141,16 +140,18 @@ const createContainer = (
 
   $element.onclick = ev => {
     ev.stopPropagation();
-    selectContainer(container);
+    // TODO: move this to container placeholder
+    // selectContainer(container);
   };
 
   return container;
 };
 
 function deleteBlock(container: bre.BlocksContainer, block: bre.block.Block) {
-  if (container.selectedBlock === block) {
-    toggleBlockSelection(block, false);
-  }
+  // TODO: now this show control the editor state
+  // if (container.selectedBlock === block) {
+  //   toggleBlockSelection(block, false);
+  // }
 
   container.blocks = container.blocks.filter(b => b !== block);
   block.$element.remove();
@@ -202,31 +203,11 @@ function moveBlock(
   // block.scrollTo();
 }
 
-// TODO: container is a block.parentContainer now
-export const selectBlock = (block: bre.block.Block) => {
-  const container = block.parentContainer;
-  if (container.selectedBlock === block) {
-    return;
-  }
-
-  const parentBlocks = getParentBlocks(block);
-  if (
-    container.selectedBlock !== null &&
-    parentBlocks.indexOf(container.selectedBlock) === -1
-  ) {
-    toggleBlockSelection(container.selectedBlock, false);
-  }
-
-  container.selectedBlock = block;
-  toggleBlockSelection(container.selectedBlock, true);
-  // selectContainer(container);
-};
-
-export const deselectBlock = (block: bre.block.Block) => {
-  const container = block.parentContainer;
-  toggleBlockSelection(block, false);
-  container.selectedBlock = null;
-};
+// export const deselectBlock = (block: bre.block.Block) => {
+//   const container = block.parentContainer;
+//   toggleBlockSelection(block, false);
+//   container.selectedBlock = null;
+// };
 
 // function selectContainer(container: bre.BlocksContainer) {
 //   const current = getActiveContainer(container);
