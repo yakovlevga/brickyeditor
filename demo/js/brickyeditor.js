@@ -750,8 +750,124 @@ var BrickyEditor = (function (exports) {
     };
     //# sourceMappingURL=emitter.js.map
 
+    var container = function (props) {
+        var $element = props.$element, data = props.data;
+        if (!isValidFieldType(data, "container")) {
+            return null;
+        }
+        if (props.preview) {
+            return { $element: $element };
+        }
+        $element.addEventListener("click", function (ev) {
+            ev.stopPropagation();
+            selectField(field);
+        });
+        var field = __assign(__assign({}, emitter()), { $element: $element,
+            data: data,
+            html: html, parentBlock: props.parentBlock });
+        var fieldContainer = createFieldContainer(field);
+        field.container = fieldContainer;
+        if (data.blocks && data.blocks.length > 0) {
+            data.blocks.map(function (blockData) {
+                return addBlockToContainer(fieldContainer, {
+                    blockData: blockData
+                }, false);
+            });
+        }
+        return field;
+    };
+    var isContainerField = function (field) {
+        return field.data.type === "container";
+    };
+    var html = function (field) {
+        var container = field.container;
+        var html = getContainerHtml(container);
+        return helpers.createElement(html);
+    };
+    //# sourceMappingURL=container.js.map
+
+    var getInitialState = function () { return ({
+        selectedField: null,
+        selectedBlocks: [],
+        selectedContainers: []
+    }); };
+    var selectField = function (selectedField) {
+        var state = selectedField.parentBlock.state;
+        if (state.selectedField === selectedField) {
+            return;
+        }
+        var prevSelectedField = state.selectedField;
+        if (prevSelectedField !== null) {
+            toggleFieldSelection(prevSelectedField, false, true);
+        }
+        if (isContainerField(selectedField)) {
+            selectBlock(selectedField.parentBlock, false);
+            selectContainer(selectedField.container);
+        }
+        else {
+            selectBlock(selectedField.parentBlock);
+        }
+        state.selectedField = selectedField;
+        toggleFieldSelection(selectedField, true, true);
+    };
+    var selectBlock = function (selectedBlock, triggerSelectContainer) {
+        if (triggerSelectContainer === void 0) { triggerSelectContainer = true; }
+        var state = selectedBlock.state;
+        if (state.selectedBlocks[0] === selectedBlock) {
+            return;
+        }
+        state.selectedField = null;
+        var prevSelectedBlocks = state.selectedBlocks;
+        var selectedBlocks = getParentBlocks(selectedBlock);
+        state.selectedBlocks = selectedBlocks;
+        if (prevSelectedBlocks.length > 0) {
+            prevSelectedBlocks.forEach(function (block) {
+                toggleBlockSelection(block, false);
+            });
+        }
+        selectedBlocks.forEach(function (block, idx) {
+            if (!block.selected) {
+                toggleBlockSelection(block, true, idx === 0);
+            }
+        });
+        if (triggerSelectContainer) {
+            selectContainer(selectedBlock.parentContainer);
+        }
+    };
+    var getParentBlocks = function (block, blocks) {
+        if (blocks === void 0) { blocks = []; }
+        blocks.push(block);
+        var parentContainerField = block.parentContainer.parentContainerField;
+        if (parentContainerField !== null) {
+            return getParentBlocks(parentContainerField.parentBlock, blocks);
+        }
+        return blocks;
+    };
+    var selectContainer = function (selectedContainer) {
+        var state = selectedContainer.state;
+        var selectedContainers = getParentContainers(selectedContainer);
+        state.selectedContainers = selectedContainers;
+    };
+    var getParentContainers = function (container) {
+        if (container.parentContainerField !== null) {
+            var blocks = getParentBlocks(container.parentContainerField.parentBlock);
+            return __spreadArrays([container], blocks.map(function (block) { return block.parentContainer; }));
+        }
+        return [container];
+    };
+    var resetState = function (state) {
+        if (state.selectedField !== null) {
+            toggleFieldSelection(state.selectedField, false);
+        }
+        state.selectedBlocks.forEach(function (block) { return toggleBlockSelection(block, false); });
+        state.selectedField = null;
+        state.selectedBlocks = [];
+        state.selectedContainers = [state.selectedContainers[0]];
+    };
+    //# sourceMappingURL=editorState.js.map
+
     var MaxPreviewLength = 50;
-    var html = function (props) {
+    var html$1 = function (props) {
         var $element = props.$element, data = props.data;
         if (!isValidFieldType(data, "html")) {
             return null;
@@ -795,8 +911,7 @@ var BrickyEditor = (function (exports) {
         });
         $element.addEventListener("click", function (ev) {
             ev.stopPropagation();
-            toggleFieldSelection(field, true);
-            return false;
+            selectField(field);
         });
         return field;
     };
@@ -880,7 +995,7 @@ var BrickyEditor = (function (exports) {
         var eventEmitter = emitter();
         var field = __assign(__assign({}, eventEmitter), { $element: $element,
             data: data,
-            html: html$1,
+            html: html$2,
             editor: editor, parentBlock: props.parentBlock });
         $element.addEventListener("click", function (ev) { return __awaiter(void 0, void 0, void 0, function () {
             var updatedData;
@@ -888,7 +1003,7 @@ var BrickyEditor = (function (exports) {
                 switch (_a.label) {
                     case 0:
                         ev.stopPropagation();
-                        toggleFieldSelection(field, true);
+                        selectField(field);
                         return [4, propmtFieldEditorAsync(field)];
                     case 1:
                         updatedData = _a.sent();
@@ -902,7 +1017,7 @@ var BrickyEditor = (function (exports) {
         }); });
         return field;
     };
-    function html$1(field) {
+    function html$2(field) {
         return getCleanFieldElement(field.$element);
     }
     function editor(initialData) {
@@ -959,42 +1074,6 @@ var BrickyEditor = (function (exports) {
     }
     //# sourceMappingURL=embed.js.map
 
-    var container = function (props) {
-        var $element = props.$element, data = props.data;
-        if (!isValidFieldType(data, "container")) {
-            return null;
-        }
-        if (props.preview) {
-            return { $element: $element };
-        }
-        $element.addEventListener("click", function (ev) {
-            ev.stopPropagation();
-            toggleFieldSelection(field, true);
-        });
-        var field = __assign(__assign({}, emitter()), { $element: $element,
-            data: data,
-            html: html$2, parentBlock: props.parentBlock });
-        var fieldContainer = createFieldContainer(field);
-        field.container = fieldContainer;
-        if (data.blocks && data.blocks.length > 0) {
-            data.blocks.map(function (blockData) {
-                return addBlockToContainer(fieldContainer, {
-                    blockData: blockData
-                }, false);
-            });
-        }
-        return field;
-    };
-    var isContainerField = function (field) {
-        return field.data.type === "container";
-    };
-    var html$2 = function (field) {
-        var container = field.container;
-        var html = getContainerHtml(container);
-        return helpers.createElement(html);
-    };
-    //# sourceMappingURL=container.js.map
-
     var image = function (props) {
         var $element = props.$element, data = props.data;
         if (!isValidFieldType(data, "image")) {
@@ -1017,7 +1096,7 @@ var BrickyEditor = (function (exports) {
                 switch (_a.label) {
                     case 0:
                         ev.stopPropagation();
-                        toggleFieldSelection(field, true);
+                        selectField(field);
                         return [4, propmtFieldEditorAsync(field)];
                     case 1:
                         updatedData = _a.sent();
@@ -1110,7 +1189,7 @@ var BrickyEditor = (function (exports) {
     //# sourceMappingURL=image.js.map
 
     var fields = {
-        html: html,
+        html: html$1,
         image: image,
         embed: embed,
         container: container
@@ -1267,6 +1346,7 @@ var BrickyEditor = (function (exports) {
             $preview: $preview
         };
     };
+    //# sourceMappingURL=template.js.map
 
     var iconDelete = "<svg viewBox=\"0 0 512 512\">\n  <path stroke-width=\"32\" d=\"M112 112l20 320c.95 18.49 14.4 32 32 32h184c17.67 0 30.87-13.51 32-32l20-320\"/>\n  <path stroke-miterlimit=\"10\" stroke-width=\"32\" d=\"M80 112h352\"/>\n  <path stroke-width=\"32\" d=\"M192 112V72h0a23.93 23.93 0 0124-24h80a23.93 23.93 0 0124 24h0v40M256 176v224M184 176l8 224M328 176l-8 224\"/>\n</svg>";
     //# sourceMappingURL=iconDelete.js.map
@@ -1368,76 +1448,6 @@ var BrickyEditor = (function (exports) {
     };
     //# sourceMappingURL=blockEditor.js.map
 
-    var getInitialState = function () { return ({
-        selectedField: null,
-        selectedBlocks: [],
-        selectedContainers: []
-    }); };
-    var selectField = function (selectedField) {
-        var state = selectedField.parentBlock.state;
-        if (state.selectedField === selectedField) {
-            return;
-        }
-        var prevSelectedField = state.selectedField;
-        if (prevSelectedField !== null) {
-            toggleFieldSelection(prevSelectedField, false, true);
-        }
-        if (isContainerField(selectedField)) {
-            selectBlock(selectedField.parentBlock, false);
-            selectContainer(selectedField.container);
-        }
-        else {
-            selectBlock(selectedField.parentBlock);
-        }
-        state.selectedField = selectedField;
-    };
-    var selectBlock = function (selectedBlock, triggerSelectContainer) {
-        if (triggerSelectContainer === void 0) { triggerSelectContainer = true; }
-        var state = selectedBlock.state;
-        if (state.selectedBlocks[0] === selectedBlock) {
-            return;
-        }
-        state.selectedField = null;
-        var prevSelectedBlocks = state.selectedBlocks;
-        var selectedBlocks = getParentBlocks(selectedBlock);
-        state.selectedBlocks = selectedBlocks;
-        if (prevSelectedBlocks.length > 0) {
-            prevSelectedBlocks.forEach(function (block) {
-                toggleBlockSelection(block, false);
-            });
-        }
-        selectedBlocks.forEach(function (block, idx) {
-            if (!block.selected) {
-                toggleBlockSelection(block, true, idx === 0);
-            }
-        });
-        if (triggerSelectContainer) {
-            selectContainer(selectedBlock.parentContainer);
-        }
-    };
-    var getParentBlocks = function (block, blocks) {
-        if (blocks === void 0) { blocks = []; }
-        blocks.push(block);
-        var parentContainerField = block.parentContainer.parentContainerField;
-        if (parentContainerField !== null) {
-            return getParentBlocks(parentContainerField.parentBlock, blocks);
-        }
-        return blocks;
-    };
-    var selectContainer = function (selectedContainer) {
-        var state = selectedContainer.state;
-        var selectedContainers = getParentContainers(selectedContainer);
-        state.selectedContainers = selectedContainers;
-    };
-    var getParentContainers = function (container) {
-        if (container.parentContainerField !== null) {
-            var blocks = getParentBlocks(container.parentContainerField.parentBlock);
-            return __spreadArrays([container], blocks.map(function (block) { return block.parentContainer; }));
-        }
-        return [container];
-    };
-    //# sourceMappingURL=editorState.js.map
-
     var toggleBlockSelection = function (block, selected, active) {
         if (active === void 0) { active = false; }
         block.selected = selected;
@@ -1465,13 +1475,6 @@ var BrickyEditor = (function (exports) {
         var block = __assign(__assign({}, eventEmitter), { parentContainer: parentContainer, state: parentContainer.state, $element: $element,
             data: data, selected: false });
         block.fields = bindBlockFields($element, block);
-        block.fields.forEach(function (field) {
-            if (field.on !== undefined) {
-                field.on("select", function () {
-                    selectField(field);
-                });
-            }
-        });
         return block;
     };
     var getBlockHtml = function (block, trim) {
@@ -1551,10 +1554,25 @@ var BrickyEditor = (function (exports) {
     };
     var deleteBlock = function (block) {
         var container = block.parentContainer;
+        var blockIdx = container.blocks.indexOf(block);
         container.blocks = container.blocks.filter(function (b) { return b !== block; });
         block.$element.remove();
+        if (container.blocks.length === 0) {
+            toggleContainersPlaceholder(container);
+            if (container.parentContainerField !== null) {
+                selectField(container.parentContainerField);
+            }
+            else {
+                resetState(container.state);
+            }
+        }
+        else if (container.blocks.length > blockIdx) {
+            selectBlock(container.blocks[blockIdx]);
+        }
+        else {
+            selectBlock(container.blocks[blockIdx - 1]);
+        }
         block = null;
-        toggleContainersPlaceholder(container);
     };
     var copyBlock = function (block) {
         var container = block.parentContainer;

@@ -7,8 +7,8 @@ import { helpers } from "@/helpers";
 import { bre } from "@/types/bre";
 import { ContainerField } from "@/fields/container";
 import { emitter } from "@/emitter";
-import { selectBlock } from "./editorState";
-import { iconContainer } from "./icons/iconContainer";
+import { selectBlock, resetState, selectField } from "@/editorState";
+import { iconContainer } from "@/icons/iconContainer";
 
 export const getContainerData = (container: bre.BlocksContainer) =>
   container.blocks.map(block => block.data);
@@ -143,16 +143,26 @@ const createContainer = (
 
 export const deleteBlock = (block: bre.block.Block) => {
   const container = block.parentContainer;
-  // TODO: now this show control the editor state
-  // if (container.selectedBlock === block) {
-  //   toggleBlockSelection(block, false);
-  // }
+  const blockIdx = container.blocks.indexOf(block);
 
   container.blocks = container.blocks.filter(b => b !== block);
   block.$element.remove();
-  (block as any) = null;
 
-  toggleContainersPlaceholder(container);
+  if (container.blocks.length === 0) {
+    toggleContainersPlaceholder(container);
+    if (container.parentContainerField !== null) {
+      selectField(container.parentContainerField);
+    } else {
+      resetState(container.state);
+    }
+  } else if (container.blocks.length > blockIdx) {
+    selectBlock(container.blocks[blockIdx]);
+  } else {
+    selectBlock(container.blocks[blockIdx - 1]);
+  }
+
+  // TODO: destroy to unsubcrive all events?
+  (block as any) = null;
 };
 
 export const copyBlock = (block: bre.block.Block) => {

@@ -18,6 +18,7 @@ import { emitter } from "@/emitter";
 import { propmtFieldEditorAsync } from "@/fields/editors";
 import { renderInput } from "@/fields/inputs";
 import { FieldFactory } from "@/fields/fields";
+import { selectField } from "@/editorState";
 
 const providerScriptsLoaded: {
   [TKey: string]: boolean;
@@ -61,7 +62,7 @@ export const embed: FieldFactory = props => {
 
   $element.addEventListener("click", async ev => {
     ev.stopPropagation();
-    toggleFieldSelection(field, true);
+    selectField(field);
 
     const updatedData = await propmtFieldEditorAsync(field);
     if (updatedData !== null) {

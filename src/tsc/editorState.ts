@@ -30,6 +30,8 @@ export const selectField = (selectedField: bre.field.FieldBase) => {
   }
 
   state.selectedField = selectedField;
+
+  toggleFieldSelection(selectedField, true, true);
 };
 
 export const selectBlock = (
@@ -96,4 +98,16 @@ const getParentContainers = (
   }
 
   return [container];
+};
+
+export const resetState = (state: bre.EditorState) => {
+  // TODO: move to update state method?
+  if (state.selectedField !== null) {
+    toggleFieldSelection(state.selectedField, false);
+  }
+  state.selectedBlocks.forEach(block => toggleBlockSelection(block, false));
+
+  state.selectedField = null;
+  state.selectedBlocks = [];
+  state.selectedContainers = [state.selectedContainers[0]];
 };

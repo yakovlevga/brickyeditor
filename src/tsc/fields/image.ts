@@ -12,6 +12,7 @@ import { locales } from "@/locales";
 import { linkEditor } from "@/fields/linkEditor";
 import { propmtFieldEditorAsync } from "@/fields/editors";
 import { FieldFactory } from "@/fields/fields";
+import { selectField } from "@/editorState";
 
 type ImageFieldPayload = {
   src?: string;
@@ -49,7 +50,7 @@ export const image: FieldFactory = props => {
 
   $element.addEventListener("click", async ev => {
     ev.stopPropagation();
-    toggleFieldSelection(field, true);
+    selectField(field);
 
     const updatedData = await propmtFieldEditorAsync(field);
     if (updatedData !== null) {

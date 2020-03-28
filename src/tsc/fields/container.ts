@@ -8,6 +8,7 @@ import { helpers } from "@/helpers";
 import { bre } from "@/types/bre";
 import { emitter } from "@/emitter";
 import { FieldFactory } from "@/fields/fields";
+import { selectField } from "@/editorState";
 
 type ContainerFieldType = "container";
 type ContainerFieldPayload = {
@@ -36,7 +37,7 @@ export const container: FieldFactory = props => {
 
   $element.addEventListener("click", ev => {
     ev.stopPropagation();
-    toggleFieldSelection(field, true);
+    selectField(field);
   });
 
   const field = {

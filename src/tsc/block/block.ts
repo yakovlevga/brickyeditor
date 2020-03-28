@@ -53,13 +53,13 @@ export const createBlockFromTemplate = (
   };
 
   block.fields = bindBlockFields($element, block);
-  block.fields.forEach(field => {
-    if (field.on !== undefined) {
-      field.on("select", () => {
-        selectField(field);
-      });
-    }
-  });
+  // block.fields.forEach(field => {
+  //   if (field.on !== undefined) {
+  //     field.on("select", () => {
+  //       selectField(field);
+  //     });
+  //   }
+  // });
 
   return block;
 };

@@ -9,6 +9,7 @@ import { toggleHtmlTools } from "@/ui/htmlTools";
 import { bindTextSelection } from "@/ui/selection";
 import { emitter } from "@/emitter";
 import { FieldFactory } from "@/fields/fields";
+import { selectField } from "@/editorState";
 
 type HtmlFieldType = "html";
 type HtmlFieldPayload = {
@@ -79,8 +80,7 @@ export const html: FieldFactory = props => {
 
   $element.addEventListener("click", ev => {
     ev.stopPropagation();
-    toggleFieldSelection(field, true);
-    return false;
+    selectField(field);
   });
 
   return field;
