@@ -23,10 +23,13 @@ export const getContainerHtml = (container: bre.BlocksContainer) => {
   return root.outerHTML;
 };
 
-const defaultPlaceholder = helpers.div(
+const defaultContainerPlaceholder = helpers.div(
   "bre-container-placeholder",
   iconContainer
 );
+
+export const getContainerPlaceholder = () =>
+  defaultContainerPlaceholder.cloneNode(true) as HTMLElement;
 
 const toggleContainersPlaceholder = (container: bre.BlocksContainer) => {
   if (container.$placeholder === null) {
@@ -122,7 +125,7 @@ const createContainer = (
   parentContainerField: ContainerField | null,
   parentEditor: bre.Editor | null
 ): bre.BlocksContainer => {
-  const $placeholder = defaultPlaceholder.cloneNode(true) as HTMLElement;
+  const $placeholder = getContainerPlaceholder();
 
   const eventEmitter = emitter<bre.BlocksContainerEventMap>();
   const container: bre.BlocksContainer = {

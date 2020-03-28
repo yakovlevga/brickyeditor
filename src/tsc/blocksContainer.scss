@@ -32,3 +32,15 @@
     }
   }
 }
+
+.bre-template {
+  .bre-container-placeholder {
+    min-height: 32px;
+    margin: 0;
+    border-width: 0;
+    & > svg {
+      width: 16px;
+      height: 16px;
+    }
+  }
+}

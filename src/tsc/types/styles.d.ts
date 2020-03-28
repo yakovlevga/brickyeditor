@@ -8,6 +8,7 @@ declare type BreStyles =
   | "bre-container-placeholder"
   | "bre-container-selected"
   | "bre-field-selected"
+  | "bre-template"
   | "bre-editor"
   | "bre-hidden"
   | "bre-icon"

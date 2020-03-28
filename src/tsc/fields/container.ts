@@ -1,9 +1,10 @@
 import {
   getContainerHtml,
   addBlockToContainer,
-  createFieldContainer
+  createFieldContainer,
+  getContainerPlaceholder
 } from "@/blocksContainer";
-import { isValidFieldType, toggleFieldSelection } from "@/fields/field";
+import { isValidFieldType } from "@/fields/field";
 import { helpers } from "@/helpers";
 import { bre } from "@/types/bre";
 import { emitter } from "@/emitter";
@@ -31,8 +32,10 @@ export const container: FieldFactory = props => {
   }
 
   if (props.preview) {
-    // TODO: return
-    return { $element };
+    $element.append(getContainerPlaceholder());
+    return {
+      $element
+    };
   }
 
   $element.addEventListener("click", ev => {
