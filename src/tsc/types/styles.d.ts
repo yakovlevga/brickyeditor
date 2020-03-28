@@ -6,6 +6,7 @@ declare type BreStyles =
   | "bre-block-editor-vertical"
   | "bre-container-placeholder"
   | "bre-container-selected"
+  | "bre-field-selected"
   | "bre-editor"
   | "bre-hidden"
   | "bre-field-editor-root"

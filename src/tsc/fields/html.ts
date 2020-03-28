@@ -77,7 +77,8 @@ export const html: FieldFactory = props => {
     }
   });
 
-  $element.addEventListener("click", () => {
+  $element.addEventListener("click", ev => {
+    ev.stopPropagation();
     toggleFieldSelection(field, true);
     return false;
   });

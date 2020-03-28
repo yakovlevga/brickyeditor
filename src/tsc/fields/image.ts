@@ -47,7 +47,8 @@ export const image: FieldFactory = props => {
     parentBlock: props.parentBlock
   };
 
-  $element.addEventListener("click", async () => {
+  $element.addEventListener("click", async ev => {
+    ev.stopPropagation();
     toggleFieldSelection(field, true);
 
     const updatedData = await propmtFieldEditorAsync(field);

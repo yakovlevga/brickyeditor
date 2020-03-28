@@ -3,7 +3,7 @@ import {
   addBlockToContainer,
   createFieldContainer
 } from "@/blocksContainer";
-import { isValidFieldType } from "@/fields/field";
+import { isValidFieldType, toggleFieldSelection } from "@/fields/field";
 import { helpers } from "@/helpers";
 import { bre } from "@/types/bre";
 import { emitter } from "@/emitter";
@@ -33,6 +33,11 @@ export const container: FieldFactory = props => {
     // TODO: return
     return { $element };
   }
+
+  $element.addEventListener("click", ev => {
+    ev.stopPropagation();
+    toggleFieldSelection(field, true);
+  });
 
   const field = {
     ...emitter<bre.field.FieldEventMap>(),

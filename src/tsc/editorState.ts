@@ -1,5 +1,7 @@
 import { bre } from "./types/bre";
 import { toggleBlockSelection } from "./block/Block";
+import { toggleFieldSelection } from "./fields/field";
+import { isContainerField } from "./fields/container";
 
 export const getInitialState = (): bre.EditorState => ({
   selectedField: null,
@@ -16,21 +18,31 @@ export const selectField = (selectedField: bre.field.FieldBase) => {
 
   const prevSelectedField = state.selectedField;
   if (prevSelectedField !== null) {
-    prevSelectedField.parentBlock.selectedField = null;
+    toggleFieldSelection(prevSelectedField, false, true);
     // prevSelectedField.fire('blur');
   }
 
+  if (isContainerField(selectedField)) {
+    selectBlock(selectedField.parentBlock, false);
+    selectContainer(selectedField.container);
+  } else {
+    selectBlock(selectedField.parentBlock);
+  }
+
   state.selectedField = selectedField;
-  selectedField.parentBlock.selectedField = selectedField;
-  selectBlock(selectedField.parentBlock);
 };
 
-export const selectBlock = (selectedBlock: bre.block.Block) => {
+export const selectBlock = (
+  selectedBlock: bre.block.Block,
+  triggerSelectContainer: boolean = true
+) => {
   const state = selectedBlock.state;
 
   if (state.selectedBlocks[0] === selectedBlock) {
     return;
   }
+
+  state.selectedField = null;
 
   const prevSelectedBlocks = state.selectedBlocks;
   const selectedBlocks = getParentBlocks(selectedBlock);
@@ -38,10 +50,8 @@ export const selectBlock = (selectedBlock: bre.block.Block) => {
   state.selectedBlocks = selectedBlocks;
 
   if (prevSelectedBlocks.length > 0) {
-    prevSelectedBlocks.forEach((block, idx) => {
-      if (selectedBlocks.indexOf(block) === -1) {
-        toggleBlockSelection(block, false, idx === 0);
-      }
+    prevSelectedBlocks.forEach(block => {
+      toggleBlockSelection(block, false);
     });
   }
 
@@ -51,7 +61,9 @@ export const selectBlock = (selectedBlock: bre.block.Block) => {
     }
   });
 
-  selectContainer(selectedBlock.parentContainer);
+  if (triggerSelectContainer) {
+    selectContainer(selectedBlock.parentContainer);
+  }
 };
 
 const getParentBlocks = (

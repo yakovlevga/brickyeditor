@@ -72,6 +72,47 @@ var BrickyEditor = (function (exports) {
         return r;
     }
 
+    var EditorStrings = (function () {
+        function EditorStrings() {
+        }
+        EditorStrings.embedFieldLinkTitle = "Link to embed media";
+        EditorStrings.embedFieldLinkPlaceholder = "Link to instagram, youtube and etc.";
+        EditorStrings.imageFieldLinkTitle = "Image link";
+        EditorStrings.imageFieldLinkPlaceholder = "http://url-to-image.png";
+        EditorStrings.imageFieldUploadTitle = "or Upload a file";
+        EditorStrings.imageFieldUploadButton = "Select file";
+        EditorStrings.imageFieldAltTitle = "Alt";
+        EditorStrings.imageFieldAltPlaceholder = "Image 'alt' attribute value";
+        EditorStrings.imageFieldUrlSubtitle = "Link to open on image click";
+        EditorStrings.htmlEditorLinkUrlTitle = "Url";
+        EditorStrings.htmlEditorLinkUrlPlaceholder = "http://put-your-link.here";
+        EditorStrings.htmlEditorLinkTitleTitle = "Title";
+        EditorStrings.htmlEditorLinkTitlePlaceholder = "Title attribute for link";
+        EditorStrings.htmlEditorLinkTargetTitle = "Target";
+        EditorStrings.htmlEditorLinkTargetBlank = "Blank";
+        EditorStrings.htmlEditorLinkTargetSelf = "Self";
+        EditorStrings.htmlEditorLinkTargetParent = "Parent";
+        EditorStrings.htmlEditorLinkTargetTop = "Top";
+        EditorStrings.buttonClose = "close";
+        EditorStrings.buttonOk = "Ok";
+        EditorStrings.buttonCancel = "Cancel";
+        EditorStrings.defaultTemplatesGroupName = "Other templates";
+        EditorStrings.errorBlocksFileNotFound = function (url) {
+            return "Blocks file not found. Requested file: " + url + ".";
+        };
+        EditorStrings.errorTemplatesFileNotFound = function (url) {
+            return "Templates file not found. Requested file: " + url + ".";
+        };
+        EditorStrings.errorBlockTemplateNotFound = function (templateName) {
+            return "Template \"" + templateName + "\" not found.";
+        };
+        EditorStrings.errorTemplateParsing = function (name) {
+            return "Template parsing error: " + name + ".";
+        };
+        return EditorStrings;
+    }());
+    //# sourceMappingURL=EditorStrings.js.map
+
     var el = function (_a) {
         var _b = _a.tag, tag = _b === void 0 ? "div" : _b, className = _a.className, innerHTML = _a.innerHTML, props = _a.props;
         var result = document.createElement(tag);
@@ -200,81 +241,6 @@ var BrickyEditor = (function (exports) {
     };
     //# sourceMappingURL=helpers.js.map
 
-    var FIELD_DATA_ATTR = "data-bre-field";
-    var FIELD_SELECTOR = "[" + FIELD_DATA_ATTR + "]";
-    var TEMPLATE_GROUP_SELECTOR = ".bre-template-group";
-    var TEMPLATE_PREVIEW_SELECTOR = ".bre-template-preview";
-    //# sourceMappingURL=constants.js.map
-
-    var isValidFieldType = function (data, type) { return data.type === type; };
-    var updateFieldData = function (field, changes, fireEvent) {
-        if (fireEvent === void 0) { fireEvent = true; }
-        var data = field.data;
-        var props = Object.keys(changes);
-        var hasChanges = props.some(function (p) { return data[p] !== changes[p]; });
-        if (hasChanges) {
-            field.data = __assign(__assign({}, data), { changes: changes });
-            if (fireEvent) {
-                field.fire("change", { field: field });
-            }
-        }
-    };
-    var toggleFieldSelection = function (field, selected, fireEvent) {
-        if (fireEvent === void 0) { fireEvent = true; }
-        field.selected = selected;
-        helpers.toggleClassName(field.$element, "bre-field-selected", selected);
-        if (fireEvent !== undefined && selected) {
-            field.fire("select", { field: field });
-        }
-    };
-    var getCleanFieldElement = function ($field) {
-        var $el = $field.cloneNode(true);
-        $el.attributes.removeNamedItem(FIELD_DATA_ATTR);
-        return $el;
-    };
-    //# sourceMappingURL=field.js.map
-
-    var EditorStrings = (function () {
-        function EditorStrings() {
-        }
-        EditorStrings.embedFieldLinkTitle = "Link to embed media";
-        EditorStrings.embedFieldLinkPlaceholder = "Link to instagram, youtube and etc.";
-        EditorStrings.imageFieldLinkTitle = "Image link";
-        EditorStrings.imageFieldLinkPlaceholder = "http://url-to-image.png";
-        EditorStrings.imageFieldUploadTitle = "or Upload a file";
-        EditorStrings.imageFieldUploadButton = "Select file";
-        EditorStrings.imageFieldAltTitle = "Alt";
-        EditorStrings.imageFieldAltPlaceholder = "Image 'alt' attribute value";
-        EditorStrings.imageFieldUrlSubtitle = "Link to open on image click";
-        EditorStrings.htmlEditorLinkUrlTitle = "Url";
-        EditorStrings.htmlEditorLinkUrlPlaceholder = "http://put-your-link.here";
-        EditorStrings.htmlEditorLinkTitleTitle = "Title";
-        EditorStrings.htmlEditorLinkTitlePlaceholder = "Title attribute for link";
-        EditorStrings.htmlEditorLinkTargetTitle = "Target";
-        EditorStrings.htmlEditorLinkTargetBlank = "Blank";
-        EditorStrings.htmlEditorLinkTargetSelf = "Self";
-        EditorStrings.htmlEditorLinkTargetParent = "Parent";
-        EditorStrings.htmlEditorLinkTargetTop = "Top";
-        EditorStrings.buttonClose = "close";
-        EditorStrings.buttonOk = "Ok";
-        EditorStrings.buttonCancel = "Cancel";
-        EditorStrings.defaultTemplatesGroupName = "Other templates";
-        EditorStrings.errorBlocksFileNotFound = function (url) {
-            return "Blocks file not found. Requested file: " + url + ".";
-        };
-        EditorStrings.errorTemplatesFileNotFound = function (url) {
-            return "Templates file not found. Requested file: " + url + ".";
-        };
-        EditorStrings.errorBlockTemplateNotFound = function (templateName) {
-            return "Template \"" + templateName + "\" not found.";
-        };
-        EditorStrings.errorTemplateParsing = function (name) {
-            return "Template parsing error: " + name + ".";
-        };
-        return EditorStrings;
-    }());
-    //# sourceMappingURL=EditorStrings.js.map
-
     var getRequest = function (url) {
         return new Promise(function (resolve, reject) {
             var request = new XMLHttpRequest();
@@ -353,6 +319,39 @@ var BrickyEditor = (function (exports) {
         });
     };
     //# sourceMappingURL=httpTransport.js.map
+
+    var FIELD_DATA_ATTR = "data-bre-field";
+    var FIELD_SELECTOR = "[" + FIELD_DATA_ATTR + "]";
+    var TEMPLATE_GROUP_SELECTOR = ".bre-template-group";
+    var TEMPLATE_PREVIEW_SELECTOR = ".bre-template-preview";
+    //# sourceMappingURL=constants.js.map
+
+    var isValidFieldType = function (data, type) { return data.type === type; };
+    var updateFieldData = function (field, changes, fireEvent) {
+        if (fireEvent === void 0) { fireEvent = true; }
+        var data = field.data;
+        var props = Object.keys(changes);
+        var hasChanges = props.some(function (p) { return data[p] !== changes[p]; });
+        if (hasChanges) {
+            field.data = __assign(__assign({}, data), { changes: changes });
+            if (fireEvent) {
+                field.fire("change", { field: field });
+            }
+        }
+    };
+    var toggleFieldSelection = function (field, selected, fireEvent) {
+        if (fireEvent === void 0) { fireEvent = true; }
+        helpers.toggleClassName(field.$element, "bre-field-selected", selected);
+        if (fireEvent !== undefined && selected) {
+            field.fire("select", { field: field });
+        }
+    };
+    var getCleanFieldElement = function ($field) {
+        var $el = $field.cloneNode(true);
+        $el.attributes.removeNamedItem(FIELD_DATA_ATTR);
+        return $el;
+    };
+    //# sourceMappingURL=field.js.map
 
     var renderLabel = function ($root, $input, _a) {
         var title = _a.title;
@@ -817,7 +816,8 @@ var BrickyEditor = (function (exports) {
                 document.execCommand("insertHTML", false, text);
             }
         });
-        $element.addEventListener("click", function () {
+        $element.addEventListener("click", function (ev) {
+            ev.stopPropagation();
             toggleFieldSelection(field, true);
             return false;
         });
@@ -905,11 +905,12 @@ var BrickyEditor = (function (exports) {
             data: data,
             html: html$1,
             editor: editor, parentBlock: props.parentBlock });
-        $element.addEventListener("click", function () { return __awaiter(void 0, void 0, void 0, function () {
+        $element.addEventListener("click", function (ev) { return __awaiter(void 0, void 0, void 0, function () {
             var updatedData;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
+                        ev.stopPropagation();
                         toggleFieldSelection(field, true);
                         return [4, propmtFieldEditorAsync(field)];
                     case 1:
@@ -989,6 +990,10 @@ var BrickyEditor = (function (exports) {
         if (props.preview) {
             return { $element: $element };
         }
+        $element.addEventListener("click", function (ev) {
+            ev.stopPropagation();
+            toggleFieldSelection(field, true);
+        });
         var field = __assign(__assign({}, emitter()), { $element: $element,
             data: data,
             html: html$2, parentBlock: props.parentBlock });
@@ -1002,6 +1007,9 @@ var BrickyEditor = (function (exports) {
             });
         }
         return field;
+    };
+    var isContainerField = function (field) {
+        return field.data.type === "container";
     };
     var html$2 = function (field) {
         var container = field.container;
@@ -1026,11 +1034,12 @@ var BrickyEditor = (function (exports) {
             data: data,
             html: html$3,
             editor: editor$1, parentBlock: props.parentBlock });
-        $element.addEventListener("click", function () { return __awaiter(void 0, void 0, void 0, function () {
+        $element.addEventListener("click", function (ev) { return __awaiter(void 0, void 0, void 0, function () {
             var updatedData;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
+                        ev.stopPropagation();
                         toggleFieldSelection(field, true);
                         return [4, propmtFieldEditorAsync(field)];
                     case 1:
@@ -1371,25 +1380,30 @@ var BrickyEditor = (function (exports) {
         }
         var prevSelectedField = state.selectedField;
         if (prevSelectedField !== null) {
-            prevSelectedField.parentBlock.selectedField = null;
+            toggleFieldSelection(prevSelectedField, false, true);
+        }
+        if (isContainerField(selectedField)) {
+            selectBlock(selectedField.parentBlock, false);
+            selectContainer(selectedField.container);
+        }
+        else {
+            selectBlock(selectedField.parentBlock);
         }
         state.selectedField = selectedField;
-        selectedField.parentBlock.selectedField = selectedField;
-        selectBlock(selectedField.parentBlock);
     };
-    var selectBlock = function (selectedBlock) {
+    var selectBlock = function (selectedBlock, triggerSelectContainer) {
+        if (triggerSelectContainer === void 0) { triggerSelectContainer = true; }
         var state = selectedBlock.state;
         if (state.selectedBlocks[0] === selectedBlock) {
             return;
         }
+        state.selectedField = null;
         var prevSelectedBlocks = state.selectedBlocks;
         var selectedBlocks = getParentBlocks(selectedBlock);
         state.selectedBlocks = selectedBlocks;
         if (prevSelectedBlocks.length > 0) {
-            prevSelectedBlocks.forEach(function (block, idx) {
-                if (selectedBlocks.indexOf(block) === -1) {
-                    toggleBlockSelection(block, false, idx === 0);
-                }
+            prevSelectedBlocks.forEach(function (block) {
+                toggleBlockSelection(block, false);
             });
         }
         selectedBlocks.forEach(function (block, idx) {
@@ -1397,7 +1411,9 @@ var BrickyEditor = (function (exports) {
                 toggleBlockSelection(block, true, idx === 0);
             }
         });
-        selectContainer(selectedBlock.parentContainer);
+        if (triggerSelectContainer) {
+            selectContainer(selectedBlock.parentContainer);
+        }
     };
     var getParentBlocks = function (block, blocks) {
         if (blocks === void 0) { blocks = []; }
@@ -1420,12 +1436,9 @@ var BrickyEditor = (function (exports) {
         }
         return [container];
     };
-    //# sourceMappingURL=editorState.js.map
 
     var toggleBlockSelection = function (block, selected, active) {
-        if (!selected && block.selectedField !== null) {
-            toggleFieldSelection(block.selectedField, false);
-        }
+        if (active === void 0) { active = false; }
         block.selected = selected;
         helpers.toggleClassName(block.$element, "bre-block-selected", selected);
         if (selected) {
@@ -1449,7 +1462,7 @@ var BrickyEditor = (function (exports) {
         helpers.toggleClassName($element, "bre-block", true);
         var eventEmitter = emitter();
         var block = __assign(__assign({}, eventEmitter), { parentContainer: parentContainer, state: parentContainer.state, $element: $element,
-            data: data, selectedField: null, selected: false });
+            data: data, selected: false });
         block.fields = bindBlockFields($element, block);
         block.fields.forEach(function (field) {
             if (field.on !== undefined) {
@@ -1465,6 +1478,9 @@ var BrickyEditor = (function (exports) {
     };
     //# sourceMappingURL=Block.js.map
 
+    var iconContainer = "<svg viewBox=\"0 0 512 512\">\n  <rect width=\"176\" height=\"176\" x=\"48\" y=\"48\" rx=\"20\" ry=\"20\"/>\n  <rect width=\"176\" height=\"176\" x=\"288\" y=\"48\" rx=\"20\" ry=\"20\"/>\n  <rect width=\"176\" height=\"176\" x=\"48\" y=\"288\" rx=\"20\" ry=\"20\"/>\n  <rect width=\"176\" height=\"176\" x=\"288\" y=\"288\" rx=\"20\" ry=\"20\"/>\n</svg>";
+    //# sourceMappingURL=iconContainer.js.map
+
     var getContainerData = function (container) {
         return container.blocks.map(function (block) { return block.data; });
     };
@@ -1476,7 +1492,7 @@ var BrickyEditor = (function (exports) {
         root.innerHTML = html;
         return root.outerHTML;
     };
-    var defaultPlaceholder = helpers.div("bre-container-placeholder", "Click here to select this container");
+    var defaultPlaceholder = helpers.div("bre-container-placeholder", iconContainer);
     var toggleContainersPlaceholder = function (container) {
         if (container.$placeholder === null) {
             return;
@@ -1542,15 +1558,13 @@ var BrickyEditor = (function (exports) {
             $placeholder: $placeholder, blocks: [], selectedBlock: null, parentContainerField: parentContainerField,
             parentEditor: parentEditor }, eventEmitter);
         toggleContainersPlaceholder(container);
-        $element.onclick = function (ev) {
-            ev.stopPropagation();
-        };
         return container;
     };
     function deleteBlock(container, block) {
         container.blocks = container.blocks.filter(function (b) { return b !== block; });
         block.$element.remove();
         block = null;
+        toggleContainersPlaceholder(container);
     }
     function copyBlock(container, block) {
         var idx = container.blocks.indexOf(block) + 1;

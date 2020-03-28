@@ -111,7 +111,6 @@ declare namespace bre {
     type FieldBase = event.Emitter<FieldEventMap> & {
       parentBlock: bre.block.Block;
       $element: HTMLElement;
-      selected?: boolean;
       data: field.FieldData;
     };
 
@@ -173,7 +172,6 @@ declare namespace bre {
       $element: HTMLElement;
       data: BlockData;
       fields?: field.FieldBase[];
-      selectedField: field.FieldBase | null;
       blockEditor?: BlockEditor;
       parentContainer: BlocksContainer;
       selected: boolean;

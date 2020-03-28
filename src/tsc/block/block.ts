@@ -1,4 +1,3 @@
-import { toggleFieldSelection } from "@/fields/field";
 import { getTemplate } from "@/template";
 import { bre } from "@/types/bre";
 import { showBlockEditor, hideBlockEditor } from "@/block/blockEditor";
@@ -10,12 +9,8 @@ import { selectField } from "@/editorState";
 export const toggleBlockSelection = (
   block: bre.block.Block,
   selected: boolean,
-  active: boolean
+  active: boolean = false
 ) => {
-  if (!selected && block.selectedField !== null) {
-    toggleFieldSelection(block.selectedField, false);
-  }
-
   block.selected = selected;
   helpers.toggleClassName(block.$element, "bre-block-selected", selected);
 
@@ -54,7 +49,6 @@ export const createBlockFromTemplate = (
     state: parentContainer.state,
     $element,
     data,
-    selectedField: null,
     selected: false
   };
 

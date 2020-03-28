@@ -37,7 +37,6 @@ export const toggleFieldSelection = (
   selected: boolean,
   fireEvent: boolean = true
 ) => {
-  field.selected = selected;
   helpers.toggleClassName(field.$element, "bre-field-selected", selected);
 
   if (fireEvent !== undefined && selected) {

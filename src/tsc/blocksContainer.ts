@@ -8,6 +8,7 @@ import { bre } from "@/types/bre";
 import { ContainerField } from "@/fields/container";
 import { emitter } from "@/emitter";
 import { selectBlock } from "./editorState";
+import { iconContainer } from "./icons/iconContainer";
 
 export const getContainerData = (container: bre.BlocksContainer) =>
   container.blocks.map(block => block.data);
@@ -22,10 +23,9 @@ export const getContainerHtml = (container: bre.BlocksContainer) => {
   return root.outerHTML;
 };
 
-// TODO: add custom placeholder and localization
 const defaultPlaceholder = helpers.div(
   "bre-container-placeholder",
-  "Click here to select this container"
+  iconContainer
 );
 
 const toggleContainersPlaceholder = (container: bre.BlocksContainer) => {
@@ -138,12 +138,6 @@ const createContainer = (
 
   toggleContainersPlaceholder(container);
 
-  $element.onclick = ev => {
-    ev.stopPropagation();
-    // TODO: move this to container placeholder
-    // selectContainer(container);
-  };
-
   return container;
 };
 
@@ -156,6 +150,8 @@ function deleteBlock(container: bre.BlocksContainer, block: bre.block.Block) {
   container.blocks = container.blocks.filter(b => b !== block);
   block.$element.remove();
   (block as any) = null;
+
+  toggleContainersPlaceholder(container);
 }
 
 function copyBlock(container: bre.BlocksContainer, block: bre.block.Block) {
