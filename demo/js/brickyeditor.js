@@ -111,12 +111,18 @@ var BrickyEditor = (function (exports) {
         };
         return EditorStrings;
     }());
+    //# sourceMappingURL=EditorStrings.js.map
 
     var el = function (_a) {
         var _b = _a.tag, tag = _b === void 0 ? "div" : _b, className = _a.className, innerHTML = _a.innerHTML, props = _a.props;
         var result = document.createElement(tag);
-        if (className !== undefined && className.length > 0) {
-            result.className = className;
+        if (className !== undefined) {
+            if (Array.isArray(className)) {
+                className.forEach(function (x) { return result.classList.add(x); });
+            }
+            else {
+                result.className = className;
+            }
         }
         if (innerHTML !== undefined) {
             result.innerHTML = innerHTML;
@@ -215,6 +221,7 @@ var BrickyEditor = (function (exports) {
         filterNotNull: filterNotNull,
         convertNodeListToArray: convertNodeListToArray
     };
+    //# sourceMappingURL=helpers.js.map
 
     var getRequest = function (url) {
         return new Promise(function (resolve, reject) {
@@ -293,11 +300,13 @@ var BrickyEditor = (function (exports) {
                 document.documentElement).appendChild(script);
         });
     };
+    //# sourceMappingURL=httpTransport.js.map
 
     var FIELD_DATA_ATTR = "data-bre-field";
     var FIELD_SELECTOR = "[" + FIELD_DATA_ATTR + "]";
     var TEMPLATE_GROUP_SELECTOR = ".bre-template-group";
     var TEMPLATE_PREVIEW_SELECTOR = ".bre-template-preview";
+    //# sourceMappingURL=constants.js.map
 
     var isValidFieldType = function (data, type) { return data.type === type; };
     var updateFieldData = function (field, changes, fireEvent) {
@@ -324,6 +333,7 @@ var BrickyEditor = (function (exports) {
         $el.attributes.removeNamedItem(FIELD_DATA_ATTR);
         return $el;
     };
+    //# sourceMappingURL=field.js.map
 
     var renderLabel = function ($root, $input, _a) {
         var title = _a.title;
@@ -402,6 +412,7 @@ var BrickyEditor = (function (exports) {
         $root.append($select);
         return $root;
     };
+    //# sourceMappingURL=inputs.js.map
 
     var locales = {
         errorBlocksFileNotFound: function (url) {
@@ -475,6 +486,7 @@ var BrickyEditor = (function (exports) {
         buttonCancel: "Cancel",
         defaultTemplatesGroupName: "Other templates",
     };
+    //# sourceMappingURL=locales.js.map
 
     var linkEditor = function (initialData) {
         var data = initialData ? __assign({}, initialData) : {};
@@ -494,6 +506,7 @@ var BrickyEditor = (function (exports) {
             data: data
         };
     };
+    //# sourceMappingURL=linkEditor.js.map
 
     var getSelectionRanges = function () {
         var selection = window.getSelection();
@@ -539,6 +552,7 @@ var BrickyEditor = (function (exports) {
         var range = selection.getRangeAt(0);
         return range.getBoundingClientRect();
     };
+    //# sourceMappingURL=selection.js.map
 
     var dialog = function ($content, ok, cancel) {
         var selection = getSelectionRanges();
@@ -578,6 +592,7 @@ var BrickyEditor = (function (exports) {
         root.append($placeholder);
         document.body.appendChild(root);
     };
+    //# sourceMappingURL=modal.js.map
 
     var promptLinkParamsAsync = function (initialData) {
         return new Promise(function (resolve) {
@@ -701,6 +716,7 @@ var BrickyEditor = (function (exports) {
             helpers.toggleVisibility(control, false);
         }
     };
+    //# sourceMappingURL=htmlTools.js.map
 
     var emitter = function () {
         var listeners = {};
@@ -737,6 +753,7 @@ var BrickyEditor = (function (exports) {
         };
         return { fire: fire, on: on, off: off };
     };
+    //# sourceMappingURL=emitter.js.map
 
     var container = function (props) {
         var $element = props.$element, data = props.data;
@@ -775,6 +792,7 @@ var BrickyEditor = (function (exports) {
         var html = getContainerHtml(container);
         return helpers.createElement(html);
     };
+    //# sourceMappingURL=container.js.map
 
     var getInitialState = function () { return ({
         selectedField: null,
@@ -854,6 +872,7 @@ var BrickyEditor = (function (exports) {
         state.selectedBlocks = [];
         state.selectedContainers = [state.selectedContainers[0]];
     };
+    //# sourceMappingURL=editorState.js.map
 
     var MaxPreviewLength = 50;
     var html$1 = function (props) {
@@ -915,6 +934,7 @@ var BrickyEditor = (function (exports) {
         $copy.removeAttribute("contenteditable");
         return $copy;
     }
+    //# sourceMappingURL=html.js.map
 
     var preProcessEmbedUrl = function (url) {
         return url.replace("https://www.instagram.com", "http://instagr.am");
@@ -951,6 +971,7 @@ var BrickyEditor = (function (exports) {
             });
         }); });
     };
+    //# sourceMappingURL=embed.js.map
 
     var propmtFieldEditorAsync = function (_a) {
         var editor = _a.editor, data = _a.data;
@@ -967,6 +988,7 @@ var BrickyEditor = (function (exports) {
             });
         });
     };
+    //# sourceMappingURL=editors.js.map
 
     var providerScriptsLoaded = {};
     var embed = function (props) {
@@ -1058,6 +1080,7 @@ var BrickyEditor = (function (exports) {
             });
         });
     }
+    //# sourceMappingURL=embed.js.map
 
     var image = function (props) {
         var $element = props.$element, data = props.data;
@@ -1171,6 +1194,7 @@ var BrickyEditor = (function (exports) {
     function getSrcOrFile(data) {
         return data.src || (data.file !== undefined ? data.file.fileContent : "");
     }
+    //# sourceMappingURL=image.js.map
 
     var fields = {
         html: html$1,
@@ -1250,6 +1274,7 @@ var BrickyEditor = (function (exports) {
         }
         return $fields;
     }
+    //# sourceMappingURL=fields.js.map
 
     var allTemplates = [];
     var getTemplate = function (templateName) {
@@ -1329,14 +1354,19 @@ var BrickyEditor = (function (exports) {
             $preview: $preview
         };
     };
+    //# sourceMappingURL=template.js.map
 
-    var iconDelete = "<svg viewBox=\"0 0 512 512\">\n  <path stroke-width=\"32\" d=\"M112 112l20 320c.95 18.49 14.4 32 32 32h184c17.67 0 30.87-13.51 32-32l20-320\"/>\n  <path stroke-miterlimit=\"10\" stroke-width=\"32\" d=\"M80 112h352\"/>\n  <path stroke-width=\"32\" d=\"M192 112V72h0a23.93 23.93 0 0124-24h80a23.93 23.93 0 0124 24h0v40M256 176v224M184 176l8 224M328 176l-8 224\"/>\n</svg>";
+    var iconDelete = "<svg viewBox=\"0 0 512 512\">\n  <path d=\"M112 112l20 320c.95 18.49 14.4 32 32 32h184c17.67 0 30.87-13.51 32-32l20-320\"/>\n  <path stroke-miterlimit=\"10\" d=\"M80 112h352\"/>\n  <path d=\"M192 112V72h0a23.93 23.93 0 0124-24h80a23.93 23.93 0 0124 24h0v40M256 176v224M184 176l8 224M328 176l-8 224\"/>\n</svg>";
+    //# sourceMappingURL=iconDelete.js.map
 
-    var iconCopy = "<svg viewBox=\"0 0 512 512\">\n  <rect width=\"336\" height=\"336\" x=\"128\" y=\"128\" stroke-width=\"32\" rx=\"57\" ry=\"57\"/>\n  <path stroke-width=\"32\" d=\"M383.5 128l.5-24a56.16 56.16 0 00-56-56H112a64.19 64.19 0 00-64 64v216a56.16 56.16 0 0056 56h24\"/>\n</svg>";
+    var iconCopy = "<svg viewBox=\"0 0 512 512\">\n  <rect width=\"336\" height=\"336\" x=\"128\" y=\"128\" rx=\"57\" ry=\"57\"/>\n  <path d=\"M383.5 128l.5-24a56.16 56.16 0 00-56-56H112a64.19 64.19 0 00-64 64v216a56.16 56.16 0 0056 56h24\"/>\n</svg>";
+    //# sourceMappingURL=iconCopy.js.map
 
     var iconUp = "<svg viewBox=\"0 0 512 512\">\n  <path stroke-width=\"48\" d=\"M112 328l144-144 144 144\"/>\n</svg>";
+    //# sourceMappingURL=iconUp.js.map
 
     var iconDown = "<svg viewBox=\"0 0 512 512\">\n  <path stroke-width=\"48\" d=\"M112 184l144 144 144-144\"/>\n</svg>";
+    //# sourceMappingURL=iconDown.js.map
 
     var defaultButtons = [
         {
@@ -1368,7 +1398,7 @@ var BrickyEditor = (function (exports) {
     var createEditor = function () {
         var $element = helpers.div("bre-block-editor");
         var buttons = defaultButtons.map(function (button) {
-            var $btn = helpers.div("bre-block-editor-button", button.icon);
+            var $btn = helpers.div(["bre-block-editor-button", "bre-icon", "bre-icon-light"], button.icon);
             $btn.title = name;
             $element.append($btn);
             return {
@@ -1424,6 +1454,7 @@ var BrickyEditor = (function (exports) {
             helpers.toggleClassName(editor.$element, "bre-block-editor-vertical", false);
         }
     };
+    //# sourceMappingURL=blockEditor.js.map
 
     var toggleBlockSelection = function (block, selected, active) {
         if (active === void 0) { active = false; }
@@ -1457,8 +1488,10 @@ var BrickyEditor = (function (exports) {
     var getBlockHtml = function (block, trim) {
         return "";
     };
+    //# sourceMappingURL=Block.js.map
 
     var iconContainer = "<svg viewBox=\"0 0 512 512\">\n  <rect width=\"176\" height=\"176\" x=\"48\" y=\"48\" rx=\"20\" ry=\"20\"/>\n  <rect width=\"176\" height=\"176\" x=\"288\" y=\"48\" rx=\"20\" ry=\"20\"/>\n  <rect width=\"176\" height=\"176\" x=\"48\" y=\"288\" rx=\"20\" ry=\"20\"/>\n  <rect width=\"176\" height=\"176\" x=\"288\" y=\"288\" rx=\"20\" ry=\"20\"/>\n</svg>";
+    //# sourceMappingURL=iconContainer.js.map
 
     var getContainerData = function (container) {
         return container.blocks.map(function (block) { return block.data; });
@@ -1471,13 +1504,13 @@ var BrickyEditor = (function (exports) {
         root.innerHTML = html;
         return root.outerHTML;
     };
-    var defaultContainerPlaceholder = helpers.div("bre-container-placeholder", iconContainer);
+    var defaultContainerPlaceholder = helpers.div(["bre-container-placeholder", "bre-icon", "bre-icon-32"], iconContainer);
     var getContainerPlaceholder = function () {
         return defaultContainerPlaceholder.cloneNode(true);
     };
     var toggleContainersPlaceholder = function (container) {
         if (container.$placeholder === null) {
-            return;
+            container.$placeholder = getContainerPlaceholder();
         }
         if (container.$element.childElementCount === 0) {
             container.$element.appendChild(container.$placeholder);
@@ -1521,11 +1554,9 @@ var BrickyEditor = (function (exports) {
         return createContainer(field.$element, field.parentBlock.state, field, null);
     };
     var createContainer = function ($element, state, parentContainerField, parentEditor) {
-        var $placeholder = getContainerPlaceholder();
         var eventEmitter = emitter();
         var container = __assign({ state: state,
-            $element: $element,
-            $placeholder: $placeholder, blocks: [], selectedBlock: null, parentContainerField: parentContainerField,
+            $element: $element, blocks: [], $placeholder: null, selectedBlock: null, parentContainerField: parentContainerField,
             parentEditor: parentEditor }, eventEmitter);
         toggleContainersPlaceholder(container);
         return container;
@@ -1582,6 +1613,7 @@ var BrickyEditor = (function (exports) {
         parentContainer.blocks.splice(idx, 1);
         parentContainer.blocks.splice(new_idx, 0, block);
     };
+    //# sourceMappingURL=blocksContainer.js.map
 
     var defaultButtons$1 = [
         { icon: "bold", command: "Bold", range: true },
@@ -1607,6 +1639,7 @@ var BrickyEditor = (function (exports) {
         ignoreHtml: true,
         htmlToolsButtons: defaultButtons$1
     };
+    //# sourceMappingURL=defaults.js.map
 
     var getTemplateUI = function (template) {
         var $template = helpers.div("bre-templates-group-item");
@@ -1659,6 +1692,7 @@ var BrickyEditor = (function (exports) {
             off: off
         };
     };
+    //# sourceMappingURL=templateSelector.js.map
 
     var Editor = (function () {
         function Editor($editor, options) {
@@ -1750,6 +1784,7 @@ var BrickyEditor = (function (exports) {
             });
         }); });
     };
+    //# sourceMappingURL=editor.js.map
 
     exports.Editor = Editor;
     exports.editor = editor$2;

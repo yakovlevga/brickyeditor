@@ -37,7 +37,10 @@ const createEditor = (): bre.block.BlockEditor => {
   const $element = helpers.div("bre-block-editor");
 
   const buttons = defaultButtons.map(button => {
-    const $btn = helpers.div("bre-block-editor-button", button.icon);
+    const $btn = helpers.div(
+      ["bre-block-editor-button", "bre-icon", "bre-icon-light"],
+      button.icon
+    );
     $btn.title = name;
     $element.append($btn);
 

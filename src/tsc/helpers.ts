@@ -9,14 +9,18 @@ const el = <THTMLElement extends HTMLElement = HTMLElement>({
   props
 }: {
   tag?: string;
-  className?: BreStyles;
+  className?: BreStyles | BreStyles[];
   innerHTML?: string;
   props?: Partial<THTMLElement>;
 }) => {
   const result = document.createElement(tag) as THTMLElement;
 
-  if (className !== undefined && className.length > 0) {
-    result.className = className;
+  if (className !== undefined) {
+    if (Array.isArray(className)) {
+      className.forEach(x => result.classList.add(x));
+    } else {
+      result.className = className;
+    }
   }
 
   if (innerHTML !== undefined) {
@@ -30,7 +34,7 @@ const el = <THTMLElement extends HTMLElement = HTMLElement>({
   return result;
 };
 
-const div = (className?: BreStyles, innerHTML?: string) =>
+const div = (className?: BreStyles | BreStyles[], innerHTML?: string) =>
   el<HTMLDivElement>({
     className,
     innerHTML

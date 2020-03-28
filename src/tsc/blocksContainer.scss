@@ -9,12 +9,6 @@
       justify-content: center;
       box-shadow: inset 0 0 1px 0px rgba(30, 30, 160, 0.9);
       opacity: 0.5;
-
-      & > svg {
-        width: 32px;
-        height: 32px;
-        stroke-width: 32px;
-      }
     }
 
     &-selected {
@@ -34,10 +28,8 @@
 }
 
 .bre-template {
+  min-height: 48px;
   .bre-container-placeholder {
-    min-height: 32px;
-    margin: 0;
-
     & > svg {
       width: 16px;
       height: 16px;
