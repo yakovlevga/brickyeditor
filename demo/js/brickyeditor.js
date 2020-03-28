@@ -1317,44 +1317,55 @@ var BrickyEditor = (function (exports) {
         {
             name: "up",
             icon: iconUp,
-            action: function (ff) { return ff("move", { offset: -1 }); }
+            action: function (ff) { return ff("move", { offset: -1 }); },
+            visibility: function (block) { return block.parentContainer.blocks.indexOf(block) !== 0; }
         },
         {
             name: "down",
             icon: iconDown,
-            action: function (ff) { return ff("move", { offset: 1 }); }
+            action: function (ff) { return ff("move", { offset: 1 }); },
+            visibility: function (block) {
+                return block.parentContainer.blocks.indexOf(block) !==
+                    block.parentContainer.blocks.length - 1;
+            }
         }
     ];
     var createEditor = function () {
         var $element = helpers.div("bre-block-editor");
-        var btns = defaultButtons.map(function (btn) {
-            var action = btn.action, icon = btn.icon, name = btn.name;
-            var $btn = helpers.div("bre-block-editor-button", icon);
+        var buttons = defaultButtons.map(function (button) {
+            var $btn = helpers.div("bre-block-editor-button", button.icon);
             $btn.title = name;
             $element.append($btn);
             return {
-                $btn: $btn,
-                action: action
+                $element: $btn,
+                button: button
             };
         });
         return {
             $element: $element,
-            btns: btns
+            buttons: buttons
         };
     };
-    var initBlockEditor = function (block) {
+    var setupBlockEditor = function (block) {
         if (block.blockEditor === undefined) {
             block.blockEditor = createEditor();
-            block.blockEditor.btns.forEach(function (_a) {
-                var $btn = _a.$btn, action = _a.action;
-                $btn.onclick = function () { return action(block.fire); };
+            block.blockEditor.buttons.forEach(function (_a) {
+                var $btn = _a.$element, button = _a.button;
+                $btn.onclick = function () { return button.action(block.fire); };
             });
             block.$element.prepend(block.blockEditor.$element);
         }
+        block.blockEditor.buttons.forEach(function (_a) {
+            var $btn = _a.$element, button = _a.button;
+            if (button.visibility !== undefined) {
+                var visible = button.visibility(block);
+                helpers.toggleVisibility($btn, visible);
+            }
+        });
         return block.blockEditor;
     };
     var showBlockEditor = function (block, active) {
-        var editor = initBlockEditor(block);
+        var editor = setupBlockEditor(block);
         helpers.toggleVisibility(editor.$element, true);
         helpers.toggleClassName(editor.$element, "bre-block-editor-vertical", !active);
         return editor;
@@ -1366,7 +1377,6 @@ var BrickyEditor = (function (exports) {
             helpers.toggleClassName(editor.$element, "bre-block-editor-vertical", false);
         }
     };
-    //# sourceMappingURL=blockEditor.js.map
 
     var getInitialState = function () { return ({
         selectedField: null,
@@ -1436,6 +1446,7 @@ var BrickyEditor = (function (exports) {
         }
         return [container];
     };
+    //# sourceMappingURL=editorState.js.map
 
     var toggleBlockSelection = function (block, selected, active) {
         if (active === void 0) { active = false; }

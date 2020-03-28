@@ -181,13 +181,14 @@ declare namespace bre {
       name: string;
       icon: string;
       action: (ff: bre.event.FireFunc<bre.block.BlockEventMap>) => void;
+      visibility?: (block: bre.block.Block) => boolean;
     };
 
     type BlockEditor = {
       $element: HTMLDivElement;
-      btns: {
-        $btn: HTMLDivElement;
-        action: BlockEditorButton["action"];
+      buttons: {
+        $element: HTMLDivElement;
+        button: BlockEditorButton;
       }[];
     };
   }

@@ -19,52 +19,62 @@ const defaultButtons: bre.block.BlockEditorButton[] = [
   {
     name: "up",
     icon: iconUp,
-    action: ff => ff("move", { offset: -1 })
+    action: ff => ff("move", { offset: -1 }),
+    visibility: block => block.parentContainer.blocks.indexOf(block) !== 0
   },
   {
     name: "down",
     icon: iconDown,
-    action: ff => ff("move", { offset: 1 })
+    action: ff => ff("move", { offset: 1 }),
+    visibility: block =>
+      block.parentContainer.blocks.indexOf(block) !==
+      block.parentContainer.blocks.length - 1
   }
 ];
 
 const createEditor = (): bre.block.BlockEditor => {
   const $element = helpers.div("bre-block-editor");
 
-  const btns = defaultButtons.map(btn => {
-    const { action, icon, name } = btn;
-    const $btn = helpers.div("bre-block-editor-button", icon);
+  const buttons = defaultButtons.map(button => {
+    const $btn = helpers.div("bre-block-editor-button", button.icon);
     $btn.title = name;
     $element.append($btn);
 
     return {
-      $btn,
-      action
+      $element: $btn,
+      button
     };
   });
 
   return {
     $element,
-    btns
+    buttons
   };
 };
 
-const initBlockEditor = (block: bre.block.Block) => {
+const setupBlockEditor = (block: bre.block.Block) => {
   if (block.blockEditor === undefined) {
     block.blockEditor = createEditor();
 
-    block.blockEditor.btns.forEach(({ $btn, action }) => {
-      $btn.onclick = () => action(block.fire);
+    block.blockEditor.buttons.forEach(({ $element: $btn, button }) => {
+      $btn.onclick = () => button.action(block.fire);
     });
 
     block.$element.prepend(block.blockEditor.$element);
   }
 
+  block.blockEditor.buttons.forEach(({ $element: $btn, button }) => {
+    if (button.visibility !== undefined) {
+      const visible = button.visibility(block);
+      helpers.toggleVisibility($btn, visible);
+    }
+  });
+
   return block.blockEditor;
 };
 
 export const showBlockEditor = (block: bre.block.Block, active: boolean) => {
-  const editor = initBlockEditor(block);
+  const editor = setupBlockEditor(block);
   helpers.toggleVisibility(editor.$element, true);
   helpers.toggleClassName(
     editor.$element,
