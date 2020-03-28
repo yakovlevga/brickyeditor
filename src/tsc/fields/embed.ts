@@ -31,6 +31,8 @@ type EmbedFieldPayload = {
 type EmbedFieldData = bre.field.FieldData<EmbedFieldType, EmbedFieldPayload>;
 type EmbedField = bre.field.Field<EmbedFieldData>;
 
+// const placeholder = helpers.div('')
+
 export const embed: FieldFactory = props => {
   const { $element, data } = props;
 

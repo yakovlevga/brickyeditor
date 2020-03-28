@@ -125,31 +125,6 @@ export const strEqualsInvariant = (s1: string, s2: string) => {
   return s1.toLowerCase() === s2.toLowerCase();
 };
 
-const insertBefore = (
-  el: HTMLElement,
-  elToInsert: HTMLElement | HTMLElement[]
-) => {
-  if (elToInsert instanceof HTMLElement) {
-    if (el.parentNode !== null) {
-      el.parentNode.insertBefore(elToInsert, el);
-    }
-  } else {
-    elToInsert.forEach($el => insertBefore(el, $el));
-  }
-};
-
-const insertAfter = (el: HTMLElement, elToInsert: HTMLElement) => {
-  if (el.parentNode === null) {
-    return;
-  }
-
-  if (el.nextSibling) {
-    el.parentNode.insertBefore(elToInsert, el);
-  } else {
-    el.parentNode.appendChild(elToInsert);
-  }
-};
-
 const convertNodeListToArray = <TNode extends Node>(nl: NodeListOf<TNode>) => {
   return Array.prototype.slice.call(nl) as TNode[];
 };
@@ -164,7 +139,5 @@ export const helpers = {
   readFileAsync,
   objectToArray,
   filterNotNull,
-  convertNodeListToArray,
-  insertBefore,
-  insertAfter
+  convertNodeListToArray
 };

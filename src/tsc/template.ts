@@ -33,8 +33,8 @@ export const loadTemplatesAsync = async (url: string, $editor: HTMLElement) => {
     const $data = helpers.createElement(`<div>${data}</div>`);
 
     const $style = $data.querySelector("style");
-    if ($style !== null) {
-      helpers.insertBefore($editor, $style);
+    if ($style !== null && $editor.parentElement !== null) {
+      $editor.parentElement?.insertBefore($style, $editor);
     }
 
     const $groups = $data.querySelectorAll<HTMLElement>(

@@ -75,21 +75,21 @@ export const addBlockToContainer = (
   container.blocks = [...blocks.slice(0, idx), block, ...blocks.slice(idx)];
 
   // Events
-  block.on("delete", () => {
-    deleteBlock(container, block);
-  });
+  // block.on("delete", () => {
+  //   deleteBlock(container, block);
+  // });
 
-  block.on("clone", () => {
-    copyBlock(container, block);
-  });
+  // block.on("clone", () => {
+  //   copyBlock(container, block);
+  // });
 
-  block.on("move", ev => {
-    moveBlock(container, block, ev !== undefined ? ev.offset : 0);
-  });
+  // block.on("move", ev => {
+  //   moveBlock(container, block, ev !== undefined ? ev.offset : 0);
+  // });
 
-  block.on("select", () => {
-    selectBlock(block);
-  });
+  // block.on("select", () => {
+  //   selectBlock(block);
+  // });
 
   // UI
   toggleContainersPlaceholder(container);
@@ -141,7 +141,8 @@ const createContainer = (
   return container;
 };
 
-function deleteBlock(container: bre.BlocksContainer, block: bre.block.Block) {
+export const deleteBlock = (block: bre.block.Block) => {
+  const container = block.parentContainer;
   // TODO: now this show control the editor state
   // if (container.selectedBlock === block) {
   //   toggleBlockSelection(block, false);
@@ -152,9 +153,10 @@ function deleteBlock(container: bre.BlocksContainer, block: bre.block.Block) {
   (block as any) = null;
 
   toggleContainersPlaceholder(container);
-}
+};
 
-function copyBlock(container: bre.BlocksContainer, block: bre.block.Block) {
+export const copyBlock = (block: bre.block.Block) => {
+  const container = block.parentContainer;
   const idx = container.blocks.indexOf(block) + 1;
   addBlockToContainer(
     container,
@@ -164,40 +166,43 @@ function copyBlock(container: bre.BlocksContainer, block: bre.block.Block) {
     },
     true
   );
-}
+};
 
-function moveBlock(
-  container: bre.BlocksContainer,
-  block: bre.block.Block,
-  offset: number
-) {
-  const idx = container.blocks.indexOf(block);
-  const new_idx = idx + offset;
+export const moveBlock = (block: bre.block.Block, offset: number) => {
+  const { $element, parentContainer } = block;
 
-  if (new_idx >= container.blocks.length || new_idx < 0) {
+  if ($element.parentElement === null) {
     return;
   }
 
-  const $anchorBlock = container.blocks[new_idx].$element;
-  if ($anchorBlock) {
+  const idx = parentContainer.blocks.indexOf(block);
+  const new_idx = idx + offset;
+
+  if (new_idx >= parentContainer.blocks.length || new_idx < 0) {
+    return;
+  }
+
+  const $referenceElement = parentContainer.blocks[new_idx].$element;
+  if ($referenceElement) {
     if (offset > 0) {
-      helpers.insertAfter($anchorBlock, block.$element);
+      $element.parentElement.insertBefore($referenceElement, $element);
     } else if (offset < 0) {
-      helpers.insertBefore($anchorBlock, block.$element);
+      $element.parentElement.insertBefore($element, $referenceElement);
     }
   }
 
-  selectBlock(block);
   // showBlockEditor(block);
 
-  container.blocks.splice(idx, 1);
-  container.blocks.splice(new_idx, 0, block);
+  parentContainer.blocks.splice(idx, 1);
+  parentContainer.blocks.splice(new_idx, 0, block);
 
   // this.onMoveBlock(block, idx, new_idx);
 
   // Scroll to block
   // block.scrollTo();
-}
+  //debugger;
+  // selectBlock(block);
+};
 
 // export const deselectBlock = (block: bre.block.Block) => {
 //   const container = block.parentContainer;

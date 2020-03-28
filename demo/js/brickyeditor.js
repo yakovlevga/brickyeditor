@@ -201,27 +201,6 @@ var BrickyEditor = (function (exports) {
         }
         return s1.toLowerCase() === s2.toLowerCase();
     };
-    var insertBefore = function (el, elToInsert) {
-        if (elToInsert instanceof HTMLElement) {
-            if (el.parentNode !== null) {
-                el.parentNode.insertBefore(elToInsert, el);
-            }
-        }
-        else {
-            elToInsert.forEach(function ($el) { return insertBefore(el, $el); });
-        }
-    };
-    var insertAfter = function (el, elToInsert) {
-        if (el.parentNode === null) {
-            return;
-        }
-        if (el.nextSibling) {
-            el.parentNode.insertBefore(elToInsert, el);
-        }
-        else {
-            el.parentNode.appendChild(elToInsert);
-        }
-    };
     var convertNodeListToArray = function (nl) {
         return Array.prototype.slice.call(nl);
     };
@@ -235,9 +214,7 @@ var BrickyEditor = (function (exports) {
         readFileAsync: readFileAsync,
         objectToArray: objectToArray,
         filterNotNull: filterNotNull,
-        convertNodeListToArray: convertNodeListToArray,
-        insertBefore: insertBefore,
-        insertAfter: insertAfter
+        convertNodeListToArray: convertNodeListToArray
     };
     //# sourceMappingURL=helpers.js.map
 
@@ -1224,20 +1201,21 @@ var BrickyEditor = (function (exports) {
     };
     var loadTemplatesAsync = function (url, $editor) { return __awaiter(void 0, void 0, void 0, function () {
         var grouppedTemplates, data, $data, $style, $groups, ungrouppedTemplates, ungrouppedTemplatesGroupName, err_1;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
+        var _a;
+        return __generator(this, function (_b) {
+            switch (_b.label) {
                 case 0:
                     grouppedTemplates = [];
-                    _a.label = 1;
+                    _b.label = 1;
                 case 1:
-                    _a.trys.push([1, 3, , 4]);
+                    _b.trys.push([1, 3, , 4]);
                     return [4, getRequest(url)];
                 case 2:
-                    data = _a.sent();
+                    data = _b.sent();
                     $data = helpers.createElement("<div>" + data + "</div>");
                     $style = $data.querySelector("style");
-                    if ($style !== null) {
-                        helpers.insertBefore($editor, $style);
+                    if ($style !== null && $editor.parentElement !== null) {
+                        (_a = $editor.parentElement) === null || _a === void 0 ? void 0 : _a.insertBefore($style, $editor);
                     }
                     $groups = $data.querySelectorAll(TEMPLATE_GROUP_SELECTOR);
                     $groups.forEach(function ($group) {
@@ -1258,7 +1236,7 @@ var BrickyEditor = (function (exports) {
                     allTemplates = __spreadArrays(allTemplates, ungrouppedTemplates);
                     return [2, grouppedTemplates];
                 case 3:
-                    err_1 = _a.sent();
+                    err_1 = _b.sent();
                     throw err_1;
                 case 4: return [2];
             }
@@ -1289,7 +1267,6 @@ var BrickyEditor = (function (exports) {
             $preview: $preview
         };
     };
-    //# sourceMappingURL=template.js.map
 
     var iconDelete = "<svg viewBox=\"0 0 512 512\">\n  <path stroke-width=\"32\" d=\"M112 112l20 320c.95 18.49 14.4 32 32 32h184c17.67 0 30.87-13.51 32-32l20-320\"/>\n  <path stroke-miterlimit=\"10\" stroke-width=\"32\" d=\"M80 112h352\"/>\n  <path stroke-width=\"32\" d=\"M192 112V72h0a23.93 23.93 0 0124-24h80a23.93 23.93 0 0124 24h0v40M256 176v224M184 176l8 224M328 176l-8 224\"/>\n</svg>";
     //# sourceMappingURL=iconDelete.js.map
@@ -1307,25 +1284,25 @@ var BrickyEditor = (function (exports) {
         {
             name: "delete",
             icon: iconDelete,
-            action: function (ff) { return ff("delete"); }
+            action: function (block) { return deleteBlock(block); }
         },
         {
             name: "clone",
             icon: iconCopy,
-            action: function (ff) { return ff("clone"); }
+            action: function (block) { return copyBlock(block); }
         },
         {
             name: "up",
             icon: iconUp,
-            action: function (ff) { return ff("move", { offset: -1 }); },
-            visibility: function (block) { return block.parentContainer.blocks.indexOf(block) !== 0; }
+            action: function (block) { return moveBlock(block, -1); },
+            disabled: function (block) { return block.parentContainer.blocks.indexOf(block) === 0; }
         },
         {
             name: "down",
             icon: iconDown,
-            action: function (ff) { return ff("move", { offset: 1 }); },
-            visibility: function (block) {
-                return block.parentContainer.blocks.indexOf(block) !==
+            action: function (block) { return moveBlock(block, 1); },
+            disabled: function (block) {
+                return block.parentContainer.blocks.indexOf(block) ===
                     block.parentContainer.blocks.length - 1;
             }
         }
@@ -1351,18 +1328,30 @@ var BrickyEditor = (function (exports) {
             block.blockEditor = createEditor();
             block.blockEditor.buttons.forEach(function (_a) {
                 var $btn = _a.$element, button = _a.button;
-                $btn.onclick = function () { return button.action(block.fire); };
+                $btn.onclick = function (ev) {
+                    ev.stopPropagation();
+                    if (button.disabled !== undefined && button.disabled(block)) {
+                        return;
+                    }
+                    button.action(block);
+                    checkButtonsState(block);
+                };
             });
             block.$element.prepend(block.blockEditor.$element);
         }
-        block.blockEditor.buttons.forEach(function (_a) {
-            var $btn = _a.$element, button = _a.button;
-            if (button.visibility !== undefined) {
-                var visible = button.visibility(block);
-                helpers.toggleVisibility($btn, visible);
-            }
-        });
+        checkButtonsState(block);
         return block.blockEditor;
+    };
+    var checkButtonsState = function (block) {
+        if (block.blockEditor) {
+            block.blockEditor.buttons.forEach(function (_a) {
+                var $btn = _a.$element, button = _a.button;
+                if (button.disabled !== undefined) {
+                    var disabled = button.disabled(block);
+                    helpers.toggleClassName($btn, "bre-block-editor-button-disabled", disabled);
+                }
+            });
+        }
     };
     var showBlockEditor = function (block, active) {
         var editor = setupBlockEditor(block);
@@ -1377,6 +1366,7 @@ var BrickyEditor = (function (exports) {
             helpers.toggleClassName(editor.$element, "bre-block-editor-vertical", false);
         }
     };
+    //# sourceMappingURL=blockEditor.js.map
 
     var getInitialState = function () { return ({
         selectedField: null,
@@ -1528,18 +1518,6 @@ var BrickyEditor = (function (exports) {
                     : blocks.length;
         }
         container.blocks = __spreadArrays(blocks.slice(0, idx), [block], blocks.slice(idx));
-        block.on("delete", function () {
-            deleteBlock(container, block);
-        });
-        block.on("clone", function () {
-            copyBlock(container, block);
-        });
-        block.on("move", function (ev) {
-            moveBlock(container, block, ev !== undefined ? ev.offset : 0);
-        });
-        block.on("select", function () {
-            selectBlock(block);
-        });
         toggleContainersPlaceholder(container);
         var $container = container.$element;
         var $block = block.$element;
@@ -1571,38 +1549,43 @@ var BrickyEditor = (function (exports) {
         toggleContainersPlaceholder(container);
         return container;
     };
-    function deleteBlock(container, block) {
+    var deleteBlock = function (block) {
+        var container = block.parentContainer;
         container.blocks = container.blocks.filter(function (b) { return b !== block; });
         block.$element.remove();
         block = null;
         toggleContainersPlaceholder(container);
-    }
-    function copyBlock(container, block) {
+    };
+    var copyBlock = function (block) {
+        var container = block.parentContainer;
         var idx = container.blocks.indexOf(block) + 1;
         addBlockToContainer(container, {
             idx: idx,
             blockData: block.data
         }, true);
-    }
-    function moveBlock(container, block, offset) {
-        var idx = container.blocks.indexOf(block);
-        var new_idx = idx + offset;
-        if (new_idx >= container.blocks.length || new_idx < 0) {
+    };
+    var moveBlock = function (block, offset) {
+        var $element = block.$element, parentContainer = block.parentContainer;
+        if ($element.parentElement === null) {
             return;
         }
-        var $anchorBlock = container.blocks[new_idx].$element;
-        if ($anchorBlock) {
+        var idx = parentContainer.blocks.indexOf(block);
+        var new_idx = idx + offset;
+        if (new_idx >= parentContainer.blocks.length || new_idx < 0) {
+            return;
+        }
+        var $referenceElement = parentContainer.blocks[new_idx].$element;
+        if ($referenceElement) {
             if (offset > 0) {
-                helpers.insertAfter($anchorBlock, block.$element);
+                $element.parentElement.insertBefore($referenceElement, $element);
             }
             else if (offset < 0) {
-                helpers.insertBefore($anchorBlock, block.$element);
+                $element.parentElement.insertBefore($element, $referenceElement);
             }
         }
-        selectBlock(block);
-        container.blocks.splice(idx, 1);
-        container.blocks.splice(new_idx, 0, block);
-    }
+        parentContainer.blocks.splice(idx, 1);
+        parentContainer.blocks.splice(new_idx, 0, block);
+    };
     //# sourceMappingURL=blocksContainer.js.map
 
     var defaultButtons$1 = [

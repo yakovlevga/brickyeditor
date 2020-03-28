@@ -4,30 +4,31 @@ import { iconDelete } from "@/icons/iconDelete";
 import { iconCopy } from "@/icons/iconCopy";
 import { iconUp } from "@/icons/iconUp";
 import { iconDown } from "@/icons/iconDown";
+import { deleteBlock, copyBlock, moveBlock } from "@/blocksContainer";
 
 const defaultButtons: bre.block.BlockEditorButton[] = [
   {
     name: "delete",
     icon: iconDelete,
-    action: ff => ff("delete")
+    action: block => deleteBlock(block)
   },
   {
     name: "clone",
     icon: iconCopy,
-    action: ff => ff("clone")
+    action: block => copyBlock(block)
   },
   {
     name: "up",
     icon: iconUp,
-    action: ff => ff("move", { offset: -1 }),
-    visibility: block => block.parentContainer.blocks.indexOf(block) !== 0
+    action: block => moveBlock(block, -1),
+    disabled: block => block.parentContainer.blocks.indexOf(block) === 0
   },
   {
     name: "down",
     icon: iconDown,
-    action: ff => ff("move", { offset: 1 }),
-    visibility: block =>
-      block.parentContainer.blocks.indexOf(block) !==
+    action: block => moveBlock(block, 1),
+    disabled: block =>
+      block.parentContainer.blocks.indexOf(block) ===
       block.parentContainer.blocks.length - 1
   }
 ];
@@ -57,20 +58,38 @@ const setupBlockEditor = (block: bre.block.Block) => {
     block.blockEditor = createEditor();
 
     block.blockEditor.buttons.forEach(({ $element: $btn, button }) => {
-      $btn.onclick = () => button.action(block.fire);
+      $btn.onclick = ev => {
+        ev.stopPropagation();
+
+        if (button.disabled !== undefined && button.disabled(block)) {
+          return;
+        }
+
+        button.action(block);
+        checkButtonsState(block);
+      };
     });
 
     block.$element.prepend(block.blockEditor.$element);
   }
 
-  block.blockEditor.buttons.forEach(({ $element: $btn, button }) => {
-    if (button.visibility !== undefined) {
-      const visible = button.visibility(block);
-      helpers.toggleVisibility($btn, visible);
-    }
-  });
-
+  checkButtonsState(block);
   return block.blockEditor;
+};
+
+const checkButtonsState = (block: bre.block.Block) => {
+  if (block.blockEditor) {
+    block.blockEditor.buttons.forEach(({ $element: $btn, button }) => {
+      if (button.disabled !== undefined) {
+        const disabled = button.disabled(block);
+        helpers.toggleClassName(
+          $btn,
+          "bre-block-editor-button-disabled",
+          disabled
+        );
+      }
+    });
+  }
 };
 
 export const showBlockEditor = (block: bre.block.Block, active: boolean) => {

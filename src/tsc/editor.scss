@@ -6,4 +6,20 @@
   &-hidden {
     display: none;
   }
+
+  &-icon {
+    stroke: #000000;
+    stroke-linecap: "round";
+    stroke-linejoin: "round";
+    fill: none;
+
+    &-light {
+      stroke: #ffffff;
+    }
+
+    &-32 {
+      width: 32px;
+      height: 32px;
+    }
+  }
 }

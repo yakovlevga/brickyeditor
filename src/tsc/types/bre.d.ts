@@ -180,8 +180,8 @@ declare namespace bre {
     type BlockEditorButton = {
       name: string;
       icon: string;
-      action: (ff: bre.event.FireFunc<bre.block.BlockEventMap>) => void;
-      visibility?: (block: bre.block.Block) => boolean;
+      action: (block: bre.block.Block) => void;
+      disabled?: (block: bre.block.Block) => boolean;
     };
 
     type BlockEditor = {
