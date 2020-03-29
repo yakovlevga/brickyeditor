@@ -1,5 +1,5 @@
 import { bre } from "@/types/bre";
-import { dialog } from "@/modal";
+import { modal } from "@/modal";
 
 export const propmtFieldEditorAsync = <TFieldData extends bre.field.FieldData>({
   editor,
@@ -13,7 +13,7 @@ export const propmtFieldEditorAsync = <TFieldData extends bre.field.FieldData>({
 
     const { $element: $editor, data: updatedData } = editor(data);
 
-    dialog(
+    modal(
       $editor,
       () => {
         resolve(updatedData);

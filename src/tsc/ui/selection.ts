@@ -22,34 +22,3 @@ export const restoreSelection = (selectionRanges: Range[] | null) => {
     selectionRanges.forEach(range => selection.addRange(range));
   }
 };
-
-export const bindTextSelection = (
-  $el: HTMLElement,
-  handler: (rect: ClientRect | null) => any
-) => {
-  if (!$el.contentEditable) {
-    return;
-  }
-
-  $el.addEventListener("mouseup", () => {
-    setTimeout(() => {
-      const rect = getSelectionRect();
-      handler(rect);
-    }, 0);
-  });
-
-  $el.addEventListener("keyup", () => {
-    const rect = getSelectionRect();
-    handler(rect);
-  });
-};
-
-const getSelectionRect = () => {
-  const selection = window.getSelection();
-  if (selection === null) {
-    return null;
-  }
-
-  const range = selection.getRangeAt(0);
-  return range.getBoundingClientRect();
-};

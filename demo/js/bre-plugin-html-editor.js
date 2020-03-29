@@ -155,12 +155,6 @@ var brePluginHtmlEditor = (function (exports) {
     var filterNotNull = function (value) {
         return value.filter(function (x) { return x !== null; });
     };
-    var strEqualsInvariant = function (s1, s2) {
-        if (!s1 || !s2) {
-            return s1 === s2;
-        }
-        return s1.toLowerCase() === s2.toLowerCase();
-    };
     var convertNodeListToArray = function (nl) {
         return Array.prototype.slice.call(nl);
     };
@@ -176,7 +170,6 @@ var brePluginHtmlEditor = (function (exports) {
         filterNotNull: filterNotNull,
         convertNodeListToArray: convertNodeListToArray
     };
-    //# sourceMappingURL=helpers.js.map
 
     var renderLabel = function ($root, $input, _a) {
         var title = _a.title;
@@ -255,7 +248,6 @@ var brePluginHtmlEditor = (function (exports) {
         $root.append($select);
         return $root;
     };
-    //# sourceMappingURL=inputs.js.map
 
     var locales = {
         errorBlocksFileNotFound: function (url) {
@@ -329,7 +321,6 @@ var brePluginHtmlEditor = (function (exports) {
         buttonCancel: "Cancel",
         defaultTemplatesGroupName: "Other templates",
     };
-    //# sourceMappingURL=locales.js.map
 
     var linkEditor = function (initialData) {
         var data = initialData ? __assign({}, initialData) : {};
@@ -349,105 +340,18 @@ var brePluginHtmlEditor = (function (exports) {
             data: data
         };
     };
-    //# sourceMappingURL=linkEditor.js.map
 
-    var getSelectionRanges = function () {
-        var selection = window.getSelection();
-        if (selection === null) {
-            return null;
-        }
-        var selectionRanges = [];
-        for (var idx = 0; idx < selection.rangeCount; idx++) {
-            selectionRanges.push(selection.getRangeAt(idx));
-        }
-        return selectionRanges;
-    };
-    var restoreSelection = function (selectionRanges) {
-        if (selectionRanges === null || selectionRanges.length === 0) {
-            return;
-        }
-        var selection = window.getSelection();
-        if (selection !== null) {
-            selection.removeAllRanges();
-            selectionRanges.forEach(function (range) { return selection.addRange(range); });
-        }
-    };
-    var bindTextSelection = function ($el, handler) {
-        if (!$el.contentEditable) {
-            return;
-        }
-        $el.addEventListener("mouseup", function () {
-            setTimeout(function () {
-                var rect = getSelectionRect();
-                handler(rect);
-            }, 0);
-        });
-        $el.addEventListener("keyup", function () {
-            var rect = getSelectionRect();
-            handler(rect);
-        });
-    };
-    var getSelectionRect = function () {
-        var selection = window.getSelection();
-        if (selection === null) {
-            return null;
-        }
-        var range = selection.getRangeAt(0);
-        return range.getBoundingClientRect();
-    };
-    //# sourceMappingURL=selection.js.map
-
-    var dialog = function ($content, ok, cancel) {
-        var selection = getSelectionRanges();
-        var root = helpers.div("bre-modal");
-        var close = function () {
-            root.remove();
-            restoreSelection(selection);
-        };
-        var $ok = helpers.el({
-            tag: "button",
-            props: {
-                type: "button",
-                onclick: function () {
-                    if (ok) {
-                        ok();
-                    }
-                    close();
-                },
-                innerHTML: "Ok"
-            }
-        });
-        var $cancel = helpers.el({
-            tag: "button",
-            props: {
-                type: "button",
-                onclick: function () {
-                    if (cancel) {
-                        cancel();
-                    }
-                    close();
-                },
-                innerHTML: "Cancel"
-            }
-        });
-        var $placeholder = helpers.div("bre-modal-placeholder");
-        $placeholder.append($content, $ok, $cancel);
-        root.append($placeholder);
-        document.body.appendChild(root);
-    };
-    //# sourceMappingURL=modal.js.map
-
-    var promptLinkParamsAsync = function (initialData) {
+    var promptLinkParamsAsync = function (modal, initialData) {
         return new Promise(function (resolve) {
             var _a = linkEditor(initialData), $editor = _a.$element, updatedData = _a.data;
-            dialog($editor, function () {
+            modal($editor, function () {
                 resolve(updatedData);
             }, function () {
                 resolve(null);
             });
         });
     };
-    var renderButtonElement = function (_a) {
+    var renderButtonElement = function (modal, helpers, _a) {
         var icon = _a.icon, command = _a.command, range = _a.range, aValueArgument = _a.aValueArgument;
         var $btn = helpers.el({
             tag: "button",
@@ -476,7 +380,7 @@ var brePluginHtmlEditor = (function (exports) {
                                 target: selectedLink.target
                             }
                             : {};
-                        return [4, promptLinkParamsAsync(currentLink)];
+                        return [4, promptLinkParamsAsync(modal, currentLink)];
                     case 1:
                         updatedLink = _a.sent();
                         if (updatedLink !== null && updatedLink.href) {
@@ -501,7 +405,7 @@ var brePluginHtmlEditor = (function (exports) {
                             document.execCommand(command, false, valueArgument);
                         }
                         catch (_b) {
-                            wrapSelectionToContainer(selection);
+                            wrapSelectionToContainer(helpers, selection);
                             document.execCommand(command, false, valueArgument);
                         }
                         _a.label = 3;
@@ -514,20 +418,22 @@ var brePluginHtmlEditor = (function (exports) {
     var getSeletedLink = function (selection) {
         if (selection.anchorNode !== null &&
             selection.anchorNode.parentNode !== null &&
-            strEqualsInvariant(selection.anchorNode.parentNode.nodeName, "a")) {
+            selection.anchorNode.parentNode.nodeName.toLowerCase() === "a") {
             return selection.anchorNode.parentNode;
         }
         return null;
     };
-    var renderControl = function (buttons) {
+    var renderControl = function (modal, helpers, buttons) {
         var $panel = helpers.createElement('<div class="bre-html-tools-panel"></div>');
-        buttons.map(renderButtonElement).forEach(function ($btn) { return $panel.appendChild($btn); });
+        buttons
+            .map(function (btn) { return renderButtonElement(modal, helpers, btn); })
+            .forEach(function ($btn) { return $panel.appendChild($btn); });
         var $controlRoot = helpers.createElement('<div class="bre-html-tools bre-btn-group"></div>');
         $controlRoot.appendChild($panel);
         helpers.toggleVisibility($controlRoot, false);
         return $controlRoot;
     };
-    var wrapSelectionToContainer = function (selection) {
+    var wrapSelectionToContainer = function (helpers, selection) {
         if (selection.anchorNode === null) {
             return;
         }
@@ -543,15 +449,15 @@ var brePluginHtmlEditor = (function (exports) {
             selection.addRange(range);
         }
     };
-    var initHtmlTools = function (buttons) {
+    var initHtmlTools = function (modal, helpers, buttons) {
         if (buttons === undefined || buttons.length === 0) {
             return null;
         }
-        var $control = renderControl(buttons);
+        var $control = renderControl(modal, helpers, buttons);
         document.body.appendChild($control);
         return $control;
     };
-    var toggleHtmlTools = function ($control, rect) {
+    var toggleHtmlTools = function ($control, rect, helpers) {
         if (rect !== null && rect.width > 1) {
             var top = rect.top + rect.height;
             var left = rect.left;
@@ -563,7 +469,29 @@ var brePluginHtmlEditor = (function (exports) {
             helpers.toggleVisibility($control, false);
         }
     };
-    //# sourceMappingURL=htmlTools.js.map
+    var bindTextSelection = function ($el, handler) {
+        if (!$el.contentEditable) {
+            return;
+        }
+        $el.addEventListener("mouseup", function () {
+            setTimeout(function () {
+                var rect = getSelectionRect();
+                handler(rect);
+            }, 0);
+        });
+        $el.addEventListener("keyup", function () {
+            var rect = getSelectionRect();
+            handler(rect);
+        });
+    };
+    var getSelectionRect = function () {
+        var selection = window.getSelection();
+        if (selection === null) {
+            return null;
+        }
+        var range = selection.getRangeAt(0);
+        return range.getBoundingClientRect();
+    };
 
     var defaultOptions = {
         buttons: [
@@ -586,12 +514,12 @@ var brePluginHtmlEditor = (function (exports) {
     };
     var plugin = {
         init: function (editor, options) {
-            var $control = initHtmlTools(defaultOptions.buttons);
+            var $control = initHtmlTools(editor.shared.modal, editor.shared.helpers, defaultOptions.buttons);
             if ($control === null) {
                 return;
             }
             var onSelect = function (rect) {
-                toggleHtmlTools($control, rect);
+                toggleHtmlTools($control, rect, editor.shared.helpers);
             };
             editor.on("fieldCreate", function (_a) {
                 var field = _a.sender;

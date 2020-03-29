@@ -1,5 +1,5 @@
-import { NoembedResponse } from "@/noembed";
 import { ContainerField } from "@/fields/container";
+import { helpers } from "@/helpers";
 
 // This types is for mock cases
 declare type Mutable<T> = { -readonly [P in keyof T]: T[P] };
@@ -38,6 +38,14 @@ declare namespace bre {
     plugins?: Array<{ plugin: EditorPlugin }>;
   };
 
+  type EditorModal = (
+    $content: HTMLElement,
+    ok?: () => void,
+    cancel?: () => void
+  ) => void;
+
+  type EditorHelpers = typeof helpers;
+
   type BlocksContainerEvent = {
     container: bre.BlocksContainer;
   };
@@ -68,12 +76,15 @@ declare namespace bre {
 
   type Editor = bre.event.Emitter<bre.event.EventMaps> & {
     $element: HTMLElement;
-    rootContainer: BlocksContainer;
     data: () => bre.block.BlockData[];
     html: () => string;
 
     state: EditorState;
     options: EditorOptions;
+    shared: {
+      modal: EditorModal;
+      helpers: EditorHelpers;
+    };
   };
 
   namespace event {

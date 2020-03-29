@@ -1,14 +1,15 @@
 import { bre } from "@/types/bre";
-import { helpers, strEqualsInvariant } from "@/helpers";
 import { linkEditor } from "@/fields/linkEditor";
-import { dialog } from "@/modal";
 import { HtmlToolsButton } from "./index";
 
-const promptLinkParamsAsync = (initialData: Readonly<bre.LinkData>) =>
+const promptLinkParamsAsync = (
+  modal: bre.EditorModal,
+  initialData: Readonly<bre.LinkData>
+) =>
   new Promise<bre.LinkData | null>(resolve => {
     const { $element: $editor, data: updatedData } = linkEditor(initialData);
 
-    dialog(
+    modal(
       $editor,
       () => {
         resolve(updatedData);
@@ -19,12 +20,11 @@ const promptLinkParamsAsync = (initialData: Readonly<bre.LinkData>) =>
     );
   });
 
-const renderButtonElement = ({
-  icon,
-  command,
-  range,
-  aValueArgument
-}: HtmlToolsButton): HTMLElement => {
+const renderButtonElement = (
+  modal: bre.EditorModal,
+  helpers: bre.EditorHelpers,
+  { icon, command, range, aValueArgument }: HtmlToolsButton
+): HTMLElement => {
   const $btn = helpers.el({
     tag: "button",
     className: "bre-button" as BreStyles,
@@ -55,7 +55,7 @@ const renderButtonElement = ({
             }
           : {};
 
-      const updatedLink = await promptLinkParamsAsync(currentLink);
+      const updatedLink = await promptLinkParamsAsync(modal, currentLink);
 
       if (updatedLink !== null && updatedLink.href) {
         document.execCommand(command, false, updatedLink.href);
@@ -91,7 +91,7 @@ const renderButtonElement = ({
       try {
         document.execCommand(command, false, valueArgument);
       } catch {
-        wrapSelectionToContainer(selection);
+        wrapSelectionToContainer(helpers, selection);
         document.execCommand(command, false, valueArgument);
       }
     }
@@ -106,7 +106,7 @@ const getSeletedLink = (selection: Selection) => {
   if (
     selection.anchorNode !== null &&
     selection.anchorNode.parentNode !== null &&
-    strEqualsInvariant(selection.anchorNode.parentNode.nodeName, "a")
+    selection.anchorNode.parentNode.nodeName.toLowerCase() === "a"
   ) {
     return selection.anchorNode.parentNode as HTMLLinkElement;
   }
@@ -114,12 +114,18 @@ const getSeletedLink = (selection: Selection) => {
   return null;
 };
 
-const renderControl = (buttons: HtmlToolsButton[]) => {
+const renderControl = (
+  modal: bre.EditorModal,
+  helpers: bre.EditorHelpers,
+  buttons: HtmlToolsButton[]
+) => {
   const $panel = helpers.createElement(
     '<div class="bre-html-tools-panel"></div>'
   );
 
-  buttons.map(renderButtonElement).forEach($btn => $panel.appendChild($btn));
+  buttons
+    .map(btn => renderButtonElement(modal, helpers, btn))
+    .forEach($btn => $panel.appendChild($btn));
 
   const $controlRoot = helpers.createElement(
     '<div class="bre-html-tools bre-btn-group"></div>'
@@ -132,7 +138,10 @@ const renderControl = (buttons: HtmlToolsButton[]) => {
 
 // ** Firefox execCommand hack */
 // TODO: Check if it was fixed in latest versions
-const wrapSelectionToContainer = (selection: Selection) => {
+const wrapSelectionToContainer = (
+  helpers: bre.EditorHelpers,
+  selection: Selection
+) => {
   if (selection.anchorNode === null) {
     return;
   }
@@ -154,12 +163,16 @@ const wrapSelectionToContainer = (selection: Selection) => {
   }
 };
 
-export const initHtmlTools = (buttons?: HtmlToolsButton[]) => {
+export const initHtmlTools = (
+  modal: bre.EditorModal,
+  helpers: bre.EditorHelpers,
+  buttons?: HtmlToolsButton[]
+) => {
   if (buttons === undefined || buttons.length === 0) {
     return null;
   }
 
-  const $control = renderControl(buttons);
+  const $control = renderControl(modal, helpers, buttons);
   document.body.appendChild($control);
 
   return $control;
@@ -167,9 +180,9 @@ export const initHtmlTools = (buttons?: HtmlToolsButton[]) => {
 
 export const toggleHtmlTools = (
   $control: HTMLElement,
-  rect: ClientRect | null
+  rect: ClientRect | null,
+  helpers: bre.EditorHelpers
 ) => {
-  // check if some text is seleted
   if (rect !== null && rect.width > 1) {
     const top = rect.top + rect.height;
     const left = rect.left;
@@ -179,4 +192,35 @@ export const toggleHtmlTools = (
   } else {
     helpers.toggleVisibility($control, false);
   }
+};
+
+export const bindTextSelection = (
+  $el: HTMLElement,
+  handler: (rect: ClientRect | null) => any
+) => {
+  if (!$el.contentEditable) {
+    return;
+  }
+
+  $el.addEventListener("mouseup", () => {
+    setTimeout(() => {
+      const rect = getSelectionRect();
+      handler(rect);
+    }, 0);
+  });
+
+  $el.addEventListener("keyup", () => {
+    const rect = getSelectionRect();
+    handler(rect);
+  });
+};
+
+const getSelectionRect = () => {
+  const selection = window.getSelection();
+  if (selection === null) {
+    return null;
+  }
+
+  const range = selection.getRangeAt(0);
+  return range.getBoundingClientRect();
 };

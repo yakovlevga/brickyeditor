@@ -12,6 +12,7 @@ import { getTemplateSelector } from "@/ui/templateSelector";
 import { helpers } from "@/helpers";
 import { getInitialState } from "@/editorState";
 import { emitter } from "./emitter";
+import { modal } from "@/modal";
 
 export class Editor {
   constructor($editor: HTMLElement, options: bre.EditorOptions) {
@@ -31,19 +32,23 @@ export const editor = (
 
     const eventEmitter = emitter();
 
-    const editor = {
+    const state = getInitialState();
+    const editor: bre.Editor = {
+      ...eventEmitter,
       $element,
-      state: getInitialState(),
+      data: () => getBlocksData(state),
+      html: () => getBlocksHtml(state),
+      state,
       options: optionsWithDefaults,
-      ...eventEmitter
-    } as bre.Editor;
+      shared: {
+        modal,
+        helpers
+      }
+    };
 
     const rootContainer = createRootContainer(editor);
 
-    editor.rootContainer = rootContainer;
     editor.state.selectedContainers = [rootContainer];
-    editor.data = () => getContainerData(rootContainer);
-    editor.html = () => getContainerHtml(rootContainer);
 
     if (options.plugins) {
       options.plugins.map(({ plugin }) => plugin.init(editor));
@@ -80,6 +85,13 @@ export const editor = (
 
     resolve(editor);
   });
+
+const getBlocksData = (state: bre.EditorState): bre.block.BlockData[] => {
+  throw Error("not implemented");
+};
+const getBlocksHtml = (state: bre.EditorState): string => {
+  throw Error("not implemented");
+};
 
 const loadInitialBlocks = ({ blocks, blocksUrl }: bre.EditorOptions) =>
   new Promise<bre.block.BlockData[] | null>(async (resolve, reject) => {

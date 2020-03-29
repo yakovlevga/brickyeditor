@@ -1,7 +1,8 @@
+import { bre } from "@/types/bre";
 import { getSelectionRanges, restoreSelection } from "@/ui/selection";
 import { helpers } from "@/helpers";
 
-export const dialog = (
+export const modal: bre.EditorModal = (
   $content: HTMLElement,
   ok?: () => void,
   cancel?: () => void

@@ -1,6 +1,5 @@
 import { bre } from "@/types/bre";
-import { initHtmlTools, toggleHtmlTools } from "./htmlTools";
-import { bindTextSelection } from "@/ui/selection";
+import { initHtmlTools, toggleHtmlTools, bindTextSelection } from "./htmlTools";
 
 type HtmlToolsButtonCommands =
   | "Bold"
@@ -44,14 +43,18 @@ const defaultOptions: Required<HtmlToolsOptions> = {
 
 export const plugin = {
   init: (editor: bre.Editor, options: HtmlToolsOptions) => {
-    const $control = initHtmlTools(defaultOptions.buttons);
+    const $control = initHtmlTools(
+      editor.shared.modal,
+      editor.shared.helpers,
+      defaultOptions.buttons
+    );
 
     if ($control === null) {
       return;
     }
 
-    const onSelect: Parameters<typeof bindTextSelection>[1] = rect => {
-      toggleHtmlTools($control, rect);
+    const onSelect = (rect: ClientRect | null) => {
+      toggleHtmlTools($control, rect, editor.shared.helpers);
     };
 
     editor.on("fieldCreate", ({ sender: field }) => {
