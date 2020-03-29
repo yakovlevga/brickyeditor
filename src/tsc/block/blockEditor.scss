@@ -12,6 +12,10 @@ $zIndex: 100;
     background-color: rgba(0, 0, 0, 0.8);
     border-radius: 20px;
 
+    &:hover {
+      opacity: 1;
+    }
+
     &-button {
       cursor: pointer;
       width: $size;
@@ -42,6 +46,7 @@ $zIndex: 100;
       top: 0;
       left: -($size + 4 * $padding);
       flex-direction: column;
+      opacity: 0.8;
     }
   }
 }
