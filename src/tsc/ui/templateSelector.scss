@@ -26,6 +26,7 @@ $fixed-z-index: 100;
 
   &-group {
     padding: 0 1rem 1rem;
+    user-select: none;
 
     &-name {
       cursor: pointer;
@@ -37,6 +38,7 @@ $fixed-z-index: 100;
     }
 
     &-item {
+      cursor: pointer;
       background-color: #ffffff;
       margin-bottom: 1rem;
       padding: 0.5rem;

@@ -24,11 +24,15 @@ export const editor = (
   options: bre.EditorOptions = defaultOptions
 ) =>
   new Promise<bre.Editor>(async resolve => {
-    const optionsWithDefaults = { ...defaultOptions, ...options };
+    const optionsWithDefaults: bre.EditorOptions = {
+      ...defaultOptions,
+      ...options
+    };
 
     const editor = {
       $element,
-      state: getInitialState()
+      state: getInitialState(),
+      options: optionsWithDefaults
     } as bre.Editor;
 
     const rootContainer = createRootContainer(editor);

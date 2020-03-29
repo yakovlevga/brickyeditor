@@ -28,11 +28,7 @@
 }
 
 .bre-template {
-  min-height: 48px;
   .bre-container-placeholder {
-    & > svg {
-      width: 16px;
-      height: 16px;
-    }
+    min-height: 48px;
   }
 }

@@ -30,6 +30,10 @@ declare namespace bre {
     formSelector?: string;
     /** Input selector to put json to on form submit */
     inputSelector?: string;
+
+    templateSelector: {
+      zoom: boolean;
+    };
   };
 
   type BlocksContainerEvent = {
@@ -67,6 +71,7 @@ declare namespace bre {
     html: () => string;
 
     state: EditorState;
+    options: EditorOptions;
   };
 
   namespace event {

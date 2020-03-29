@@ -5,7 +5,8 @@ import { bre } from "@/types/bre";
 import { bindTemplateFields } from "@/fields/fields";
 import {
   TEMPLATE_GROUP_SELECTOR,
-  TEMPLATE_PREVIEW_SELECTOR
+  TEMPLATE_PREVIEW_SELECTOR,
+  TEMPLATE_SELECTOR
 } from "./constants";
 
 let allTemplates: bre.template.Template[] = [];
@@ -73,21 +74,12 @@ export const loadTemplatesAsync = async (url: string, $editor: HTMLElement) => {
   }
 };
 
-const templateClassName: BreStyles = "bre-template";
-const templateSelector = `.${templateClassName}`;
-
 const parseTemplates = ($el: HTMLElement): bre.template.Template[] => {
-  const $templates = $el.querySelectorAll<HTMLElement>(templateSelector);
+  const $templates = $el.querySelectorAll<HTMLElement>(TEMPLATE_SELECTOR);
   const templates = helpers
     .convertNodeListToArray($templates)
     .map(createTemplate);
   return helpers.filterNotNull(templates);
-};
-
-export const getTemplatePreview = (template: bre.template.Template) => {
-  const $template = helpers.div("bre-template");
-  $template.appendChild(template.$preview);
-  return $template;
 };
 
 const createTemplate = (

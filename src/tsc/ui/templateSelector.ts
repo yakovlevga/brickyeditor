@@ -2,11 +2,15 @@ import { bre } from "@/types/bre";
 import { helpers } from "@/helpers";
 import { addBlockToContainer } from "@/blocksContainer";
 
-const getTemplateUI = (template: bre.template.Template) => {
+const getTemplateUI = (template: bre.template.Template, zoom: boolean) => {
   const $template = helpers.div("bre-templates-group-item");
-
   const { $preview } = template;
   $preview.setAttribute("title", template.name);
+
+  if (zoom) {
+    helpers.toggleClassName($preview, "bre-template-zoom", true);
+  }
+
   $template.append($preview);
 
   return $template;
@@ -27,7 +31,11 @@ const getTemplateGroupUI = (
   $group.append($name);
 
   group.templates.forEach(template => {
-    const $template = getTemplateUI(template);
+    const $template = getTemplateUI(
+      template,
+      editor.options.templateSelector.zoom
+    );
+
     $group.append($template);
 
     $template.onclick = ev => {

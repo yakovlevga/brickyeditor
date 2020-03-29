@@ -24,7 +24,7 @@ declare type BreStyles =
   | "bre-modal"
   | "bre-modal-placeholder"
   | "bre-modal-close"
-  | "bre-template"
+  | "bre-template-zoom"
   | "bre-templates-root"
   | "bre-templates-loader"
   | "bre-templates-list"

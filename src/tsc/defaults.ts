@@ -23,5 +23,9 @@ export const defaultOptions: bre.EditorOptions = {
   compactTools: false,
   compactToolsWidth: 768,
   ignoreHtml: true,
-  htmlToolsButtons: defaultButtons
+  htmlToolsButtons: defaultButtons,
+
+  templateSelector: {
+    zoom: true
+  }
 };

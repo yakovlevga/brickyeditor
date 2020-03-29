@@ -17,6 +17,10 @@ type HtmlFieldData = bre.field.FieldData<HtmlFieldType, HtmlFieldPayload>;
 type HtmlField = bre.field.Field<HtmlFieldData>;
 
 const MaxPreviewLength = 50;
+const getTextPreview = ($element: HTMLElement) =>
+  $element.innerHTML.length > MaxPreviewLength
+    ? $element.innerHTML.substr(0, MaxPreviewLength) + "..."
+    : $element.innerHTML;
 
 export const html: FieldFactory = props => {
   const { $element, data } = props;
@@ -26,10 +30,7 @@ export const html: FieldFactory = props => {
   }
 
   if (props.preview) {
-    $element.innerHTML =
-      $element.innerHTML.length > MaxPreviewLength
-        ? $element.innerHTML.substr(0, MaxPreviewLength) + "..."
-        : $element.innerHTML;
+    $element.innerHTML = getTextPreview($element);
 
     return {
       $element

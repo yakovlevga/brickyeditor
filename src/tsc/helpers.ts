@@ -56,8 +56,14 @@ const createElement = <TElement extends HTMLElement>(
   return result;
 };
 
-const toggleVisibility = (el: HTMLElement, visible?: boolean) =>
-  toggleClassName(el, "bre-hidden", !visible);
+const hiddenClassName: BreStyles = "bre-hidden";
+const toggleVisibility = (el: HTMLElement, visible?: boolean) => {
+  if (visible === undefined) {
+    visible = el.classList.contains(hiddenClassName);
+  }
+
+  toggleClassName(el, hiddenClassName, !visible);
+};
 
 const toggleClassName = (
   el: HTMLElement,

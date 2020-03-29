@@ -38,6 +38,7 @@ export const createBlockFromTemplate = (
 ): bre.block.Block => {
   const $element = $template.cloneNode(true) as HTMLElement;
   helpers.toggleClassName($element, "bre-template", false);
+  helpers.toggleClassName($element, "bre-template-zoom", false);
   helpers.toggleClassName($element, "bre-block", true);
 
   const block: bre.block.Block = {

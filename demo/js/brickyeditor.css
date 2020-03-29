@@ -56,11 +56,8 @@
   .bre-field-selected .bre-container-placeholder > svg {
     visibility: hidden; }
 
-.bre-template {
+.bre-template .bre-container-placeholder {
   min-height: 48px; }
-  .bre-template .bre-container-placeholder > svg {
-    width: 16px;
-    height: 16px; }
 
 .bre-editor {
   /* empty */ }
@@ -139,8 +136,8 @@
     text-align: right;
     padding: 0.5rem 1.5rem 0 0; }
 
-.bre-template {
-  /* empty */ }
+.bre-template-zoom {
+  zoom: 0.5; }
 
 .bre-templates-root {
   position: fixed;
@@ -162,7 +159,11 @@
   overflow-x: hidden; }
 
 .bre-templates-group {
-  padding: 0 1rem 1rem; }
+  padding: 0 1rem 1rem;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none; }
   .bre-templates-group-name {
     cursor: pointer;
     color: #111111;
@@ -171,6 +172,7 @@
     text-transform: uppercase;
     overflow: hidden; }
   .bre-templates-group-item {
+    cursor: pointer;
     background-color: #ffffff;
     margin-bottom: 1rem;
     padding: 0.5rem;
