@@ -309,24 +309,16 @@ var BrickyEditor = (function (exports) {
     //# sourceMappingURL=constants.js.map
 
     var isValidFieldType = function (data, type) { return data.type === type; };
-    var updateFieldData = function (field, changes, fireEvent) {
-        if (fireEvent === void 0) { fireEvent = true; }
+    var updateFieldData = function (field, changes) {
         var data = field.data;
         var props = Object.keys(changes);
         var hasChanges = props.some(function (p) { return data[p] !== changes[p]; });
         if (hasChanges) {
             field.data = __assign(__assign({}, data), { changes: changes });
-            if (fireEvent) {
-                field.fire("change", { field: field });
-            }
         }
     };
-    var toggleFieldSelection = function (field, selected, fireEvent) {
-        if (fireEvent === void 0) { fireEvent = true; }
+    var toggleFieldSelection = function (field, selected) {
         helpers.toggleClassName(field.$element, "bre-field-selected", selected);
-        if (fireEvent !== undefined && selected) {
-            field.fire("select", { field: field });
-        }
     };
     var getCleanFieldElement = function ($field) {
         var $el = $field.cloneNode(true);
@@ -718,43 +710,6 @@ var BrickyEditor = (function (exports) {
     };
     //# sourceMappingURL=htmlTools.js.map
 
-    var emitter = function () {
-        var listeners = {};
-        var on = function (type, listener) {
-            if (listeners[type] === undefined) {
-                listeners[type] = [];
-            }
-            var listenersOfType = listeners[type];
-            if (listenersOfType.indexOf(listener) !== -1) {
-                return;
-            }
-            listenersOfType.push(listener);
-        };
-        var off = function (type, listener) {
-            var listenersOfType = listeners[type];
-            if (listenersOfType === undefined) {
-                return;
-            }
-            else {
-                var idx = listenersOfType.indexOf(listener);
-                if (idx > -1) {
-                    listenersOfType.splice(idx, 1);
-                }
-            }
-        };
-        var fire = function (type, ev) {
-            var listenersOfType = listeners[type];
-            if (listenersOfType === undefined) {
-                return;
-            }
-            else {
-                listenersOfType.forEach(function (listener) { return listener(ev); });
-            }
-        };
-        return { fire: fire, on: on, off: off };
-    };
-    //# sourceMappingURL=emitter.js.map
-
     var container = function (props) {
         var $element = props.$element, data = props.data;
         if (!isValidFieldType(data, "container")) {
@@ -770,9 +725,12 @@ var BrickyEditor = (function (exports) {
             ev.stopPropagation();
             selectField(field);
         });
-        var field = __assign(__assign({}, emitter()), { $element: $element,
+        var field = {
+            $element: $element,
             data: data,
-            html: html, parentBlock: props.parentBlock });
+            html: html,
+            parentBlock: props.parentBlock
+        };
         var fieldContainer = createFieldContainer(field);
         field.container = fieldContainer;
         if (data.blocks && data.blocks.length > 0) {
@@ -806,7 +764,7 @@ var BrickyEditor = (function (exports) {
         }
         var prevSelectedField = state.selectedField;
         if (prevSelectedField !== null) {
-            toggleFieldSelection(prevSelectedField, false, true);
+            toggleFieldSelection(prevSelectedField, false);
         }
         if (isContainerField(selectedField)) {
             selectBlock(selectedField.parentBlock, false);
@@ -816,7 +774,7 @@ var BrickyEditor = (function (exports) {
             selectBlock(selectedField.parentBlock);
         }
         state.selectedField = selectedField;
-        toggleFieldSelection(selectedField, true, true);
+        toggleFieldSelection(selectedField, true);
     };
     var selectBlock = function (selectedBlock, triggerSelectContainer) {
         if (triggerSelectContainer === void 0) { triggerSelectContainer = true; }
@@ -890,9 +848,12 @@ var BrickyEditor = (function (exports) {
             };
         }
         bind($element, data);
-        var eventEmiter = emitter();
-        var field = __assign(__assign({}, eventEmiter), { $element: $element,
-            data: data, html: getHtml, parentBlock: props.parentBlock });
+        var field = {
+            parentBlock: props.parentBlock,
+            $element: $element,
+            data: data,
+            html: getHtml
+        };
         var updateHtmlProp = function () {
             var html = $element.innerHTML.trim();
             if ($element.innerHTML !== html) {
@@ -1000,11 +961,13 @@ var BrickyEditor = (function (exports) {
             return { $element: $element };
         }
         bind$1($element, data);
-        var eventEmitter = emitter();
-        var field = __assign(__assign({}, eventEmitter), { $element: $element,
+        var field = {
+            $element: $element,
             data: data,
             html: html$2,
-            editor: editor, parentBlock: props.parentBlock });
+            editor: editor,
+            parentBlock: props.parentBlock
+        };
         $element.addEventListener("click", function (ev) { return __awaiter(void 0, void 0, void 0, function () {
             var updatedData;
             return __generator(this, function (_a) {
@@ -1093,11 +1056,13 @@ var BrickyEditor = (function (exports) {
                 $element: $element
             };
         }
-        var eventEmiter = emitter();
-        var field = __assign(__assign({}, eventEmiter), { $element: $element,
+        var field = {
+            $element: $element,
             data: data,
             html: html$3,
-            editor: editor$1, parentBlock: props.parentBlock });
+            editor: editor$1,
+            parentBlock: props.parentBlock
+        };
         $element.addEventListener("click", function (ev) { return __awaiter(void 0, void 0, void 0, function () {
             var updatedData;
             return __generator(this, function (_a) {
@@ -1479,9 +1444,13 @@ var BrickyEditor = (function (exports) {
         var $element = $template.cloneNode(true);
         helpers.toggleClassName($element, "bre-template", false);
         helpers.toggleClassName($element, "bre-block", true);
-        var eventEmitter = emitter();
-        var block = __assign(__assign({}, eventEmitter), { parentContainer: parentContainer, state: parentContainer.state, $element: $element,
-            data: data, selected: false });
+        var block = {
+            parentContainer: parentContainer,
+            state: parentContainer.state,
+            $element: $element,
+            data: data,
+            selected: false
+        };
         block.fields = bindBlockFields($element, block);
         return block;
     };
@@ -1554,10 +1523,15 @@ var BrickyEditor = (function (exports) {
         return createContainer(field.$element, field.parentBlock.state, field, null);
     };
     var createContainer = function ($element, state, parentContainerField, parentEditor) {
-        var eventEmitter = emitter();
-        var container = __assign({ state: state,
-            $element: $element, blocks: [], $placeholder: null, selectedBlock: null, parentContainerField: parentContainerField,
-            parentEditor: parentEditor }, eventEmitter);
+        var container = {
+            state: state,
+            $element: $element,
+            blocks: [],
+            $placeholder: null,
+            selectedBlock: null,
+            parentContainerField: parentContainerField,
+            parentEditor: parentEditor
+        };
         toggleContainersPlaceholder(container);
         return container;
     };
@@ -1648,7 +1622,7 @@ var BrickyEditor = (function (exports) {
         $template.append($preview);
         return $template;
     };
-    var getTemplateGroupUI = function (group, fireFunc) {
+    var getTemplateGroupUI = function (editor, group) {
         var $group = helpers.div("bre-templates-group");
         var $name = helpers.div("bre-templates-group-name", group.name || "");
         $name.onclick = function () {
@@ -1662,15 +1636,12 @@ var BrickyEditor = (function (exports) {
             $group.append($template);
             $template.onclick = function (ev) {
                 ev.stopPropagation();
-                fireFunc("select", {
-                    template: template
-                });
+                addBlockWithTemplate(editor, template);
             };
         });
         return $group;
     };
-    var getTemplateSelector = function () {
-        var _a = emitter(), fire = _a.fire, on = _a.on, off = _a.off;
+    var getTemplateSelector = function (editor) {
         var $element = helpers.div("bre-templates-root");
         var $loader = helpers.div("bre-templates-loader", "...LOADING...");
         var $templates = helpers.div("bre-templates-list");
@@ -1681,18 +1652,29 @@ var BrickyEditor = (function (exports) {
                 if (group.templates.length === 0) {
                     return;
                 }
-                var $group = getTemplateGroupUI(group, fire);
+                var $group = getTemplateGroupUI(editor, group);
                 $templates.append($group);
             });
         };
         return {
             $element: $element,
-            setTemplates: setTemplates,
-            on: on,
-            off: off
+            setTemplates: setTemplates
         };
     };
-    //# sourceMappingURL=templateSelector.js.map
+    var addBlockWithTemplate = function (editor, blockTemplate) {
+        var state = editor.state;
+        var selectedContainer = state.selectedContainers[0];
+        var selectedBlock = state.selectedBlocks.length > 0 ? state.selectedBlocks[0] : null;
+        var idx = selectedBlock !== null
+            ? selectedContainer.blocks.indexOf(selectedBlock) + 1
+            : selectedContainer.blocks.length;
+        if (selectedContainer !== null) {
+            addBlockToContainer(selectedContainer, {
+                blockTemplate: blockTemplate,
+                idx: idx
+            }, true);
+        }
+    };
 
     var Editor = (function () {
         function Editor($editor, options) {
@@ -1722,17 +1704,9 @@ var BrickyEditor = (function (exports) {
                         return [4, loadTemplatesAsync(optionsWithDefaults.templatesUrl, editor.$element)];
                     case 1:
                         templates = _a.sent();
-                        templatesUI = getTemplateSelector();
+                        templatesUI = getTemplateSelector(editor);
                         if (templates !== undefined) {
                             templatesUI.setTemplates(templates);
-                            templatesUI.on("select", function (ev) {
-                                var selectedContainer = editor.state.selectedContainers[0];
-                                if (selectedContainer !== null) {
-                                    addBlockToContainer(selectedContainer, {
-                                        blockTemplate: ev.template
-                                    }, true);
-                                }
-                            });
                             $element.append(templatesUI.$element);
                         }
                         return [4, loadInitialBlocks(optionsWithDefaults)];

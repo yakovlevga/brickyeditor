@@ -6,7 +6,6 @@ import {
 import { helpers } from "@/helpers";
 import { bre } from "@/types/bre";
 import { ContainerField } from "@/fields/container";
-import { emitter } from "@/emitter";
 import { selectBlock, resetState, selectField } from "@/editorState";
 import { iconContainer } from "@/icons/iconContainer";
 
@@ -125,8 +124,6 @@ const createContainer = (
   parentContainerField: ContainerField | null,
   parentEditor: bre.Editor | null
 ): bre.BlocksContainer => {
-  const eventEmitter = emitter<bre.BlocksContainerEventMap>();
-
   const container: bre.BlocksContainer = {
     state,
     $element,
@@ -134,8 +131,7 @@ const createContainer = (
     $placeholder: null,
     selectedBlock: null,
     parentContainerField,
-    parentEditor,
-    ...eventEmitter
+    parentEditor
   };
 
   toggleContainersPlaceholder(container);

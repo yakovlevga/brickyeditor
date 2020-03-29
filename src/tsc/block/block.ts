@@ -1,10 +1,8 @@
 import { getTemplate } from "@/template";
 import { bre } from "@/types/bre";
 import { showBlockEditor, hideBlockEditor } from "@/block/blockEditor";
-import { emitter } from "@/emitter";
 import { bindBlockFields } from "@/fields/fields";
 import { helpers } from "@/helpers";
-import { selectField } from "@/editorState";
 
 export const toggleBlockSelection = (
   block: bre.block.Block,
@@ -42,9 +40,7 @@ export const createBlockFromTemplate = (
   helpers.toggleClassName($element, "bre-template", false);
   helpers.toggleClassName($element, "bre-block", true);
 
-  const eventEmitter = emitter<bre.block.BlockEventMap>();
   const block: bre.block.Block = {
-    ...eventEmitter,
     parentContainer,
     state: parentContainer.state,
     $element,

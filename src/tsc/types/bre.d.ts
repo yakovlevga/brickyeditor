@@ -41,7 +41,7 @@ declare namespace bre {
     select: BlocksContainerEvent;
   };
 
-  type BlocksContainer = event.Emitter<BlocksContainerEventMap> & {
+  type BlocksContainer = {
     state: bre.EditorState;
     $element: HTMLElement;
     $placeholder: HTMLElement | null;
@@ -108,7 +108,7 @@ declare namespace bre {
       select: FieldEvent;
     };
 
-    type FieldBase = event.Emitter<FieldEventMap> & {
+    type FieldBase = {
       parentBlock: bre.block.Block;
       $element: HTMLElement;
       data: field.FieldData;
@@ -167,7 +167,7 @@ declare namespace bre {
       fields: field.FieldData[];
     };
 
-    type Block = event.Emitter<BlockEventMap> & {
+    type Block = {
       state: bre.EditorState;
       $element: HTMLElement;
       data: BlockData;

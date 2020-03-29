@@ -7,7 +7,6 @@ import {
 import { isValidFieldType } from "@/fields/field";
 import { helpers } from "@/helpers";
 import { bre } from "@/types/bre";
-import { emitter } from "@/emitter";
 import { FieldFactory } from "@/fields/fields";
 import { selectField } from "@/editorState";
 
@@ -44,7 +43,6 @@ export const container: FieldFactory = props => {
   });
 
   const field = {
-    ...emitter<bre.field.FieldEventMap>(),
     $element,
     data,
     html,

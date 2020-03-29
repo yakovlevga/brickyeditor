@@ -7,14 +7,12 @@ import {
 import {
   getCleanFieldElement,
   isValidFieldType,
-  toggleFieldSelection,
   updateFieldData
 } from "@/fields/field";
 import { helpers } from "@/helpers";
 import { loadScriptAsync } from "@/httpTransport";
 import { locales } from "@/locales";
 import { bre } from "@/types/bre";
-import { emitter } from "@/emitter";
 import { propmtFieldEditorAsync } from "@/fields/editors";
 import { renderInput } from "@/fields/inputs";
 import { FieldFactory } from "@/fields/fields";
@@ -50,9 +48,7 @@ export const embed: FieldFactory = props => {
 
   // updateEmbedMedia(data.url, false);
 
-  const eventEmitter = emitter<bre.field.FieldEventMap>();
   const field: EmbedField = {
-    ...eventEmitter,
     $element,
     data,
     html,

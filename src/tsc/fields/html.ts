@@ -1,13 +1,11 @@
 import {
   getCleanFieldElement,
-  toggleFieldSelection,
   updateFieldData,
   isValidFieldType
 } from "@/fields/field";
 import { bre } from "@/types/bre";
 import { toggleHtmlTools } from "@/ui/htmlTools";
 import { bindTextSelection } from "@/ui/selection";
-import { emitter } from "@/emitter";
 import { FieldFactory } from "@/fields/fields";
 import { selectField } from "@/editorState";
 
@@ -40,13 +38,11 @@ export const html: FieldFactory = props => {
 
   bind($element, data);
 
-  const eventEmiter = emitter<bre.field.FieldEventMap>();
   let field: HtmlField = {
-    ...eventEmiter,
+    parentBlock: props.parentBlock,
     $element,
     data,
-    html: getHtml,
-    parentBlock: props.parentBlock
+    html: getHtml
   };
 
   const updateHtmlProp = () => {

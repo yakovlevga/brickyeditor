@@ -1,6 +1,6 @@
 import { bre } from "@/types/bre";
 import { helpers } from "@/helpers";
-import { emitter } from "@/emitter";
+import { addBlockToContainer } from "@/blocksContainer";
 
 const getTemplateUI = (template: bre.template.Template) => {
   const $template = helpers.div("bre-templates-group-item");
@@ -13,8 +13,8 @@ const getTemplateUI = (template: bre.template.Template) => {
 };
 
 const getTemplateGroupUI = (
-  group: bre.template.TemplateGroup,
-  fireFunc: bre.event.FireFunc<bre.template.TemplatesEventMap>
+  editor: bre.Editor,
+  group: bre.template.TemplateGroup
 ) => {
   const $group = helpers.div("bre-templates-group");
   const $name = helpers.div("bre-templates-group-name", group.name || "");
@@ -32,18 +32,14 @@ const getTemplateGroupUI = (
 
     $template.onclick = ev => {
       ev.stopPropagation();
-      fireFunc("select", {
-        template
-      });
+      addBlockWithTemplate(editor, template);
     };
   });
 
   return $group;
 };
 
-export const getTemplateSelector = () => {
-  const { fire, on, off } = emitter<bre.template.TemplatesEventMap>();
-
+export const getTemplateSelector = (editor: bre.Editor) => {
   const $element = helpers.div("bre-templates-root");
   const $loader = helpers.div("bre-templates-loader", "...LOADING...");
   const $templates = helpers.div("bre-templates-list");
@@ -58,15 +54,39 @@ export const getTemplateSelector = () => {
         return;
       }
 
-      const $group = getTemplateGroupUI(group, fire);
+      const $group = getTemplateGroupUI(editor, group);
       $templates.append($group);
     });
   };
 
   return {
     $element,
-    setTemplates,
-    on,
-    off
+    setTemplates
   };
+};
+
+const addBlockWithTemplate = (
+  editor: bre.Editor,
+  blockTemplate: bre.template.Template
+) => {
+  const state = editor.state;
+  const selectedContainer = state.selectedContainers[0];
+  const selectedBlock =
+    state.selectedBlocks.length > 0 ? state.selectedBlocks[0] : null;
+
+  const idx =
+    selectedBlock !== null
+      ? selectedContainer.blocks.indexOf(selectedBlock) + 1
+      : selectedContainer.blocks.length;
+
+  if (selectedContainer !== null) {
+    addBlockToContainer(
+      selectedContainer,
+      {
+        blockTemplate,
+        idx
+      },
+      true
+    );
+  }
 };

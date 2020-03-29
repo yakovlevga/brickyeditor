@@ -1,12 +1,10 @@
 import {
   getCleanFieldElement,
   isValidFieldType,
-  updateFieldData,
-  toggleFieldSelection
+  updateFieldData
 } from "@/fields/field";
 import { helpers } from "@/helpers";
 import { bre } from "@/types/bre";
-import { emitter } from "@/emitter";
 import { renderInput } from "@/fields/inputs";
 import { locales } from "@/locales";
 import { linkEditor } from "@/fields/linkEditor";
@@ -38,9 +36,7 @@ export const image: FieldFactory = props => {
     };
   }
 
-  const eventEmiter = emitter<bre.field.FieldEventMap>();
   let field: ImageField = {
-    ...eventEmiter,
     $element,
     data,
     html,
