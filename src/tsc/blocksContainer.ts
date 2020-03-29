@@ -90,23 +90,6 @@ export const addBlockToContainer = (
 
   container.blocks = [...blocks.slice(0, idx), block, ...blocks.slice(idx)];
 
-  // Events
-  // block.on("delete", () => {
-  //   deleteBlock(container, block);
-  // });
-
-  // block.on("clone", () => {
-  //   copyBlock(container, block);
-  // });
-
-  // block.on("move", ev => {
-  //   moveBlock(container, block, ev !== undefined ? ev.offset : 0);
-  // });
-
-  // block.on("select", () => {
-  //   selectBlock(block);
-  // });
-
   // UI
   toggleContainersPlaceholder(container);
 
@@ -123,6 +106,8 @@ export const addBlockToContainer = (
   if (select) {
     selectBlock(block);
   }
+
+  container.editor.fire("blockAdd", { sender: block });
 
   return block;
 };

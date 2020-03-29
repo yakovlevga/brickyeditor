@@ -9,9 +9,9 @@ import { getRequest } from "@/httpTransport";
 import { loadTemplatesAsync } from "@/template";
 import { bre } from "@/types/bre";
 import { getTemplateSelector } from "@/ui/templateSelector";
-import { initHtmlTools } from "@/ui/htmlTools";
 import { helpers } from "@/helpers";
-import { getInitialState } from "./editorState";
+import { getInitialState } from "@/editorState";
+import { emitter } from "./emitter";
 
 export class Editor {
   constructor($editor: HTMLElement, options: bre.EditorOptions) {
@@ -29,10 +29,13 @@ export const editor = (
       ...options
     };
 
+    const eventEmitter = emitter();
+
     const editor = {
       $element,
       state: getInitialState(),
-      options: optionsWithDefaults
+      options: optionsWithDefaults,
+      ...eventEmitter
     } as bre.Editor;
 
     const rootContainer = createRootContainer(editor);
@@ -42,8 +45,11 @@ export const editor = (
     editor.data = () => getContainerData(rootContainer);
     editor.html = () => getContainerHtml(rootContainer);
 
+    if (options.plugins) {
+      options.plugins.map(({ plugin }) => plugin.init(editor));
+    }
+
     helpers.toggleClassName($element, "bre-editor", true);
-    initHtmlTools(optionsWithDefaults);
 
     // TODO: move it to separate plugin?
     // bindFormSubmit(editor, optionsWithDefaults);

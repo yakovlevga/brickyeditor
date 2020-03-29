@@ -4,8 +4,6 @@ import {
   isValidFieldType
 } from "@/fields/field";
 import { bre } from "@/types/bre";
-import { toggleHtmlTools } from "@/ui/htmlTools";
-import { bindTextSelection } from "@/ui/selection";
 import { FieldFactory } from "@/fields/fields";
 import { selectField } from "@/editorState";
 
@@ -57,10 +55,6 @@ export const html: FieldFactory = props => {
   };
 
   $element.setAttribute("contenteditable", "true");
-
-  bindTextSelection($element, rect => {
-    toggleHtmlTools(rect);
-  });
 
   $element.addEventListener("blur", updateHtmlProp);
   $element.addEventListener("keyup", updateHtmlProp);

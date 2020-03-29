@@ -32,6 +32,16 @@ export const toggleFieldSelection = (
   selected: boolean
 ) => {
   helpers.toggleClassName(field.$element, "bre-field-selected", selected);
+
+  if (selected) {
+    field.parentBlock.parentContainer.editor.fire("fieldSelect", {
+      sender: field
+    });
+  } else {
+    field.parentBlock.parentContainer.editor.fire("fieldBlur", {
+      sender: field
+    });
+  }
 };
 
 export const getCleanFieldElement = ($field: HTMLElement) => {

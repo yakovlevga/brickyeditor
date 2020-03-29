@@ -7,6 +7,8 @@ declare type Mutable<T> = { -readonly [P in keyof T]: T[P] };
 declare namespace bre {
   type FileUploadHandler = (file: any, callback: (url: string) => void) => void;
 
+  type EditorPlugin = { init: (editor: bre.Editor) => void };
+
   type EditorOptions = {
     /** Url to predifined templates */
     templatesUrl: string;
@@ -24,8 +26,6 @@ declare namespace bre {
     compactToolsWidth?: number;
     /** Ignore blocks html field, if you need only json */
     ignoreHtml?: boolean;
-    /** Custom Html editor buttons */
-    htmlToolsButtons?: bre.HtmlToolsButton[];
     /** Form selector to bind form submit event */
     formSelector?: string;
     /** Input selector to put json to on form submit */
@@ -34,6 +34,8 @@ declare namespace bre {
     templateSelector: {
       zoom: boolean;
     };
+
+    plugins?: Array<{ plugin: EditorPlugin }>;
   };
 
   type BlocksContainerEvent = {
@@ -64,7 +66,7 @@ declare namespace bre {
     selectedContainers: bre.BlocksContainer[];
   };
 
-  type Editor = {
+  type Editor = bre.event.Emitter<bre.event.EventMaps> & {
     $element: HTMLElement;
     rootContainer: BlocksContainer;
     data: () => bre.block.BlockData[];
@@ -75,22 +77,23 @@ declare namespace bre {
   };
 
   namespace event {
-    type BaseEvent<TSender> = {};
+    type BaseEvent<TSender> = {
+      sender: TSender;
+    };
 
-    type EventMaps =
-      | BlocksContainerEventMap
-      | field.FieldEventMap
-      | template.TemplatesEventMap
-      | block.BlockEventMap;
+    type EventMaps = BlocksContainerEventMap &
+      field.FieldEventMap &
+      // template.TemplatesEventMap &
+      block.BlockEventMap;
 
     type OnOffFunc<TEventMap extends EventMaps> = <K extends keyof TEventMap>(
       type: K,
-      listener: (ev?: TEventMap[K]) => void
+      listener: (ev: TEventMap[K]) => void
     ) => void;
 
     type FireFunc<TEventMap extends EventMaps> = <K extends keyof TEventMap>(
       type: K,
-      ev?: TEventMap[K]
+      ev: TEventMap[K]
     ) => void;
 
     type Emitter<TEventMap extends EventMaps> = {
@@ -108,8 +111,10 @@ declare namespace bre {
     type FieldEvent = bre.event.BaseEvent<bre.field.FieldBase>;
 
     type FieldEventMap = {
-      change: FieldEvent;
-      select: FieldEvent;
+      fieldChange: FieldEvent;
+      fieldSelect: FieldEvent;
+      fieldBlur: FieldEvent;
+      fieldCreate: FieldEvent;
     };
 
     type FieldBase = {
@@ -143,25 +148,26 @@ declare namespace bre {
       templates: bre.template.Template[];
     };
 
-    type TemplatesEventMap = {
-      select: {
-        template: bre.template.Template;
-      };
-    };
+    // type TemplatesEventMap = {
+    //   select: {
+    //     template: bre.template.Template;
+    //   };
+    // };
 
-    type Templates = event.Emitter<TemplatesEventMap> & {
-      $element: HTMLElement;
-      setTemplates: (groups: bre.template.TemplateGroup[]) => void;
-    };
+    // type Templates = event.Emitter<TemplatesEventMap> & {
+    //   $element: HTMLElement;
+    //   setTemplates: (groups: bre.template.TemplateGroup[]) => void;
+    // };
   }
 
   namespace block {
-    type BlockEvent<T = {}> = T;
+    type BlockEvent<T = {}> = event.BaseEvent<bre.block.Block> & T;
     type BlockEventMap = {
-      delete: BlockEvent;
-      clone: BlockEvent;
-      select: BlockEvent;
-      move: BlockEvent<{
+      blockAdd: BlockEvent;
+      blockDelete: BlockEvent;
+      blockClone: BlockEvent;
+      blockSelect: BlockEvent;
+      blockMove: BlockEvent<{
         offset: number;
       }>;
     };
@@ -195,22 +201,6 @@ declare namespace bre {
       }[];
     };
   }
-
-  type HtmlToolsButtonCommands =
-    | "Bold"
-    | "Italic"
-    | "CreateLink"
-    | "insertOrderedList"
-    | "insertUnorderedList"
-    | "Undo"
-    | "Redo";
-
-  type HtmlToolsButton = {
-    icon: string;
-    command: HtmlToolsButtonCommands;
-    range: boolean;
-    aValueArgument?: string;
-  };
 
   type LinkData = Partial<Pick<HTMLLinkElement, "href" | "title" | "target">>;
 

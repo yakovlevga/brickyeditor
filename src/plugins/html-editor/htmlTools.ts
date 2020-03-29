@@ -1,8 +1,8 @@
-import { helpers, strEqualsInvariant } from "@/helpers";
-
 import { bre } from "@/types/bre";
+import { helpers, strEqualsInvariant } from "@/helpers";
 import { linkEditor } from "@/fields/linkEditor";
 import { dialog } from "@/modal";
+import { HtmlToolsButton } from "./index";
 
 const promptLinkParamsAsync = (initialData: Readonly<bre.LinkData>) =>
   new Promise<bre.LinkData | null>(resolve => {
@@ -24,10 +24,12 @@ const renderButtonElement = ({
   command,
   range,
   aValueArgument
-}: bre.HtmlToolsButton): HTMLElement => {
-  const $btn = helpers.createElement(
-    `<button type="button" class="bre-btn"><i class="fa fa-${icon}"></i></button>`
-  );
+}: HtmlToolsButton): HTMLElement => {
+  const $btn = helpers.el({
+    tag: "button",
+    className: "bre-button" as BreStyles,
+    innerHTML: `<i class="fa fa-${icon}"></i>`
+  });
 
   $btn.onclick = async () => {
     const selection = window.getSelection();
@@ -112,7 +114,7 @@ const getSeletedLink = (selection: Selection) => {
   return null;
 };
 
-const renderControl = (buttons: bre.HtmlToolsButton[]) => {
+const renderControl = (buttons: HtmlToolsButton[]) => {
   const $panel = helpers.createElement(
     '<div class="bre-html-tools-panel"></div>'
   );
@@ -152,24 +154,29 @@ const wrapSelectionToContainer = (selection: Selection) => {
   }
 };
 
-let control: HTMLElement;
-
-export const initHtmlTools = ({ htmlToolsButtons }: bre.EditorOptions) => {
-  if (htmlToolsButtons) {
-    control = renderControl(htmlToolsButtons);
-    document.body.appendChild(control);
+export const initHtmlTools = (buttons?: HtmlToolsButton[]) => {
+  if (buttons === undefined || buttons.length === 0) {
+    return null;
   }
+
+  const $control = renderControl(buttons);
+  document.body.appendChild($control);
+
+  return $control;
 };
 
-export const toggleHtmlTools = (rect: ClientRect | null) => {
+export const toggleHtmlTools = (
+  $control: HTMLElement,
+  rect: ClientRect | null
+) => {
   // check if some text is seleted
   if (rect !== null && rect.width > 1) {
     const top = rect.top + rect.height;
     const left = rect.left;
-    control.style.top = `${top}px`;
-    control.style.left = `${left}px`;
-    helpers.toggleVisibility(control, true);
+    $control.style.top = `${top}px`;
+    $control.style.left = `${left}px`;
+    helpers.toggleVisibility($control, true);
   } else {
-    helpers.toggleVisibility(control, false);
+    helpers.toggleVisibility($control, false);
   }
 };

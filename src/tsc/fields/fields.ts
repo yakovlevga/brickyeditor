@@ -67,9 +67,15 @@ export const bindBlockFields = (
   block: bre.block.Block
 ) => {
   const $fieldElement = findFieldElements($element);
-  const fields = $fieldElement.map($fieldElement =>
-    bindBlockField($fieldElement, block)
-  );
+  const fields = $fieldElement.map($fieldElement => {
+    const field = bindBlockField($fieldElement, block);
+    if (field !== null) {
+      field.parentBlock.parentContainer.editor.fire("fieldCreate", {
+        sender: field
+      });
+    }
+    return field;
+  });
 
   return helpers.filterNotNull(fields);
 };

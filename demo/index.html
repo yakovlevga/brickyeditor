@@ -12,7 +12,10 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js"></script>
   <script src="js/brickyeditor.js"></script>
+  <script src="js/bre-plugin-example.js"></script>
+  <script src="js/bre-plugin-html-editor.js"></script>
   <script src="js/locales/jquery.brickyeditor.ru.js"></script>
+  
 
   <script>
     $(function () {
@@ -22,7 +25,10 @@
         templatesUrl: 'templates.html',
         onChange: function(data) {
           console.log(data.html);
-        }
+        },
+        plugins: [
+          brePluginHtmlEditor
+        ]
       };
       
       const editor = new BrickyEditor.Editor($("#editor")[0], options);       
