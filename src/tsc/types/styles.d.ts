@@ -20,6 +20,7 @@ declare type BreStyles =
   | "bre-field-editor-prop"
   | "bre-field-editor-label"
   | "bre-field-editor-input"
+  | "bre-field-placeholder"
   | "bre-field-selected"
   | "bre-modal"
   | "bre-modal-placeholder"

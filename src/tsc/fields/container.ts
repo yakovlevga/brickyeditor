@@ -31,7 +31,7 @@ export const container: FieldFactory = props => {
   }
 
   if (props.preview) {
-    $element.append(getContainerPlaceholder());
+    $element.append(getContainerPlaceholder(true));
     return {
       $element
     };

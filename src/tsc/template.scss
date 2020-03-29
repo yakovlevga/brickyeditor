@@ -1,7 +1,9 @@
+$zoom: 0.5;
+
 .bre {
   &-template {
     &-zoom {
-      zoom: 0.5;
+      zoom: $zoom;
     }
   }
 }

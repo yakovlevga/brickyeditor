@@ -23,16 +23,30 @@ export const getContainerHtml = (container: bre.BlocksContainer) => {
 };
 
 const defaultContainerPlaceholder = helpers.div(
-  ["bre-container-placeholder", "bre-icon", "bre-icon-32"],
+  [
+    "bre-field-placeholder",
+    "bre-container-placeholder",
+    "bre-icon",
+    "bre-icon-32"
+  ],
   iconContainer
 );
 
-export const getContainerPlaceholder = () =>
-  defaultContainerPlaceholder.cloneNode(true) as HTMLElement;
+export const getContainerPlaceholder = (preview: boolean) => {
+  const $placeholder = defaultContainerPlaceholder.cloneNode(
+    true
+  ) as HTMLElement;
+
+  if (preview) {
+    helpers.toggleClassName($placeholder, "bre-container-placeholder", false);
+  }
+
+  return $placeholder;
+};
 
 const toggleContainersPlaceholder = (container: bre.BlocksContainer) => {
   if (container.$placeholder === null) {
-    container.$placeholder = getContainerPlaceholder();
+    container.$placeholder = getContainerPlaceholder(false);
   }
 
   if (container.$element.childElementCount === 0) {

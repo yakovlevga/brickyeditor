@@ -3,7 +3,7 @@ import {
   NoembedResponse,
   postProcessEmbed,
   preProcessEmbedUrl
-} from "@/embed";
+} from "@/noembed";
 import {
   getCleanFieldElement,
   isValidFieldType,
@@ -17,6 +17,7 @@ import { propmtFieldEditorAsync } from "@/fields/editors";
 import { renderInput } from "@/fields/inputs";
 import { FieldFactory } from "@/fields/fields";
 import { selectField } from "@/editorState";
+import { iconEmbed } from "@/icons/iconEmbed";
 
 const providerScriptsLoaded: {
   [TKey: string]: boolean;
@@ -30,7 +31,11 @@ type EmbedFieldPayload = {
 type EmbedFieldData = bre.field.FieldData<EmbedFieldType, EmbedFieldPayload>;
 type EmbedField = bre.field.Field<EmbedFieldData>;
 
-// const placeholder = helpers.div('')
+const getEmbedPlaceholder = () =>
+  helpers.div(
+    ["bre-field-placeholder", "bre-icon", "bre-icon-32"],
+    `${iconEmbed}<span>embed</span>`
+  );
 
 export const embed: FieldFactory = props => {
   const { $element, data } = props;
@@ -41,6 +46,7 @@ export const embed: FieldFactory = props => {
 
   // No need to update embed data for templates
   if (props.preview) {
+    $element.appendChild(getEmbedPlaceholder());
     return { $element };
   }
 

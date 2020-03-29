@@ -225,6 +225,7 @@ var BrickyEditor = (function (exports) {
         filterNotNull: filterNotNull,
         convertNodeListToArray: convertNodeListToArray
     };
+    //# sourceMappingURL=helpers.js.map
 
     var getRequest = function (url) {
         return new Promise(function (resolve, reject) {
@@ -721,7 +722,7 @@ var BrickyEditor = (function (exports) {
             return null;
         }
         if (props.preview) {
-            $element.append(getContainerPlaceholder());
+            $element.append(getContainerPlaceholder(true));
             return {
                 $element: $element
             };
@@ -939,7 +940,7 @@ var BrickyEditor = (function (exports) {
             });
         }); });
     };
-    //# sourceMappingURL=embed.js.map
+    //# sourceMappingURL=noembed.js.map
 
     var propmtFieldEditorAsync = function (_a) {
         var editor = _a.editor, data = _a.data;
@@ -958,13 +959,20 @@ var BrickyEditor = (function (exports) {
     };
     //# sourceMappingURL=editors.js.map
 
+    var iconEmbed = "<svg viewBox=\"0 0 512 512\">\n  <path d=\"M160 368L32 256l128-112M352 368l128-112-128-112M304 96l-96 320\"/>\n</svg>";
+    //# sourceMappingURL=iconEmbed.js.map
+
     var providerScriptsLoaded = {};
+    var getEmbedPlaceholder = function () {
+        return helpers.div(["bre-field-placeholder", "bre-icon", "bre-icon-32"], iconEmbed + "<span>embed</span>");
+    };
     var embed = function (props) {
         var $element = props.$element, data = props.data;
         if (!isValidFieldType(data, "embed")) {
             return null;
         }
         if (props.preview) {
+            $element.appendChild(getEmbedPlaceholder());
             return { $element: $element };
         }
         bind$1($element, data);
@@ -1050,7 +1058,6 @@ var BrickyEditor = (function (exports) {
             });
         });
     }
-    //# sourceMappingURL=embed.js.map
 
     var image = function (props) {
         var $element = props.$element, data = props.data;
@@ -1464,7 +1471,7 @@ var BrickyEditor = (function (exports) {
     };
     //# sourceMappingURL=Block.js.map
 
-    var iconContainer = "<svg viewBox=\"0 0 512 512\">\n  <rect width=\"176\" height=\"176\" x=\"48\" y=\"48\" rx=\"20\" ry=\"20\"/>\n  <rect width=\"176\" height=\"176\" x=\"288\" y=\"48\" rx=\"20\" ry=\"20\"/>\n  <rect width=\"176\" height=\"176\" x=\"48\" y=\"288\" rx=\"20\" ry=\"20\"/>\n  <rect width=\"176\" height=\"176\" x=\"288\" y=\"288\" rx=\"20\" ry=\"20\"/>\n</svg>";
+    var iconContainer = "<svg viewBox=\"0 0 512 512\">\n  <rect width=\"80\" height=\"80\" x=\"64\" y=\"64\" rx=\"40\" ry=\"40\"/>\n  <rect width=\"80\" height=\"80\" x=\"216\" y=\"64\" rx=\"40\" ry=\"40\"/>\n  <rect width=\"80\" height=\"80\" x=\"368\" y=\"64\" rx=\"40\" ry=\"40\"/>\n  <rect width=\"80\" height=\"80\" x=\"64\" y=\"216\" rx=\"40\" ry=\"40\"/>\n  <rect width=\"80\" height=\"80\" x=\"216\" y=\"216\" rx=\"40\" ry=\"40\"/>\n  <rect width=\"80\" height=\"80\" x=\"368\" y=\"216\" rx=\"40\" ry=\"40\"/>\n  <rect width=\"80\" height=\"80\" x=\"64\" y=\"368\" rx=\"40\" ry=\"40\"/>\n  <rect width=\"80\" height=\"80\" x=\"216\" y=\"368\" rx=\"40\" ry=\"40\"/>\n  <rect width=\"80\" height=\"80\" x=\"368\" y=\"368\" rx=\"40\" ry=\"40\"/>\n</svg>";
     //# sourceMappingURL=iconContainer.js.map
 
     var getContainerData = function (container) {
@@ -1478,13 +1485,22 @@ var BrickyEditor = (function (exports) {
         root.innerHTML = html;
         return root.outerHTML;
     };
-    var defaultContainerPlaceholder = helpers.div(["bre-container-placeholder", "bre-icon", "bre-icon-32"], iconContainer);
-    var getContainerPlaceholder = function () {
-        return defaultContainerPlaceholder.cloneNode(true);
+    var defaultContainerPlaceholder = helpers.div([
+        "bre-field-placeholder",
+        "bre-container-placeholder",
+        "bre-icon",
+        "bre-icon-32"
+    ], iconContainer);
+    var getContainerPlaceholder = function (preview) {
+        var $placeholder = defaultContainerPlaceholder.cloneNode(true);
+        if (preview) {
+            helpers.toggleClassName($placeholder, "bre-container-placeholder", false);
+        }
+        return $placeholder;
     };
     var toggleContainersPlaceholder = function (container) {
         if (container.$placeholder === null) {
-            container.$placeholder = getContainerPlaceholder();
+            container.$placeholder = getContainerPlaceholder(false);
         }
         if (container.$element.childElementCount === 0) {
             container.$element.appendChild(container.$placeholder);

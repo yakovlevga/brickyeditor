@@ -1,5 +1,14 @@
 .bre {
   &-field {
+    &-placeholder {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      min-height: 100px;
+      height: 100%;
+    }
+
     &-selected {
       /* empty */
     }

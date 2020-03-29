@@ -1,4 +1,4 @@
-import { NoembedResponse } from "@/embed";
+import { NoembedResponse } from "@/noembed";
 import { ContainerField } from "@/fields/container";
 
 // This types is for mock cases
