@@ -10,7 +10,7 @@ export const getInitialState = (): bre.EditorState => ({
 });
 
 export const selectField = (selectedField: bre.field.FieldBase) => {
-  const state = selectedField.parentBlock.state;
+  const state = selectedField.parentBlock.parentContainer.editor.state;
 
   if (state.selectedField === selectedField) {
     return;
@@ -18,7 +18,8 @@ export const selectField = (selectedField: bre.field.FieldBase) => {
 
   const prevSelectedField = state.selectedField;
   if (prevSelectedField !== null) {
-    toggleFieldSelection(prevSelectedField, false, true);
+    toggleFieldSelection(prevSelectedField, false);
+    // TODO: fire event
     // prevSelectedField.fire('blur');
   }
 
@@ -31,14 +32,15 @@ export const selectField = (selectedField: bre.field.FieldBase) => {
 
   state.selectedField = selectedField;
 
-  toggleFieldSelection(selectedField, true, true);
+  toggleFieldSelection(selectedField, true);
+  // TODO: fire event
 };
 
 export const selectBlock = (
   selectedBlock: bre.block.Block,
   triggerSelectContainer: boolean = true
 ) => {
-  const state = selectedBlock.state;
+  const state = selectedBlock.parentContainer.editor.state;
 
   if (state.selectedBlocks[0] === selectedBlock) {
     return;
@@ -83,7 +85,7 @@ const getParentBlocks = (
 };
 
 export const selectContainer = (selectedContainer: bre.BlocksContainer) => {
-  const state = selectedContainer.state;
+  const state = selectedContainer.editor.state;
 
   const selectedContainers = getParentContainers(selectedContainer);
   state.selectedContainers = selectedContainers;

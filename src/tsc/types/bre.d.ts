@@ -42,13 +42,12 @@ declare namespace bre {
   };
 
   type BlocksContainer = {
-    state: bre.EditorState;
+    editor: bre.Editor;
     $element: HTMLElement;
     $placeholder: HTMLElement | null;
     blocks: block.Block[];
     selectedBlock: block.Block | null;
     parentContainerField: ContainerField | null;
-    parentEditor: bre.Editor | null;
     // usePlaceholder: boolean;
     // data: () => any;
     // html: () => string;
@@ -168,7 +167,6 @@ declare namespace bre {
     };
 
     type Block = {
-      state: bre.EditorState;
       $element: HTMLElement;
       data: BlockData;
       fields?: field.FieldBase[];

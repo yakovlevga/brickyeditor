@@ -42,7 +42,6 @@ export const createBlockFromTemplate = (
 
   const block: bre.block.Block = {
     parentContainer,
-    state: parentContainer.state,
     $element,
     data,
     selected: false

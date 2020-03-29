@@ -114,24 +114,25 @@ export const addBlockToContainer = (
 };
 
 export const createRootContainer = (editor: bre.Editor) =>
-  createContainer(editor.$element, editor.state, null, editor);
+  createContainer(editor);
 export const createFieldContainer = (field: ContainerField) =>
-  createContainer(field.$element, field.parentBlock.state, field, null);
+  createContainer(field.parentBlock.parentContainer.editor, field);
 
 const createContainer = (
-  $element: HTMLElement,
-  state: bre.EditorState,
-  parentContainerField: ContainerField | null,
-  parentEditor: bre.Editor | null
+  editor: bre.Editor,
+  parentContainerField: ContainerField | null = null
 ): bre.BlocksContainer => {
+  const $element =
+    parentContainerField !== null
+      ? parentContainerField.$element
+      : editor.$element;
   const container: bre.BlocksContainer = {
-    state,
+    editor,
     $element,
     blocks: [],
     $placeholder: null,
     selectedBlock: null,
-    parentContainerField,
-    parentEditor
+    parentContainerField
   };
 
   toggleContainersPlaceholder(container);
@@ -151,7 +152,7 @@ export const deleteBlock = (block: bre.block.Block) => {
     if (container.parentContainerField !== null) {
       selectField(container.parentContainerField);
     } else {
-      resetState(container.state);
+      resetState(container.editor.state);
     }
   } else if (container.blocks.length > blockIdx) {
     selectBlock(container.blocks[blockIdx]);

@@ -758,7 +758,7 @@ var BrickyEditor = (function (exports) {
         selectedContainers: []
     }); };
     var selectField = function (selectedField) {
-        var state = selectedField.parentBlock.state;
+        var state = selectedField.parentBlock.parentContainer.editor.state;
         if (state.selectedField === selectedField) {
             return;
         }
@@ -778,7 +778,7 @@ var BrickyEditor = (function (exports) {
     };
     var selectBlock = function (selectedBlock, triggerSelectContainer) {
         if (triggerSelectContainer === void 0) { triggerSelectContainer = true; }
-        var state = selectedBlock.state;
+        var state = selectedBlock.parentContainer.editor.state;
         if (state.selectedBlocks[0] === selectedBlock) {
             return;
         }
@@ -810,7 +810,7 @@ var BrickyEditor = (function (exports) {
         return blocks;
     };
     var selectContainer = function (selectedContainer) {
-        var state = selectedContainer.state;
+        var state = selectedContainer.editor.state;
         var selectedContainers = getParentContainers(selectedContainer);
         state.selectedContainers = selectedContainers;
     };
@@ -830,7 +830,6 @@ var BrickyEditor = (function (exports) {
         state.selectedBlocks = [];
         state.selectedContainers = [state.selectedContainers[0]];
     };
-    //# sourceMappingURL=editorState.js.map
 
     var MaxPreviewLength = 50;
     var html$1 = function (props) {
@@ -1446,7 +1445,6 @@ var BrickyEditor = (function (exports) {
         helpers.toggleClassName($element, "bre-block", true);
         var block = {
             parentContainer: parentContainer,
-            state: parentContainer.state,
             $element: $element,
             data: data,
             selected: false
@@ -1517,20 +1515,23 @@ var BrickyEditor = (function (exports) {
         return block;
     };
     var createRootContainer = function (editor) {
-        return createContainer(editor.$element, editor.state, null, editor);
+        return createContainer(editor);
     };
     var createFieldContainer = function (field) {
-        return createContainer(field.$element, field.parentBlock.state, field, null);
+        return createContainer(field.parentBlock.parentContainer.editor, field);
     };
-    var createContainer = function ($element, state, parentContainerField, parentEditor) {
+    var createContainer = function (editor, parentContainerField) {
+        if (parentContainerField === void 0) { parentContainerField = null; }
+        var $element = parentContainerField !== null
+            ? parentContainerField.$element
+            : editor.$element;
         var container = {
-            state: state,
+            editor: editor,
             $element: $element,
             blocks: [],
             $placeholder: null,
             selectedBlock: null,
-            parentContainerField: parentContainerField,
-            parentEditor: parentEditor
+            parentContainerField: parentContainerField
         };
         toggleContainersPlaceholder(container);
         return container;
@@ -1546,7 +1547,7 @@ var BrickyEditor = (function (exports) {
                 selectField(container.parentContainerField);
             }
             else {
-                resetState(container.state);
+                resetState(container.editor.state);
             }
         }
         else if (container.blocks.length > blockIdx) {
@@ -1675,6 +1676,7 @@ var BrickyEditor = (function (exports) {
             }, true);
         }
     };
+    //# sourceMappingURL=templateSelector.js.map
 
     var Editor = (function () {
         function Editor($editor, options) {
