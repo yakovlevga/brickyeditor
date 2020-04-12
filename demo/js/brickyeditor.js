@@ -806,7 +806,7 @@ var BrickyEditor = (function (exports) {
             data: data,
             html: html$2,
             editor: editor,
-            parentBlock: props.parentBlock
+            parentBlock: props.parentBlock,
         };
         $element.addEventListener("click", function (ev) { return __awaiter(void 0, void 0, void 0, function () {
             var updatedData;
@@ -845,7 +845,7 @@ var BrickyEditor = (function (exports) {
         $element.append($preview, $url);
         return {
             $element: $element,
-            data: data
+            data: data,
         };
     }
     function bind$1($element, _a) {
@@ -862,13 +862,12 @@ var BrickyEditor = (function (exports) {
                         return [4, getEmbedAsync(preProcessEmbedUrl(url))];
                     case 1:
                         embed = _b.sent();
-                        $embed = helpers.createElement(embed.html);
+                        $embed = helpers.div(undefined, embed.html);
                         $script = $embed.querySelector("script");
                         if ($script !== null) {
                             $script.remove();
                         }
-                        $element.innerHTML = "";
-                        $element.appendChild($embed);
+                        $element.innerHTML = $embed.innerHTML;
                         if (!($script !== null)) return [3, 4];
                         if (!(providerScriptsLoaded[$script.src] === undefined)) return [3, 3];
                         return [4, loadScriptAsync($script.src)];

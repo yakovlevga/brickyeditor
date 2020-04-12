@@ -2,12 +2,12 @@ import {
   getEmbedAsync,
   NoembedResponse,
   postProcessEmbed,
-  preProcessEmbedUrl
+  preProcessEmbedUrl,
 } from "@/noembed";
 import {
   getCleanFieldElement,
   isValidFieldType,
-  updateFieldData
+  updateFieldData,
 } from "@/fields/field";
 import { helpers } from "@/helpers";
 import { loadScriptAsync } from "@/httpTransport";
@@ -37,7 +37,7 @@ const getEmbedPlaceholder = () =>
     `${iconEmbed}<span>embed</span>`
   );
 
-export const embed: FieldFactory = props => {
+export const embed: FieldFactory = (props) => {
   const { $element, data } = props;
 
   if (!isValidFieldType<EmbedFieldData>(data, "embed")) {
@@ -59,10 +59,10 @@ export const embed: FieldFactory = props => {
     data,
     html,
     editor,
-    parentBlock: props.parentBlock
+    parentBlock: props.parentBlock,
   };
 
-  $element.addEventListener("click", async ev => {
+  $element.addEventListener("click", async (ev) => {
     ev.stopPropagation();
     selectField(field);
 
@@ -82,7 +82,7 @@ function html(field: EmbedField) {
 
 function editor(initialData: Readonly<EmbedFieldData>) {
   const data: EmbedFieldData = {
-    ...initialData
+    ...initialData,
   };
 
   const $element = helpers.div("bre-field-editor-root");
@@ -94,19 +94,19 @@ function editor(initialData: Readonly<EmbedFieldData>) {
     ...locales.prompt.embed.url,
     value: data.url || "",
     type: "text",
-    onUpdate: v => {
+    onUpdate: (v) => {
       if (data.url != v) {
         data.url = v;
         bind($preview, data);
       }
-    }
+    },
   });
 
   $element.append($preview, $url);
 
   return {
     $element,
-    data
+    data,
   };
 }
 
@@ -117,14 +117,13 @@ async function bind($element: HTMLElement, { url }: EmbedFieldData) {
   }
 
   const embed = await getEmbedAsync(preProcessEmbedUrl(url));
-  const $embed = helpers.createElement(embed.html);
+  const $embed = helpers.div(undefined, embed.html);
   const $script = $embed.querySelector("script");
   if ($script !== null) {
     $script.remove();
   }
 
-  $element.innerHTML = "";
-  $element.appendChild($embed);
+  $element.innerHTML = $embed.innerHTML;
 
   if ($script !== null) {
     if (providerScriptsLoaded[$script.src] === undefined) {
