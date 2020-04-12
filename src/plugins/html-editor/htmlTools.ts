@@ -119,17 +119,14 @@ const renderControl = (
   helpers: bre.EditorHelpers,
   buttons: HtmlToolsButton[]
 ) => {
-  const $panel = helpers.createElement(
-    '<div class="bre-html-tools-panel"></div>'
-  );
+  const $panel = helpers.div("bre-plugin-html-editor-root" as BreStyles);
 
   buttons
     .map(btn => renderButtonElement(modal, helpers, btn))
     .forEach($btn => $panel.appendChild($btn));
 
-  const $controlRoot = helpers.createElement(
-    '<div class="bre-html-tools bre-btn-group"></div>'
-  );
+  const $controlRoot = helpers.div("bre-html-tools" as BreStyles);
+
   $controlRoot.appendChild($panel);
   helpers.toggleVisibility($controlRoot, false);
 

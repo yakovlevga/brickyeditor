@@ -112,6 +112,7 @@ function editor(initialData: Readonly<EmbedFieldData>) {
 
 async function bind($element: HTMLElement, { url }: EmbedFieldData) {
   if (url === undefined) {
+    $element.appendChild(getEmbedPlaceholder());
     return;
   }
 

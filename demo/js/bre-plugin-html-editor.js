@@ -1,6 +1,24 @@
 var brePluginHtmlEditor = (function (exports) {
     'use strict';
 
+    
+
+    function ___$insertStyle(css) {
+      if (!css) {
+        return;
+      }
+      if (typeof window === 'undefined') {
+        return;
+      }
+
+      var style = document.createElement('style');
+
+      style.setAttribute('type', 'text/css');
+      style.innerHTML = css;
+      document.head.appendChild(style);
+      return css;
+    }
+
     /*! *****************************************************************************
     Copyright (c) Microsoft Corporation. All rights reserved.
     Licensed under the Apache License, Version 2.0 (the "License"); you may not use
@@ -424,11 +442,11 @@ var brePluginHtmlEditor = (function (exports) {
         return null;
     };
     var renderControl = function (modal, helpers, buttons) {
-        var $panel = helpers.createElement('<div class="bre-html-tools-panel"></div>');
+        var $panel = helpers.div("bre-plugin-html-editor-root");
         buttons
             .map(function (btn) { return renderButtonElement(modal, helpers, btn); })
             .forEach(function ($btn) { return $panel.appendChild($btn); });
-        var $controlRoot = helpers.createElement('<div class="bre-html-tools bre-btn-group"></div>');
+        var $controlRoot = helpers.div("bre-html-tools");
         $controlRoot.appendChild($panel);
         helpers.toggleVisibility($controlRoot, false);
         return $controlRoot;

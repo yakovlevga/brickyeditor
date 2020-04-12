@@ -9,6 +9,8 @@ const typingsPath = "src/tsc/types/styles.d.ts";
 
 const processor = postcss([autoprefixer]);
 
+console.log(process.env.HELLO);
+
 function fromDir(startPath, filter, callback) {
   //console.log('Starting from dir '+startPath+'/');
 

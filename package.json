@@ -48,7 +48,8 @@
     "rewire": "^4.0.1",
     "rollup": "^1.31.1",
     "rollup-plugin-browsersync": "^1.1.0",
-    "rollup-plugin-postcss": "^2.0.6",
+    "rollup-plugin-execute": "^1.1.1",
+    "rollup-plugin-sass": "^1.2.2",
     "rollup-plugin-typescript": "^1.0.1",
     "rollup-plugin-uglify": "^6.0.4",
     "ts-jest": "^25.2.1",
@@ -60,7 +61,7 @@
   },
   "scripts": {
     "test": "jest",
-    "start": "node src/scripts/index.js && rollup -c --watch",
+    "start": "rollup -c --watch",
     "styles": "node src/scripts/index.js"
   },
   "babel": {

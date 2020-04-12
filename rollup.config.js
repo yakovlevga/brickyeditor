@@ -1,5 +1,7 @@
 import typescript from "rollup-plugin-typescript";
 import browsersync from "rollup-plugin-browsersync";
+import execute from "rollup-plugin-execute";
+import sass from "rollup-plugin-sass";
 
 const ts = typescript({
   target: "es5",
@@ -7,15 +9,6 @@ const ts = typescript({
 });
 
 export default [
-  // {
-  //   input: "./src/plugins/example/example.ts",
-  //   output: {
-  //     format: "iife",
-  //     file: "demo/js/bre-plugin-example.js",
-  //     name: "brePluginExample"
-  //   },
-  //   plugins: [ts]
-  // },
   {
     input: "./src/plugins/html-editor/index.ts",
     output: {
@@ -23,8 +16,14 @@ export default [
       file: "demo/js/bre-plugin-html-editor.js",
       name: "brePluginHtmlEditor"
     },
-    plugins: [ts]
+    plugins: [
+      ts,
+      sass({
+        insert: true
+      })
+    ]
   },
+
   {
     input: "./src/tsc/editor.ts",
     output: {
@@ -33,8 +32,8 @@ export default [
       name: "BrickyEditor"
     },
     plugins: [
+      execute("node src/scripts/styles.js"),
       ts,
-
       // uglify(),
       browsersync({
         https: true,

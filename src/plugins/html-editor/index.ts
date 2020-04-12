@@ -1,6 +1,8 @@
 import { bre } from "@/types/bre";
 import { initHtmlTools, toggleHtmlTools, bindTextSelection } from "./htmlTools";
 
+import style from "./style.scss";
+
 type HtmlToolsButtonCommands =
   | "Bold"
   | "Italic"

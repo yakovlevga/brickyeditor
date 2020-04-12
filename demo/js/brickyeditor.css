@@ -46,10 +46,8 @@
 .bre-container-selected {
   box-shadow: inset 0 0 1px 0px rgba(30, 30, 160, 0.2); }
 
-.bre-field-selected .bre-container-placeholder {
-  opacity: 1; }
-  .bre-field-selected .bre-container-placeholder > svg {
-    visibility: hidden; }
+.bre-field-selected > .bre-container-placeholder {
+  opacity: 0; }
 
 .bre-template .bre-container-placeholder {
   min-height: 48px; }
@@ -107,6 +105,7 @@
   width: 100%; }
 
 .bre-field-placeholder {
+  cursor: pointer;
   display: flex;
   justify-content: center;
   align-items: center;

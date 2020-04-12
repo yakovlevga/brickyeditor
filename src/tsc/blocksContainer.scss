@@ -12,13 +12,9 @@
   }
 }
 
-.bre-field-selected {
+.bre-field-selected > {
   .bre-container-placeholder {
-    opacity: 1;
-
-    & > svg {
-      visibility: hidden;
-    }
+    opacity: 0;
   }
 }
 

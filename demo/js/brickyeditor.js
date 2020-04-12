@@ -856,6 +856,7 @@ var BrickyEditor = (function (exports) {
                 switch (_b.label) {
                     case 0:
                         if (url === undefined) {
+                            $element.appendChild(getEmbedPlaceholder());
                             return [2];
                         }
                         return [4, getEmbedAsync(preProcessEmbedUrl(url))];
