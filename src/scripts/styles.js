@@ -10,10 +10,10 @@ const typingsPath = 'src/tsc/types/styles.d.ts';
 const processor = postcss([autoprefixer]);
 
 function fromDir(startPath, filter, callback) {
-  //console.log('Starting from dir '+startPath+'/');
+  //// console.log('Starting from dir '+startPath+'/');
 
   if (!fs.existsSync(startPath)) {
-    console.log('no dir ', startPath);
+    // console.log('no dir ', startPath);
     return;
   }
 
@@ -33,7 +33,7 @@ let resultCss = '';
 let resultTypings = 'declare type BreStyles =';
 
 fromDir('src/tsc', /\.scss$/, (pathname, file) => {
-  console.log('-- found: ', pathname);
+  // console.log('-- found: ', pathname);
 
   const { css } = nodeSass.renderSync({
     file: pathname,
@@ -42,7 +42,7 @@ fromDir('src/tsc', /\.scss$/, (pathname, file) => {
   const result = processor.process(css);
   const { root } = result;
 
-  console.log({ nodes: root.nodes.map(n => n.selector) });
+  // console.log({ nodes: root.nodes.map(n => n.selector) });
 
   const rules = root.nodes
     .filter(n => n.type === 'rule')

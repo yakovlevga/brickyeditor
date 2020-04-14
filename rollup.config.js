@@ -37,7 +37,7 @@ export default [
       execute('node src/scripts/styles.js'),
       execute('node src/scripts/i18n.js'),
       ts,
-      uglify({}),
+      // uglify({}),
       browsersync({
         https: true,
         server: {

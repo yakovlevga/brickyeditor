@@ -13,7 +13,7 @@ import { helpers } from '@/helpers';
 import { getInitialState } from '@/editorState';
 import { emitter } from './emitter';
 import { modal } from '@/modal';
-import { initDefaultLocale } from '@/i18n';
+import { setLocale, i18n } from '@/i18n';
 
 export class Editor {
   constructor($editor: HTMLElement, options: bre.EditorOptions) {
@@ -23,12 +23,14 @@ export class Editor {
 
 export const editor = ($element: HTMLElement, options?: bre.EditorOptions) =>
   new Promise<bre.Editor>(async resolve => {
-    initDefaultLocale();
+    i18n();
 
     const optionsWithDefaults: bre.EditorOptions = {
       ...(defaultOptions as bre.EditorOptions),
       ...options,
     };
+
+    setLocale(optionsWithDefaults.locale);
 
     const eventEmitter = emitter();
 

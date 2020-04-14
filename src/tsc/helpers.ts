@@ -141,12 +141,8 @@ const convertNodeListToArray = <TNode extends Node>(nl: NodeListOf<TNode>) => {
 };
 
 const msg = (key: keyof Locale, params?: Record<string, string>) => {
-  window.BrickyEditor.i18n.default = 'en';
-  window.BrickyEditor.i18n.locale = 'en';
-
   const locale =
-    window.BrickyEditor.i18n.messages[window.BrickyEditor.i18n.locale] ||
-    window.BrickyEditor.i18n.messages[window.BrickyEditor.i18n.default];
+    window.BrickyEditor.i18n.messages[window.BrickyEditor.i18n.locale];
 
   let str = locale[key];
 
