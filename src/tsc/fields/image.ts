@@ -1,12 +1,11 @@
 import {
   getCleanFieldElement,
   isValidFieldType,
-  updateFieldData
+  updateFieldData,
 } from "@/fields/field";
 import { helpers } from "@/helpers";
 import { bre } from "@/types/bre";
 import { renderInput } from "@/fields/inputs";
-import { locales } from "@/locales";
 import { linkEditor } from "@/fields/linkEditor";
 import { propmtFieldEditorAsync } from "@/fields/editors";
 import { FieldFactory } from "@/fields/fields";
@@ -21,7 +20,7 @@ type ImageFieldPayload = {
 type ImageFieldData = bre.field.FieldData<"image", ImageFieldPayload>;
 type ImageField = bre.field.Field<ImageFieldData>;
 
-export const image: FieldFactory = props => {
+export const image: FieldFactory = (props) => {
   const { $element, data } = props;
 
   if (!isValidFieldType<ImageFieldData>(data, "image")) {
@@ -32,7 +31,7 @@ export const image: FieldFactory = props => {
 
   if (props.preview) {
     return {
-      $element
+      $element,
     };
   }
 
@@ -41,10 +40,10 @@ export const image: FieldFactory = props => {
     data,
     html,
     editor,
-    parentBlock: props.parentBlock
+    parentBlock: props.parentBlock,
   };
 
-  $element.addEventListener("click", async ev => {
+  $element.addEventListener("click", async (ev) => {
     ev.stopPropagation();
     selectField(field);
 
@@ -74,9 +73,11 @@ function bind($element: HTMLElement, data: ImageFieldData) {
   $element.title = alt;
 }
 
-function editor(initialData: Readonly<ImageFieldData>) {
+function editor(field: bre.field.FieldBase) {
+  const initialData: Readonly<ImageFieldData> = field.data;
+
   const data: ImageFieldData = {
-    ...initialData
+    ...initialData,
   };
 
   const $element = helpers.div("bre-field-editor-root");
@@ -85,26 +86,28 @@ function editor(initialData: Readonly<ImageFieldData>) {
     tag: "img",
     className: "bre-field-editor-preview-img",
     props: {
-      src: getSrcOrFile(data)
-    }
+      src: getSrcOrFile(data),
+    },
   });
 
   const $preview = helpers.div("bre-field-editor-preview");
   $preview.appendChild($previewImg);
 
   const $src = renderInput({
-    ...locales.prompt.image.link,
+    title: helpers.msg("image.link.title"),
+    placeholder: helpers.msg("image.link.placeholder"),
     value: data.src,
     type: "text",
-    onUpdate: src => {
+    onUpdate: (src) => {
       $previewImg.src = src;
       data.src = src;
       data.file = undefined;
-    }
+    },
   });
 
   const $file = renderInput({
-    ...locales.prompt.image.upload,
+    title: helpers.msg("image.upload.title"),
+    placeholder: helpers.msg("image.upload.title"),
     type: "file",
     value: data.file ? data.file.fileContent : "",
     onUpdate: async (f, fileContent) => {
@@ -114,7 +117,7 @@ function editor(initialData: Readonly<ImageFieldData>) {
         name: f.name,
         size: f.size,
         type: f.type,
-        lastModified: f.lastModified
+        lastModified: f.lastModified,
       };
 
       // TODO: if we have upload link, than do upload it here
@@ -125,16 +128,17 @@ function editor(initialData: Readonly<ImageFieldData>) {
       data.src = undefined;
       data.file = {
         fileContent,
-        fileInfo
+        fileInfo,
       };
-    }
+    },
   });
 
   const $alt = renderInput({
-    ...locales.prompt.image.alt,
+    title: helpers.msg("image.alt.title"),
+    placeholder: helpers.msg("image.alt.title"),
     value: data.alt,
     type: "text",
-    onUpdate: v => (data.alt = $previewImg.alt = v)
+    onUpdate: (v) => (data.alt = $previewImg.alt = v),
   });
 
   const { $element: $link, data: linkData } = linkEditor(initialData.link);
@@ -144,7 +148,7 @@ function editor(initialData: Readonly<ImageFieldData>) {
 
   return {
     $element,
-    data
+    data,
   };
 }
 
@@ -157,7 +161,7 @@ function html(field: ImageField) {
   if (link !== undefined && link.href !== undefined && link.href.length) {
     const $link = helpers.el<HTMLLinkElement>({
       tag: "a",
-      props: link
+      props: link,
     });
     $link.appendChild($result);
 

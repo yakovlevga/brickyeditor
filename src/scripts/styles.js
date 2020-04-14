@@ -1,21 +1,19 @@
-const path = require("path");
-const fs = require("fs");
-const nodeSass = require("node-sass");
-const postcss = require("postcss");
-const autoprefixer = require("autoprefixer");
+const path = require('path');
+const fs = require('fs');
+const nodeSass = require('node-sass');
+const postcss = require('postcss');
+const autoprefixer = require('autoprefixer');
 
-const cssPath = "demo/js/brickyeditor.css";
-const typingsPath = "src/tsc/types/styles.d.ts";
+const cssPath = 'demo/js/brickyeditor.css';
+const typingsPath = 'src/tsc/types/styles.d.ts';
 
 const processor = postcss([autoprefixer]);
-
-console.log(process.env.HELLO);
 
 function fromDir(startPath, filter, callback) {
   //console.log('Starting from dir '+startPath+'/');
 
   if (!fs.existsSync(startPath)) {
-    console.log("no dir ", startPath);
+    console.log('no dir ', startPath);
     return;
   }
 
@@ -31,14 +29,14 @@ function fromDir(startPath, filter, callback) {
   }
 }
 
-let resultCss = "";
-let resultTypings = "declare type BreStyles =";
+let resultCss = '';
+let resultTypings = 'declare type BreStyles =';
 
-fromDir("src/tsc", /\.scss$/, (pathname, file) => {
-  console.log("-- found: ", pathname);
+fromDir('src/tsc', /\.scss$/, (pathname, file) => {
+  console.log('-- found: ', pathname);
 
   const { css } = nodeSass.renderSync({
-    file: pathname
+    file: pathname,
   });
 
   const result = processor.process(css);
@@ -47,21 +45,21 @@ fromDir("src/tsc", /\.scss$/, (pathname, file) => {
   console.log({ nodes: root.nodes.map(n => n.selector) });
 
   const rules = root.nodes
-    .filter(n => n.type === "rule")
-    .filter(n => n.selector.indexOf(".") === 0)
-    .filter(n => n.selector.indexOf(":") === -1)
-    .map(n => n.selector.split(" ")[0])
-    .map(n => `"${n.substr(1)}"`)
+    .filter(n => n.type === 'rule')
+    .filter(n => n.selector.indexOf('.') === 0)
+    .filter(n => n.selector.indexOf(':') === -1)
+    .map(n => n.selector.split(' ')[0])
+    .map(n => `'${n.substr(1)}'`)
     .reduce((unique, item) => {
       return unique.indexOf(item) === -1 ? [...unique, item] : unique;
     }, []);
 
   if (rules && rules.length > 0) {
-    resultTypings += `\n${rules.map(r => renderRule(r)).join("\n")}`;
+    resultTypings += `\n${rules.map(r => renderRule(r)).join('\n')}`;
   }
 
   if (result && result.css) {
-    resultCss += "\n" + result.css;
+    resultCss += '\n' + result.css;
   }
 });
 
@@ -69,12 +67,12 @@ function renderRule(rule) {
   return `  | ${rule}`;
 }
 
-resultTypings += ";";
+resultTypings += ';';
 
 fs.writeFileSync(typingsPath, resultTypings, {
-  encoding: "utf8"
+  encoding: 'utf8',
 });
 
 fs.writeFileSync(cssPath, resultCss, {
-  encoding: "utf8"
+  encoding: 'utf8',
 });

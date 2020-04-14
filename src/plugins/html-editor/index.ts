@@ -31,21 +31,22 @@ const defaultOptions: Required<HtmlToolsOptions> = {
     {
       icon: "list-ul",
       command: "insertUnorderedList",
-      range: true
+      range: true,
     },
     {
       icon: "list-ol",
       command: "insertOrderedList",
-      range: true
+      range: true,
     },
     { icon: "undo", command: "Undo", range: false },
-    { icon: "repeat", command: "Redo", range: false }
-  ]
+    { icon: "repeat", command: "Redo", range: false },
+  ],
 };
 
 export const plugin = {
   init: (editor: bre.Editor, options: HtmlToolsOptions) => {
     const $control = initHtmlTools(
+      editor.shared.messages,
       editor.shared.modal,
       editor.shared.helpers,
       defaultOptions.buttons
@@ -64,5 +65,5 @@ export const plugin = {
         bindTextSelection(field.$element, onSelect);
       }
     });
-  }
+  },
 };

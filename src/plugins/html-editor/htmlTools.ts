@@ -6,7 +6,7 @@ const promptLinkParamsAsync = (
   modal: bre.EditorModal,
   initialData: Readonly<bre.LinkData>
 ) =>
-  new Promise<bre.LinkData | null>(resolve => {
+  new Promise<bre.LinkData | null>((resolve) => {
     const { $element: $editor, data: updatedData } = linkEditor(initialData);
 
     modal(
@@ -28,7 +28,7 @@ const renderButtonElement = (
   const $btn = helpers.el({
     tag: "button",
     className: "bre-button" as BreStyles,
-    innerHTML: `<i class="fa fa-${icon}"></i>`
+    innerHTML: `<i class="fa fa-${icon}"></i>`,
   });
 
   $btn.onclick = async () => {
@@ -51,7 +51,7 @@ const renderButtonElement = (
           ? {
               href: selectedLink.href,
               title: selectedLink.title,
-              target: selectedLink.target
+              target: selectedLink.target,
             }
           : {};
 
@@ -122,8 +122,8 @@ const renderControl = (
   const $panel = helpers.div("bre-plugin-html-editor-root" as BreStyles);
 
   buttons
-    .map(btn => renderButtonElement(modal, helpers, btn))
-    .forEach($btn => $panel.appendChild($btn));
+    .map((btn) => renderButtonElement(modal, helpers, btn))
+    .forEach(($btn) => $panel.appendChild($btn));
 
   const $controlRoot = helpers.div("bre-html-tools" as BreStyles);
 

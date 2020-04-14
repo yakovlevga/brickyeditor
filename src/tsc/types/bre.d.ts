@@ -1,8 +1,21 @@
 import { ContainerField } from "@/fields/container";
 import { helpers } from "@/helpers";
+import { Locale, defaultLocale } from "@/types/locale";
 
 // This types is for mock cases
 declare type Mutable<T> = { -readonly [P in keyof T]: T[P] };
+
+declare global {
+  interface Window {
+    BrickyEditor: {
+      i18n: {
+        default: defaultLocale;
+        locale: string;
+        messages: Record<string, Locale>;
+      };
+    };
+  }
+}
 
 declare namespace bre {
   type FileUploadHandler = (file: any, callback: (url: string) => void) => void;
@@ -10,6 +23,7 @@ declare namespace bre {
   type EditorPlugin = { init: (editor: bre.Editor) => void };
 
   type EditorOptions = {
+    locale: string;
     /** Url to predifined templates */
     templatesUrl: string;
 
@@ -139,7 +153,7 @@ declare namespace bre {
       // clean up html element from editors data attributes, etc.
       html: (field: Field<TFieldData>) => HTMLElement;
       editor?: (
-        initialData: Readonly<TFieldData>
+        field: FieldBase
       ) => {
         $element: HTMLElement;
         data: TFieldData;

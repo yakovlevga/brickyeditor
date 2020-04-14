@@ -72,48 +72,8 @@ var BrickyEditor = (function (exports) {
         return r;
     }
 
-    var EditorStrings = (function () {
-        function EditorStrings() {
-        }
-        EditorStrings.embedFieldLinkTitle = "Link to embed media";
-        EditorStrings.embedFieldLinkPlaceholder = "Link to instagram, youtube and etc.";
-        EditorStrings.imageFieldLinkTitle = "Image link";
-        EditorStrings.imageFieldLinkPlaceholder = "http://url-to-image.png";
-        EditorStrings.imageFieldUploadTitle = "or Upload a file";
-        EditorStrings.imageFieldUploadButton = "Select file";
-        EditorStrings.imageFieldAltTitle = "Alt";
-        EditorStrings.imageFieldAltPlaceholder = "Image 'alt' attribute value";
-        EditorStrings.imageFieldUrlSubtitle = "Link to open on image click";
-        EditorStrings.htmlEditorLinkUrlTitle = "Url";
-        EditorStrings.htmlEditorLinkUrlPlaceholder = "http://put-your-link.here";
-        EditorStrings.htmlEditorLinkTitleTitle = "Title";
-        EditorStrings.htmlEditorLinkTitlePlaceholder = "Title attribute for link";
-        EditorStrings.htmlEditorLinkTargetTitle = "Target";
-        EditorStrings.htmlEditorLinkTargetBlank = "Blank";
-        EditorStrings.htmlEditorLinkTargetSelf = "Self";
-        EditorStrings.htmlEditorLinkTargetParent = "Parent";
-        EditorStrings.htmlEditorLinkTargetTop = "Top";
-        EditorStrings.buttonClose = "close";
-        EditorStrings.buttonOk = "Ok";
-        EditorStrings.buttonCancel = "Cancel";
-        EditorStrings.defaultTemplatesGroupName = "Other templates";
-        EditorStrings.errorBlocksFileNotFound = function (url) {
-            return "Blocks file not found. Requested file: " + url + ".";
-        };
-        EditorStrings.errorTemplatesFileNotFound = function (url) {
-            return "Templates file not found. Requested file: " + url + ".";
-        };
-        EditorStrings.errorBlockTemplateNotFound = function (templateName) {
-            return "Template \"" + templateName + "\" not found.";
-        };
-        EditorStrings.errorTemplateParsing = function (name) {
-            return "Template parsing error: " + name + ".";
-        };
-        return EditorStrings;
-    }());
-
     var el = function (_a) {
-        var _b = _a.tag, tag = _b === void 0 ? "div" : _b, className = _a.className, innerHTML = _a.innerHTML, props = _a.props;
+        var _b = _a.tag, tag = _b === void 0 ? 'div' : _b, className = _a.className, innerHTML = _a.innerHTML, props = _a.props;
         var result = document.createElement(tag);
         if (className !== undefined) {
             if (Array.isArray(className)) {
@@ -134,20 +94,20 @@ var BrickyEditor = (function (exports) {
     var div = function (className, innerHTML) {
         return el({
             className: className,
-            innerHTML: innerHTML
+            innerHTML: innerHTML,
         });
     };
     var createElement = function (html, className) {
-        var temp = document.createElement("div");
+        var temp = document.createElement('div');
         temp.innerHTML = html;
         var result = temp.children[0];
-        temp.innerHTML = "";
+        temp.innerHTML = '';
         if (className !== undefined) {
             result.className = className;
         }
         return result;
     };
-    var hiddenClassName = "bre-hidden";
+    var hiddenClassName = 'bre-hidden';
     var toggleVisibility = function (el, visible) {
         if (visible === undefined) {
             visible = el.classList.contains(hiddenClassName);
@@ -212,6 +172,22 @@ var BrickyEditor = (function (exports) {
     var convertNodeListToArray = function (nl) {
         return Array.prototype.slice.call(nl);
     };
+    var msg = function (key, params) {
+        window.BrickyEditor.i18n.default = 'en';
+        window.BrickyEditor.i18n.locale = 'en';
+        var locale = window.BrickyEditor.i18n.messages[window.BrickyEditor.i18n.locale] ||
+            window.BrickyEditor.i18n.messages[window.BrickyEditor.i18n.default];
+        var str = locale[key];
+        if (str === undefined) {
+            return '';
+        }
+        if (params !== undefined) {
+            Object.keys(params).forEach(function (p) {
+                str.replace(/`{${p}}`/g, params[p]);
+            });
+        }
+        return str;
+    };
     var helpers = {
         createElement: createElement,
         div: div,
@@ -222,7 +198,8 @@ var BrickyEditor = (function (exports) {
         readFileAsync: readFileAsync,
         objectToArray: objectToArray,
         filterNotNull: filterNotNull,
-        convertNodeListToArray: convertNodeListToArray
+        convertNodeListToArray: convertNodeListToArray,
+        msg: msg,
     };
 
     var getRequest = function (url) {
@@ -557,79 +534,6 @@ var BrickyEditor = (function (exports) {
         }); });
     };
 
-    var locales = {
-        errorBlocksFileNotFound: function (url) {
-            return "Blocks file not found. Requested file: " + url + ".";
-        },
-        errorTemplatesFileNotFound: function (url) {
-            return "Templates file not found. Requested file: " + url + ".";
-        },
-        errorBlockTemplateNotFound: function (templateName) {
-            return "Template \"" + templateName + "\" not found.";
-        },
-        errorTemplateParsing: function (name) {
-            return "Template parsing error: " + name + ".";
-        },
-        embedFieldLinkTitle: "Link to embed media",
-        embedFieldLinkPlaceholder: "Link to instagram, youtube and etc.",
-        prompt: {
-            image: {
-                link: {
-                    title: "Image link",
-                    placeholder: "http://url-to-image.png",
-                },
-                alt: {
-                    title: "Image alt",
-                    placeholder: "Image 'alt' attribute value",
-                },
-                upload: {
-                    title: "or Upload a file",
-                    placeholder: "select file",
-                    button: "Select file",
-                },
-                url: {
-                    subtitle: "Link to open on image click",
-                },
-            },
-            embed: {
-                url: {
-                    title: "URL to media",
-                    placeholder: "Paste link to youtube, instagram, etc.",
-                },
-            },
-            link: {
-                href: {
-                    title: "Url",
-                    placeholder: "https://put-your-link.here",
-                },
-                title: {
-                    title: "Title",
-                    placeholder: "Title attribute for link",
-                },
-                target: {
-                    title: "Target",
-                    blank: "Blank",
-                    self: "Self",
-                    parent: "Parent",
-                    top: "Top",
-                },
-            },
-        },
-        htmlEditorLinkUrlTitle: "Url",
-        htmlEditorLinkUrlPlaceholder: "http://put-your-link.here",
-        htmlEditorLinkTitleTitle: "Title",
-        htmlEditorLinkTitlePlaceholder: "Title attribute for link",
-        htmlEditorLinkTargetTitle: "Target",
-        htmlEditorLinkTargetBlank: "Blank",
-        htmlEditorLinkTargetSelf: "Self",
-        htmlEditorLinkTargetParent: "Parent",
-        htmlEditorLinkTargetTop: "Top",
-        buttonClose: "close",
-        buttonOk: "Ok",
-        buttonCancel: "Cancel",
-        defaultTemplatesGroupName: "Other templates",
-    };
-
     var getSelectionRanges = function () {
         var selection = window.getSelection();
         if (selection === null) {
@@ -691,14 +595,14 @@ var BrickyEditor = (function (exports) {
         document.body.appendChild(root);
     };
 
-    var propmtFieldEditorAsync = function (_a) {
-        var editor = _a.editor, data = _a.data;
+    var propmtFieldEditorAsync = function (field) {
         return new Promise(function (resolve) {
+            var editor = field.editor;
             if (editor === undefined) {
                 resolve(null);
                 return;
             }
-            var _a = editor(data), $editor = _a.$element, updatedData = _a.data;
+            var _a = editor(field), $editor = _a.$element, updatedData = _a.data;
             modal($editor, function () {
                 resolve(updatedData);
             }, function () {
@@ -831,17 +735,23 @@ var BrickyEditor = (function (exports) {
     function html$2(field) {
         return getCleanFieldElement(field.$element);
     }
-    function editor(initialData) {
-        var data = __assign({}, initialData);
+    function editor(field) {
+        var data = __assign({}, field.data);
         var $element = helpers.div("bre-field-editor-root");
         var $preview = helpers.div("bre-field-editor-preview");
         bind$1($preview, data);
-        var $url = renderInput(__assign(__assign({}, locales.prompt.embed.url), { value: data.url || "", type: "text", onUpdate: function (v) {
+        var $url = renderInput({
+            title: helpers.msg("embed.link.title"),
+            placeholder: helpers.msg("embed.link.placeholder"),
+            value: data.url || "",
+            type: "text",
+            onUpdate: function (v) {
                 if (data.url != v) {
                     data.url = v;
                     bind$1($preview, data);
                 }
-            } }));
+            },
+        });
         $element.append($preview, $url);
         return {
             $element: $element,
@@ -887,19 +797,36 @@ var BrickyEditor = (function (exports) {
     var linkEditor = function (initialData) {
         var data = initialData ? __assign({}, initialData) : {};
         var $element = helpers.div("bre-field-editor-root");
-        var $href = renderInput(__assign(__assign({}, locales.prompt.link.href), { value: data.href, type: "text", onUpdate: function (v) { return (data.href = v); } }));
-        var $title = renderInput(__assign(__assign({}, locales.prompt.link.title), { value: data.title, type: "text", onUpdate: function (v) { return (data.title = v); } }));
-        var $target = renderSelect(__assign(__assign({}, locales.prompt.link.target), { value: data.target, options: [
+        var $href = renderInput({
+            title: helpers.msg("link.url.title"),
+            placeholder: helpers.msg("link.url.placeholder"),
+            value: data.href,
+            type: "text",
+            onUpdate: function (v) { return (data.href = v); },
+        });
+        var $title = renderInput({
+            title: helpers.msg("link.title.title"),
+            placeholder: helpers.msg("link.title.placeholder"),
+            value: data.title,
+            type: "text",
+            onUpdate: function (v) { return (data.title = v); },
+        });
+        var $target = renderSelect({
+            title: helpers.msg("link.target.title"),
+            value: data.target,
+            options: [
                 { value: "" },
                 { value: "_blank" },
                 { value: "_self" },
                 { value: "_parent" },
-                { value: "_top" }
-            ], onUpdate: function (v) { return (data.target = v); } }));
+                { value: "_top" },
+            ],
+            onUpdate: function (v) { return (data.target = v); },
+        });
         $element.append($href, $title, $target);
         return {
             $element: $element,
-            data: data
+            data: data,
         };
     };
 
@@ -911,7 +838,7 @@ var BrickyEditor = (function (exports) {
         bind$2($element, data);
         if (props.preview) {
             return {
-                $element: $element
+                $element: $element,
             };
         }
         var field = {
@@ -919,7 +846,7 @@ var BrickyEditor = (function (exports) {
             data: data,
             html: html$3,
             editor: editor$1,
-            parentBlock: props.parentBlock
+            parentBlock: props.parentBlock,
         };
         $element.addEventListener("click", function (ev) { return __awaiter(void 0, void 0, void 0, function () {
             var updatedData;
@@ -955,25 +882,37 @@ var BrickyEditor = (function (exports) {
         }
         $element.title = alt;
     }
-    function editor$1(initialData) {
+    function editor$1(field) {
         var _this = this;
+        var initialData = field.data;
         var data = __assign({}, initialData);
         var $element = helpers.div("bre-field-editor-root");
         var $previewImg = helpers.el({
             tag: "img",
             className: "bre-field-editor-preview-img",
             props: {
-                src: getSrcOrFile(data)
-            }
+                src: getSrcOrFile(data),
+            },
         });
         var $preview = helpers.div("bre-field-editor-preview");
         $preview.appendChild($previewImg);
-        var $src = renderInput(__assign(__assign({}, locales.prompt.image.link), { value: data.src, type: "text", onUpdate: function (src) {
+        var $src = renderInput({
+            title: helpers.msg("image.link.title"),
+            placeholder: helpers.msg("image.link.placeholder"),
+            value: data.src,
+            type: "text",
+            onUpdate: function (src) {
                 $previewImg.src = src;
                 data.src = src;
                 data.file = undefined;
-            } }));
-        var $file = renderInput(__assign(__assign({}, locales.prompt.image.upload), { type: "file", value: data.file ? data.file.fileContent : "", onUpdate: function (f, fileContent) { return __awaiter(_this, void 0, void 0, function () {
+            },
+        });
+        var $file = renderInput({
+            title: helpers.msg("image.upload.title"),
+            placeholder: helpers.msg("image.upload.title"),
+            type: "file",
+            value: data.file ? data.file.fileContent : "",
+            onUpdate: function (f, fileContent) { return __awaiter(_this, void 0, void 0, function () {
                 var fileInfo;
                 return __generator(this, function (_a) {
                     $previewImg.src = fileContent;
@@ -981,23 +920,30 @@ var BrickyEditor = (function (exports) {
                         name: f.name,
                         size: f.size,
                         type: f.type,
-                        lastModified: f.lastModified
+                        lastModified: f.lastModified,
                     };
                     data.src = undefined;
                     data.file = {
                         fileContent: fileContent,
-                        fileInfo: fileInfo
+                        fileInfo: fileInfo,
                     };
                     return [2];
                 });
-            }); } }));
-        var $alt = renderInput(__assign(__assign({}, locales.prompt.image.alt), { value: data.alt, type: "text", onUpdate: function (v) { return (data.alt = $previewImg.alt = v); } }));
+            }); },
+        });
+        var $alt = renderInput({
+            title: helpers.msg("image.alt.title"),
+            placeholder: helpers.msg("image.alt.title"),
+            value: data.alt,
+            type: "text",
+            onUpdate: function (v) { return (data.alt = $previewImg.alt = v); },
+        });
         var _a = linkEditor(initialData.link), $link = _a.$element, linkData = _a.data;
         data.link = linkData;
         $element.append($preview, $src, $file, $alt, $link);
         return {
             $element: $element,
-            data: data
+            data: data,
         };
     }
     function html$3(field) {
@@ -1007,7 +953,7 @@ var BrickyEditor = (function (exports) {
         if (link !== undefined && link.href !== undefined && link.href.length) {
             var $link = helpers.el({
                 tag: "a",
-                props: link
+                props: link,
             });
             $link.appendChild($result);
             return $link;
@@ -1141,11 +1087,11 @@ var BrickyEditor = (function (exports) {
                     });
                     ungrouppedTemplates = parseTemplates($data);
                     ungrouppedTemplatesGroupName = grouppedTemplates.length > 0
-                        ? EditorStrings.defaultTemplatesGroupName
+                        ? helpers.msg("templates.group.name.default")
                         : "";
                     grouppedTemplates.push({
                         name: ungrouppedTemplatesGroupName,
-                        templates: ungrouppedTemplates
+                        templates: ungrouppedTemplates,
                     });
                     allTemplates = __spreadArrays(allTemplates, ungrouppedTemplates);
                     return [2, grouppedTemplates];
@@ -1176,7 +1122,7 @@ var BrickyEditor = (function (exports) {
         return {
             name: name,
             $template: $template,
-            $preview: $preview
+            $preview: $preview,
         };
     };
 
@@ -1451,13 +1397,14 @@ var BrickyEditor = (function (exports) {
     };
 
     var defaultOptions = {
-        templatesUrl: "templates/bootstrap4.html",
+        locale: 'en',
+        templatesUrl: 'templates/bootstrap4.html',
         compactTools: false,
         compactToolsWidth: 768,
         ignoreHtml: true,
         templateSelector: {
-            zoom: true
-        }
+            zoom: true,
+        },
     };
 
     var getTemplateUI = function (template, zoom) {
@@ -1567,7 +1514,6 @@ var BrickyEditor = (function (exports) {
         return Editor;
     }());
     var editor$2 = function ($element, options) {
-        if (options === void 0) { options = defaultOptions; }
         return new Promise(function (resolve) { return __awaiter(void 0, void 0, void 0, function () {
             var optionsWithDefaults, eventEmitter, state, editor, rootContainer, templates, templatesUI, blocks;
             return __generator(this, function (_a) {
@@ -1578,17 +1524,17 @@ var BrickyEditor = (function (exports) {
                         state = getInitialState();
                         editor = __assign(__assign({}, eventEmitter), { $element: $element, data: function () { return getBlocksData(); }, html: function () { return getBlocksHtml(); }, state: state, options: optionsWithDefaults, shared: {
                                 modal: modal,
-                                helpers: helpers
+                                helpers: helpers,
                             } });
                         rootContainer = createRootContainer(editor);
                         editor.state.selectedContainers = [rootContainer];
-                        if (options.plugins) {
-                            options.plugins.map(function (_a) {
+                        if (optionsWithDefaults.plugins) {
+                            optionsWithDefaults.plugins.map(function (_a) {
                                 var plugin = _a.plugin;
                                 return plugin.init(editor);
                             });
                         }
-                        helpers.toggleClassName($element, "bre-editor", true);
+                        helpers.toggleClassName($element, 'bre-editor', true);
                         return [4, loadTemplatesAsync(optionsWithDefaults.templatesUrl, editor.$element)];
                     case 1:
                         templates = _a.sent();
@@ -1603,7 +1549,7 @@ var BrickyEditor = (function (exports) {
                         if (blocks !== null) {
                             blocks.map(function (blockData) {
                                 return addBlockToContainer(rootContainer, {
-                                    blockData: blockData
+                                    blockData: blockData,
                                 }, false);
                             });
                         }
@@ -1614,10 +1560,10 @@ var BrickyEditor = (function (exports) {
         }); });
     };
     var getBlocksData = function (state) {
-        throw Error("not implemented");
+        throw Error('not implemented');
     };
     var getBlocksHtml = function (state) {
-        throw Error("not implemented");
+        throw Error('not implemented');
     };
     var loadInitialBlocks = function (_a) {
         var blocks = _a.blocks, blocksUrl = _a.blocksUrl;

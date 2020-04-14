@@ -11,7 +11,6 @@ import {
 } from "@/fields/field";
 import { helpers } from "@/helpers";
 import { loadScriptAsync } from "@/httpTransport";
-import { locales } from "@/locales";
 import { bre } from "@/types/bre";
 import { propmtFieldEditorAsync } from "@/fields/editors";
 import { renderInput } from "@/fields/inputs";
@@ -80,9 +79,9 @@ function html(field: EmbedField) {
   return getCleanFieldElement(field.$element);
 }
 
-function editor(initialData: Readonly<EmbedFieldData>) {
+function editor(field: bre.field.FieldBase) {
   const data: EmbedFieldData = {
-    ...initialData,
+    ...field.data,
   };
 
   const $element = helpers.div("bre-field-editor-root");
@@ -91,7 +90,8 @@ function editor(initialData: Readonly<EmbedFieldData>) {
   bind($preview, data);
 
   const $url = renderInput({
-    ...locales.prompt.embed.url,
+    title: helpers.msg("embed.link.title"),
+    placeholder: helpers.msg("embed.link.placeholder"),
     value: data.url || "",
     type: "text",
     onUpdate: (v) => {

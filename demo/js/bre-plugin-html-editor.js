@@ -83,7 +83,7 @@ var brePluginHtmlEditor = (function (exports) {
     }
 
     var el = function (_a) {
-        var _b = _a.tag, tag = _b === void 0 ? "div" : _b, className = _a.className, innerHTML = _a.innerHTML, props = _a.props;
+        var _b = _a.tag, tag = _b === void 0 ? 'div' : _b, className = _a.className, innerHTML = _a.innerHTML, props = _a.props;
         var result = document.createElement(tag);
         if (className !== undefined) {
             if (Array.isArray(className)) {
@@ -104,20 +104,20 @@ var brePluginHtmlEditor = (function (exports) {
     var div = function (className, innerHTML) {
         return el({
             className: className,
-            innerHTML: innerHTML
+            innerHTML: innerHTML,
         });
     };
     var createElement = function (html, className) {
-        var temp = document.createElement("div");
+        var temp = document.createElement('div');
         temp.innerHTML = html;
         var result = temp.children[0];
-        temp.innerHTML = "";
+        temp.innerHTML = '';
         if (className !== undefined) {
             result.className = className;
         }
         return result;
     };
-    var hiddenClassName = "bre-hidden";
+    var hiddenClassName = 'bre-hidden';
     var toggleVisibility = function (el, visible) {
         if (visible === undefined) {
             visible = el.classList.contains(hiddenClassName);
@@ -176,6 +176,22 @@ var brePluginHtmlEditor = (function (exports) {
     var convertNodeListToArray = function (nl) {
         return Array.prototype.slice.call(nl);
     };
+    var msg = function (key, params) {
+        window.BrickyEditor.i18n.default = 'en';
+        window.BrickyEditor.i18n.locale = 'en';
+        var locale = window.BrickyEditor.i18n.messages[window.BrickyEditor.i18n.locale] ||
+            window.BrickyEditor.i18n.messages[window.BrickyEditor.i18n.default];
+        var str = locale[key];
+        if (str === undefined) {
+            return '';
+        }
+        if (params !== undefined) {
+            Object.keys(params).forEach(function (p) {
+                str.replace(/`{${p}}`/g, params[p]);
+            });
+        }
+        return str;
+    };
     var helpers = {
         createElement: createElement,
         div: div,
@@ -186,7 +202,8 @@ var brePluginHtmlEditor = (function (exports) {
         readFileAsync: readFileAsync,
         objectToArray: objectToArray,
         filterNotNull: filterNotNull,
-        convertNodeListToArray: convertNodeListToArray
+        convertNodeListToArray: convertNodeListToArray,
+        msg: msg,
     };
 
     var renderLabel = function ($root, $input, _a) {
@@ -267,95 +284,39 @@ var brePluginHtmlEditor = (function (exports) {
         return $root;
     };
 
-    var locales = {
-        errorBlocksFileNotFound: function (url) {
-            return "Blocks file not found. Requested file: " + url + ".";
-        },
-        errorTemplatesFileNotFound: function (url) {
-            return "Templates file not found. Requested file: " + url + ".";
-        },
-        errorBlockTemplateNotFound: function (templateName) {
-            return "Template \"" + templateName + "\" not found.";
-        },
-        errorTemplateParsing: function (name) {
-            return "Template parsing error: " + name + ".";
-        },
-        embedFieldLinkTitle: "Link to embed media",
-        embedFieldLinkPlaceholder: "Link to instagram, youtube and etc.",
-        prompt: {
-            image: {
-                link: {
-                    title: "Image link",
-                    placeholder: "http://url-to-image.png",
-                },
-                alt: {
-                    title: "Image alt",
-                    placeholder: "Image 'alt' attribute value",
-                },
-                upload: {
-                    title: "or Upload a file",
-                    placeholder: "select file",
-                    button: "Select file",
-                },
-                url: {
-                    subtitle: "Link to open on image click",
-                },
-            },
-            embed: {
-                url: {
-                    title: "URL to media",
-                    placeholder: "Paste link to youtube, instagram, etc.",
-                },
-            },
-            link: {
-                href: {
-                    title: "Url",
-                    placeholder: "https://put-your-link.here",
-                },
-                title: {
-                    title: "Title",
-                    placeholder: "Title attribute for link",
-                },
-                target: {
-                    title: "Target",
-                    blank: "Blank",
-                    self: "Self",
-                    parent: "Parent",
-                    top: "Top",
-                },
-            },
-        },
-        htmlEditorLinkUrlTitle: "Url",
-        htmlEditorLinkUrlPlaceholder: "http://put-your-link.here",
-        htmlEditorLinkTitleTitle: "Title",
-        htmlEditorLinkTitlePlaceholder: "Title attribute for link",
-        htmlEditorLinkTargetTitle: "Target",
-        htmlEditorLinkTargetBlank: "Blank",
-        htmlEditorLinkTargetSelf: "Self",
-        htmlEditorLinkTargetParent: "Parent",
-        htmlEditorLinkTargetTop: "Top",
-        buttonClose: "close",
-        buttonOk: "Ok",
-        buttonCancel: "Cancel",
-        defaultTemplatesGroupName: "Other templates",
-    };
-
     var linkEditor = function (initialData) {
         var data = initialData ? __assign({}, initialData) : {};
         var $element = helpers.div("bre-field-editor-root");
-        var $href = renderInput(__assign(__assign({}, locales.prompt.link.href), { value: data.href, type: "text", onUpdate: function (v) { return (data.href = v); } }));
-        var $title = renderInput(__assign(__assign({}, locales.prompt.link.title), { value: data.title, type: "text", onUpdate: function (v) { return (data.title = v); } }));
-        var $target = renderSelect(__assign(__assign({}, locales.prompt.link.target), { value: data.target, options: [
+        var $href = renderInput({
+            title: helpers.msg("link.url.title"),
+            placeholder: helpers.msg("link.url.placeholder"),
+            value: data.href,
+            type: "text",
+            onUpdate: function (v) { return (data.href = v); },
+        });
+        var $title = renderInput({
+            title: helpers.msg("link.title.title"),
+            placeholder: helpers.msg("link.title.placeholder"),
+            value: data.title,
+            type: "text",
+            onUpdate: function (v) { return (data.title = v); },
+        });
+        var $target = renderSelect({
+            title: helpers.msg("link.target.title"),
+            value: data.target,
+            options: [
                 { value: "" },
                 { value: "_blank" },
                 { value: "_self" },
                 { value: "_parent" },
-                { value: "_top" }
-            ], onUpdate: function (v) { return (data.target = v); } }));
+                { value: "_top" },
+            ],
+            onUpdate: function (v) { return (data.target = v); },
+        });
         $element.append($href, $title, $target);
         return {
             $element: $element,
-            data: data
+            data: data,
         };
     };
 
@@ -374,7 +335,7 @@ var brePluginHtmlEditor = (function (exports) {
         var $btn = helpers.el({
             tag: "button",
             className: "bre-button",
-            innerHTML: "<i class=\"fa fa-" + icon + "\"></i>"
+            innerHTML: "<i class=\"fa fa-" + icon + "\"></i>",
         });
         $btn.onclick = function () { return __awaiter(void 0, void 0, void 0, function () {
             var selection, selectionRange, selectedLink, currentLink, updatedLink, valueArgument;
@@ -395,7 +356,7 @@ var brePluginHtmlEditor = (function (exports) {
                             ? {
                                 href: selectedLink.href,
                                 title: selectedLink.title,
-                                target: selectedLink.target
+                                target: selectedLink.target,
                             }
                             : {};
                         return [4, promptLinkParamsAsync(modal, currentLink)];
@@ -511,28 +472,9 @@ var brePluginHtmlEditor = (function (exports) {
         return range.getBoundingClientRect();
     };
 
-    var defaultOptions = {
-        buttons: [
-            { icon: "bold", command: "Bold", range: true },
-            { icon: "italic", command: "Italic", range: true },
-            { icon: "link", command: "CreateLink", range: true },
-            {
-                icon: "list-ul",
-                command: "insertUnorderedList",
-                range: true
-            },
-            {
-                icon: "list-ol",
-                command: "insertOrderedList",
-                range: true
-            },
-            { icon: "undo", command: "Undo", range: false },
-            { icon: "repeat", command: "Redo", range: false }
-        ]
-    };
     var plugin = {
         init: function (editor, options) {
-            var $control = initHtmlTools(editor.shared.modal, editor.shared.helpers, defaultOptions.buttons);
+            var $control = initHtmlTools(editor.shared.messages, editor.shared.modal, editor.shared.helpers);
             if ($control === null) {
                 return;
             }
@@ -545,7 +487,7 @@ var brePluginHtmlEditor = (function (exports) {
                     bindTextSelection(field.$element, onSelect);
                 }
             });
-        }
+        },
     };
 
     exports.plugin = plugin;

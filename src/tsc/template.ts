@@ -1,4 +1,3 @@
-import { EditorStrings } from "@/EditorStrings";
 import { helpers, strEqualsInvariant } from "@/helpers";
 import { getRequest } from "@/httpTransport";
 import { bre } from "@/types/bre";
@@ -6,13 +5,13 @@ import { bindTemplateFields } from "@/fields/fields";
 import {
   TEMPLATE_GROUP_SELECTOR,
   TEMPLATE_PREVIEW_SELECTOR,
-  TEMPLATE_SELECTOR
+  TEMPLATE_SELECTOR,
 } from "./constants";
 
 let allTemplates: bre.template.Template[] = [];
 
 export const getTemplate = (templateName: string): bre.template.Template => {
-  const template = allTemplates.find(x =>
+  const template = allTemplates.find((x) =>
     strEqualsInvariant(x.name, templateName)
   );
 
@@ -42,7 +41,7 @@ export const loadTemplatesAsync = async (url: string, $editor: HTMLElement) => {
       TEMPLATE_GROUP_SELECTOR
     );
 
-    $groups.forEach($group => {
+    $groups.forEach(($group) => {
       const name = $group.getAttribute("title");
       const templates = parseTemplates($group);
       grouppedTemplates.push({ name, templates });
@@ -56,12 +55,12 @@ export const loadTemplatesAsync = async (url: string, $editor: HTMLElement) => {
     const ungrouppedTemplates = parseTemplates($data);
     const ungrouppedTemplatesGroupName =
       grouppedTemplates.length > 0
-        ? EditorStrings.defaultTemplatesGroupName
+        ? helpers.msg("templates.group.name.default")
         : "";
 
     grouppedTemplates.push({
       name: ungrouppedTemplatesGroupName,
-      templates: ungrouppedTemplates
+      templates: ungrouppedTemplates,
     });
 
     // add to dictionary
@@ -101,6 +100,6 @@ const createTemplate = (
   return {
     name,
     $template,
-    $preview
+    $preview,
   };
 };

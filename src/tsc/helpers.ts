@@ -1,12 +1,13 @@
-import { bre } from "@/types/bre";
+import { bre } from '@/types/bre';
+import { Locale } from '@/types/locale';
 
 type FieldData = bre.field.FieldData;
 
 const el = <THTMLElement extends HTMLElement = HTMLElement>({
-  tag = "div",
+  tag = 'div',
   className,
   innerHTML,
-  props
+  props,
 }: {
   tag?: string;
   className?: BreStyles | BreStyles[];
@@ -37,17 +38,17 @@ const el = <THTMLElement extends HTMLElement = HTMLElement>({
 const div = (className?: BreStyles | BreStyles[], innerHTML?: string) =>
   el<HTMLDivElement>({
     className,
-    innerHTML
+    innerHTML,
   });
 
 const createElement = <TElement extends HTMLElement>(
   html: string,
   className?: string
 ): TElement => {
-  const temp = document.createElement("div");
+  const temp = document.createElement('div');
   temp.innerHTML = html;
   const result = temp.children[0] as TElement;
-  temp.innerHTML = "";
+  temp.innerHTML = '';
 
   if (className !== undefined) {
     result.className = className;
@@ -56,7 +57,7 @@ const createElement = <TElement extends HTMLElement>(
   return result;
 };
 
-const hiddenClassName: BreStyles = "bre-hidden";
+const hiddenClassName: BreStyles = 'bre-hidden';
 const toggleVisibility = (el: HTMLElement, visible?: boolean) => {
   if (visible === undefined) {
     visible = el.classList.contains(hiddenClassName);
@@ -139,6 +140,29 @@ const convertNodeListToArray = <TNode extends Node>(nl: NodeListOf<TNode>) => {
   return Array.prototype.slice.call(nl) as TNode[];
 };
 
+const msg = (key: keyof Locale, params?: Record<string, string>) => {
+  window.BrickyEditor.i18n.default = 'en';
+  window.BrickyEditor.i18n.locale = 'en';
+
+  const locale =
+    window.BrickyEditor.i18n.messages[window.BrickyEditor.i18n.locale] ||
+    window.BrickyEditor.i18n.messages[window.BrickyEditor.i18n.default];
+
+  let str = locale[key];
+
+  if (str === undefined) {
+    // TODO: log missing message
+    return '';
+  }
+
+  if (params !== undefined) {
+    Object.keys(params).forEach(p => {
+      str.replace(/`{${p}}`/g, params[p]);
+    });
+  }
+  return str;
+};
+
 export const helpers = {
   createElement,
   div,
@@ -149,5 +173,6 @@ export const helpers = {
   readFileAsync,
   objectToArray,
   filterNotNull,
-  convertNodeListToArray
+  convertNodeListToArray,
+  msg,
 };

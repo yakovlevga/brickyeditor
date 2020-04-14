@@ -2,17 +2,17 @@ import {
   addBlockToContainer,
   getContainerData,
   getContainerHtml,
-  createRootContainer
-} from "@/blocksContainer";
-import { defaultOptions } from "@/defaults";
-import { getRequest } from "@/httpTransport";
-import { loadTemplatesAsync } from "@/template";
-import { bre } from "@/types/bre";
-import { getTemplateSelector } from "@/ui/templateSelector";
-import { helpers } from "@/helpers";
-import { getInitialState } from "@/editorState";
-import { emitter } from "./emitter";
-import { modal } from "@/modal";
+  createRootContainer,
+} from '@/blocksContainer';
+import { defaultOptions } from '@/defaults';
+import { getRequest } from '@/httpTransport';
+import { loadTemplatesAsync } from '@/template';
+import { bre } from '@/types/bre';
+import { getTemplateSelector } from '@/ui/templateSelector';
+import { helpers } from '@/helpers';
+import { getInitialState } from '@/editorState';
+import { emitter } from './emitter';
+import { modal } from '@/modal';
 
 export class Editor {
   constructor($editor: HTMLElement, options: bre.EditorOptions) {
@@ -20,14 +20,17 @@ export class Editor {
   }
 }
 
-export const editor = (
-  $element: HTMLElement,
-  options: bre.EditorOptions = defaultOptions
-) =>
+function i18n() {
+  // window.BrickyEditor.i18n.default = 'en';
+}
+
+export const editor = ($element: HTMLElement, options?: bre.EditorOptions) =>
   new Promise<bre.Editor>(async resolve => {
+    i18n();
+
     const optionsWithDefaults: bre.EditorOptions = {
-      ...defaultOptions,
-      ...options
+      ...(defaultOptions as bre.EditorOptions),
+      ...options,
     };
 
     const eventEmitter = emitter();
@@ -42,19 +45,19 @@ export const editor = (
       options: optionsWithDefaults,
       shared: {
         modal,
-        helpers
-      }
+        helpers,
+      },
     };
 
     const rootContainer = createRootContainer(editor);
 
     editor.state.selectedContainers = [rootContainer];
 
-    if (options.plugins) {
-      options.plugins.map(({ plugin }) => plugin.init(editor));
+    if (optionsWithDefaults.plugins) {
+      optionsWithDefaults.plugins.map(({ plugin }) => plugin.init(editor));
     }
 
-    helpers.toggleClassName($element, "bre-editor", true);
+    helpers.toggleClassName($element, 'bre-editor', true);
 
     // TODO: move it to separate plugin?
     // bindFormSubmit(editor, optionsWithDefaults);
@@ -76,7 +79,7 @@ export const editor = (
         addBlockToContainer(
           rootContainer,
           {
-            blockData
+            blockData,
           },
           false
         )
@@ -87,10 +90,10 @@ export const editor = (
   });
 
 const getBlocksData = (state: bre.EditorState): bre.block.BlockData[] => {
-  throw Error("not implemented");
+  throw Error('not implemented');
 };
 const getBlocksHtml = (state: bre.EditorState): string => {
-  throw Error("not implemented");
+  throw Error('not implemented');
 };
 
 const loadInitialBlocks = ({ blocks, blocksUrl }: bre.EditorOptions) =>
