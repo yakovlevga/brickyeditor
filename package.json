@@ -64,7 +64,7 @@
   },
   "scripts": {
     "test": "jest",
-    "start": "rollup -c --watch",
+    "start": "rollup -c",
     "styles": "node src/scripts/styles.js",
     "i18n": "node src/scripts/i18n.js"
   },

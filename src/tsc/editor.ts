@@ -13,6 +13,7 @@ import { helpers } from '@/helpers';
 import { getInitialState } from '@/editorState';
 import { emitter } from './emitter';
 import { modal } from '@/modal';
+import { initDefaultLocale } from '@/i18n';
 
 export class Editor {
   constructor($editor: HTMLElement, options: bre.EditorOptions) {
@@ -20,13 +21,9 @@ export class Editor {
   }
 }
 
-function i18n() {
-  // window.BrickyEditor.i18n.default = 'en';
-}
-
 export const editor = ($element: HTMLElement, options?: bre.EditorOptions) =>
   new Promise<bre.Editor>(async resolve => {
-    i18n();
+    initDefaultLocale();
 
     const optionsWithDefaults: bre.EditorOptions = {
       ...(defaultOptions as bre.EditorOptions),

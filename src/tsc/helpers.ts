@@ -1,5 +1,5 @@
 import { bre } from '@/types/bre';
-import { Locale } from '@/types/locale';
+import { Locale } from '@/i18n';
 
 type FieldData = bre.field.FieldData;
 

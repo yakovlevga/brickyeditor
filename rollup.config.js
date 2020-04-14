@@ -2,6 +2,7 @@ import typescript from 'rollup-plugin-typescript';
 import browsersync from 'rollup-plugin-browsersync';
 import execute from 'rollup-plugin-execute';
 import sass from 'rollup-plugin-sass';
+import { uglify } from 'rollup-plugin-uglify';
 
 const ts = typescript({
   target: 'es5',
@@ -18,6 +19,7 @@ export default [
     },
     plugins: [
       ts,
+      uglify({}),
       sass({
         insert: true,
       }),
@@ -35,7 +37,7 @@ export default [
       execute('node src/scripts/styles.js'),
       execute('node src/scripts/i18n.js'),
       ts,
-      // uglify(),
+      uglify({}),
       browsersync({
         https: true,
         server: {

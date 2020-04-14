@@ -5,12 +5,24 @@ const uglify = require('uglify-js');
 
 const defaultLocale = 'en';
 const localeFolder = 'src/i18n/';
-const typingsPath = 'src/tsc/types/locale.d.ts';
+const tsPath = 'src/tsc/i18n.ts';
 const filehound = require('filehound');
 
 function getLocaleFromFile(fileName) {
   const fn = fileName.split(/[\\\/]/).pop();
   return fn.substring(0, fn.lastIndexOf('.'));
+}
+
+function generateScript(locale, space = '') {
+  var script = space + 'window.BrickyEditor = window.BrickyEditor || {};\n';
+  script +=
+    space + 'window.BrickyEditor.i18n = window.BrickyEditor.i18n || {};\n';
+  script +=
+    space +
+    'window.BrickyEditor.i18n.messages = window.BrickyEditor.i18n.messages || {};\n';
+  script += space + `window.BrickyEditor.i18n.messages.${locale} = ${locale}\n`;
+
+  return script;
 }
 
 function toJS(fileName) {
@@ -23,11 +35,7 @@ function toJS(fileName) {
   js += `  var ${locale} = `;
   js += JSON.stringify(doc, null, 4).replace(/};/g, '    };');
   js += ';';
-  js += '  window.BrickyEditor = window.BrickyEditor || {};';
-  js += '  window.BrickyEditor.i18n = window.BrickyEditor.i18n || {};';
-  js +=
-    '  window.BrickyEditor.i18n.messages = window.BrickyEditor.i18n.messages || {};';
-  js += `  window.BrickyEditor.i18n.messages.${locale} = ${locale}`;
+  js += generateScript(locale, '  ');
   js += '})();';
 
   js = uglify.minify(js).code;
@@ -38,21 +46,26 @@ function toJS(fileName) {
   });
 }
 
-function toDTS(fileName) {
+function defaultToTS(fileName) {
   const locale = getLocaleFromFile(fileName);
   console.log(`Converting ${fileName} to locale.d.ts`);
 
   const doc = yaml.safeLoad(fs.readFileSync(fileName, 'utf8'));
+  let ts = `const ${locale} = `;
+  ts += JSON.stringify(doc, null, 2);
+  ts += ';\n\n';
+  ts += 'export const initDefaultLocale = () => {\n';
+  ts += generateScript(locale, '  ');
+  ts += ';\n';
+  ts += `  window.BrickyEditor.i18n.locale = '${locale}';\n`;
+  ts += `  window.BrickyEditor.i18n.default = '${locale}';\n\n`;
+  ts += '};\n\n';
 
-  const keys = Object.keys(doc);
+  ts += `export type Locale = Record<keyof typeof ${locale}, string>;\n`;
+  ts += '\n';
+  ts += `export type defaultLocale = '${locale}'`;
 
-  let dts = 'type BreStrings =\n';
-  dts += keys.map(k => `  | "${k}"`).join('\n') + ';\n\n';
-  dts += 'export type Locale = Record<BreStrings, string>;\n';
-  dts += '\n';
-  dts += `export type defaultLocale = '${locale}'`;
-
-  fs.writeFileSync(typingsPath, dts, {
+  fs.writeFileSync(tsPath, ts, {
     encoding: 'utf8',
   });
 }
@@ -70,5 +83,5 @@ function toDTS(fileName) {
   const defaultLocaleFile = files.find(x =>
     x.endsWith(`${defaultLocale}.yaml`)
   );
-  toDTS(defaultLocaleFile);
+  defaultToTS(defaultLocaleFile);
 })();
