@@ -3,28 +3,47 @@ import browsersync from 'rollup-plugin-browsersync';
 import execute from 'rollup-plugin-execute';
 import sass from 'rollup-plugin-sass';
 import { uglify } from 'rollup-plugin-uglify';
+import postcss from 'rollup-plugin-postcss';
+
+import extensionMapper from 'rollup-plugin-extension-mapper';
 
 const ts = typescript({
   target: 'es5',
   declaration: true,
 });
 
-export default [
+const getPluginTasks = (name, plugin) => [
   {
-    input: './src/plugins/html-editor/index.ts',
-    output: {
-      format: 'iife',
-      file: 'demo/js/bre-plugin-html-editor.js',
-      name: 'brePluginHtmlEditor',
-    },
+    input: './src/scripts/empty.js',
     plugins: [
-      ts,
-      uglify({}),
-      sass({
-        insert: true,
-      }),
+      execute(
+        `node-sass ./src/plugins/${plugin} -o ./src/plugins/${plugin} --source-map true`
+      ),
     ],
   },
+  {
+    input: `./src/plugins/${plugin}/index.ts`,
+    output: {
+      format: 'iife',
+      file: `demo/js/brickyeditor/plugins/bre-plugin-${plugin}.js`,
+      name,
+    },
+    sourceMap: true,
+    plugins: [
+      extensionMapper({
+        '.scss': '.css',
+      }),
+      ts,
+      postcss({}),
+      // sass({
+      //   insert: true,
+      // }),
+    ],
+  },
+];
+
+export default [
+  ...getPluginTasks('brePluginHtmlEditor', 'html-editor'),
 
   {
     input: './src/tsc/editor.ts',
@@ -33,6 +52,7 @@ export default [
       file: 'demo/js/brickyeditor/brickyeditor.js',
       name: 'BrickyEditor',
     },
+    sourceMap: true,
     plugins: [
       execute('node src/scripts/styles.js'),
       execute('node src/scripts/i18n.js'),

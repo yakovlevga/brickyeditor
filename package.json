@@ -51,6 +51,8 @@
     "rollup": "^1.31.1",
     "rollup-plugin-browsersync": "^1.1.0",
     "rollup-plugin-execute": "^1.1.1",
+    "rollup-plugin-extension-mapper": "franklin-ross/rollup-plugin-extension-mapper",
+    "rollup-plugin-postcss": "^2.6.2",
     "rollup-plugin-sass": "^1.2.2",
     "rollup-plugin-typescript": "^1.0.1",
     "rollup-plugin-uglify": "^6.0.4",

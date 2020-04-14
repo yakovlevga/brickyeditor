@@ -30,8 +30,6 @@ function toJS(fileName) {
 
 function defaultToTS(fileName) {
   const locale = getLocaleFromFile(fileName);
-  console.log(`Converting ${fileName} to locale.d.ts`);
-
   const doc = yaml.safeLoad(fs.readFileSync(fileName, 'utf8'));
   let ts = `export const defaultLocale = ${JSON.stringify(doc, null, 2)}`;
 
@@ -46,7 +44,6 @@ function defaultToTS(fileName) {
     .ext('yaml')
     .paths('./src/locales')
     .findSync();
-  console.log(files);
 
   files.forEach(toJS);
 

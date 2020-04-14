@@ -12,6 +12,7 @@
     "noUnusedParameters": true,
     "esModuleInterop": true,
     "baseUrl": "src/tsc",
+    "sourceMap": true,
     "paths": {
       "@/*": ["*"]
     },
