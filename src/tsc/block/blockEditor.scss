@@ -18,8 +18,8 @@ $zIndex: 100;
 
     &-button {
       cursor: pointer;
+      user-select: none;
       width: $size;
-      height: $size;
       padding: 6px;
       margin-right: $padding;
       opacity: 0.8;
@@ -33,7 +33,7 @@ $zIndex: 100;
       }
 
       &-disabled {
-        cursor: "unset";
+        cursor: 'unset';
         opacity: 0.3;
 
         &:hover {

@@ -171,6 +171,27 @@ var brePluginHtmlEditor = (function (exports) {
         }
         return str;
     };
+    var getSelectionRanges = function () {
+        var selection = window.getSelection();
+        if (selection === null || selection.rangeCount === 0) {
+            return null;
+        }
+        var selectionRanges = [];
+        for (var idx = 0; idx < selection.rangeCount; idx++) {
+            selectionRanges.push(selection.getRangeAt(idx));
+        }
+        return selectionRanges;
+    };
+    var restoreSelection = function (selectionRanges) {
+        if (selectionRanges === null || selectionRanges.length === 0) {
+            return;
+        }
+        var selection = window.getSelection();
+        if (selection !== null) {
+            selection.removeAllRanges();
+            selectionRanges.forEach(function (range) { return selection.addRange(range); });
+        }
+    };
     var helpers = {
         createElement: createElement,
         div: div,
@@ -183,6 +204,8 @@ var brePluginHtmlEditor = (function (exports) {
         filterNotNull: filterNotNull,
         convertNodeListToArray: convertNodeListToArray,
         msg: msg,
+        getSelectionRanges: getSelectionRanges,
+        restoreSelection: restoreSelection,
     };
 
     var renderLabel = function ($root, $input, _a) {
@@ -299,6 +322,7 @@ var brePluginHtmlEditor = (function (exports) {
         };
     };
 
+    var _selectionRange = null;
     var promptLinkParamsAsync = function (modal, initialData) {
         return new Promise(function (resolve) {
             var _a = linkEditor(initialData), $editor = _a.$element, updatedData = _a.data;
@@ -310,64 +334,30 @@ var brePluginHtmlEditor = (function (exports) {
         });
     };
     var renderButtonElement = function (modal, helpers, _a) {
-        var icon = _a.icon, command = _a.command, range = _a.range, aValueArgument = _a.aValueArgument;
-        var $btn = helpers.el({
-            tag: "button",
-            className: "bre-button",
-            innerHTML: "<i class=\"fa fa-" + icon + "\"></i>",
-        });
+        var icon = _a.icon, command = _a.command, range = _a.range;
+        var $btn = helpers.div(['bre-block-editor-button', 'bre-icon', 'bre-icon-light'], icon);
         $btn.onclick = function () { return __awaiter(void 0, void 0, void 0, function () {
-            var selection, selectionRange, selectedLink, currentLink, updatedLink, valueArgument;
+            var selection, selectionRange;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         selection = window.getSelection();
-                        if (selection === null) {
-                            return [2];
-                        }
-                        selectionRange = selection.rangeCount > 0 ? selection.getRangeAt(0) : null;
+                        selectionRange = selection !== null && selection.rangeCount > 0
+                            ? selection.getRangeAt(0)
+                            : null;
+                        console.log({ selection: selection });
                         if (range && !selectionRange) {
                             return [2];
                         }
-                        if (!(command === "CreateLink")) return [3, 2];
-                        selectedLink = getSeletedLink(selection);
-                        currentLink = selectedLink !== null
-                            ? {
-                                href: selectedLink.href,
-                                title: selectedLink.title,
-                                target: selectedLink.target,
-                            }
-                            : {};
-                        return [4, promptLinkParamsAsync(modal, currentLink)];
+                        if (!(command === 'CreateLink' && selection !== null)) return [3, 2];
+                        return [4, createLinkCmd(selection, modal)];
                     case 1:
-                        updatedLink = _a.sent();
-                        if (updatedLink !== null && updatedLink.href) {
-                            document.execCommand(command, false, updatedLink.href);
-                            if (selection.anchorNode !== null &&
-                                selection.anchorNode.parentElement !== null) {
-                                if (updatedLink.target) {
-                                    selection.anchorNode.parentElement.setAttribute("target", updatedLink.target);
-                                }
-                                if (updatedLink.title) {
-                                    selection.anchorNode.parentElement.setAttribute("title", updatedLink.title);
-                                }
-                            }
-                        }
+                        _a.sent();
                         return [3, 3];
                     case 2:
-                        valueArgument = void 0;
-                        if (typeof aValueArgument === "string") {
-                            valueArgument = aValueArgument.replace("%%SELECTION%%", selection.toString());
-                        }
-                        try {
-                            document.execCommand(command, false, valueArgument);
-                        }
-                        catch (_b) {
-                            wrapSelectionToContainer(helpers, selection);
-                            document.execCommand(command, false, valueArgument);
-                        }
+                        document.execCommand(command);
                         _a.label = 3;
-                    case 3: return [2, false];
+                    case 3: return [2];
                 }
             });
         }); };
@@ -376,36 +366,18 @@ var brePluginHtmlEditor = (function (exports) {
     var getSeletedLink = function (selection) {
         if (selection.anchorNode !== null &&
             selection.anchorNode.parentNode !== null &&
-            selection.anchorNode.parentNode.nodeName.toLowerCase() === "a") {
+            selection.anchorNode.parentNode.nodeName.toLowerCase() === 'a') {
             return selection.anchorNode.parentNode;
         }
         return null;
     };
     var renderControl = function (modal, helpers, buttons) {
-        var $panel = helpers.div("bre-plugin-html-editor-root");
+        var $root = helpers.div('bre-block-editor');
         buttons
             .map(function (btn) { return renderButtonElement(modal, helpers, btn); })
-            .forEach(function ($btn) { return $panel.appendChild($btn); });
-        var $controlRoot = helpers.div("bre-html-tools");
-        $controlRoot.appendChild($panel);
-        helpers.toggleVisibility($controlRoot, false);
-        return $controlRoot;
-    };
-    var wrapSelectionToContainer = function (helpers, selection) {
-        if (selection.anchorNode === null) {
-            return;
-        }
-        var $container = selection.anchorNode.parentElement;
-        if ($container !== null) {
-            var $wrapper = helpers.createElement("<div class=\"bre-temp-container\" contenteditable=\"true\">" + $container.innerHTML + "</div>");
-            $container.innerHTML = "";
-            $container.removeAttribute("contenteditable");
-            $container.appendChild($wrapper);
-            var range = document.createRange();
-            range.selectNodeContents($wrapper);
-            selection.removeAllRanges();
-            selection.addRange(range);
-        }
+            .forEach(function ($btn) { return $root.appendChild($btn); });
+        helpers.toggleVisibility($root, false);
+        return $root;
     };
     var initHtmlTools = function (modal, helpers, buttons) {
         if (buttons === undefined || buttons.length === 0) {
@@ -421,6 +393,7 @@ var brePluginHtmlEditor = (function (exports) {
             var left = rect.left;
             $control.style.top = top + "px";
             $control.style.left = left + "px";
+            _selectionRange = helpers.getSelectionRanges();
             helpers.toggleVisibility($control, true);
         }
         else {
@@ -431,13 +404,13 @@ var brePluginHtmlEditor = (function (exports) {
         if (!$el.contentEditable) {
             return;
         }
-        $el.addEventListener("mouseup", function () {
+        $el.addEventListener('mouseup', function () {
             setTimeout(function () {
                 var rect = getSelectionRect();
                 handler(rect);
             }, 0);
         });
-        $el.addEventListener("keyup", function () {
+        $el.addEventListener('keyup', function () {
             var rect = getSelectionRect();
             handler(rect);
         });
@@ -450,54 +423,70 @@ var brePluginHtmlEditor = (function (exports) {
         var range = selection.getRangeAt(0);
         return range.getBoundingClientRect();
     };
-
-    function styleInject(css, ref) {
-      if ( ref === void 0 ) ref = {};
-      var insertAt = ref.insertAt;
-
-      if (!css || typeof document === 'undefined') { return; }
-
-      var head = document.head || document.getElementsByTagName('head')[0];
-      var style = document.createElement('style');
-      style.type = 'text/css';
-
-      if (insertAt === 'top') {
-        if (head.firstChild) {
-          head.insertBefore(style, head.firstChild);
-        } else {
-          head.appendChild(style);
-        }
-      } else {
-        head.appendChild(style);
-      }
-
-      if (style.styleSheet) {
-        style.styleSheet.cssText = css;
-      } else {
-        style.appendChild(document.createTextNode(css));
-      }
+    function createLinkCmd(selection, modal) {
+        return __awaiter(this, void 0, void 0, function () {
+            var selectedLink, currentLink, updatedLink;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        selectedLink = getSeletedLink(selection);
+                        currentLink = selectedLink !== null
+                            ? {
+                                href: selectedLink.href,
+                                title: selectedLink.title,
+                                target: selectedLink.target,
+                            }
+                            : {};
+                        return [4, promptLinkParamsAsync(modal, currentLink)];
+                    case 1:
+                        updatedLink = _a.sent();
+                        if (updatedLink !== null && updatedLink.href) {
+                            document.execCommand('CreateLink', false, updatedLink.href);
+                            if (selection.anchorNode !== null &&
+                                selection.anchorNode.parentElement !== null) {
+                                if (updatedLink.target) {
+                                    selection.anchorNode.parentElement.setAttribute('target', updatedLink.target);
+                                }
+                                if (updatedLink.title) {
+                                    selection.anchorNode.parentElement.setAttribute('title', updatedLink.title);
+                                }
+                            }
+                        }
+                        return [2];
+                }
+            });
+        });
     }
 
-    var css_248z = ".bre-plugin-html-editor-root {\n  display: flex;\n  position: absolute;\n  background-color: rgba(0, 0, 0, 0.8);\n  border-radius: 20px; }";
-    styleInject(css_248z);
+    var iconBold = "\n<svg viewBox=\"0 0 24 24\">\n  <path d=\"M6 4h8a4 4 0 014 4 4 4 0 01-4 4H6zM6 12h9a4 4 0 014 4 4 4 0 01-4 4H6z\"/>\n</svg>";
+
+    var iconItalic = "\n<svg viewBox=\"0 0 24 24\">\n  <path d=\"M19 4h-9M14 20H5M15 4L9 20\"/>\n</svg>";
+
+    var iconLink = "\n<svg viewBox=\"0 0 24 24\">\n  <path d=\"M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71\"/>\n  <path d=\"M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71\"/>\n</svg>";
+
+    var iconList = "\n<svg viewBox=\"0 0 24 24\">\n  <path d=\"M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01\"/>\n</svg>";
+
+    var iconUndo = "\n<svg viewBox=\"0 0 24 24\">\n  <path d=\"M19 12H5M12 19l-7-7 7-7\"/>\n</svg>";
+
+    var iconRepeat = "\n<svg viewBox=\"0 0 24 24\">\n  <path d=\"M5 12h14M12 5l7 7-7 7\"/>\n</svg>";
 
     var defaultOptions = {
         buttons: [
-            { icon: 'bold', command: 'Bold', range: true },
-            { icon: 'italic', command: 'Italic', range: true },
-            { icon: 'link', command: 'CreateLink', range: true },
+            { icon: iconBold, command: 'Bold', range: true },
+            { icon: iconItalic, command: 'Italic', range: true },
+            { icon: iconLink, command: 'CreateLink', range: true },
             {
-                icon: 'list-ul',
+                icon: iconList,
                 command: 'insertUnorderedList',
                 range: true,
             },
             {
-                icon: 'list-ol',
+                icon: iconList,
                 command: 'insertOrderedList',
                 range: true,
             },
-            { icon: 'undo', command: 'Undo', range: false },
-            { icon: 'repeat', command: 'Redo', range: false },
+            { icon: iconUndo, command: 'Undo', range: false },
+            { icon: iconRepeat, command: 'Redo', range: false },
         ],
     };
     var plugin = {

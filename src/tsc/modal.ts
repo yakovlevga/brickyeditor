@@ -1,50 +1,49 @@
-import { bre } from "@/types/bre";
-import { getSelectionRanges, restoreSelection } from "@/ui/selection";
-import { helpers } from "@/helpers";
+import { bre } from '@/types/bre';
+import { helpers } from '@/helpers';
 
 export const modal: bre.EditorModal = (
   $content: HTMLElement,
   ok?: () => void,
   cancel?: () => void
 ) => {
-  const selection = getSelectionRanges();
+  const selection = helpers.getSelectionRanges();
 
-  const root = helpers.div("bre-modal");
+  const root = helpers.div('bre-modal');
 
   const close = () => {
     root.remove();
-    restoreSelection(selection);
+    helpers.restoreSelection(selection);
   };
 
   const $ok = helpers.el<HTMLButtonElement>({
-    tag: "button",
+    tag: 'button',
     props: {
-      type: "button",
+      type: 'button',
       onclick: () => {
         if (ok) {
           ok();
         }
         close();
       },
-      innerHTML: "Ok"
-    }
+      innerHTML: 'Ok',
+    },
   });
 
   const $cancel = helpers.el<HTMLButtonElement>({
-    tag: "button",
+    tag: 'button',
     props: {
-      type: "button",
+      type: 'button',
       onclick: () => {
         if (cancel) {
           cancel();
         }
         close();
       },
-      innerHTML: "Cancel"
-    }
+      innerHTML: 'Cancel',
+    },
   });
 
-  const $placeholder = helpers.div("bre-modal-placeholder");
+  const $placeholder = helpers.div('bre-modal-placeholder');
   $placeholder.append($content, $ok, $cancel);
   root.append($placeholder);
 

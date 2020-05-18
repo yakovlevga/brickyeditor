@@ -4,7 +4,7 @@ const nodeSass = require('node-sass');
 const postcss = require('postcss');
 const autoprefixer = require('autoprefixer');
 
-const cssPath = 'demo/js/brickyeditor.css';
+const cssPath = 'demo/js/brickyeditor/brickyeditor.css';
 const typingsPath = 'src/tsc/types/styles.d.ts';
 
 const processor = postcss([autoprefixer]);

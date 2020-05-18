@@ -19,7 +19,6 @@
   .bre-block-editor-button {
     cursor: pointer;
     width: 32px;
-    height: 32px;
     padding: 6px;
     margin-right: 4px;
     opacity: 0.8; }
@@ -28,7 +27,7 @@
     .bre-block-editor-button:hover {
       opacity: 1; }
     .bre-block-editor-button-disabled {
-      cursor: "unset";
+      cursor: 'unset';
       opacity: 0.3; }
       .bre-block-editor-button-disabled:hover {
         opacity: 0.3; }
@@ -63,17 +62,15 @@
   fill: none;
   width: 100%;
   height: 100%;
-  stroke-width: 32;
+  stroke-width: 2;
   stroke-linecap: round;
-  stroke-linejoin: round;
-  stroke-miterlimit: 10; }
+  stroke-linejoin: round; }
 
 .bre-icon-light > svg {
   stroke: #ffffff; }
 
 .bre-icon-32 > svg {
-  width: 32px;
-  height: 32px; }
+  width: 32px; }
 
 .bre-field-editor-root {
   width: 100%; }

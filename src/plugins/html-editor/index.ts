@@ -1,7 +1,12 @@
 import { bre } from '@/types/bre';
 import { initHtmlTools, toggleHtmlTools, bindTextSelection } from './htmlTools';
 
-import './style.scss';
+import { iconBold } from './icons/iconBold';
+import { iconItalic } from './icons/iconItalic';
+import { iconLink } from '@/../plugins/html-editor/icons/iconLink';
+import { iconList } from '@/../plugins/html-editor/icons/iconList';
+import { iconUndo } from '@/../plugins/html-editor/icons/iconUndo';
+import { iconRepeat } from '@/../plugins/html-editor/icons/iconRepeat';
 
 type HtmlToolsButtonCommands =
   | 'Bold'
@@ -16,7 +21,6 @@ export type HtmlToolsButton = {
   icon: string;
   command: HtmlToolsButtonCommands;
   range: boolean;
-  aValueArgument?: string;
 };
 
 export type HtmlToolsOptions = {
@@ -25,21 +29,21 @@ export type HtmlToolsOptions = {
 
 const defaultOptions: Required<HtmlToolsOptions> = {
   buttons: [
-    { icon: 'bold', command: 'Bold', range: true },
-    { icon: 'italic', command: 'Italic', range: true },
-    { icon: 'link', command: 'CreateLink', range: true },
+    { icon: iconBold, command: 'Bold', range: true },
+    { icon: iconItalic, command: 'Italic', range: true },
+    { icon: iconLink, command: 'CreateLink', range: true },
     {
-      icon: 'list-ul',
+      icon: iconList,
       command: 'insertUnorderedList',
       range: true,
     },
     {
-      icon: 'list-ol',
+      icon: iconList,
       command: 'insertOrderedList',
       range: true,
     },
-    { icon: 'undo', command: 'Undo', range: false },
-    { icon: 'repeat', command: 'Redo', range: false },
+    { icon: iconUndo, command: 'Undo', range: false },
+    { icon: iconRepeat, command: 'Redo', range: false },
   ],
 };
 

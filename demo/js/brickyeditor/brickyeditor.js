@@ -185,6 +185,27 @@ var BrickyEditor = (function (exports) {
         }
         return str;
     };
+    var getSelectionRanges = function () {
+        var selection = window.getSelection();
+        if (selection === null || selection.rangeCount === 0) {
+            return null;
+        }
+        var selectionRanges = [];
+        for (var idx = 0; idx < selection.rangeCount; idx++) {
+            selectionRanges.push(selection.getRangeAt(idx));
+        }
+        return selectionRanges;
+    };
+    var restoreSelection = function (selectionRanges) {
+        if (selectionRanges === null || selectionRanges.length === 0) {
+            return;
+        }
+        var selection = window.getSelection();
+        if (selection !== null) {
+            selection.removeAllRanges();
+            selectionRanges.forEach(function (range) { return selection.addRange(range); });
+        }
+    };
     var helpers = {
         createElement: createElement,
         div: div,
@@ -197,6 +218,8 @@ var BrickyEditor = (function (exports) {
         filterNotNull: filterNotNull,
         convertNodeListToArray: convertNodeListToArray,
         msg: msg,
+        getSelectionRanges: getSelectionRanges,
+        restoreSelection: restoreSelection,
     };
 
     var getRequest = function (url) {
@@ -531,62 +554,40 @@ var BrickyEditor = (function (exports) {
         }); });
     };
 
-    var getSelectionRanges = function () {
-        var selection = window.getSelection();
-        if (selection === null) {
-            return null;
-        }
-        var selectionRanges = [];
-        for (var idx = 0; idx < selection.rangeCount; idx++) {
-            selectionRanges.push(selection.getRangeAt(idx));
-        }
-        return selectionRanges;
-    };
-    var restoreSelection = function (selectionRanges) {
-        if (selectionRanges === null || selectionRanges.length === 0) {
-            return;
-        }
-        var selection = window.getSelection();
-        if (selection !== null) {
-            selection.removeAllRanges();
-            selectionRanges.forEach(function (range) { return selection.addRange(range); });
-        }
-    };
-
     var modal = function ($content, ok, cancel) {
-        var selection = getSelectionRanges();
-        var root = helpers.div("bre-modal");
+        var selection = helpers.getSelectionRanges();
+        var root = helpers.div('bre-modal');
         var close = function () {
             root.remove();
-            restoreSelection(selection);
+            helpers.restoreSelection(selection);
         };
         var $ok = helpers.el({
-            tag: "button",
+            tag: 'button',
             props: {
-                type: "button",
+                type: 'button',
                 onclick: function () {
                     if (ok) {
                         ok();
                     }
                     close();
                 },
-                innerHTML: "Ok"
-            }
+                innerHTML: 'Ok',
+            },
         });
         var $cancel = helpers.el({
-            tag: "button",
+            tag: 'button',
             props: {
-                type: "button",
+                type: 'button',
                 onclick: function () {
                     if (cancel) {
                         cancel();
                     }
                     close();
                 },
-                innerHTML: "Cancel"
-            }
+                innerHTML: 'Cancel',
+            },
         });
-        var $placeholder = helpers.div("bre-modal-placeholder");
+        var $placeholder = helpers.div('bre-modal-placeholder');
         $placeholder.append($content, $ok, $cancel);
         root.append($placeholder);
         document.body.appendChild(root);
@@ -686,7 +687,7 @@ var BrickyEditor = (function (exports) {
         return $root;
     };
 
-    var iconEmbed = "<svg viewBox=\"0 0 512 512\">\n  <path d=\"M160 368L32 256l128-112M352 368l128-112-128-112M304 96l-96 320\"/>\n</svg>";
+    var iconEmbed = "\n<svg viewBox=\"0 0 24 24\">\n  <rect width=\"20\" height=\"20\" x=\"2\" y=\"2\" rx=\"2.18\" ry=\"2.18\"/>\n  <path d=\"M7 2v20M17 2v20M2 12h20M2 7h5M2 17h5M17 17h5M17 7h5\"/>\n</svg>";
 
     var providerScriptsLoaded = {};
     var getEmbedPlaceholder = function () {
@@ -1123,13 +1124,13 @@ var BrickyEditor = (function (exports) {
         };
     };
 
-    var iconDelete = "<svg viewBox=\"0 0 512 512\">\n  <path d=\"M112 112l20 320c.95 18.49 14.4 32 32 32h184c17.67 0 30.87-13.51 32-32l20-320\"/>\n  <path stroke-miterlimit=\"10\" d=\"M80 112h352\"/>\n  <path d=\"M192 112V72h0a23.93 23.93 0 0124-24h80a23.93 23.93 0 0124 24h0v40M256 176v224M184 176l8 224M328 176l-8 224\"/>\n</svg>";
+    var iconDelete = "\n<svg viewBox=\"0 0 24 24\">\n  <path d=\"M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2M10 11v6M14 11v6\"/>\n</svg>";
 
-    var iconCopy = "<svg viewBox=\"0 0 512 512\">\n  <rect width=\"336\" height=\"336\" x=\"128\" y=\"128\" rx=\"57\" ry=\"57\"/>\n  <path d=\"M383.5 128l.5-24a56.16 56.16 0 00-56-56H112a64.19 64.19 0 00-64 64v216a56.16 56.16 0 0056 56h24\"/>\n</svg>";
+    var iconCopy = "\n<svg viewBox=\"0 0 24 24\">\n  <rect width=\"13\" height=\"13\" x=\"9\" y=\"9\" rx=\"2\" ry=\"2\"/>\n  <path d=\"M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1\"/>\n</svg>";
 
-    var iconUp = "<svg viewBox=\"0 0 512 512\">\n  <path stroke-width=\"48\" d=\"M112 328l144-144 144 144\"/>\n</svg>";
+    var iconUp = "\n<svg viewBox=\"0 0 24 24\">\n  <path d=\"M18 15l-6-6-6 6\"/>\n</svg>";
 
-    var iconDown = "<svg viewBox=\"0 0 512 512\">\n  <path stroke-width=\"48\" d=\"M112 184l144 144 144-144\"/>\n</svg>";
+    var iconDown = "\n<svg viewBox=\"0 0 24 24\">\n  <path d=\"M6 9l6 6 6-6\"/>\n</svg>";
 
     var defaultButtons = [
         {
@@ -1255,7 +1256,7 @@ var BrickyEditor = (function (exports) {
         return "";
     };
 
-    var iconContainer = "<svg viewBox=\"0 0 512 512\">\n  <rect width=\"80\" height=\"80\" x=\"64\" y=\"64\" rx=\"40\" ry=\"40\"/>\n  <rect width=\"80\" height=\"80\" x=\"216\" y=\"64\" rx=\"40\" ry=\"40\"/>\n  <rect width=\"80\" height=\"80\" x=\"368\" y=\"64\" rx=\"40\" ry=\"40\"/>\n  <rect width=\"80\" height=\"80\" x=\"64\" y=\"216\" rx=\"40\" ry=\"40\"/>\n  <rect width=\"80\" height=\"80\" x=\"216\" y=\"216\" rx=\"40\" ry=\"40\"/>\n  <rect width=\"80\" height=\"80\" x=\"368\" y=\"216\" rx=\"40\" ry=\"40\"/>\n  <rect width=\"80\" height=\"80\" x=\"64\" y=\"368\" rx=\"40\" ry=\"40\"/>\n  <rect width=\"80\" height=\"80\" x=\"216\" y=\"368\" rx=\"40\" ry=\"40\"/>\n  <rect width=\"80\" height=\"80\" x=\"368\" y=\"368\" rx=\"40\" ry=\"40\"/>\n</svg>";
+    var iconContainer = "\n<svg viewBox=\"0 0 24 24\">\n  <path d=\"M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z\"/>\n</svg>";
 
     var getContainerHtml = function (container) {
         var html = container.blocks
