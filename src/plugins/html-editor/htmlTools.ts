@@ -1,12 +1,12 @@
-import { bre } from "@/types/bre";
-import { linkEditor } from "@/fields/linkEditor";
-import { HtmlToolsButton } from "./index";
+import { bre } from '@/types/bre';
+import { linkEditor } from '@/fields/linkEditor';
+import { HtmlToolsButton } from './index';
 
 const promptLinkParamsAsync = (
   modal: bre.EditorModal,
   initialData: Readonly<bre.LinkData>
 ) =>
-  new Promise<bre.LinkData | null>((resolve) => {
+  new Promise<bre.LinkData | null>(resolve => {
     const { $element: $editor, data: updatedData } = linkEditor(initialData);
 
     modal(
@@ -26,9 +26,9 @@ const renderButtonElement = (
   { icon, command, range, aValueArgument }: HtmlToolsButton
 ): HTMLElement => {
   const $btn = helpers.el({
-    tag: "button",
-    className: "bre-button" as BreStyles,
-    innerHTML: `<i class="fa fa-${icon}"></i>`,
+    tag: 'button',
+    className: 'bre-button' as BreStyles,
+    innerHTML: icon,
   });
 
   $btn.onclick = async () => {
@@ -44,7 +44,7 @@ const renderButtonElement = (
       return;
     }
 
-    if (command === "CreateLink") {
+    if (command === 'CreateLink') {
       const selectedLink = getSeletedLink(selection);
       const currentLink =
         selectedLink !== null
@@ -66,14 +66,14 @@ const renderButtonElement = (
         ) {
           if (updatedLink.target) {
             selection.anchorNode.parentElement.setAttribute(
-              "target",
+              'target',
               updatedLink.target
             );
           }
 
           if (updatedLink.title) {
             selection.anchorNode.parentElement.setAttribute(
-              "title",
+              'title',
               updatedLink.title
             );
           }
@@ -81,9 +81,9 @@ const renderButtonElement = (
       }
     } else {
       let valueArgument;
-      if (typeof aValueArgument === "string") {
+      if (typeof aValueArgument === 'string') {
         valueArgument = aValueArgument.replace(
-          "%%SELECTION%%",
+          '%%SELECTION%%',
           selection.toString()
         );
       }
@@ -106,7 +106,7 @@ const getSeletedLink = (selection: Selection) => {
   if (
     selection.anchorNode !== null &&
     selection.anchorNode.parentNode !== null &&
-    selection.anchorNode.parentNode.nodeName.toLowerCase() === "a"
+    selection.anchorNode.parentNode.nodeName.toLowerCase() === 'a'
   ) {
     return selection.anchorNode.parentNode as HTMLLinkElement;
   }
@@ -119,13 +119,13 @@ const renderControl = (
   helpers: bre.EditorHelpers,
   buttons: HtmlToolsButton[]
 ) => {
-  const $panel = helpers.div("bre-plugin-html-editor-root" as BreStyles);
+  const $panel = helpers.div('bre-plugin-html-editor-root' as BreStyles);
 
   buttons
-    .map((btn) => renderButtonElement(modal, helpers, btn))
-    .forEach(($btn) => $panel.appendChild($btn));
+    .map(btn => renderButtonElement(modal, helpers, btn))
+    .forEach($btn => $panel.appendChild($btn));
 
-  const $controlRoot = helpers.div("bre-html-tools" as BreStyles);
+  const $controlRoot = helpers.div('bre-html-tools' as BreStyles);
 
   $controlRoot.appendChild($panel);
   helpers.toggleVisibility($controlRoot, false);
@@ -149,8 +149,8 @@ const wrapSelectionToContainer = (
     const $wrapper = helpers.createElement(
       `<div class="bre-temp-container" contenteditable="true">${$container.innerHTML}</div>`
     );
-    $container.innerHTML = "";
-    $container.removeAttribute("contenteditable");
+    $container.innerHTML = '';
+    $container.removeAttribute('contenteditable');
     $container.appendChild($wrapper);
 
     const range = document.createRange();
@@ -199,14 +199,14 @@ export const bindTextSelection = (
     return;
   }
 
-  $el.addEventListener("mouseup", () => {
+  $el.addEventListener('mouseup', () => {
     setTimeout(() => {
       const rect = getSelectionRect();
       handler(rect);
     }, 0);
   });
 
-  $el.addEventListener("keyup", () => {
+  $el.addEventListener('keyup', () => {
     const rect = getSelectionRect();
     handler(rect);
   });
