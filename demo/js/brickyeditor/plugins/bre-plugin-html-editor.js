@@ -322,7 +322,6 @@ var brePluginHtmlEditor = (function (exports) {
         };
     };
 
-    var _selectionRange = null;
     var promptLinkParamsAsync = function (modal, initialData) {
         return new Promise(function (resolve) {
             var _a = linkEditor(initialData), $editor = _a.$element, updatedData = _a.data;
@@ -393,7 +392,6 @@ var brePluginHtmlEditor = (function (exports) {
             var left = rect.left;
             $control.style.top = top + "px";
             $control.style.left = left + "px";
-            _selectionRange = helpers.getSelectionRanges();
             helpers.toggleVisibility($control, true);
         }
         else {
