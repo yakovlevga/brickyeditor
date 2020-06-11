@@ -2,15 +2,13 @@
   "name": "brickyeditor",
   "description": "WYSIWYG block editor jQuery plugin.",
   "main": "./dist/jquery.brickyeditor.js",
-  "authors": [
-    "George Yakovlev <yakovlev.ga@gmail.com>"
-  ],
+  "authors": ["George Yakovlev <yakovlev.ga@gmail.com>"],
   "license": "MIT",
   "keywords": [
     "wysiwyg",
     "wysiwyg",
     "editor",
-    "longrid",
+    "longread",
     "block",
     "editor",
     "editor",
