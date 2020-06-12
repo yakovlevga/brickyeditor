@@ -1,10 +1,10 @@
-import { html } from "@/fields/html";
-import { embed } from "@/fields/embed";
-import { container } from "@/fields/container";
-import { image } from "@/fields/image";
-import { bre } from "@/types/bre";
-import { helpers, strEqualsInvariant } from "@/helpers";
-import { FIELD_SELECTOR, FIELD_DATA_ATTR } from "@/constants";
+import { html } from '@/fields/html';
+import { embed } from '@/fields/embed';
+import { container } from '@/fields/container';
+import { image } from '@/fields/image';
+import { bre } from '@/types/bre';
+import { helpers, strEqualsInvariant } from '@/helpers';
+import { FIELD_SELECTOR, FIELD_DATA_ATTR } from '@/constants';
 
 let fields: {
   [TKey in string]: FieldFactory;
@@ -12,35 +12,33 @@ let fields: {
   html,
   image,
   embed,
-  container
+  container,
 };
 
 const getFieldFunc = (type: string) => fields[type];
 
-export const registerField = () => {
-  // TODO:
-};
-
-export type CreateFieldProps = {
+type CreateFieldPropsBase = {
   $element: HTMLElement;
   data: bre.field.FieldData;
-} & (
-  | {
-      preview: false;
-      parentBlock: bre.block.Block;
-    }
-  | { preview: true; parentBlock?: undefined }
-);
+};
+type CreateFieldPropsForPreview = { preview: true; parentBlock?: undefined };
+type CreateFieldPropsForBlock = {
+  preview: false;
+  parentBlock: bre.block.Block;
+};
+
+export type CreateFieldProps = CreateFieldPropsBase &
+  (CreateFieldPropsForPreview | CreateFieldPropsForBlock);
 
 export type FieldFactory = (
   props: CreateFieldProps
-) => bre.field.FieldBase | Pick<bre.field.FieldBase, "$element"> | null;
+) => bre.field.FieldBase | Pick<bre.field.FieldBase, '$element'> | null;
 
 export const createField: FieldFactory = props => {
   const { $element, data: initialData } = props;
 
   // take base field props from data-bre-field attribute
-  let data = helpers.parseElementData($element, "breField");
+  let data = helpers.parseElementData($element, 'breField');
 
   if (data === null) {
     return null;
@@ -50,7 +48,7 @@ export const createField: FieldFactory = props => {
   if (initialData !== undefined) {
     data = {
       ...data,
-      ...initialData
+      ...initialData,
     };
   }
 
@@ -70,8 +68,8 @@ export const bindBlockFields = (
   const fields = $fieldElement.map($fieldElement => {
     const field = bindBlockField($fieldElement, block);
     if (field !== null) {
-      field.parentBlock.parentContainer.editor.fire("fieldCreate", {
-        sender: field
+      field.parentBlock.parentContainer.editor.fire('fieldCreate', {
+        sender: field,
       });
     }
     return field;
@@ -89,7 +87,7 @@ export const bindTemplateFields = ($element: HTMLElement) => {
 };
 
 function bindBlockField($element: HTMLElement, parentBlock: bre.block.Block) {
-  let data = helpers.parseElementData($element, "breField");
+  let data = helpers.parseElementData($element, 'breField');
   if (data === null) {
     return null;
   }
@@ -100,12 +98,12 @@ function bindBlockField($element: HTMLElement, parentBlock: bre.block.Block) {
     parentBlock,
     $element,
     preview: false,
-    data
+    data,
   }) as bre.field.FieldBase;
 }
 
 function bindTemplateField($element: HTMLElement) {
-  let data = helpers.parseElementData($element, "breField");
+  let data = helpers.parseElementData($element, 'breField');
 
   if (data === null) {
     return null;
@@ -114,8 +112,8 @@ function bindTemplateField($element: HTMLElement) {
   return createField({
     $element,
     data,
-    preview: true
-  }) as Pick<bre.field.FieldBase, "$element">;
+    preview: true,
+  }) as Pick<bre.field.FieldBase, '$element'>;
 }
 
 function getFieldDataByName(

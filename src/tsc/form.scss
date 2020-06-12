@@ -1,0 +1,84 @@
+@import './editor.scss';
+
+.bre {
+  &-label {
+    display: block;
+    font-weight: bold;
+    font-size: 0.8rem;
+    color: #333333;
+    margin-bottom: 0.3rem;
+  }
+
+  &-input {
+    height: 2rem;
+    display: inline-block;
+    max-width: 100%;
+    width: 100%;
+    background: #fff;
+    font-size: 0.8rem;
+    font-weight: 400;
+    color: #555555;
+    border: 1px solid transparentize($color: $accent, $amount: 0.5);
+    padding: 0 0.8rem;
+    margin-bottom: 0.5rem;
+    transition: all 0.3s ease-in-out;
+
+    &:focus {
+      outline: none;
+      border-color: $accent;
+    }
+
+    &::placeholder {
+      appearance: none;
+      color: transparentize($color: $accent, $amount: 0.5);
+    }
+
+    &[type='file'] {
+      line-height: 200%;
+      padding-left: 0;
+
+      &:focus {
+        border-color: transparent;
+      }
+    }
+  }
+
+  &-btns {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  &-btn {
+    background-color: $accent;
+    border: 1px solid $accent;
+    border-radius: 0.5rem;
+    color: #fff;
+    cursor: pointer;
+    display: inline-block;
+    font-size: 0.8rem;
+    font-weight: 700;
+    height: 2.5rem;
+    letter-spacing: 0.1rem;
+    line-height: 2.5rem;
+    padding: 0 2.5rem;
+    text-align: center;
+    text-decoration: none;
+    text-transform: uppercase;
+    white-space: nowrap;
+
+    &:focus {
+      outline-color: $accent;
+    }
+
+    &-clear {
+      background-color: transparent;
+      border-color: transparent;
+      color: $accent;
+    }
+
+    margin-right: 0.5rem;
+    &:last-of-type {
+      margin-right: 0;
+    }
+  }
+}

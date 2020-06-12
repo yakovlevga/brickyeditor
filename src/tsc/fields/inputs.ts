@@ -1,4 +1,4 @@
-import { helpers } from "@/helpers";
+import { helpers } from '@/helpers';
 
 type InputParams = {
   title?: string;
@@ -7,12 +7,12 @@ type InputParams = {
 
 type InputTypeParams =
   | {
-      type: "text";
+      type: 'text';
       value?: string;
       onUpdate: (value: string) => void;
     }
   | {
-      type: "file";
+      type: 'file';
       value?: string;
       uploadUrl?: string;
       onUpdate: (file: File, content: string) => void;
@@ -27,12 +27,12 @@ const renderLabel = (
 ) => {
   if (title !== undefined) {
     const $label = helpers.el<HTMLLabelElement>({
-      tag: "label",
-      className: "bre-field-editor-label",
+      tag: 'label',
+      className: 'bre-label',
       innerHTML: title,
       props: {
-        onclick: () => $input.focus()
-      }
+        onclick: () => $input.focus(),
+      },
     });
 
     $root.append($label);
@@ -42,27 +42,27 @@ const renderLabel = (
 export const renderInput = (props: InputParamsWithType) => {
   const { type, placeholder } = props;
 
-  const $root = helpers.div("bre-field-editor-prop");
+  const $root = helpers.div('bre-field-editor-prop');
 
   const $input = helpers.el<HTMLInputElement>({
-    tag: "input",
-    className: "bre-field-editor-input",
+    tag: 'input',
+    className: 'bre-input',
     props: {
       type,
-      placeholder: placeholder || ""
-    }
+      placeholder: placeholder || '',
+    },
   });
 
-  if (props.type === "text") {
+  if (props.type === 'text') {
     const updateValue = () => {
       props.onUpdate($input.value);
     };
 
-    $input.value = props.value || "";
+    $input.value = props.value || '';
     $input.onchange = updateValue;
     $input.onkeyup = updateValue;
     $input.onpaste = updateValue;
-  } else if ((props.type = "file")) {
+  } else if ((props.type = 'file')) {
     $input.onchange = async () => {
       const files = $input.files;
       const file = files === null ? null : files[0];
@@ -89,14 +89,14 @@ type InputSelectParams = InputParams & {
 export const renderSelect = (props: InputSelectParams) => {
   const { placeholder, value, options, onUpdate } = props;
 
-  const $root = helpers.div("bre-field-editor-prop");
+  const $root = helpers.div('bre-field-editor-prop');
 
   const $select = helpers.el<HTMLInputElement>({
-    tag: "select",
-    className: "bre-field-editor-input",
+    tag: 'select',
+    className: 'bre-input',
     props: {
-      placeholder: placeholder || ""
-    }
+      placeholder: placeholder || '',
+    },
   });
 
   $select.onchange = () => onUpdate($select.value);
@@ -104,11 +104,11 @@ export const renderSelect = (props: InputSelectParams) => {
   $select.innerHTML = options
     .map(
       x =>
-        `<option value="${x.value}" ${
-          x.value === value ? "selected" : ""
-        }>${x.label || x.value}</option>`
+        `<option value="${x.value}" ${x.value === value ? 'selected' : ''}>${
+          x.label || x.value
+        }</option>`
     )
-    .join("\n");
+    .join('\n');
 
   renderLabel($root, $select, props);
 

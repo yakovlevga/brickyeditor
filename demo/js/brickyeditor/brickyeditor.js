@@ -554,43 +554,60 @@ var BrickyEditor = (function (exports) {
         }); });
     };
 
-    var modal = function ($content, ok, cancel) {
+    var modal = function ($content, okHandler, cancelHandler) {
         var selection = helpers.getSelectionRanges();
-        var root = helpers.div('bre-modal');
+        var $modal = helpers.div('bre-modal');
+        var onLightboxClick = function () { return close(); };
+        var $lightbox = helpers.div('bre-modal-lightbox');
+        $lightbox.addEventListener('click', onLightboxClick);
+        var onEscEvent = function (ev) {
+            if (ev.key === 'Escape' || ev.key === 'Esc' || ev.keyCode === 27) {
+                close();
+            }
+        };
+        document.addEventListener('keydown', onEscEvent);
         var close = function () {
-            root.remove();
+            $modal.remove();
             helpers.restoreSelection(selection);
+            document.removeEventListener('keydown', onEscEvent);
+            $lightbox.removeEventListener('click', onLightboxClick);
         };
         var $ok = helpers.el({
             tag: 'button',
+            className: 'bre-btn',
+            innerHTML: helpers.msg('button.ok'),
             props: {
                 type: 'button',
                 onclick: function () {
-                    if (ok) {
-                        ok();
+                    if (okHandler) {
+                        okHandler();
                     }
                     close();
                 },
-                innerHTML: 'Ok',
             },
         });
         var $cancel = helpers.el({
             tag: 'button',
+            className: ['bre-btn', 'bre-btn-clear'],
+            innerHTML: helpers.msg('button.cancel'),
             props: {
                 type: 'button',
                 onclick: function () {
-                    if (cancel) {
-                        cancel();
+                    if (cancelHandler) {
+                        cancelHandler();
                     }
                     close();
                 },
-                innerHTML: 'Cancel',
             },
         });
-        var $placeholder = helpers.div('bre-modal-placeholder');
-        $placeholder.append($content, $ok, $cancel);
-        root.append($placeholder);
-        document.body.appendChild(root);
+        var $btns = helpers.div('bre-btns');
+        $btns.append($cancel, $ok);
+        var $modalContent = helpers.div('bre-modal-content');
+        $modalContent.append($content);
+        var $modalRoot = helpers.div('bre-modal-root');
+        $modalRoot.append($modalContent, $btns);
+        $modal.append($lightbox, $modalRoot);
+        document.body.appendChild($modal);
     };
 
     var propmtFieldEditorAsync = function (field) {
@@ -613,37 +630,37 @@ var BrickyEditor = (function (exports) {
         var title = _a.title;
         if (title !== undefined) {
             var $label = helpers.el({
-                tag: "label",
-                className: "bre-field-editor-label",
+                tag: 'label',
+                className: 'bre-label',
                 innerHTML: title,
                 props: {
-                    onclick: function () { return $input.focus(); }
-                }
+                    onclick: function () { return $input.focus(); },
+                },
             });
             $root.append($label);
         }
     };
     var renderInput = function (props) {
         var type = props.type, placeholder = props.placeholder;
-        var $root = helpers.div("bre-field-editor-prop");
+        var $root = helpers.div('bre-field-editor-prop');
         var $input = helpers.el({
-            tag: "input",
-            className: "bre-field-editor-input",
+            tag: 'input',
+            className: 'bre-input',
             props: {
                 type: type,
-                placeholder: placeholder || ""
-            }
+                placeholder: placeholder || '',
+            },
         });
-        if (props.type === "text") {
+        if (props.type === 'text') {
             var updateValue = function () {
                 props.onUpdate($input.value);
             };
-            $input.value = props.value || "";
+            $input.value = props.value || '';
             $input.onchange = updateValue;
             $input.onkeyup = updateValue;
             $input.onpaste = updateValue;
         }
-        else if ((props.type = "file")) {
+        else if ((props.type = 'file')) {
             $input.onchange = function () { return __awaiter(void 0, void 0, void 0, function () {
                 var files, file, content;
                 return __generator(this, function (_a) {
@@ -668,20 +685,20 @@ var BrickyEditor = (function (exports) {
     };
     var renderSelect = function (props) {
         var placeholder = props.placeholder, value = props.value, options = props.options, onUpdate = props.onUpdate;
-        var $root = helpers.div("bre-field-editor-prop");
+        var $root = helpers.div('bre-field-editor-prop');
         var $select = helpers.el({
-            tag: "select",
-            className: "bre-field-editor-input",
+            tag: 'select',
+            className: 'bre-input',
             props: {
-                placeholder: placeholder || ""
-            }
+                placeholder: placeholder || '',
+            },
         });
         $select.onchange = function () { return onUpdate($select.value); };
         $select.innerHTML = options
             .map(function (x) {
-            return "<option value=\"" + x.value + "\" " + (x.value === value ? "selected" : "") + ">" + (x.label || x.value) + "</option>";
+            return "<option value=\"" + x.value + "\" " + (x.value === value ? 'selected' : '') + ">" + (x.label || x.value) + "</option>";
         })
-            .join("\n");
+            .join('\n');
         renderLabel($root, $select, props);
         $root.append($select);
         return $root;
@@ -966,12 +983,12 @@ var BrickyEditor = (function (exports) {
         html: html$1,
         image: image,
         embed: embed,
-        container: container
+        container: container,
     };
     var getFieldFunc = function (type) { return fields[type]; };
     var createField = function (props) {
         var $element = props.$element, initialData = props.data;
-        var data = helpers.parseElementData($element, "breField");
+        var data = helpers.parseElementData($element, 'breField');
         if (data === null) {
             return null;
         }
@@ -989,8 +1006,8 @@ var BrickyEditor = (function (exports) {
         var fields = $fieldElement.map(function ($fieldElement) {
             var field = bindBlockField($fieldElement, block);
             if (field !== null) {
-                field.parentBlock.parentContainer.editor.fire("fieldCreate", {
-                    sender: field
+                field.parentBlock.parentContainer.editor.fire('fieldCreate', {
+                    sender: field,
                 });
             }
             return field;
@@ -1005,7 +1022,7 @@ var BrickyEditor = (function (exports) {
         return helpers.filterNotNull(fields);
     };
     function bindBlockField($element, parentBlock) {
-        var data = helpers.parseElementData($element, "breField");
+        var data = helpers.parseElementData($element, 'breField');
         if (data === null) {
             return null;
         }
@@ -1014,18 +1031,18 @@ var BrickyEditor = (function (exports) {
             parentBlock: parentBlock,
             $element: $element,
             preview: false,
-            data: data
+            data: data,
         });
     }
     function bindTemplateField($element) {
-        var data = helpers.parseElementData($element, "breField");
+        var data = helpers.parseElementData($element, 'breField');
         if (data === null) {
             return null;
         }
         return createField({
             $element: $element,
             data: data,
-            preview: true
+            preview: true,
         });
     }
     function getFieldDataByName(block, name) {

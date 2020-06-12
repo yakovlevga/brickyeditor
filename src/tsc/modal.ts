@@ -3,49 +3,71 @@ import { helpers } from '@/helpers';
 
 export const modal: bre.EditorModal = (
   $content: HTMLElement,
-  ok?: () => void,
-  cancel?: () => void
+  okHandler?: () => void,
+  cancelHandler?: () => void
 ) => {
   const selection = helpers.getSelectionRanges();
 
-  const root = helpers.div('bre-modal');
+  const $modal = helpers.div('bre-modal');
+
+  const onLightboxClick = () => close();
+  const $lightbox = helpers.div('bre-modal-lightbox');
+  $lightbox.addEventListener('click', onLightboxClick);
+
+  const onEscEvent = (ev: KeyboardEvent) => {
+    if (ev.key === 'Escape' || ev.key === 'Esc' || ev.keyCode === 27) {
+      close();
+    }
+  };
+  document.addEventListener('keydown', onEscEvent);
 
   const close = () => {
-    root.remove();
+    $modal.remove();
     helpers.restoreSelection(selection);
+    document.removeEventListener('keydown', onEscEvent);
+    $lightbox.removeEventListener('click', onLightboxClick);
   };
 
   const $ok = helpers.el<HTMLButtonElement>({
     tag: 'button',
+    className: 'bre-btn',
+    innerHTML: helpers.msg('button.ok'),
     props: {
       type: 'button',
       onclick: () => {
-        if (ok) {
-          ok();
+        if (okHandler) {
+          okHandler();
         }
         close();
       },
-      innerHTML: 'Ok',
     },
   });
 
   const $cancel = helpers.el<HTMLButtonElement>({
     tag: 'button',
+    className: ['bre-btn', 'bre-btn-clear'],
+    innerHTML: helpers.msg('button.cancel'),
     props: {
       type: 'button',
       onclick: () => {
-        if (cancel) {
-          cancel();
+        if (cancelHandler) {
+          cancelHandler();
         }
         close();
       },
-      innerHTML: 'Cancel',
     },
   });
 
-  const $placeholder = helpers.div('bre-modal-placeholder');
-  $placeholder.append($content, $ok, $cancel);
-  root.append($placeholder);
+  const $btns = helpers.div('bre-btns');
+  $btns.append($cancel, $ok);
 
-  document.body.appendChild(root);
+  const $modalContent = helpers.div('bre-modal-content');
+  $modalContent.append($content);
+
+  const $modalRoot = helpers.div('bre-modal-root');
+  $modalRoot.append($modalContent, $btns);
+
+  $modal.append($lightbox, $modalRoot);
+
+  document.body.appendChild($modal);
 };

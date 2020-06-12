@@ -48,6 +48,7 @@ fromDir('src/tsc', /\.scss$/, (pathname, file) => {
     .filter(n => n.type === 'rule')
     .filter(n => n.selector.indexOf('.') === 0)
     .filter(n => n.selector.indexOf(':') === -1)
+    .filter(n => n.selector.indexOf('[') === -1)
     .map(n => n.selector.split(' ')[0])
     .map(n => `'${n.substr(1)}'`)
     .reduce((unique, item) => {
