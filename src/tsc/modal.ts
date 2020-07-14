@@ -1,11 +1,15 @@
 import { bre } from '@/types/bre';
 import { helpers } from '@/helpers';
 
+const fixBodyClassName: BreStyles = 'bre-modal-fix-body';
+
 export const modal: bre.EditorModal = (
   $content: HTMLElement,
   okHandler?: () => void,
   cancelHandler?: () => void
 ) => {
+  document.body.classList.add(fixBodyClassName);
+
   const selection = helpers.getSelectionRanges();
 
   const $modal = helpers.div('bre-modal');
@@ -22,6 +26,8 @@ export const modal: bre.EditorModal = (
   document.addEventListener('keydown', onEscEvent);
 
   const close = () => {
+    document.body.classList.remove(fixBodyClassName);
+
     $modal.remove();
     helpers.restoreSelection(selection);
     document.removeEventListener('keydown', onEscEvent);

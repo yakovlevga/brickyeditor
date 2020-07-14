@@ -35,6 +35,7 @@ declare type BreStyles =
   | 'bre-modal-root'
   | 'bre-modal-content'
   | 'bre-modal-close'
+  | 'bre-modal-fix-body'
   | 'bre-template-zoom'
   | 'bre-templates-root'
   | 'bre-templates-loader'

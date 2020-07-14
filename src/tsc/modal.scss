@@ -47,5 +47,9 @@
       text-align: right;
       padding: 0.5rem 1.5rem 0 0;
     }
+
+    &-fix-body {
+      overflow: hidden;
+    }
   }
 }

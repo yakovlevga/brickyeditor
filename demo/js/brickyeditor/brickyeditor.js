@@ -554,7 +554,9 @@ var BrickyEditor = (function (exports) {
         }); });
     };
 
+    var fixBodyClassName = 'bre-modal-fix-body';
     var modal = function ($content, okHandler, cancelHandler) {
+        document.body.classList.add(fixBodyClassName);
         var selection = helpers.getSelectionRanges();
         var $modal = helpers.div('bre-modal');
         var onLightboxClick = function () { return close(); };
@@ -567,6 +569,7 @@ var BrickyEditor = (function (exports) {
         };
         document.addEventListener('keydown', onEscEvent);
         var close = function () {
+            document.body.classList.remove(fixBodyClassName);
             $modal.remove();
             helpers.restoreSelection(selection);
             document.removeEventListener('keydown', onEscEvent);

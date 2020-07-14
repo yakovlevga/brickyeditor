@@ -1,7 +1,6 @@
 import typescript from 'rollup-plugin-typescript';
 import browsersync from 'rollup-plugin-browsersync';
 import execute from 'rollup-plugin-execute';
-import sass from 'rollup-plugin-sass';
 import { uglify } from 'rollup-plugin-uglify';
 import postcss from 'rollup-plugin-postcss';
 
@@ -15,6 +14,7 @@ const ts = typescript({
 const getPluginTasks = (name, plugin) => [
   {
     input: './src/scripts/empty.js',
+    output: './src/scripts/empty-output.js',
     plugins: [
       execute(
         `node-sass ./src/plugins/${plugin} -o ./src/plugins/${plugin} --source-map true`
@@ -57,7 +57,7 @@ export default [
       execute('node src/scripts/styles.js'),
       execute('node src/scripts/i18n.js'),
       ts,
-      // uglify({}),
+      //uglify({}),
       browsersync({
         https: true,
         server: {
