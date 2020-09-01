@@ -1,6 +1,6 @@
-import { ContainerField } from "@/fields/container";
-import { helpers } from "@/helpers";
-import { Locale, defaultLocale } from "@/types/locale";
+import { ContainerField } from '@/fields/container';
+import { helpers } from '@/helpers';
+import { Locale } from '@/i18n';
 
 // This types is for mock cases
 declare type Mutable<T> = { -readonly [P in keyof T]: T[P] };
@@ -9,7 +9,7 @@ declare global {
   interface Window {
     BrickyEditor: {
       i18n: {
-        default: defaultLocale;
+        default: string;
         locale: string;
         messages: Record<string, Locale>;
       };
@@ -145,7 +145,7 @@ declare namespace bre {
     type FieldBase = {
       parentBlock: bre.block.Block;
       $element: HTMLElement;
-      data: field.FieldData;
+      data: FieldData;
     };
 
     type Field<TFieldData extends field.FieldData> = FieldBase & {
@@ -206,7 +206,7 @@ declare namespace bre {
       $element: HTMLElement;
       data: BlockData;
       fields?: field.FieldBase[];
-      blockEditor?: BlockEditor;
+      editor?: BlockEditor;
       parentContainer: BlocksContainer;
       selected: boolean;
     };
@@ -214,8 +214,8 @@ declare namespace bre {
     type BlockEditorButton = {
       name: string;
       icon: string;
-      action: (block: bre.block.Block) => void;
-      disabled?: (block: bre.block.Block) => boolean;
+      onClickHandler: (block: bre.block.Block) => void;
+      getIsDisabledForBlock?: (block: bre.block.Block) => boolean;
     };
 
     type BlockEditor = {
@@ -227,10 +227,10 @@ declare namespace bre {
     };
   }
 
-  type LinkData = Partial<Pick<HTMLLinkElement, "href" | "title" | "target">>;
+  type LinkData = Partial<Pick<HTMLLinkElement, 'href' | 'title' | 'target'>>;
 
   namespace field {
-    type FieldType = "html" | "container" | "embed" | "image";
+    type FieldType = 'html' | 'container' | 'embed' | 'image';
 
     type FieldData<TType extends FieldType = any, TData = {}> = {
       type: TType;
@@ -239,7 +239,7 @@ declare namespace bre {
   }
 
   // TODO: or Exclude 'slice'?
-  type FileInfo = Pick<File, "name" | "size" | "type" | "lastModified">;
+  type FileInfo = Pick<File, 'name' | 'size' | 'type' | 'lastModified'>;
 
   type FileContent = {
     fileContent: string;

@@ -1,11 +1,11 @@
-import { defaultLocale } from '@/i18n.default';
+import { defaultLocale, defaultLanguage } from '@/i18n.default';
 
 export const i18n = () => {
   window.BrickyEditor = window.BrickyEditor || {};
   window.BrickyEditor.i18n = window.BrickyEditor.i18n || {};
   window.BrickyEditor.i18n.messages = window.BrickyEditor.i18n.messages || {};
-  window.BrickyEditor.i18n.messages.en = defaultLocale;
-  window.BrickyEditor.i18n.default = 'en';
+  window.BrickyEditor.i18n.default = defaultLanguage;
+  window.BrickyEditor.i18n.messages[defaultLanguage] = defaultLocale;
 };
 
 export const setLocale = (

@@ -1,4 +1,13 @@
+@import '../../node_modules/include-media/dist/_include-media.scss';
+
 $accent: #92819f;
+
+$tools-width: 260px;
+
+$zIndex-base: 100;
+$zIndex-template-selector: $zIndex-base + 1;
+$zIndex-block-editor: $zIndex-base;
+$zIndex-modal: $zIndex-template-selector + 1;
 
 .bre {
   &-editor {

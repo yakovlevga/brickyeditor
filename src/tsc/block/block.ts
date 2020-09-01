@@ -1,8 +1,8 @@
-import { getTemplate } from "@/template";
-import { bre } from "@/types/bre";
-import { showBlockEditor, hideBlockEditor } from "@/block/blockEditor";
-import { bindBlockFields } from "@/fields/fields";
-import { helpers } from "@/helpers";
+import { getTemplate } from '@/template';
+import { bre } from '@/types/bre';
+import { showBlockEditor, hideBlockEditor } from '@/block/blockEditor';
+import { bindBlockFields } from '@/fields/fields';
+import { helpers } from '@/helpers';
 
 export const toggleBlockSelection = (
   block: bre.block.Block,
@@ -10,7 +10,7 @@ export const toggleBlockSelection = (
   active: boolean = false
 ) => {
   block.selected = selected;
-  helpers.toggleClassName(block.$element, "bre-block-selected", selected);
+  helpers.toggleClassName(block.$element, 'bre-block-selected', selected);
 
   if (selected) {
     showBlockEditor(block, active);
@@ -33,20 +33,24 @@ export const createBlockFromTemplate = (
   $template: HTMLElement,
   data: bre.block.BlockData = {
     template: name,
-    fields: []
+    fields: [],
   }
 ): bre.block.Block => {
   const $element = $template.cloneNode(true) as HTMLElement;
-  helpers.toggleClassName($element, "bre-template", false);
-  helpers.toggleClassName($element, "bre-template-zoom", false);
-  helpers.toggleClassName($element, "bre-block", true);
+  helpers.toggleClassName($element, 'bre-template', false);
+  helpers.toggleClassName($element, 'bre-template-zoom', false);
+  helpers.toggleClassName($element, 'bre-block', true);
 
   const block: bre.block.Block = {
     parentContainer,
     $element,
     data,
-    selected: false
+    selected: false,
   };
+
+  $element.addEventListener('click', () => {
+    toggleBlockSelection(block, true, true);
+  });
 
   block.fields = bindBlockFields($element, block);
   // block.fields.forEach(field => {
@@ -62,7 +66,7 @@ export const createBlockFromTemplate = (
 
 // TODO:
 export const getBlockHtml = (block: bre.block.Block, trim: boolean = true) => {
-  return "";
+  return '';
 
   // let $html = this.template.$html.clone(false, false)
   // .wrap('<div></div>')

@@ -1,9 +1,11 @@
+@import './editor.scss';
+
 .bre {
   &-modal {
     position: fixed;
     display: flex;
     align-items: center;
-    z-index: 102;
+    z-index: $zIndex-modal;
     left: 0;
     top: 0;
     width: 100%;

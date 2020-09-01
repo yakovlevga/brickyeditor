@@ -1,13 +1,13 @@
 import {
   createBlockFromData,
   createBlockFromTemplate,
-  getBlockHtml
-} from "@/block/Block";
-import { helpers } from "@/helpers";
-import { bre } from "@/types/bre";
-import { ContainerField } from "@/fields/container";
-import { selectBlock, resetState, selectField } from "@/editorState";
-import { iconContainer } from "@/icons/iconContainer";
+  getBlockHtml,
+} from '@/block/Block';
+import { helpers } from '@/helpers';
+import { bre } from '@/types/bre';
+import { ContainerField } from '@/fields/container';
+import { selectBlock, resetState, selectField } from '@/editorState';
+import { iconContainer } from '@/icons/iconContainer';
 
 export const getContainerData = (container: bre.BlocksContainer) =>
   container.blocks.map(block => block.data);
@@ -16,7 +16,7 @@ export const getContainerHtml = (container: bre.BlocksContainer) => {
   // TODO: fix it
   const html = container.blocks
     .map(block => getBlockHtml(block, true))
-    .join("\n");
+    .join('\n');
   const root: HTMLElement = container.$element.cloneNode(false) as HTMLElement;
   root.innerHTML = html;
   return root.outerHTML;
@@ -24,10 +24,10 @@ export const getContainerHtml = (container: bre.BlocksContainer) => {
 
 const defaultContainerPlaceholder = helpers.div(
   [
-    "bre-field-placeholder",
-    "bre-container-placeholder",
-    "bre-icon",
-    "bre-icon-32"
+    'bre-field-placeholder',
+    'bre-container-placeholder',
+    'bre-icon',
+    'bre-icon-32',
   ],
   iconContainer
 );
@@ -38,7 +38,7 @@ export const getContainerPlaceholder = (preview: boolean) => {
   ) as HTMLElement;
 
   if (preview) {
-    helpers.toggleClassName($placeholder, "bre-container-placeholder", false);
+    helpers.toggleClassName($placeholder, 'bre-container-placeholder', false);
   }
 
   return $placeholder;
@@ -107,7 +107,7 @@ export const addBlockToContainer = (
     selectBlock(block);
   }
 
-  container.editor.fire("blockAdd", { sender: block });
+  container.editor.fire('blockAdd', { sender: block });
 
   return block;
 };
@@ -131,7 +131,7 @@ const createContainer = (
     blocks: [],
     $placeholder: null,
     selectedBlock: null,
-    parentContainerField
+    parentContainerField,
   };
 
   toggleContainersPlaceholder(container);
@@ -170,7 +170,7 @@ export const copyBlock = (block: bre.block.Block) => {
     container,
     {
       idx,
-      blockData: block.data
+      blockData: block.data,
     },
     true
   );

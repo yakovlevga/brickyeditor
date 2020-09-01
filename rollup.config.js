@@ -1,7 +1,7 @@
 import typescript from 'rollup-plugin-typescript';
 import browsersync from 'rollup-plugin-browsersync';
 import execute from 'rollup-plugin-execute';
-import { uglify } from 'rollup-plugin-uglify';
+// import { uglify } from 'rollup-plugin-uglify';
 import postcss from 'rollup-plugin-postcss';
 
 import extensionMapper from 'rollup-plugin-extension-mapper';
@@ -14,7 +14,9 @@ const ts = typescript({
 const getPluginTasks = (name, plugin) => [
   {
     input: './src/scripts/empty.js',
-    output: './src/scripts/empty-output.js',
+    // output: {
+    //   file: './empty-output.js',
+    // },
     plugins: [
       execute(
         `node-sass ./src/plugins/${plugin} -o ./src/plugins/${plugin} --source-map true`
@@ -43,7 +45,7 @@ const getPluginTasks = (name, plugin) => [
 ];
 
 export default [
-  ...getPluginTasks('brePluginHtmlEditor', 'html-editor'),
+  // ...getPluginTasks('brePluginHtmlEditor', 'html-editor'),
 
   {
     input: './src/tsc/editor.ts',
@@ -55,7 +57,7 @@ export default [
     sourceMap: true,
     plugins: [
       execute('node src/scripts/styles.js'),
-      execute('node src/scripts/i18n.js'),
+      // execute('node src/scripts/i18n.js'),
       ts,
       //uglify({}),
       browsersync({
@@ -65,5 +67,9 @@ export default [
         },
       }),
     ],
+    watch: {
+      include: 'src/**/*',
+      exclude: ['src/tsc/i18n.default.ts'],
+    },
   },
 ];

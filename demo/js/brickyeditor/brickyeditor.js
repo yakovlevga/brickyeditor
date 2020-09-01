@@ -2,18 +2,18 @@ var BrickyEditor = (function (exports) {
     'use strict';
 
     /*! *****************************************************************************
-    Copyright (c) Microsoft Corporation. All rights reserved.
-    Licensed under the Apache License, Version 2.0 (the "License"); you may not use
-    this file except in compliance with the License. You may obtain a copy of the
-    License at http://www.apache.org/licenses/LICENSE-2.0
+    Copyright (c) Microsoft Corporation.
 
-    THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-    KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
-    WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
-    MERCHANTABLITY OR NON-INFRINGEMENT.
+    Permission to use, copy, modify, and/or distribute this software for any
+    purpose with or without fee is hereby granted.
 
-    See the Apache Version 2.0 License for specific language governing permissions
-    and limitations under the License.
+    THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
+    REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
+    AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
+    INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
+    LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+    OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+    PERFORMANCE OF THIS SOFTWARE.
     ***************************************************************************** */
 
     var __assign = function() {
@@ -28,10 +28,11 @@ var BrickyEditor = (function (exports) {
     };
 
     function __awaiter(thisArg, _arguments, P, generator) {
+        function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
         return new (P || (P = Promise))(function (resolve, reject) {
             function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
             function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-            function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+            function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
             step((generator = generator.apply(thisArg, _arguments || [])).next());
         });
     }
@@ -1154,95 +1155,102 @@ var BrickyEditor = (function (exports) {
 
     var defaultButtons = [
         {
-            name: "delete",
+            name: 'delete',
             icon: iconDelete,
-            action: function (block) { return deleteBlock(block); }
+            onClickHandler: function (block) { return deleteBlock(block); },
         },
         {
-            name: "clone",
+            name: 'clone',
             icon: iconCopy,
-            action: function (block) { return copyBlock(block); }
+            onClickHandler: function (block) { return copyBlock(block); },
         },
         {
-            name: "up",
+            name: 'up',
             icon: iconUp,
-            action: function (block) { return moveBlock(block, -1); },
-            disabled: function (block) { return block.parentContainer.blocks.indexOf(block) === 0; }
+            onClickHandler: function (block) { return moveBlock(block, -1); },
+            getIsDisabledForBlock: function (block) {
+                return block.parentContainer.blocks.indexOf(block) === 0;
+            },
         },
         {
-            name: "down",
+            name: 'down',
             icon: iconDown,
-            action: function (block) { return moveBlock(block, 1); },
-            disabled: function (block) {
+            onClickHandler: function (block) { return moveBlock(block, 1); },
+            getIsDisabledForBlock: function (block) {
                 return block.parentContainer.blocks.indexOf(block) ===
                     block.parentContainer.blocks.length - 1;
-            }
-        }
+            },
+        },
     ];
     var createEditor = function () {
-        var $element = helpers.div("bre-block-editor");
+        var $element = helpers.div('bre-block-editor');
         var buttons = defaultButtons.map(function (button) {
-            var $btn = helpers.div(["bre-block-editor-button", "bre-icon", "bre-icon-light"], button.icon);
+            var $btn = helpers.div(['bre-block-editor-button', 'bre-icon', 'bre-icon-light'], button.icon);
             $btn.title = name;
             $element.append($btn);
             return {
                 $element: $btn,
-                button: button
+                button: button,
             };
         });
         return {
             $element: $element,
-            buttons: buttons
+            buttons: buttons,
         };
     };
-    var setupBlockEditor = function (block) {
-        if (block.blockEditor === undefined) {
-            block.blockEditor = createEditor();
-            block.blockEditor.buttons.forEach(function (_a) {
+    var getBlockEditor = function (block) {
+        if (block.editor === undefined) {
+            block.editor = createEditor();
+            block.editor.buttons.forEach(function (_a) {
                 var $btn = _a.$element, button = _a.button;
                 $btn.onclick = function (ev) {
                     ev.stopPropagation();
-                    if (button.disabled !== undefined && button.disabled(block)) {
+                    if (button.getIsDisabledForBlock !== undefined &&
+                        button.getIsDisabledForBlock(block)) {
                         return;
                     }
-                    button.action(block);
-                    checkButtonsState(block);
+                    button.onClickHandler(block);
+                    updateEditorButtonsState(block);
                 };
             });
-            block.$element.prepend(block.blockEditor.$element);
+            block.$element.prepend(block.editor.$element);
         }
-        checkButtonsState(block);
-        return block.blockEditor;
+        updateEditorButtonsState(block);
+        return block.editor;
     };
-    var checkButtonsState = function (block) {
-        if (block.blockEditor) {
-            block.blockEditor.buttons.forEach(function (_a) {
-                var $btn = _a.$element, button = _a.button;
-                if (button.disabled !== undefined) {
-                    var disabled = button.disabled(block);
-                    helpers.toggleClassName($btn, "bre-block-editor-button-disabled", disabled);
-                }
-            });
+    var updateEditorButtonsState = function (block) {
+        if (block.editor === undefined) {
+            return;
         }
+        block.editor.buttons
+            .filter(function (_a) {
+            var button = _a.button;
+            return Boolean(button.getIsDisabledForBlock);
+        })
+            .forEach(function (_a) {
+            var $btn = _a.$element, button = _a.button;
+            var isDisabled = button.getIsDisabledForBlock(block);
+            helpers.toggleClassName($btn, 'bre-block-editor-button-disabled', isDisabled);
+        });
     };
     var showBlockEditor = function (block, active) {
-        var editor = setupBlockEditor(block);
+        var editor = getBlockEditor(block);
         helpers.toggleVisibility(editor.$element, true);
-        helpers.toggleClassName(editor.$element, "bre-block-editor-vertical", !active);
+        helpers.toggleClassName(editor.$element, 'bre-block-editor-vertical', !active);
         return editor;
     };
     var hideBlockEditor = function (block) {
-        var editor = block.blockEditor;
+        var editor = block.editor;
         if (editor !== undefined) {
             helpers.toggleVisibility(editor.$element, false);
-            helpers.toggleClassName(editor.$element, "bre-block-editor-vertical", false);
+            helpers.toggleClassName(editor.$element, 'bre-block-editor-vertical', false);
         }
     };
 
     var toggleBlockSelection = function (block, selected, active) {
         if (active === void 0) { active = false; }
         block.selected = selected;
-        helpers.toggleClassName(block.$element, "bre-block-selected", selected);
+        helpers.toggleClassName(block.$element, 'bre-block-selected', selected);
         if (selected) {
             showBlockEditor(block, active);
         }
@@ -1257,23 +1265,26 @@ var BrickyEditor = (function (exports) {
     var createBlockFromTemplate = function (parentContainer, name, $template, data) {
         if (data === void 0) { data = {
             template: name,
-            fields: []
+            fields: [],
         }; }
         var $element = $template.cloneNode(true);
-        helpers.toggleClassName($element, "bre-template", false);
-        helpers.toggleClassName($element, "bre-template-zoom", false);
-        helpers.toggleClassName($element, "bre-block", true);
+        helpers.toggleClassName($element, 'bre-template', false);
+        helpers.toggleClassName($element, 'bre-template-zoom', false);
+        helpers.toggleClassName($element, 'bre-block', true);
         var block = {
             parentContainer: parentContainer,
             $element: $element,
             data: data,
-            selected: false
+            selected: false,
         };
+        $element.addEventListener('click', function () {
+            toggleBlockSelection(block, true, true);
+        });
         block.fields = bindBlockFields($element, block);
         return block;
     };
     var getBlockHtml = function (block, trim) {
-        return "";
+        return '';
     };
 
     var iconContainer = "\n<svg viewBox=\"0 0 24 24\">\n  <path d=\"M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z\"/>\n</svg>";
@@ -1281,21 +1292,21 @@ var BrickyEditor = (function (exports) {
     var getContainerHtml = function (container) {
         var html = container.blocks
             .map(function (block) { return getBlockHtml(); })
-            .join("\n");
+            .join('\n');
         var root = container.$element.cloneNode(false);
         root.innerHTML = html;
         return root.outerHTML;
     };
     var defaultContainerPlaceholder = helpers.div([
-        "bre-field-placeholder",
-        "bre-container-placeholder",
-        "bre-icon",
-        "bre-icon-32"
+        'bre-field-placeholder',
+        'bre-container-placeholder',
+        'bre-icon',
+        'bre-icon-32',
     ], iconContainer);
     var getContainerPlaceholder = function (preview) {
         var $placeholder = defaultContainerPlaceholder.cloneNode(true);
         if (preview) {
-            helpers.toggleClassName($placeholder, "bre-container-placeholder", false);
+            helpers.toggleClassName($placeholder, 'bre-container-placeholder', false);
         }
         return $placeholder;
     };
@@ -1336,7 +1347,7 @@ var BrickyEditor = (function (exports) {
         if (select) {
             selectBlock(block);
         }
-        container.editor.fire("blockAdd", { sender: block });
+        container.editor.fire('blockAdd', { sender: block });
         return block;
     };
     var createRootContainer = function (editor) {
@@ -1356,7 +1367,7 @@ var BrickyEditor = (function (exports) {
             blocks: [],
             $placeholder: null,
             selectedBlock: null,
-            parentContainerField: parentContainerField
+            parentContainerField: parentContainerField,
         };
         toggleContainersPlaceholder(container);
         return container;
@@ -1388,7 +1399,7 @@ var BrickyEditor = (function (exports) {
         var idx = container.blocks.indexOf(block) + 1;
         addBlockToContainer(container, {
             idx: idx,
-            blockData: block.data
+            blockData: block.data,
         }, true);
     };
     var moveBlock = function (block, offset) {
@@ -1525,38 +1536,39 @@ var BrickyEditor = (function (exports) {
         return { fire: fire, on: on, off: off };
     };
 
+    var defaultLanguage = 'en;';
     var defaultLocale = {
-        "embed.link.title": "Link to embed media",
-        "embed.link.placeholder": "Link to instagram, youtube and etc.",
-        "image.link.title": "Image link",
-        "image.link.placeholder": "http://url-to-image.png",
-        "image.upload.title": "or Upload a file",
-        "image.upload.placeholder": "select file",
-        "image.upload.button": "Select file",
-        "image.alt.title": "Alt",
-        "image.alt.placeholder": "Image 'alt' attribute value",
-        "image.url.subtitle": "Link to open on image click",
-        "link.url.title": "Url",
-        "link.url.placeholder": "http://put-your-link.here",
-        "link.title.title": "Title",
-        "link.title.placeholder": "Title attribute for link",
-        "link.target.title": "Target",
-        "button.close": "close",
-        "button.ok": "Ok",
-        "button.cancel": "Cancel",
-        "templates.group.name.default": "Other templates",
-        "error.blocksFileNotFound": "Blocks file not found. Requested file: {url}.",
-        "error.templatesFileNotFound": "Templates file not found. Requested file: {url}.",
-        "error.blockTemplateNotFound": "Template '{templateName}' not found.",
-        "error.templateParsing": "Template parsing error: {name}."
+        'embed.link.title': 'Link to embed media',
+        'embed.link.placeholder': 'Link to instagram, youtube and etc.',
+        'image.link.title': 'Image link',
+        'image.link.placeholder': 'http://url-to-image.png',
+        'image.upload.title': 'or Upload a file',
+        'image.upload.placeholder': 'select file',
+        'image.upload.button': 'Select file',
+        'image.alt.title': 'Alt',
+        'image.alt.placeholder': "Image 'alt' attribute value",
+        'image.url.subtitle': 'Link to open on image click',
+        'link.url.title': 'Url',
+        'link.url.placeholder': 'http://put-your-link.here',
+        'link.title.title': 'Title',
+        'link.title.placeholder': 'Title attribute for link',
+        'link.target.title': 'Target',
+        'button.close': 'close',
+        'button.ok': 'Ok',
+        'button.cancel': 'Cancel',
+        'templates.group.name.default': 'Other templates',
+        'error.blocksFileNotFound': 'Blocks file not found. Requested file: {url}.',
+        'error.templatesFileNotFound': 'Templates file not found. Requested file: {url}.',
+        'error.blockTemplateNotFound': "Template '{templateName}' not found.",
+        'error.templateParsing': 'Template parsing error: {name}.',
     };
 
     var i18n = function () {
         window.BrickyEditor = window.BrickyEditor || {};
         window.BrickyEditor.i18n = window.BrickyEditor.i18n || {};
         window.BrickyEditor.i18n.messages = window.BrickyEditor.i18n.messages || {};
-        window.BrickyEditor.i18n.messages.en = defaultLocale;
-        window.BrickyEditor.i18n.default = 'en';
+        window.BrickyEditor.i18n.default = defaultLanguage;
+        window.BrickyEditor.i18n.messages[defaultLanguage] = defaultLocale;
     };
     var setLocale = function (locale) {
         if (locale === void 0) { locale = window.BrickyEditor.i18n.default; }

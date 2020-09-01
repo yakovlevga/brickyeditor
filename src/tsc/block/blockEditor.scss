@@ -1,13 +1,14 @@
+@import '../editor.scss';
+
 $size: 32px;
 $padding: 4px;
-$zIndex: 100;
 
 .bre-block {
   &-editor {
     display: flex;
     position: absolute;
     top: -($size + 4 * $padding);
-    z-index: $zIndex;
+    z-index: $zIndex-block-editor;
     padding: $padding;
     background-color: rgba(0, 0, 0, 0.8);
     border-radius: 20px;
@@ -47,6 +48,10 @@ $zIndex: 100;
       left: -($size + 4 * $padding);
       flex-direction: column;
       opacity: 0.8;
+    }
+
+    @include media('print') {
+      display: 'none';
     }
   }
 }
