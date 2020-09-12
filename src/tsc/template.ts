@@ -1,17 +1,17 @@
-import { helpers, strEqualsInvariant } from "@/helpers";
-import { getRequest } from "@/httpTransport";
-import { bre } from "@/types/bre";
-import { bindTemplateFields } from "@/fields/fields";
+import { helpers, strEqualsInvariant } from '@/helpers';
+import { getRequest } from '@/httpTransport';
+import { bre } from '@/types/bre';
+import { bindTemplateFields, getFieldFactory } from '@/fields/fields';
 import {
   TEMPLATE_GROUP_SELECTOR,
   TEMPLATE_PREVIEW_SELECTOR,
   TEMPLATE_SELECTOR,
-} from "./constants";
+} from './constants';
 
 let allTemplates: bre.template.Template[] = [];
 
 export const getTemplate = (templateName: string): bre.template.Template => {
-  const template = allTemplates.find((x) =>
+  const template = allTemplates.find(x =>
     strEqualsInvariant(x.name, templateName)
   );
 
@@ -32,7 +32,7 @@ export const loadTemplatesAsync = async (url: string, $editor: HTMLElement) => {
     // TODO: check if we could remove wrapping div
     const $data = helpers.createElement(`<div>${data}</div>`);
 
-    const $style = $data.querySelector("style");
+    const $style = $data.querySelector('style');
     if ($style !== null && $editor.parentElement !== null) {
       $editor.parentElement?.insertBefore($style, $editor);
     }
@@ -41,8 +41,8 @@ export const loadTemplatesAsync = async (url: string, $editor: HTMLElement) => {
       TEMPLATE_GROUP_SELECTOR
     );
 
-    $groups.forEach(($group) => {
-      const name = $group.getAttribute("title");
+    $groups.forEach($group => {
+      const name = $group.getAttribute('title');
       const templates = parseTemplates($group);
       grouppedTemplates.push({ name, templates });
       $group.remove();
@@ -55,8 +55,8 @@ export const loadTemplatesAsync = async (url: string, $editor: HTMLElement) => {
     const ungrouppedTemplates = parseTemplates($data);
     const ungrouppedTemplatesGroupName =
       grouppedTemplates.length > 0
-        ? helpers.msg("templates.group.name.default")
-        : "";
+        ? helpers.msg('templates.group.name.default')
+        : '';
 
     grouppedTemplates.push({
       name: ungrouppedTemplatesGroupName,
@@ -84,7 +84,7 @@ const parseTemplates = ($el: HTMLElement): bre.template.Template[] => {
 const createTemplate = (
   $template: HTMLElement
 ): bre.template.Template | null => {
-  const name = $template.dataset.name || "";
+  const name = $template.dataset.name || '';
 
   let $preview = $template.querySelector<HTMLElement>(
     TEMPLATE_PREVIEW_SELECTOR
@@ -103,3 +103,18 @@ const createTemplate = (
     $preview,
   };
 };
+
+export const setupTemplateFields = ($element: HTMLElement) => {
+  const $fields = findFieldElements($element);
+  const fields = $fields.map($f => bindTemplateField($f));
+  return helpers.filterNotNull(fields);
+};
+
+function bindTemplateField($element: HTMLElement) {
+  const initialData = helpers.parseElementData($element, 'breField');
+  if (initialData === null) {
+    return null;
+  }
+  const fieldFactory = getFieldFactory(initialData.type);
+  return fieldFactory.setupPreview($element, initialData);
+}

@@ -52,7 +52,7 @@ export const createBlockFromTemplate = (
     toggleBlockSelection(block, true, true);
   });
 
-  block.fields = bindBlockFields($element, block);
+  block.fields = bindBlockFields(block);
   // block.fields.forEach(field => {
   //   if (field.on !== undefined) {
   //     field.on("select", () => {

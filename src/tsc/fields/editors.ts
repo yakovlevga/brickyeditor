@@ -1,11 +1,11 @@
-import { bre } from "@/types/bre";
-import { modal } from "@/modal";
+import { bre } from '@/types/bre';
+import { modal } from '@/modal';
 
 export const propmtFieldEditorAsync = <TFieldData extends bre.field.FieldData>(
   field: bre.field.Field<TFieldData>
 ) =>
-  new Promise<TFieldData | null>((resolve) => {
-    const { editor } = field;
+  new Promise<TFieldData | null>(resolve => {
+    const { getEditor: editor } = field;
 
     if (editor === undefined) {
       resolve(null);

@@ -1,15 +1,10 @@
-import {
-  getCleanFieldElement,
-  isValidFieldType,
-  updateFieldData,
-} from "@/fields/field";
-import { helpers } from "@/helpers";
-import { bre } from "@/types/bre";
-import { renderInput } from "@/fields/inputs";
-import { linkEditor } from "@/fields/linkEditor";
-import { propmtFieldEditorAsync } from "@/fields/editors";
-import { FieldFactory } from "@/fields/fields";
-import { selectField } from "@/editorState";
+import { getCleanFieldElement, updateFieldData } from '@/fields/field';
+import { helpers } from '@/helpers';
+import { bre } from '@/types/bre';
+import { renderInput } from '@/fields/inputs';
+import { linkEditor } from '@/fields/linkEditor';
+import { propmtFieldEditorAsync } from '@/fields/editors';
+import { selectField } from '@/editorState';
 
 type ImageFieldPayload = {
   src?: string;
@@ -17,51 +12,45 @@ type ImageFieldPayload = {
   file?: bre.FileContent;
   link?: bre.LinkData;
 };
-type ImageFieldData = bre.field.FieldData<"image", ImageFieldPayload>;
+type ImageFieldData = bre.field.FieldData<'image', ImageFieldPayload>;
 type ImageField = bre.field.Field<ImageFieldData>;
 
-export const image: FieldFactory = (props) => {
-  const { $element, data } = props;
+export const image: bre.field.FieldDescriptor<ImageFieldData> = {
+  makeField: ($element, initialData, parentBlock) => {
+    bind($element, initialData);
 
-  if (!isValidFieldType<ImageFieldData>(data, "image")) {
-    return null;
-  }
-
-  bind($element, data);
-
-  if (props.preview) {
-    return {
+    let field: ImageField = {
       $element,
+      data: initialData,
+      parentBlock: parentBlock,
     };
-  }
 
-  let field: ImageField = {
-    $element,
-    data,
-    html,
-    editor,
-    parentBlock: props.parentBlock,
-  };
+    $element.addEventListener('click', async ev => {
+      ev.stopPropagation();
+      selectField(field);
 
-  $element.addEventListener("click", async (ev) => {
-    ev.stopPropagation();
-    selectField(field);
+      const updatedData = await propmtFieldEditorAsync(field);
+      if (updatedData !== null) {
+        bind(field.$element, updatedData);
+        updateFieldData(field, updatedData);
+      }
+    });
 
-    const updatedData = await propmtFieldEditorAsync(field);
-    if (updatedData !== null) {
-      bind(field.$element, updatedData);
-      updateFieldData(field, updatedData);
-    }
-  });
-
-  return field;
+    return field;
+  },
+  setupPreview: ($element, initialData) => {
+    bind($element, initialData);
+    return $element;
+  },
+  getHtml,
+  getEditor,
 };
 
 function bind($element: HTMLElement, data: ImageFieldData) {
   const src = getSrcOrFile(data);
-  const alt = data.alt || "";
+  const alt = data.alt || '';
 
-  const isImageElement = $element.tagName.toLowerCase() === "img";
+  const isImageElement = $element.tagName.toLowerCase() === 'img';
   if (isImageElement) {
     const image = $element as HTMLImageElement;
     image.src = src;
@@ -73,32 +62,32 @@ function bind($element: HTMLElement, data: ImageFieldData) {
   $element.title = alt;
 }
 
-function editor(field: bre.field.FieldBase) {
+function getEditor(field: bre.field.FieldBase) {
   const initialData: Readonly<ImageFieldData> = field.data;
 
   const data: ImageFieldData = {
     ...initialData,
   };
 
-  const $element = helpers.div("bre-field-editor-root");
+  const $element = helpers.div('bre-field-editor-root');
 
   const $previewImg = helpers.el<HTMLImageElement>({
-    tag: "img",
-    className: "bre-field-editor-preview-img",
+    tag: 'img',
+    className: 'bre-field-editor-preview-img',
     props: {
       src: getSrcOrFile(data),
     },
   });
 
-  const $preview = helpers.div("bre-field-editor-preview");
+  const $preview = helpers.div('bre-field-editor-preview');
   $preview.appendChild($previewImg);
 
   const $src = renderInput({
-    title: helpers.msg("image.link.title"),
-    placeholder: helpers.msg("image.link.placeholder"),
+    title: helpers.msg('image.link.title'),
+    placeholder: helpers.msg('image.link.placeholder'),
     value: data.src,
-    type: "text",
-    onUpdate: (src) => {
+    type: 'text',
+    onUpdate: src => {
       $previewImg.src = src;
       data.src = src;
       data.file = undefined;
@@ -106,10 +95,10 @@ function editor(field: bre.field.FieldBase) {
   });
 
   const $file = renderInput({
-    title: helpers.msg("image.upload.title"),
-    placeholder: helpers.msg("image.upload.title"),
-    type: "file",
-    value: data.file ? data.file.fileContent : "",
+    title: helpers.msg('image.upload.title'),
+    placeholder: helpers.msg('image.upload.title'),
+    type: 'file',
+    value: data.file ? data.file.fileContent : '',
     onUpdate: async (f, fileContent) => {
       $previewImg.src = fileContent;
 
@@ -134,11 +123,11 @@ function editor(field: bre.field.FieldBase) {
   });
 
   const $alt = renderInput({
-    title: helpers.msg("image.alt.title"),
-    placeholder: helpers.msg("image.alt.title"),
+    title: helpers.msg('image.alt.title'),
+    placeholder: helpers.msg('image.alt.title'),
     value: data.alt,
-    type: "text",
-    onUpdate: (v) => (data.alt = $previewImg.alt = v),
+    type: 'text',
+    onUpdate: v => (data.alt = $previewImg.alt = v),
   });
 
   const { $element: $link, data: linkData } = linkEditor(initialData.link);
@@ -152,7 +141,7 @@ function editor(field: bre.field.FieldBase) {
   };
 }
 
-function html(field: ImageField) {
+function getHtml(field: ImageField) {
   const { $element, data } = field;
   const { link } = data;
 
@@ -160,7 +149,7 @@ function html(field: ImageField) {
 
   if (link !== undefined && link.href !== undefined && link.href.length) {
     const $link = helpers.el<HTMLLinkElement>({
-      tag: "a",
+      tag: 'a',
       props: link,
     });
     $link.appendChild($result);
@@ -172,5 +161,5 @@ function html(field: ImageField) {
 }
 
 function getSrcOrFile(data: ImageFieldPayload) {
-  return data.src || (data.file !== undefined ? data.file.fileContent : "");
+  return data.src || (data.file !== undefined ? data.file.fileContent : '');
 }

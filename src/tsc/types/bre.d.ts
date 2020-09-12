@@ -150,10 +150,23 @@ declare namespace bre {
 
     type Field<TFieldData extends field.FieldData> = FieldBase & {
       data: TFieldData;
-      // clean up html element from editors data attributes, etc.
-      html: (field: Field<TFieldData>) => HTMLElement;
-      editor?: (
-        field: FieldBase
+    };
+
+    type FieldDescriptor<
+      TFieldData extends field.FieldData = field.FieldData
+    > = {
+      makeField: (
+        $element: HTMLElement,
+        initialData: TFieldData,
+        parentBlock: block.Block
+      ) => Field<TFieldData>;
+      setupPreview: (
+        $element: HTMLElement,
+        initialData: TFieldData
+      ) => HTMLElement;
+      getHtml: (field: Field<TFieldData>) => HTMLElement;
+      getEditor?: (
+        field: Field<TFieldData>
       ) => {
         $element: HTMLElement;
         data: TFieldData;
