@@ -1,8 +1,8 @@
 import { getTemplate } from '@/template';
 import { bre } from '@/types/bre';
 import { showBlockEditor, hideBlockEditor } from '@/block/blockEditor';
-import { bindBlockFields } from '@/fields/fields';
 import { helpers } from '@/helpers';
+import { setupBlockFields } from '@/block/blockService';
 
 export const toggleBlockSelection = (
   block: bre.block.Block,
@@ -52,7 +52,7 @@ export const createBlockFromTemplate = (
     toggleBlockSelection(block, true, true);
   });
 
-  block.fields = bindBlockFields(block);
+  block.fields = setupBlockFields(block);
   // block.fields.forEach(field => {
   //   if (field.on !== undefined) {
   //     field.on("select", () => {

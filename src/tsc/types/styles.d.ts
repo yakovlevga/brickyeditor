@@ -24,6 +24,7 @@ declare type BreStyles =
   | 'bre-field-editor-preview-img'
   | 'bre-field-editor-prop'
   | 'bre-field-placeholder'
+  | 'bre-truncate'
   | 'bre-editor'
   | 'bre-hidden'
   | 'bre-icon'

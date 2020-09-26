@@ -308,25 +308,25 @@ var BrickyEditor = (function (exports) {
     var TEMPLATE_GROUP_SELECTOR = ".bre-template-group";
     var TEMPLATE_PREVIEW_SELECTOR = ".bre-template-preview";
 
-    var isValidFieldType = function (data, type) { return data.type === type; };
     var updateFieldData = function (field, changes) {
         var data = field.data;
         var props = Object.keys(changes);
         var hasChanges = props.some(function (p) { return data[p] !== changes[p]; });
         if (hasChanges) {
-            field.data = __assign(__assign({}, data), { changes: changes });
+            field.data = __assign(__assign({}, data), changes);
         }
     };
     var toggleFieldSelection = function (field, selected) {
-        helpers.toggleClassName(field.$element, "bre-field-selected", selected);
+        debugger;
+        helpers.toggleClassName(field.$element, 'bre-field-selected', selected);
         if (selected) {
-            field.parentBlock.parentContainer.editor.fire("fieldSelect", {
-                sender: field
+            field.parentBlock.parentContainer.editor.fire('fieldSelect', {
+                sender: field,
             });
         }
         else {
-            field.parentBlock.parentContainer.editor.fire("fieldBlur", {
-                sender: field
+            field.parentBlock.parentContainer.editor.fire('fieldBlur', {
+                sender: field,
             });
         }
     };
@@ -336,51 +336,47 @@ var BrickyEditor = (function (exports) {
         return $el;
     };
 
-    var container = function (props) {
-        var $element = props.$element, data = props.data;
-        if (!isValidFieldType(data, "container")) {
-            return null;
-        }
-        if (props.preview) {
-            $element.append(getContainerPlaceholder(true));
-            return {
-                $element: $element
-            };
-        }
-        $element.addEventListener("click", function (ev) {
-            ev.stopPropagation();
-            selectField(field);
-        });
-        var field = {
-            $element: $element,
-            data: data,
-            html: html,
-            parentBlock: props.parentBlock
-        };
-        var fieldContainer = createFieldContainer(field);
-        field.container = fieldContainer;
-        if (data.blocks && data.blocks.length > 0) {
-            data.blocks.map(function (blockData) {
-                return addBlockToContainer(fieldContainer, {
-                    blockData: blockData
-                }, false);
+    var container = {
+        makeField: function ($element, initialData, parentBlock) {
+            $element.addEventListener('click', function (ev) {
+                ev.stopPropagation();
+                selectField(field);
             });
-        }
-        return field;
+            var field = {
+                $element: $element,
+                data: initialData,
+                parentBlock: parentBlock,
+            };
+            var fieldContainer = createFieldContainer(field);
+            field.container = fieldContainer;
+            if (initialData.blocks && initialData.blocks.length > 0) {
+                initialData.blocks.map(function (blockData) {
+                    return addBlockToContainer(fieldContainer, {
+                        blockData: blockData,
+                    }, false);
+                });
+            }
+            return field;
+        },
+        setupPreview: function ($element) {
+            $element.append(getContainerPlaceholder(true));
+            return $element;
+        },
+        getHtml: getHtml,
     };
     var isContainerField = function (field) {
-        return field.data.type === "container";
+        return field.data.type === 'container';
     };
-    var html = function (field) {
+    function getHtml(field) {
         var container = field.container;
         var html = getContainerHtml(container);
         return helpers.createElement(html);
-    };
+    }
 
     var getInitialState = function () { return ({
         selectedField: null,
         selectedBlocks: [],
-        selectedContainers: []
+        selectedContainers: [],
     }); };
     var selectField = function (selectedField) {
         var state = selectedField.parentBlock.parentContainer.editor.state;
@@ -429,7 +425,7 @@ var BrickyEditor = (function (exports) {
         if (blocks === void 0) { blocks = []; }
         blocks.push(block);
         var parentContainerField = block.parentContainer.parentContainerField;
-        if (parentContainerField !== null) {
+        if (parentContainerField) {
             return getParentBlocks(parentContainerField.parentBlock, blocks);
         }
         return blocks;
@@ -456,56 +452,40 @@ var BrickyEditor = (function (exports) {
         state.selectedContainers = [state.selectedContainers[0]];
     };
 
-    var MaxPreviewLength = 50;
-    var getTextPreview = function ($element) {
-        return $element.innerHTML.length > MaxPreviewLength
-            ? $element.innerHTML.substr(0, MaxPreviewLength) + "..."
-            : $element.innerHTML;
-    };
-    var html$1 = function (props) {
-        var $element = props.$element, data = props.data;
-        if (!isValidFieldType(data, "html")) {
-            return null;
-        }
-        if (props.preview) {
-            $element.innerHTML = getTextPreview($element);
-            return {
-                $element: $element
+    var truncateClassName = 'bre-truncate';
+    var html = {
+        makeField: function ($element, initialData, parentBlock) {
+            bind($element, initialData);
+            var field = {
+                parentBlock: parentBlock,
+                $element: $element,
+                data: initialData,
             };
-        }
-        bind($element, data);
-        var field = {
-            parentBlock: props.parentBlock,
-            $element: $element,
-            data: data,
-            html: getHtml
-        };
-        var updateHtmlProp = function () {
-            var html = $element.innerHTML.trim();
-            if ($element.innerHTML !== html) {
-                var updatedData = {
-                    html: html
-                };
-                updateFieldData(field, updatedData);
-            }
-        };
-        $element.setAttribute("contenteditable", "true");
-        $element.addEventListener("blur", updateHtmlProp);
-        $element.addEventListener("keyup", updateHtmlProp);
-        $element.addEventListener("paste", updateHtmlProp);
-        $element.addEventListener("input", updateHtmlProp);
-        $element.addEventListener("paste", function (ev) {
-            ev.preventDefault();
-            if (ev.clipboardData) {
-                var text = ev.clipboardData.getData("text/plain");
-                document.execCommand("insertHTML", false, text);
-            }
-        });
-        $element.addEventListener("click", function (ev) {
-            ev.stopPropagation();
-            selectField(field);
-        });
-        return field;
+            var updateHtmlProp = function () {
+                var html = $element.innerHTML.trim();
+                updateFieldData(field, { html: html });
+            };
+            $element.setAttribute('contenteditable', 'true');
+            $element.addEventListener('input', updateHtmlProp);
+            $element.addEventListener('paste', function (ev) {
+                ev.preventDefault();
+                if (ev.clipboardData) {
+                    var text = ev.clipboardData.getData('text/plain');
+                    document.execCommand('insertHTML', false, text);
+                    updateHtmlProp();
+                }
+            });
+            $element.addEventListener('click', function (ev) {
+                ev.stopPropagation();
+                selectField(field);
+            });
+            return field;
+        },
+        setupPreview: function ($element) {
+            $element.classList.add(truncateClassName);
+            return $element;
+        },
+        getHtml: getHtml$1,
     };
     function bind($element, _a) {
         var html = _a.html;
@@ -513,9 +493,9 @@ var BrickyEditor = (function (exports) {
             $element.innerHTML = html;
         }
     }
-    function getHtml(field) {
+    function getHtml$1(field) {
         var $copy = getCleanFieldElement(field.$element);
-        $copy.removeAttribute("contenteditable");
+        $copy.removeAttribute('contenteditable');
         return $copy;
     }
 
@@ -616,7 +596,7 @@ var BrickyEditor = (function (exports) {
 
     var propmtFieldEditorAsync = function (field) {
         return new Promise(function (resolve) {
-            var editor = field.editor;
+            var editor = field.getEditor;
             if (editor === undefined) {
                 resolve(null);
                 return;
@@ -712,58 +692,56 @@ var BrickyEditor = (function (exports) {
 
     var providerScriptsLoaded = {};
     var getEmbedPlaceholder = function () {
-        return helpers.div(["bre-field-placeholder", "bre-icon", "bre-icon-32"], iconEmbed + "<span>embed</span>");
+        return helpers.div(['bre-field-placeholder', 'bre-icon', 'bre-icon-32'], iconEmbed + "<span>embed</span>");
     };
-    var embed = function (props) {
-        var $element = props.$element, data = props.data;
-        if (!isValidFieldType(data, "embed")) {
-            return null;
-        }
-        if (props.preview) {
+    var embed = {
+        makeField: function ($element, data, parentBlock) {
+            bind$1($element, data);
+            var field = {
+                $element: $element,
+                data: data,
+                parentBlock: parentBlock,
+            };
+            $element.addEventListener('click', function (ev) { return __awaiter(void 0, void 0, void 0, function () {
+                var updatedData;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            ev.stopPropagation();
+                            selectField(field);
+                            return [4, propmtFieldEditorAsync(field)];
+                        case 1:
+                            updatedData = _a.sent();
+                            if (updatedData !== null) {
+                                bind$1(field.$element, updatedData);
+                                updateFieldData(field, updatedData);
+                            }
+                            return [2];
+                    }
+                });
+            }); });
+            return field;
+        },
+        setupPreview: function ($element) {
             $element.appendChild(getEmbedPlaceholder());
-            return { $element: $element };
-        }
-        bind$1($element, data);
-        var field = {
-            $element: $element,
-            data: data,
-            html: html$2,
-            editor: editor,
-            parentBlock: props.parentBlock,
-        };
-        $element.addEventListener("click", function (ev) { return __awaiter(void 0, void 0, void 0, function () {
-            var updatedData;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        ev.stopPropagation();
-                        selectField(field);
-                        return [4, propmtFieldEditorAsync(field)];
-                    case 1:
-                        updatedData = _a.sent();
-                        if (updatedData !== null) {
-                            bind$1(field.$element, updatedData);
-                            updateFieldData(field, updatedData);
-                        }
-                        return [2];
-                }
-            });
-        }); });
-        return field;
+            return $element;
+        },
+        getHtml: getHtml$2,
+        getEditor: getEditor,
     };
-    function html$2(field) {
+    function getHtml$2(field) {
         return getCleanFieldElement(field.$element);
     }
-    function editor(field) {
+    function getEditor(field) {
         var data = __assign({}, field.data);
-        var $element = helpers.div("bre-field-editor-root");
-        var $preview = helpers.div("bre-field-editor-preview");
+        var $element = helpers.div('bre-field-editor-root');
+        var $preview = helpers.div('bre-field-editor-preview');
         bind$1($preview, data);
         var $url = renderInput({
-            title: helpers.msg("embed.link.title"),
-            placeholder: helpers.msg("embed.link.placeholder"),
-            value: data.url || "",
-            type: "text",
+            title: helpers.msg('embed.link.title'),
+            placeholder: helpers.msg('embed.link.placeholder'),
+            value: data.url || '',
+            type: 'text',
             onUpdate: function (v) {
                 if (data.url != v) {
                     data.url = v;
@@ -792,7 +770,7 @@ var BrickyEditor = (function (exports) {
                     case 1:
                         embed = _b.sent();
                         $embed = helpers.div(undefined, embed.html);
-                        $script = $embed.querySelector("script");
+                        $script = $embed.querySelector('script');
                         if ($script !== null) {
                             $script.remove();
                         }
@@ -849,48 +827,45 @@ var BrickyEditor = (function (exports) {
         };
     };
 
-    var image = function (props) {
-        var $element = props.$element, data = props.data;
-        if (!isValidFieldType(data, "image")) {
-            return null;
-        }
-        bind$2($element, data);
-        if (props.preview) {
-            return {
+    var image = {
+        makeField: function ($element, initialData, parentBlock) {
+            bind$2($element, initialData);
+            var field = {
                 $element: $element,
+                data: initialData,
+                parentBlock: parentBlock,
             };
-        }
-        var field = {
-            $element: $element,
-            data: data,
-            html: html$3,
-            editor: editor$1,
-            parentBlock: props.parentBlock,
-        };
-        $element.addEventListener("click", function (ev) { return __awaiter(void 0, void 0, void 0, function () {
-            var updatedData;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        ev.stopPropagation();
-                        selectField(field);
-                        return [4, propmtFieldEditorAsync(field)];
-                    case 1:
-                        updatedData = _a.sent();
-                        if (updatedData !== null) {
-                            bind$2(field.$element, updatedData);
-                            updateFieldData(field, updatedData);
-                        }
-                        return [2];
-                }
-            });
-        }); });
-        return field;
+            $element.addEventListener('click', function (ev) { return __awaiter(void 0, void 0, void 0, function () {
+                var updatedData;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            ev.stopPropagation();
+                            selectField(field);
+                            return [4, propmtFieldEditorAsync(field)];
+                        case 1:
+                            updatedData = _a.sent();
+                            if (updatedData !== null) {
+                                bind$2(field.$element, updatedData);
+                                updateFieldData(field, updatedData);
+                            }
+                            return [2];
+                    }
+                });
+            }); });
+            return field;
+        },
+        setupPreview: function ($element, initialData) {
+            bind$2($element, initialData);
+            return $element;
+        },
+        getHtml: getHtml$3,
+        getEditor: getEditor$1,
     };
     function bind$2($element, data) {
         var src = getSrcOrFile(data);
-        var alt = data.alt || "";
-        var isImageElement = $element.tagName.toLowerCase() === "img";
+        var alt = data.alt || '';
+        var isImageElement = $element.tagName.toLowerCase() === 'img';
         if (isImageElement) {
             var image_1 = $element;
             image_1.src = src;
@@ -901,25 +876,25 @@ var BrickyEditor = (function (exports) {
         }
         $element.title = alt;
     }
-    function editor$1(field) {
+    function getEditor$1(field) {
         var _this = this;
         var initialData = field.data;
         var data = __assign({}, initialData);
-        var $element = helpers.div("bre-field-editor-root");
+        var $element = helpers.div('bre-field-editor-root');
         var $previewImg = helpers.el({
-            tag: "img",
-            className: "bre-field-editor-preview-img",
+            tag: 'img',
+            className: 'bre-field-editor-preview-img',
             props: {
                 src: getSrcOrFile(data),
             },
         });
-        var $preview = helpers.div("bre-field-editor-preview");
+        var $preview = helpers.div('bre-field-editor-preview');
         $preview.appendChild($previewImg);
         var $src = renderInput({
-            title: helpers.msg("image.link.title"),
-            placeholder: helpers.msg("image.link.placeholder"),
+            title: helpers.msg('image.link.title'),
+            placeholder: helpers.msg('image.link.placeholder'),
             value: data.src,
-            type: "text",
+            type: 'text',
             onUpdate: function (src) {
                 $previewImg.src = src;
                 data.src = src;
@@ -927,10 +902,10 @@ var BrickyEditor = (function (exports) {
             },
         });
         var $file = renderInput({
-            title: helpers.msg("image.upload.title"),
-            placeholder: helpers.msg("image.upload.title"),
-            type: "file",
-            value: data.file ? data.file.fileContent : "",
+            title: helpers.msg('image.upload.title'),
+            placeholder: helpers.msg('image.upload.title'),
+            type: 'file',
+            value: data.file ? data.file.fileContent : '',
             onUpdate: function (f, fileContent) { return __awaiter(_this, void 0, void 0, function () {
                 var fileInfo;
                 return __generator(this, function (_a) {
@@ -951,10 +926,10 @@ var BrickyEditor = (function (exports) {
             }); },
         });
         var $alt = renderInput({
-            title: helpers.msg("image.alt.title"),
-            placeholder: helpers.msg("image.alt.title"),
+            title: helpers.msg('image.alt.title'),
+            placeholder: helpers.msg('image.alt.title'),
             value: data.alt,
-            type: "text",
+            type: 'text',
             onUpdate: function (v) { return (data.alt = $previewImg.alt = v); },
         });
         var _a = linkEditor(initialData.link), $link = _a.$element, linkData = _a.data;
@@ -965,13 +940,13 @@ var BrickyEditor = (function (exports) {
             data: data,
         };
     }
-    function html$3(field) {
+    function getHtml$3(field) {
         var $element = field.$element, data = field.data;
         var link = data.link;
         var $result = getCleanFieldElement($element);
         if (link !== undefined && link.href !== undefined && link.href.length) {
             var $link = helpers.el({
-                tag: "a",
+                tag: 'a',
                 props: link,
             });
             $link.appendChild($result);
@@ -980,35 +955,23 @@ var BrickyEditor = (function (exports) {
         return $result;
     }
     function getSrcOrFile(data) {
-        return data.src || (data.file !== undefined ? data.file.fileContent : "");
+        return data.src || (data.file !== undefined ? data.file.fileContent : '');
     }
 
-    var fields = {
-        html: html$1,
+    var fieldFactories = {
+        html: html,
         image: image,
         embed: embed,
         container: container,
     };
-    var getFieldFunc = function (type) { return fields[type]; };
-    var createField = function (props) {
-        var $element = props.$element, initialData = props.data;
-        var data = helpers.parseElementData($element, 'breField');
-        if (data === null) {
-            return null;
-        }
-        if (initialData !== undefined) {
-            data = __assign(__assign({}, data), initialData);
-        }
-        var field = getFieldFunc(data.type);
-        if (field === undefined) {
-            throw new Error(data.type + " field not found");
-        }
-        return field(props);
+    var getFieldFactory = function (fieldType) {
+        return fieldFactories[fieldType];
     };
-    var bindBlockFields = function ($element, block) {
-        var $fieldElement = findFieldElements($element);
-        var fields = $fieldElement.map(function ($fieldElement) {
-            var field = bindBlockField($fieldElement, block);
+
+    var setupBlockFields = function (block) {
+        var $fields = findFieldElements(block.$element);
+        var fields = $fields.map(function ($f) {
+            var field = bindBlockField($f, block);
             if (field !== null) {
                 field.parentBlock.parentContainer.editor.fire('fieldCreate', {
                     sender: field,
@@ -1018,36 +981,23 @@ var BrickyEditor = (function (exports) {
         });
         return helpers.filterNotNull(fields);
     };
-    var bindTemplateFields = function ($element) {
-        var $fieldElement = findFieldElements($element);
-        var fields = $fieldElement.map(function ($fieldElement) {
-            return bindTemplateField($fieldElement);
-        });
-        return helpers.filterNotNull(fields);
+    var findFieldElements = function ($html) {
+        var nodes = $html.querySelectorAll(FIELD_SELECTOR);
+        var $fields = nodes.length > 0 ? Array.prototype.slice.call(nodes) : [];
+        if ($html.attributes.getNamedItem(FIELD_DATA_ATTR) !== null) {
+            $fields = __spreadArrays($fields, [$html]);
+        }
+        return $fields;
     };
     function bindBlockField($element, parentBlock) {
-        var data = helpers.parseElementData($element, 'breField');
-        if (data === null) {
+        var initialData = helpers.parseElementData($element, 'breField');
+        if (initialData === null) {
             return null;
         }
-        data = getFieldDataByName(parentBlock, data.name) || data;
-        return createField({
-            parentBlock: parentBlock,
-            $element: $element,
-            preview: false,
-            data: data,
-        });
-    }
-    function bindTemplateField($element) {
-        var data = helpers.parseElementData($element, 'breField');
-        if (data === null) {
-            return null;
-        }
-        return createField({
-            $element: $element,
-            data: data,
-            preview: true,
-        });
+        var blockData = getFieldDataByName(parentBlock, initialData.name);
+        var data = blockData !== null ? blockData : initialData;
+        var fieldFactory = getFieldFactory(data.type);
+        return fieldFactory.makeField($element, initialData, parentBlock);
     }
     function getFieldDataByName(block, name) {
         if (!block.data || !block.data.fields) {
@@ -1058,14 +1008,6 @@ var BrickyEditor = (function (exports) {
             return null;
         }
         return field;
-    }
-    function findFieldElements($html) {
-        var nodes = $html.querySelectorAll(FIELD_SELECTOR);
-        var $fields = nodes.length > 0 ? Array.prototype.slice.call(nodes) : [];
-        if ($html.attributes.getNamedItem(FIELD_DATA_ATTR) !== null) {
-            $fields = __spreadArrays($fields, [$html]);
-        }
-        return $fields;
     }
 
     var allTemplates = [];
@@ -1092,13 +1034,13 @@ var BrickyEditor = (function (exports) {
                 case 2:
                     data = _b.sent();
                     $data = helpers.createElement("<div>" + data + "</div>");
-                    $style = $data.querySelector("style");
+                    $style = $data.querySelector('style');
                     if ($style !== null && $editor.parentElement !== null) {
                         (_a = $editor.parentElement) === null || _a === void 0 ? void 0 : _a.insertBefore($style, $editor);
                     }
                     $groups = $data.querySelectorAll(TEMPLATE_GROUP_SELECTOR);
                     $groups.forEach(function ($group) {
-                        var name = $group.getAttribute("title");
+                        var name = $group.getAttribute('title');
                         var templates = parseTemplates($group);
                         grouppedTemplates.push({ name: name, templates: templates });
                         $group.remove();
@@ -1106,8 +1048,8 @@ var BrickyEditor = (function (exports) {
                     });
                     ungrouppedTemplates = parseTemplates($data);
                     ungrouppedTemplatesGroupName = grouppedTemplates.length > 0
-                        ? helpers.msg("templates.group.name.default")
-                        : "";
+                        ? helpers.msg('templates.group.name.default')
+                        : '';
                     grouppedTemplates.push({
                         name: ungrouppedTemplatesGroupName,
                         templates: ungrouppedTemplates,
@@ -1129,14 +1071,14 @@ var BrickyEditor = (function (exports) {
         return helpers.filterNotNull(templates);
     };
     var createTemplate = function ($template) {
-        var name = $template.dataset.name || "";
+        var name = $template.dataset.name || '';
         var $preview = $template.querySelector(TEMPLATE_PREVIEW_SELECTOR);
         if ($preview !== null) {
             $preview.remove();
         }
         else {
             $preview = $template.cloneNode(true);
-            bindTemplateFields($preview);
+            setupTemplateFields($preview);
         }
         return {
             name: name,
@@ -1144,6 +1086,19 @@ var BrickyEditor = (function (exports) {
             $preview: $preview,
         };
     };
+    var setupTemplateFields = function ($element) {
+        var $fields = findFieldElements($element);
+        var fields = $fields.map(function ($f) { return bindTemplateField($f); });
+        return helpers.filterNotNull(fields);
+    };
+    function bindTemplateField($element) {
+        var initialData = helpers.parseElementData($element, 'breField');
+        if (initialData === null) {
+            return null;
+        }
+        var fieldFactory = getFieldFactory(initialData.type);
+        return fieldFactory.setupPreview($element, initialData);
+    }
 
     var iconDelete = "\n<svg viewBox=\"0 0 24 24\">\n  <path d=\"M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2M10 11v6M14 11v6\"/>\n</svg>";
 
@@ -1280,7 +1235,7 @@ var BrickyEditor = (function (exports) {
         $element.addEventListener('click', function () {
             toggleBlockSelection(block, true, true);
         });
-        block.fields = bindBlockFields($element, block);
+        block.fields = setupBlockFields(block);
         return block;
     };
     var getBlockHtml = function (block, trim) {
@@ -1579,11 +1534,11 @@ var BrickyEditor = (function (exports) {
 
     var Editor = (function () {
         function Editor($editor, options) {
-            editor$2($editor, options);
+            editor($editor, options);
         }
         return Editor;
     }());
-    var editor$2 = function ($element, options) {
+    var editor = function ($element, options) {
         return new Promise(function (resolve) { return __awaiter(void 0, void 0, void 0, function () {
             var optionsWithDefaults, eventEmitter, state, editor, rootContainer, templates, templatesUI, blocks;
             return __generator(this, function (_a) {
@@ -1672,7 +1627,7 @@ var BrickyEditor = (function (exports) {
     };
 
     exports.Editor = Editor;
-    exports.editor = editor$2;
+    exports.editor = editor;
 
     return exports;
 

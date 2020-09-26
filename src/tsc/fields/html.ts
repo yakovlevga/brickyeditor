@@ -9,11 +9,7 @@ type HtmlFieldPayload = {
 type HtmlFieldData = bre.field.FieldData<HtmlFieldType, HtmlFieldPayload>;
 type HtmlField = bre.field.Field<HtmlFieldData>;
 
-const MaxPreviewLength = 50;
-const getTextPreview = ($element: HTMLElement) =>
-  $element.innerHTML.length > MaxPreviewLength
-    ? $element.innerHTML.substr(0, MaxPreviewLength) + '...'
-    : $element.innerHTML;
+const truncateClassName: BreStyles = 'bre-truncate';
 
 export const html: bre.field.FieldDescriptor<HtmlFieldData> = {
   makeField: ($element, initialData, parentBlock) => {
@@ -49,7 +45,7 @@ export const html: bre.field.FieldDescriptor<HtmlFieldData> = {
     return field;
   },
   setupPreview: $element => {
-    $element.innerHTML = getTextPreview($element);
+    $element.classList.add(truncateClassName);
     return $element;
   },
   getHtml,

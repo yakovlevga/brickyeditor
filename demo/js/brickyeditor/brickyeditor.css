@@ -135,6 +135,12 @@
   min-height: 100px;
   height: 100%; }
 
+.bre-truncate {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden; }
+
 .bre-editor {
   /* empty */ }
 
@@ -184,9 +190,6 @@
          appearance: none;
     color: rgba(146, 129, 159, 0.5); }
   .bre-input:-ms-input-placeholder {
-    appearance: none;
-    color: rgba(146, 129, 159, 0.5); }
-  .bre-input::-ms-input-placeholder {
     appearance: none;
     color: rgba(146, 129, 159, 0.5); }
   .bre-input::placeholder {
@@ -356,6 +359,8 @@
     margin-bottom: 1rem;
     padding: 0.5rem;
     overflow: hidden; }
+    .bre-templates-group-item p {
+      max-lines: 3; }
 
 @media print {
   .bre-templates-root {
