@@ -27,26 +27,17 @@ export const html: bre.field.FieldDescriptor<HtmlFieldData> = {
 
     const updateHtmlProp = () => {
       const html = $element.innerHTML.trim();
-      if ($element.innerHTML !== html) {
-        const updatedData = {
-          html,
-        };
-        updateFieldData(field, updatedData);
-      }
+      updateFieldData(field, { html });
     };
 
     $element.setAttribute('contenteditable', 'true');
-
-    $element.addEventListener('blur', updateHtmlProp);
-    $element.addEventListener('keyup', updateHtmlProp);
-    $element.addEventListener('paste', updateHtmlProp);
     $element.addEventListener('input', updateHtmlProp);
-
     $element.addEventListener('paste', (ev: ClipboardEvent) => {
       ev.preventDefault();
       if (ev.clipboardData) {
         const text = ev.clipboardData.getData('text/plain');
         document.execCommand('insertHTML', false, text);
+        updateHtmlProp();
       }
     });
 

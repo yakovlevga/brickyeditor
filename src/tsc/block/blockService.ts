@@ -18,7 +18,7 @@ export const setupBlockFields = (block: bre.block.Block) => {
   return helpers.filterNotNull(fields);
 };
 
-function findFieldElements($html: HTMLElement) {
+export const findFieldElements = ($html: HTMLElement) => {
   const nodes = $html.querySelectorAll<HTMLElement>(FIELD_SELECTOR);
   let $fields: HTMLElement[] =
     nodes.length > 0 ? Array.prototype.slice.call(nodes) : [];
@@ -28,7 +28,7 @@ function findFieldElements($html: HTMLElement) {
   }
 
   return $fields;
-}
+};
 
 function bindBlockField($element: HTMLElement, parentBlock: bre.block.Block) {
   const initialData = helpers.parseElementData($element, 'breField');

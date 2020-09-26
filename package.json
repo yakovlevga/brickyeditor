@@ -28,6 +28,11 @@
     "jquery-plugin"
   ],
   "devDependencies": {
+    "@babel/preset-env": "^7.11.5",
+    "@babel/preset-typescript": "^7.10.4",
+    "@testing-library/dom": "^7.24.1",
+    "@testing-library/jest-dom": "^5.11.4",
+    "@testing-library/user-event": "^12.1.4",
     "@types/jest": "^26.0.4",
     "@types/node-sass": "^4.11.1",
     "autoprefixer": "^9.8.5",
@@ -43,7 +48,7 @@
     "gulp-typescript": "^6.0.0-alpha.1",
     "gulp-uglify": "^3.0.2",
     "include-media": "^1.4.9",
-    "jest": "^26.1.0",
+    "jest": "^26.4.2",
     "js-yaml": "^3.14.0",
     "node-sass": "^4.14.1",
     "postcss-selector-parser": "^6.0.2",
@@ -66,14 +71,19 @@
     "uglify-js": "^3.10.0"
   },
   "scripts": {
-    "test": "jest",
+    "test": "jest --watch",
     "start": "rollup -c -w",
     "styles": "node src/scripts/styles.js",
     "i18n": "node src/scripts/i18n.js"
   },
   "babel": {
     "presets": [
-      "es2015"
+      "@babel/preset-env",
+      "@babel/preset-typescript"
     ]
-  }
+  },
+  "browserslist": [
+    "defaults"
+  ],
+  "dependencies": {}
 }

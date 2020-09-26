@@ -1,6 +1,6 @@
-import { bre } from "@/types/bre";
-import { helpers } from "@/helpers";
-import { FIELD_DATA_ATTR } from "@/constants";
+import { bre } from '@/types/bre';
+import { helpers } from '@/helpers';
+import { FIELD_DATA_ATTR } from '@/constants';
 
 export const isValidFieldType = <TResult extends bre.field.FieldData>(
   data: bre.field.FieldData,
@@ -22,7 +22,7 @@ export const updateFieldData = <TData extends bre.field.FieldData>(
   if (hasChanges) {
     field.data = {
       ...data,
-      changes
+      ...changes,
     };
   }
 };
@@ -31,15 +31,16 @@ export const toggleFieldSelection = (
   field: bre.field.FieldBase,
   selected: boolean
 ) => {
-  helpers.toggleClassName(field.$element, "bre-field-selected", selected);
+  debugger;
+  helpers.toggleClassName(field.$element, 'bre-field-selected', selected);
 
   if (selected) {
-    field.parentBlock.parentContainer.editor.fire("fieldSelect", {
-      sender: field
+    field.parentBlock.parentContainer.editor.fire('fieldSelect', {
+      sender: field,
     });
   } else {
-    field.parentBlock.parentContainer.editor.fire("fieldBlur", {
-      sender: field
+    field.parentBlock.parentContainer.editor.fire('fieldBlur', {
+      sender: field,
     });
   }
 };

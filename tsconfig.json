@@ -3,6 +3,7 @@
     "strict": true,
     "target": "es5",
     "module": "amd",
+    "moduleResolution": "node",
     "outFile": "brickyeditor.js",
     "removeComments": true,
     "declaration": false,

@@ -28,7 +28,6 @@ export const image: bre.field.FieldDescriptor<ImageFieldData> = {
     $element.addEventListener('click', async ev => {
       ev.stopPropagation();
       selectField(field);
-
       const updatedData = await propmtFieldEditorAsync(field);
       if (updatedData !== null) {
         bind(field.$element, updatedData);

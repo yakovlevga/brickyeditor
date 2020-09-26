@@ -1,12 +1,12 @@
-import { bre } from "./types/bre";
-import { toggleBlockSelection } from "./block/Block";
-import { toggleFieldSelection } from "./fields/field";
-import { isContainerField } from "./fields/container";
+import { bre } from './types/bre';
+import { toggleBlockSelection } from './block/Block';
+import { toggleFieldSelection } from './fields/field';
+import { isContainerField } from './fields/container';
 
 export const getInitialState = (): bre.EditorState => ({
   selectedField: null,
   selectedBlocks: [],
-  selectedContainers: []
+  selectedContainers: [],
 });
 
 export const selectField = (selectedField: bre.field.FieldBase) => {
@@ -77,7 +77,7 @@ const getParentBlocks = (
   blocks.push(block);
 
   const parentContainerField = block.parentContainer.parentContainerField;
-  if (parentContainerField !== null) {
+  if (parentContainerField) {
     return getParentBlocks(parentContainerField.parentBlock, blocks);
   }
 

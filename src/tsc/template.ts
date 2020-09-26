@@ -1,12 +1,13 @@
 import { helpers, strEqualsInvariant } from '@/helpers';
 import { getRequest } from '@/httpTransport';
 import { bre } from '@/types/bre';
-import { bindTemplateFields, getFieldFactory } from '@/fields/fields';
+import { getFieldFactory } from '@/fields/fields';
 import {
   TEMPLATE_GROUP_SELECTOR,
   TEMPLATE_PREVIEW_SELECTOR,
   TEMPLATE_SELECTOR,
 } from './constants';
+import { findFieldElements } from '@/block/blockService';
 
 let allTemplates: bre.template.Template[] = [];
 
@@ -94,7 +95,7 @@ const createTemplate = (
     $preview.remove();
   } else {
     $preview = $template.cloneNode(true) as HTMLElement;
-    bindTemplateFields($preview);
+    setupTemplateFields($preview);
   }
 
   return {
