@@ -1,6 +1,6 @@
 import { bre } from '@/types/bre';
+import { findFieldElements } from '@/block/Block';
 import { helpers, strEqualsInvariant } from '@/helpers';
-import { FIELD_SELECTOR, FIELD_DATA_ATTR } from '@/constants';
 import { getFieldFactory } from '@/fields/fields';
 
 export const setupBlockFields = (block: bre.block.Block) => {
@@ -16,18 +16,6 @@ export const setupBlockFields = (block: bre.block.Block) => {
   });
 
   return helpers.filterNotNull(fields);
-};
-
-export const findFieldElements = ($html: HTMLElement) => {
-  const nodes = $html.querySelectorAll<HTMLElement>(FIELD_SELECTOR);
-  let $fields: HTMLElement[] =
-    nodes.length > 0 ? Array.prototype.slice.call(nodes) : [];
-
-  if ($html.attributes.getNamedItem(FIELD_DATA_ATTR) !== null) {
-    $fields = [...$fields, $html];
-  }
-
-  return $fields;
 };
 
 function bindBlockField($element: HTMLElement, parentBlock: bre.block.Block) {

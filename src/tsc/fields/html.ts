@@ -1,6 +1,6 @@
 import { getCleanFieldElement, updateFieldData } from '@/fields/field';
 import { bre } from '@/types/bre';
-import { selectField } from '@/editorState';
+import { selectField } from '@/state/editorState';
 
 type HtmlFieldType = 'html';
 type HtmlFieldPayload = {

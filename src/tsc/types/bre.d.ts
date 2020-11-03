@@ -1,4 +1,3 @@
-import { ContainerField } from '@/fields/container';
 import { helpers } from '@/helpers';
 import { Locale } from '@/i18n';
 
@@ -75,7 +74,7 @@ declare namespace bre {
     $placeholder: HTMLElement | null;
     blocks: block.Block[];
     selectedBlock: block.Block | null;
-    parentContainerField: ContainerField | null;
+    parentContainerField: bre.field.container.ContainerField | null;
     // usePlaceholder: boolean;
     // data: () => any;
     // html: () => string;
@@ -172,6 +171,21 @@ declare namespace bre {
         data: TFieldData;
       };
     };
+
+    namespace container {
+      type ContainerFieldType = 'container';
+      type ContainerFieldPayload = {
+        html: string;
+        blocks: bre.block.BlockData[];
+      };
+      type ContainerFieldData = bre.field.FieldData<
+        ContainerFieldType,
+        ContainerFieldPayload
+      >;
+      type ContainerField = bre.field.Field<ContainerFieldData> & {
+        container: bre.BlocksContainer;
+      };
+    }
   }
 
   namespace template {

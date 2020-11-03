@@ -5,7 +5,7 @@ import { fireEvent, waitFor } from '@testing-library/dom';
 import { html } from '@/fields/html';
 import { bre } from '@/types/bre';
 
-import * as editorState from '@/editorState';
+import * as editorState from '@/state/editorState';
 jest.mock('@/editorState');
 const selectFieldMock = (editorState as typeof editorState)
   .selectField as jest.Mock;

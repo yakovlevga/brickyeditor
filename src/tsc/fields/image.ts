@@ -4,7 +4,8 @@ import { bre } from '@/types/bre';
 import { renderInput } from '@/fields/inputs';
 import { linkEditor } from '@/fields/linkEditor';
 import { propmtFieldEditorAsync } from '@/fields/editors';
-import { selectField } from '@/editorState';
+import { selectField } from '@/state/editorState';
+import { fieldFactories } from '@/fields/fields';
 
 type ImageFieldPayload = {
   src?: string;

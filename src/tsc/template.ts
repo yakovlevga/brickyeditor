@@ -7,7 +7,7 @@ import {
   TEMPLATE_PREVIEW_SELECTOR,
   TEMPLATE_SELECTOR,
 } from './constants';
-import { findFieldElements } from '@/block/blockService';
+import { findFieldElements } from '@/block/block';
 
 let allTemplates: bre.template.Template[] = [];
 

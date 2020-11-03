@@ -1,7 +1,7 @@
-import { bre } from './types/bre';
-import { toggleBlockSelection } from './block/Block';
-import { toggleFieldSelection } from './fields/field';
-import { isContainerField } from './fields/container';
+import { bre } from '@/types/bre';
+import { toggleBlockSelection } from '@/block/toggleBlockSelection';
+import { toggleFieldSelection } from '@/fields/toggleFieldSelection';
+import { isContainerField } from '@/fields/helpers';
 
 export const getInitialState = (): bre.EditorState => ({
   selectedField: null,

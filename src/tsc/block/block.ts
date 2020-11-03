@@ -1,67 +1,16 @@
-import { getTemplate } from '@/template';
 import { bre } from '@/types/bre';
-import { showBlockEditor, hideBlockEditor } from '@/block/blockEditor';
-import { helpers } from '@/helpers';
-import { setupBlockFields } from '@/block/blockService';
+import { FIELD_SELECTOR, FIELD_DATA_ATTR } from '@/constants';
 
-export const toggleBlockSelection = (
-  block: bre.block.Block,
-  selected: boolean,
-  active: boolean = false
-) => {
-  block.selected = selected;
-  helpers.toggleClassName(block.$element, 'bre-block-selected', selected);
+export const findFieldElements = ($html: HTMLElement) => {
+  const nodes = $html.querySelectorAll<HTMLElement>(FIELD_SELECTOR);
+  let $fields: HTMLElement[] =
+    nodes.length > 0 ? Array.prototype.slice.call(nodes) : [];
 
-  if (selected) {
-    showBlockEditor(block, active);
-  } else {
-    hideBlockEditor(block);
+  if ($html.attributes.getNamedItem(FIELD_DATA_ATTR) !== null) {
+    $fields = [...$fields, $html];
   }
-};
 
-export const createBlockFromData = (
-  parentContainer: bre.BlocksContainer,
-  blockData: bre.block.BlockData
-): bre.block.Block => {
-  const { name, $template } = getTemplate(blockData.template);
-  return createBlockFromTemplate(parentContainer, name, $template, blockData);
-};
-
-export const createBlockFromTemplate = (
-  parentContainer: bre.BlocksContainer,
-  name: string,
-  $template: HTMLElement,
-  data: bre.block.BlockData = {
-    template: name,
-    fields: [],
-  }
-): bre.block.Block => {
-  const $element = $template.cloneNode(true) as HTMLElement;
-  helpers.toggleClassName($element, 'bre-template', false);
-  helpers.toggleClassName($element, 'bre-template-zoom', false);
-  helpers.toggleClassName($element, 'bre-block', true);
-
-  const block: bre.block.Block = {
-    parentContainer,
-    $element,
-    data,
-    selected: false,
-  };
-
-  $element.addEventListener('click', () => {
-    toggleBlockSelection(block, true, true);
-  });
-
-  block.fields = setupBlockFields(block);
-  // block.fields.forEach(field => {
-  //   if (field.on !== undefined) {
-  //     field.on("select", () => {
-  //       selectField(field);
-  //     });
-  //   }
-  // });
-
-  return block;
+  return $fields;
 };
 
 // TODO:

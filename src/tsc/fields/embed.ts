@@ -10,7 +10,7 @@ import { loadScriptAsync } from '@/httpTransport';
 import { bre } from '@/types/bre';
 import { propmtFieldEditorAsync } from '@/fields/editors';
 import { renderInput } from '@/fields/inputs';
-import { selectField } from '@/editorState';
+import { selectField } from '@/state/editorState';
 import { iconEmbed } from '@/icons/iconEmbed';
 
 const providerScriptsLoaded: {

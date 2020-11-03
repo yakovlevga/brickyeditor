@@ -1,19 +1,18 @@
 import {
   addBlockToContainer,
-  getContainerData,
-  getContainerHtml,
   createRootContainer,
-} from '@/blocksContainer';
+} from '@/blocksContainer/blocksContainer';
 import { defaultOptions } from '@/defaults';
 import { getRequest } from '@/httpTransport';
 import { loadTemplatesAsync } from '@/template';
 import { bre } from '@/types/bre';
 import { getTemplateSelector } from '@/ui/templateSelector';
 import { helpers } from '@/helpers';
-import { getInitialState } from '@/editorState';
+import { getInitialState } from '@/state/editorState';
 import { emitter } from './emitter';
 import { modal } from '@/modal';
 import { setLocale, i18n } from '@/i18n';
+import { initBaseFields } from '@/fields/initBaseFields';
 
 export class Editor {
   constructor($editor: HTMLElement, options: bre.EditorOptions) {
@@ -24,6 +23,7 @@ export class Editor {
 export const editor = ($element: HTMLElement, options?: bre.EditorOptions) =>
   new Promise<bre.Editor>(async resolve => {
     i18n();
+    initBaseFields();
 
     const optionsWithDefaults: bre.EditorOptions = {
       ...(defaultOptions as bre.EditorOptions),

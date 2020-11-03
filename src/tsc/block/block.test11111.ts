@@ -1,4 +1,4 @@
-import { createBlockFromData, createBlockFromTemplate } from '@/block/block';
+import { createBlockFromTemplate } from '@/block/createBlockFromTemplate';
 import * as template from '@/template';
 import { Mutable } from '@/types/bre';
 

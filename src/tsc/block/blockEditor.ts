@@ -4,7 +4,11 @@ import { iconDelete } from '@/icons/iconDelete';
 import { iconCopy } from '@/icons/iconCopy';
 import { iconUp } from '@/icons/iconUp';
 import { iconDown } from '@/icons/iconDown';
-import { deleteBlock, copyBlock, moveBlock } from '@/blocksContainer';
+import {
+  deleteBlock,
+  copyBlock,
+  moveBlock,
+} from '@/blocksContainer/blocksContainer';
 
 const defaultButtons: bre.block.BlockEditorButton[] = [
   {

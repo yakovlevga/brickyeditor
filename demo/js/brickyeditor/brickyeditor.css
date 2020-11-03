@@ -359,8 +359,6 @@
     margin-bottom: 1rem;
     padding: 0.5rem;
     overflow: hidden; }
-    .bre-templates-group-item p {
-      max-lines: 3; }
 
 @media print {
   .bre-templates-root {

@@ -1,26 +1,12 @@
-import {
-  createBlockFromData,
-  createBlockFromTemplate,
-  getBlockHtml,
-} from '@/block/Block';
 import { helpers } from '@/helpers';
 import { bre } from '@/types/bre';
-import { ContainerField } from '@/fields/container';
-import { selectBlock, resetState, selectField } from '@/editorState';
+import { selectBlock, resetState, selectField } from '@/state/editorState';
 import { iconContainer } from '@/icons/iconContainer';
+import { getTemplate } from '@/template';
+import { createBlockFromTemplate } from '@/block/createBlockFromTemplate';
 
 export const getContainerData = (container: bre.BlocksContainer) =>
   container.blocks.map(block => block.data);
-
-export const getContainerHtml = (container: bre.BlocksContainer) => {
-  // TODO: fix it
-  const html = container.blocks
-    .map(block => getBlockHtml(block, true))
-    .join('\n');
-  const root: HTMLElement = container.$element.cloneNode(false) as HTMLElement;
-  root.innerHTML = html;
-  return root.outerHTML;
-};
 
 const defaultContainerPlaceholder = helpers.div(
   [
@@ -66,21 +52,21 @@ type AddBlockToContainerOptions = { idx?: number } & (
 
 export const addBlockToContainer = (
   container: bre.BlocksContainer,
-  options: AddBlockToContainerOptions,
+  { idx, blockData, blockTemplate }: AddBlockToContainerOptions,
   select: boolean
 ) => {
   const { blocks, selectedBlock } = container;
 
-  const block =
-    options.blockData !== undefined
-      ? createBlockFromData(container, options.blockData)
-      : createBlockFromTemplate(
-          container,
-          options.blockTemplate.name,
-          options.blockTemplate.$template
-        );
+  const template =
+    blockData !== undefined ? getTemplate(blockData.template) : blockTemplate;
 
-  let { idx } = options;
+  if (template === undefined) {
+    throw new Error(`Template is undefined`);
+  }
+
+  const { name, $template } = template;
+  const block = createBlockFromTemplate(container, name, $template);
+
   if (idx === undefined) {
     idx =
       selectedBlock !== null
@@ -114,12 +100,13 @@ export const addBlockToContainer = (
 
 export const createRootContainer = (editor: bre.Editor) =>
   createContainer(editor);
-export const createFieldContainer = (field: ContainerField) =>
-  createContainer(field.parentBlock.parentContainer.editor, field);
+export const createFieldContainer = (
+  field: bre.field.container.ContainerField
+) => createContainer(field.parentBlock.parentContainer.editor, field);
 
 const createContainer = (
   editor: bre.Editor,
-  parentContainerField: ContainerField | null = null
+  parentContainerField: bre.field.container.ContainerField | null = null
 ): bre.BlocksContainer => {
   const $element =
     parentContainerField !== null
