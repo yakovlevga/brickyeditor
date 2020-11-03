@@ -1629,6 +1629,8 @@ var BrickyEditor = (function (exports) {
     exports.Editor = Editor;
     exports.editor = editor;
 
+    Object.defineProperty(exports, '__esModule', { value: true });
+
     return exports;
 
 }({}));
