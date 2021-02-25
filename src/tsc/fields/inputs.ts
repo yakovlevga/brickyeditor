@@ -39,13 +39,16 @@ const renderLabel = (
   }
 };
 
-export const renderInput = (props: InputParamsWithType) => {
+export const renderInput = (
+  props: InputParamsWithType,
+  tag: 'input' | 'textarea' = 'input'
+) => {
   const { type, placeholder } = props;
 
   const $root = helpers.div('bre-field-editor-prop');
 
   const $input = helpers.el<HTMLInputElement>({
-    tag: 'input',
+    tag,
     className: 'bre-input',
     props: {
       type,

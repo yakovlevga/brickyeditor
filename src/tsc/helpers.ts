@@ -29,7 +29,14 @@ const el = <THTMLElement extends HTMLElement = HTMLElement>({
   }
 
   if (props !== undefined) {
-    Object.assign(result, props);
+    if (tag === 'textarea') {
+      // const { type, ...restProps } = props;
+      // Object.assign(result, restProps);
+      // TODO
+      Object.assign(result, props);
+    } else {
+      Object.assign(result, props);
+    }
   }
 
   return result;
@@ -184,6 +191,19 @@ export const restoreSelection = (selectionRanges: Range[] | null) => {
   }
 };
 
+export const reInjectScript = ($script: HTMLScriptElement): void => {
+  if ($script.parentNode !== null) {
+    $script.parentNode.removeChild($script);
+  }
+
+  var $reAppended = document.createElement('script');
+  $reAppended.type = $script.type;
+  $reAppended.async = true;
+  $reAppended.src = $script.src;
+  document.head.appendChild($reAppended);
+  // s.parentNode!.insertBefore(po, s);
+};
+
 export const helpers = {
   createElement,
   div,
@@ -198,4 +218,5 @@ export const helpers = {
   msg,
   getSelectionRanges,
   restoreSelection,
+  reInjectScript,
 };

@@ -1,4 +1,4 @@
-import { jsonp } from "@/httpTransport";
+import { jsonp } from '@/httpTransport';
 
 type WindowWithInstgrm = {
   instgrm?: {
@@ -8,7 +8,7 @@ type WindowWithInstgrm = {
   };
 };
 
-type EmbedServiceName = "Instagram";
+type EmbedServiceName = 'Instagram';
 
 export type NoembedResponse = {
   provider_name: EmbedServiceName;
@@ -16,11 +16,11 @@ export type NoembedResponse = {
 };
 
 export const preProcessEmbedUrl = (url: string) =>
-  url.replace("https://www.instagram.com", "http://instagr.am");
+  url.replace('https://www.instagram.com', 'http://instagr.am');
 
 export const postProcessEmbed = (provider: EmbedServiceName) => {
   switch (provider) {
-    case "Instagram":
+    case 'Instagram':
       const { instgrm } = window as WindowWithInstgrm;
       if (instgrm !== undefined) {
         instgrm.Embeds.process();

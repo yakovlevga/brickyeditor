@@ -151,6 +151,11 @@ declare namespace bre {
       data: TFieldData;
     };
 
+    type FieldEditor<TFieldData extends field.FieldData> = {
+      $element: HTMLElement;
+      data: TFieldData;
+    };
+
     type FieldDescriptor<
       TFieldData extends field.FieldData = field.FieldData
     > = {
@@ -257,7 +262,7 @@ declare namespace bre {
   type LinkData = Partial<Pick<HTMLLinkElement, 'href' | 'title' | 'target'>>;
 
   namespace field {
-    type FieldType = 'html' | 'container' | 'embed' | 'image';
+    type FieldType = 'html' | 'container' | 'embed' | 'image' | 'htmlCode';
 
     type FieldData<TType extends FieldType = any, TData = {}> = {
       type: TType;

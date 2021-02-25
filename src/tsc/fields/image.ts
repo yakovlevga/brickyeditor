@@ -5,7 +5,6 @@ import { renderInput } from '@/fields/inputs';
 import { linkEditor } from '@/fields/linkEditor';
 import { propmtFieldEditorAsync } from '@/fields/editors';
 import { selectField } from '@/state/editorState';
-import { fieldFactories } from '@/fields/fields';
 
 type ImageFieldPayload = {
   src?: string;
@@ -29,7 +28,7 @@ export const image: bre.field.FieldDescriptor<ImageFieldData> = {
     $element.addEventListener('click', async ev => {
       ev.stopPropagation();
       selectField(field);
-      const updatedData = await propmtFieldEditorAsync(field);
+      const updatedData = await propmtFieldEditorAsync(field, editor);
       if (updatedData !== null) {
         bind(field.$element, updatedData);
         updateFieldData(field, updatedData);
@@ -43,7 +42,6 @@ export const image: bre.field.FieldDescriptor<ImageFieldData> = {
     return $element;
   },
   getHtml,
-  getEditor,
 };
 
 function bind($element: HTMLElement, data: ImageFieldData) {
@@ -62,7 +60,9 @@ function bind($element: HTMLElement, data: ImageFieldData) {
   $element.title = alt;
 }
 
-function getEditor(field: bre.field.FieldBase) {
+function editor(
+  field: bre.field.FieldBase
+): bre.field.FieldEditor<ImageFieldData> {
   const initialData: Readonly<ImageFieldData> = field.data;
 
   const data: ImageFieldData = {

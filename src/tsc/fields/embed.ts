@@ -43,13 +43,13 @@ export const embed: bre.field.FieldDescriptor<EmbedFieldData> = {
     $element.addEventListener('click', async ev => {
       ev.stopPropagation();
       selectField(field);
-
-      const updatedData = await propmtFieldEditorAsync(field);
+      const updatedData = await propmtFieldEditorAsync(field, editor);
       if (updatedData !== null) {
         bind(field.$element, updatedData);
         updateFieldData(field, updatedData);
       }
     });
+
     return field;
   },
 
@@ -58,14 +58,15 @@ export const embed: bre.field.FieldDescriptor<EmbedFieldData> = {
     return $element;
   },
   getHtml,
-  getEditor,
 };
 
 function getHtml(field: EmbedField) {
   return getCleanFieldElement(field.$element);
 }
 
-function getEditor(field: bre.field.FieldBase) {
+function editor(
+  field: bre.field.FieldBase
+): bre.field.FieldEditor<EmbedFieldData> {
   const data: EmbedFieldData = {
     ...field.data,
   };

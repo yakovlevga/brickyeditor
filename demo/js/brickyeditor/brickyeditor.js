@@ -27,6 +27,18 @@ var BrickyEditor = (function (exports) {
         return __assign.apply(this, arguments);
     };
 
+    function __rest(s, e) {
+        var t = {};
+        for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+            t[p] = s[p];
+        if (s != null && typeof Object.getOwnPropertySymbols === "function")
+            for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+                if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
+                    t[p[i]] = s[p[i]];
+            }
+        return t;
+    }
+
     function __awaiter(thisArg, _arguments, P, generator) {
         function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
         return new (P || (P = Promise))(function (resolve, reject) {
@@ -88,7 +100,13 @@ var BrickyEditor = (function (exports) {
             result.innerHTML = innerHTML;
         }
         if (props !== undefined) {
-            Object.assign(result, props);
+            if (tag === 'textarea') {
+                var type = props.type, restProps = __rest(props, ["type"]);
+                Object.assign(result, restProps);
+            }
+            else {
+                Object.assign(result, props);
+            }
         }
         return result;
     };
@@ -207,6 +225,16 @@ var BrickyEditor = (function (exports) {
             selectionRanges.forEach(function (range) { return selection.addRange(range); });
         }
     };
+    var reInjectScript = function ($script) {
+        if ($script.parentNode !== null) {
+            $script.parentNode.removeChild($script);
+        }
+        var $reAppended = document.createElement('script');
+        $reAppended.type = $script.type;
+        $reAppended.async = true;
+        $reAppended.src = $script.src;
+        document.head.appendChild($reAppended);
+    };
     var helpers = {
         createElement: createElement,
         div: div,
@@ -221,6 +249,7 @@ var BrickyEditor = (function (exports) {
         msg: msg,
         getSelectionRanges: getSelectionRanges,
         restoreSelection: restoreSelection,
+        reInjectScript: reInjectScript,
     };
 
     var iconDelete = "\n<svg viewBox=\"0 0 24 24\">\n  <path d=\"M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2M10 11v6M14 11v6\"/>\n</svg>";
@@ -439,7 +468,7 @@ var BrickyEditor = (function (exports) {
     var getRequest = function (url) {
         return new Promise(function (resolve, reject) {
             var request = new XMLHttpRequest();
-            request.open("GET", url, true);
+            request.open('GET', url, true);
             request.onreadystatechange = function () {
                 if (this.readyState === 4) {
                     if (this.status >= 200 && this.status < 400) {
@@ -468,14 +497,14 @@ var BrickyEditor = (function (exports) {
     };
     var loadScriptAsync = function (url) {
         return new Promise(function (resolve, reject) {
-            var script = document.createElement("script");
+            var script = document.createElement('script');
             var done = false;
             var scriptDocLoadedHandler = function () {
                 var readyState = script.readyState;
                 if (done === false &&
                     (readyState === undefined ||
-                        readyState === "loaded" ||
-                        readyState === "complete")) {
+                        readyState === 'loaded' ||
+                        readyState === 'complete')) {
                     done = true;
                     resolve();
                 }
@@ -487,14 +516,14 @@ var BrickyEditor = (function (exports) {
             if (script.onreadystatechange !== undefined) {
                 script.onreadystatechange = scriptDocLoadedHandler;
             }
-            script.src = url.indexOf("//") === 0 ? "https:" + url : url;
+            script.src = url.indexOf('//') === 0 ? "https:" + url : url;
             document.head.appendChild(script);
         });
     };
     var jsonp = function (url) {
         return new Promise(function (resolve, reject) {
-            var id = "_" + Math.round(10000 * Math.random());
-            var callbackName = "jsonp_callback_" + id;
+            var id = String(Date.now());
+            var callbackName = 'jsonp_callback_' + id;
             window[callbackName] = function (data) {
                 delete window[callbackName];
                 var element = document.getElementById(id);
@@ -503,12 +532,12 @@ var BrickyEditor = (function (exports) {
                 }
                 resolve(data);
             };
-            var src = url + "&callback=" + callbackName;
-            var script = document.createElement("script");
+            var src = url + '&callback=' + callbackName;
+            var script = document.createElement('script');
             script.src = src;
             script.id = id;
-            script.addEventListener("error", reject);
-            (document.getElementsByTagName("head")[0] ||
+            script.addEventListener('error', reject);
+            (document.getElementsByTagName('head')[0] ||
                 document.body ||
                 document.documentElement).appendChild(script);
         });
@@ -1108,11 +1137,12 @@ var BrickyEditor = (function (exports) {
             $root.append($label);
         }
     };
-    var renderInput = function (props) {
+    var renderInput = function (props, tag) {
+        if (tag === void 0) { tag = 'input'; }
         var type = props.type, placeholder = props.placeholder;
         var $root = helpers.div('bre-field-editor-prop');
         var $input = helpers.el({
-            tag: 'input',
+            tag: tag,
             className: 'bre-input',
             props: {
                 type: type,
@@ -1208,13 +1238,8 @@ var BrickyEditor = (function (exports) {
         };
     };
 
-    var propmtFieldEditorAsync = function (field) {
+    var propmtFieldEditorAsync = function (field, editor) {
         return new Promise(function (resolve) {
-            var editor = field.getEditor;
-            if (editor === undefined) {
-                resolve(null);
-                return;
-            }
             var _a = editor(field), $editor = _a.$element, updatedData = _a.data;
             modal($editor, function () {
                 resolve(updatedData);
@@ -1239,7 +1264,7 @@ var BrickyEditor = (function (exports) {
                         case 0:
                             ev.stopPropagation();
                             selectField(field);
-                            return [4, propmtFieldEditorAsync(field)];
+                            return [4, propmtFieldEditorAsync(field, editor)];
                         case 1:
                             updatedData = _a.sent();
                             if (updatedData !== null) {
@@ -1257,7 +1282,6 @@ var BrickyEditor = (function (exports) {
             return $element;
         },
         getHtml: getHtml$1,
-        getEditor: getEditor,
     };
     function bind$1($element, data) {
         var src = getSrcOrFile(data);
@@ -1273,7 +1297,7 @@ var BrickyEditor = (function (exports) {
         }
         $element.title = alt;
     }
-    function getEditor(field) {
+    function editor(field) {
         var _this = this;
         var initialData = field.data;
         var data = __assign({}, initialData);
@@ -1356,11 +1380,11 @@ var BrickyEditor = (function (exports) {
     }
 
     var preProcessEmbedUrl = function (url) {
-        return url.replace("https://www.instagram.com", "http://instagr.am");
+        return url.replace('https://www.instagram.com', 'http://instagr.am');
     };
     var postProcessEmbed = function (provider) {
         switch (provider) {
-            case "Instagram":
+            case 'Instagram':
                 var instgrm = window.instgrm;
                 if (instgrm !== undefined) {
                     instgrm.Embeds.process();
@@ -1412,7 +1436,7 @@ var BrickyEditor = (function (exports) {
                         case 0:
                             ev.stopPropagation();
                             selectField(field);
-                            return [4, propmtFieldEditorAsync(field)];
+                            return [4, propmtFieldEditorAsync(field, editor$1)];
                         case 1:
                             updatedData = _a.sent();
                             if (updatedData !== null) {
@@ -1430,12 +1454,11 @@ var BrickyEditor = (function (exports) {
             return $element;
         },
         getHtml: getHtml$2,
-        getEditor: getEditor$1,
     };
     function getHtml$2(field) {
         return getCleanFieldElement(field.$element);
     }
-    function getEditor$1(field) {
+    function editor$1(field) {
         var data = __assign({}, field.data);
         var $element = helpers.div('bre-field-editor-root');
         var $preview = helpers.div('bre-field-editor-preview');
@@ -1537,20 +1560,108 @@ var BrickyEditor = (function (exports) {
         return helpers.createElement(html);
     }
 
+    var getHtmlCodePlaceholder = function () {
+        return helpers.div(['bre-field-placeholder', 'bre-icon', 'bre-icon-32'], iconEmbed + "<span>html code</span>");
+    };
+    var htmlCode = {
+        makeField: function ($element, data, parentBlock) {
+            bind$3($element, data);
+            var field = {
+                $element: $element,
+                data: data,
+                parentBlock: parentBlock,
+            };
+            $element.addEventListener('click', function (ev) { return __awaiter(void 0, void 0, void 0, function () {
+                var updatedData;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            ev.stopPropagation();
+                            selectField(field);
+                            return [4, propmtFieldEditorAsync(field, editor$2)];
+                        case 1:
+                            updatedData = _a.sent();
+                            if (updatedData !== null) {
+                                bind$3(field.$element, updatedData);
+                                updateFieldData(field, updatedData);
+                            }
+                            return [2];
+                    }
+                });
+            }); });
+            return field;
+        },
+        setupPreview: function ($element) {
+            $element.appendChild(getHtmlCodePlaceholder());
+            return $element;
+        },
+        getHtml: getHtml$4,
+    };
+    function getHtml$4(field) {
+        return getCleanFieldElement(field.$element);
+    }
+    function editor$2(field) {
+        var data = __assign({}, field.data);
+        var $element = helpers.div('bre-field-editor-root');
+        var $preview = helpers.div('bre-field-editor-preview');
+        bind$3($preview, data);
+        var $url = renderInput({
+            title: helpers.msg('embed.link.title'),
+            placeholder: helpers.msg('embed.link.placeholder'),
+            value: data.code || '',
+            type: 'text',
+            onUpdate: function (v) {
+                if (data.code != v) {
+                    data.code = v;
+                    bind$3($preview, data);
+                }
+            },
+        }, 'textarea');
+        $element.append($preview, $url);
+        return {
+            $element: $element,
+            data: data,
+        };
+    }
+    function bind$3($element, _a) {
+        var code = _a.code;
+        return __awaiter(this, void 0, void 0, function () {
+            var $node, $scripts;
+            return __generator(this, function (_b) {
+                if (code === undefined) {
+                    $element.appendChild(getHtmlCodePlaceholder());
+                    return [2];
+                }
+                $node = helpers.div(undefined, code);
+                $scripts = $node.querySelectorAll('script');
+                $scripts.forEach(function ($s) { return $s.remove(); });
+                $element.innerHTML = $node.innerHTML;
+                setTimeout(function () {
+                    $scripts.forEach(function ($s) { return reInjectScript($s); });
+                    if (code.indexOf('instagram') !== -1) {
+                        postProcessEmbed('Instagram');
+                    }
+                }, 100);
+                return [2];
+            });
+        });
+    }
+
     var initBaseFields = function () {
         fieldFactories.html = html;
         fieldFactories.image = image;
         fieldFactories.embed = embed;
+        fieldFactories.htmlCode = htmlCode;
         fieldFactories.container = container;
     };
 
     var Editor = (function () {
         function Editor($editor, options) {
-            editor($editor, options);
+            editor$3($editor, options);
         }
         return Editor;
     }());
-    var editor = function ($element, options) {
+    var editor$3 = function ($element, options) {
         return new Promise(function (resolve) { return __awaiter(void 0, void 0, void 0, function () {
             var optionsWithDefaults, eventEmitter, state, editor, rootContainer, templates, templatesUI, blocks;
             return __generator(this, function (_a) {
@@ -1640,7 +1751,7 @@ var BrickyEditor = (function (exports) {
     };
 
     exports.Editor = Editor;
-    exports.editor = editor;
+    exports.editor = editor$3;
 
     Object.defineProperty(exports, '__esModule', { value: true });
 
